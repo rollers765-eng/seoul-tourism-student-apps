@@ -23,7 +23,7 @@
 @media(max-width:800px){.school-emblem{width:50px;height:50px}.school-name{font-size:16px}.school-name small{font-size:11px}.mast{gap:10px;flex-wrap:wrap;margin-bottom:14px}.hero{grid-template-columns:minmax(0,1fr) 115px;gap:6px;align-items:center}.hero h1{font-size:29px}.hero .eyebrow{font-size:11px;letter-spacing:0}.hero p{font-size:13px;margin-top:10px}.welcome-art{min-height:174px;padding:0;background:radial-gradient(ellipse at 55% 70%,#fbe9b6 0%,#fbe9b6 50%,transparent 51%)}.welcome-art>.school-character{height:148px;width:114px}.welcome-message{top:0;left:-4px;font-size:11px;padding:7px 9px;white-space:nowrap}.welcome-message small{display:none}.side-character{height:130px;float:right;width:96px;margin:0 0 10px 12px}.side-character img{height:130px}.side:after{content:'';display:block;clear:both}.character-note{gap:13px;padding:10px 14px 0;min-height:105px}.character-note>.school-character{width:58px;height:96px}.character-note b{font-size:15px}.character-note p{font-size:12px}.mock-welcome{padding:10px 12px 0;gap:12px}.mock-welcome>.school-character{width:60px;height:108px}.mock-welcome b{font-size:16px}.mock-welcome .small{font-size:12px}.tip-portrait{width:80px;height:135px;margin-left:12px}.nav button{padding:10px 8px}.badge{font-size:10px}.tip-character-card{min-height:220px}}
 @media(max-width:359px){.hero{grid-template-columns:minmax(0,1fr) 88px}.hero h1{font-size:27px}.welcome-art>.school-character{width:88px;height:130px}.welcome-message{font-size:10px;left:-12px}.school-name{font-size:15px}.school-emblem{width:46px;height:46px}}
 @media print{.welcome-art,.character-note,.side-character,.mock-welcome,.tip-portrait{display:none!important}.school-emblem{width:45px;height:45px}}
-.record-options{margin-top:18px;padding:12px 16px;background:#fffaf0;border:1px solid var(--line);border-radius:14px}.record-options .check{align-items:center}.record-options input{width:26px;height:26px}.record-result{border:1px solid #d8ba87;background:#fffaf0;border-radius:16px;padding:18px;margin:18px 0}.record-result audio{min-height:48px}.recording-active{box-shadow:0 0 0 2px #a94721}.record-result .row{margin-bottom:12px}.answer-feedback{margin-top:14px;padding:18px;background:#fff9e9;border:1px solid #dbc18e;border-radius:14px}.answer-feedback h4{font-size:16px;margin:20px 0 8px;color:#80431f}.answer-feedback ul{padding-left:20px;font-size:15px}.answer-feedback li{margin:9px 0}.feedback-frame{font-size:15px;padding:11px 12px;margin:8px 0;background:white;border-radius:9px;border-left:3px solid #e6bd5d}.answer-feedback .hint{margin-top:8px}</style>
+.record-options{margin-top:18px;padding:12px 16px;background:#fffaf0;border:1px solid var(--line);border-radius:14px}.record-options .check{align-items:center}.record-options input{width:26px;height:26px}.record-result{border:1px solid #d8ba87;background:#fffaf0;border-radius:16px;padding:18px;margin:18px 0}.record-result audio{min-height:48px}.recording-active{box-shadow:0 0 0 2px #a94721}.record-result .row{margin-bottom:12px}.answer-feedback{margin-top:14px;padding:18px;background:#fff9e9;border:1px solid #dbc18e;border-radius:14px}.answer-feedback h4{font-size:16px;margin:20px 0 8px;color:#80431f}.answer-feedback ul{padding-left:20px;font-size:15px}.answer-feedback li{margin:9px 0}.feedback-frame{font-size:15px;padding:11px 12px;margin:8px 0;background:white;border-radius:9px;border-left:3px solid #e6bd5d}.answer-feedback .hint{margin-top:8px}.correction-item{background:#fff;border:1px solid #dfc99f;border-radius:12px;padding:14px;margin:12px 0;overflow-wrap:anywhere}.correction-tag{font-size:13px;font-weight:bold;color:#794017;background:#fff1c6;border-radius:6px;padding:4px 8px}.correction-context{font-size:14px;color:#65513f}.correction-choice{display:flex;align-items:center;gap:10px;min-height:48px}.correction-choice input{flex:0 0 22px;width:22px;height:22px}.correction-item select{width:100%;min-height:48px;font-size:16px}.correction-preview{width:100%;margin-top:14px;box-sizing:border-box;background:#fffdf7}.answer-feedback button{min-height:48px}.answer-feedback select{max-width:100%}</style>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="서울관광고등학교 · 서광전공체험">
@@ -90,13 +90,290 @@ function answerFeedback(text){
  if(!/[.!?。！？…][”’"']?$/.test(text.trim()))basic.push('마지막 문장이 완성되었는지 읽어보고, 끝에 마침표를 붙여보세요.');
  if(/[/／]|(?:^|\n)\s*[^\n]{1,30}(?:,| · )/.test(text))basic.push('키워드를 나열한 부분이 있다면 아래 문장 틀을 참고해 누가 무엇을 했는지 직접 적어보세요.');
  const rules=[['싶어요','싶습니다'],['했어요','했습니다'],['배웠어요','배웠습니다'],['좋아해요','좋아합니다'],['할 거예요','하겠습니다'],['할거예요','하겠습니다'],['거 같아요','것 같습니다'],['것 같아요','것 같습니다'],['재밌었어요','재미있었습니다']];
- for(const [from,to] of rules){const escaped=from.replace(/[.*+?^${}()|[\]\\]/g,'\\const CHECKS=');if(new RegExp(escaped+'(?=[.!?。！？…\\s]|$)').test(text))tone.push('“'+from+'” → “'+to+'”: 문맥에 맞으면 면접 말투로 바꿔보세요.');}
+ for(const [from,to] of rules){const escaped=from.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');if(new RegExp(escaped+'(?=[.!?。！？…\\s]|$)').test(text))tone.push('“'+from+'” → “'+to+'”: 문맥에 맞으면 면접 말투로 바꿔보세요.');}
  if(/(?:^|\s)(?:엄청|완전|짱)(?=\s|[.!?]|$)/.test(text))tone.push('강조하는 말보다 무엇이 좋았는지, 어떤 행동을 했는지 구체적으로 표현해보세요.');
  if(!basic.length)basic.push('등록된 기본 규칙에서 눈에 띄는 부분을 찾지 못했어요. 완전한 맞춤법 검사 결과는 아니니 소리 내어 읽어보세요.');
  if(!tone.length)tone.push('등록된 말투에서 바꿀 표현을 찾지 못했어요. 문장 끝을 “~합니다 / ~했습니다”로 일관되게 말했는지 확인해보세요.');
  return {empty:false,basic,tone};
 }
-
+// Reviewed, deliberately bounded candidates. No network or inferred experiences.
+const CORRECTION_RULES=[];
+function addPairs(category,reason,lines){for(const line of lines.trim().split('\n')){const [from,to]=line.split('|');CORRECTION_RULES.push({from,options:to.split('/'),category,reason});}}
+addPairs('맞춤법','자주 혼동하는 표기를 확인해 보세요.',`
+몇일|며칠
+어의없|어이없
+금새|금세
+왠만|웬만
+웬지|왠지
+역활|역할
+설겆이|설거지
+오랫만|오랜만
+어떻해|어떡해
+됬|됐
+되요|돼요
+안되요|안 돼요
+뵈요|봬요
+할께요|할게요
+갈께요|갈게요
+볼께요|볼게요
+할께|할게
+갈께|갈게
+바램입니다|바람입니다
+바램이었습니다|바람이었습니다
+깨닳|깨달
+가르켜 주|가르쳐 주
+가르켜주|가르쳐 주
+가르키는 선생님|가르치는 선생님
+되서|돼서
+됀|된
+돼고|되고
+돼는|되는
+돼면|되면
+됄|될
+않 했|안 했
+않했|안 했
+하지 안았|하지 않았
+않돼|안 돼
+않되|안 되
+할려고|하려고
+갈려고|가려고
+볼려고|보려고
+할려면|하려면
+할려는|하려는
+어떻하면|어떡하면
+어떻하|어떡하
+어떡게|어떻게
+희안|희한
+구지|굳이
+꼼꼼이|꼼꼼히
+곰곰히|곰곰이
+틈틈히|틈틈이
+일일히|일일이
+열심이|열심히
+오뚜기처럼|오뚝이처럼
+짖궂|짓궂
+건들이|건드리
+건들였|건드렸
+맞추법|맞춤법
+맞춤뻡|맞춤법
+잊지 안겠|잊지 않겠
+낳아졌|나아졌
+낳은 결과|나은 결과
+더 낳은|더 나은
+실증이 났|싫증이 났
+싫증나다|싫증 나다
+통채로|통째로
+뒷처리|뒤처리
+뒤쳐지지|뒤처지지
+뒤쳐졌|뒤처졌
+통털어|통틀어
+통털어서|통틀어서
+제작년|재작년
+요세|요새
+예기했|얘기했
+예기를 나|얘기를 나
+애기했|얘기했
+담임쌤|담임 선생님
+담임샘|담임 선생님
+리더쉽|리더십
+파트너쉽|파트너십
+팀웍|팀워크
+컨닝|커닝
+쵸콜릿|초콜릿
+케잌|케이크
+메세지|메시지
+엑세서리|액세서리
+악세사리|액세서리
+로보트|로봇
+화이팅|파이팅
+프리젠테이션|프레젠테이션
+프리젠테이숀|프레젠테이션
+커뮤니케이숀|커뮤니케이션
+후회됬|후회됐
+준비됬|준비됐
+도움됬|도움 됐
+기억됬|기억됐
+이끌 었|이끌었
+배 웠|배웠
+느 꼈|느꼈
+깨달 았|깨달았
+노력 했|노력했
+협력 했|협력했
+참여 했|참여했
+실천 했|실천했
+경험 했|경험했
+해결 했|해결했
+지원 했|지원했
+성장 했|성장했
+생각 했|생각했
+생각 합니다|생각합니다
+노력 하겠습니다|노력하겠습니다
+실천 하겠습니다|실천하겠습니다
+감사 합니다|감사합니다
+`);
+// These entries are stems: only the listed, ordinary inflections may follow.
+const STEM_ENDINGS=/^(?:습니다|었습니다|았습니다|겠습니다|어요|아요|었|았|겠|고|는|은|을|면|며|지만|도록|하게|하다|합니다|했다|다|한|해|하|히|이|기|지|게|서|요|도|을|를|에|의|으로|처럼|$)/;
+addPairs('띄어쓰기','단어와 의존 명사의 띄어쓰기를 확인해 보세요.',`
+갖고있|갖고 있
+가지고있|가지고 있
+하고있|하고 있
+배우고있|배우고 있
+노력하고있|노력하고 있
+준비하고있|준비하고 있
+생각하고있|생각하고 있
+알고있|알고 있
+맡고있|맡고 있
+살고있|살고 있
+관심있|관심 있
+관심없|관심 없
+할수|할 수
+될수|될 수
+갈수|갈 수
+볼수|볼 수
+배울수|배울 수
+도울수|도울 수
+해낼수|해낼 수
+할줄|할 줄
+할것|할 것
+될것|될 것
+한것|한 것
+배운것|배운 것
+느낀것|느낀 것
+할때|할 때
+했을때|했을 때
+어릴때|어릴 때
+힘들때|힘들 때
+그때 부터|그때부터
+그 때부터|그때부터
+입학후|입학 후
+졸업후|졸업 후
+수업후|수업 후
+학교생활중|학교생활 중
+그 중|그중
+그 동안|그동안
+그 다음|그다음
+그 만큼|그만큼
+몇번|몇 번
+두번|두 번
+세번|세 번
+첫번째|첫 번째
+두번째|두 번째
+세번째|세 번째
+네번째|네 번째
+한가지|한 가지
+두가지|두 가지
+여러가지|여러 가지
+할뿐|할 뿐
+한적이|한 적이
+해본적이|해본 적이
+한적은|한 적은
+한적도|한 적도
+저 뿐|저뿐
+친구 뿐|친구뿐
+저 처럼|저처럼
+친구 처럼|친구처럼
+학교 에서|학교에서
+친구 들|친구들
+선생님 께|선생님께
+저 에게|저에게
+할 지|할지
+될 지|될지
+할건지|할 건지
+할거예요|할 거예요
+할거에요|할 거예요
+거에요|거예요
+`);
+addPairs('은어·구어 표현','맞춤법 오류라기보다 말투 제안이에요. 내 뜻에 맞는 표현을 선택하세요.',`
+쌤|선생님
+쌤이|선생님이
+쌤께|선생님께
+쌤한테|선생님께
+쌤에게|선생님께
+쌤을|선생님을
+쌤의|선생님의
+애들이|친구들이/학생들이
+애들을|친구들을/학생들을
+애들과|친구들과/학생들과
+애들한테|친구들에게/학생들에게
+빡셌습니다|힘들었습니다/어려웠습니다
+빡셌어요|힘들었습니다/어려웠습니다
+빡세서|힘들어서/어려워서
+꿀잼이었습니다|매우 재미있었습니다
+꿀잼이었어요|매우 재미있었습니다
+노잼이었습니다|재미를 느끼지 못했습니다
+노잼이었어요|재미를 느끼지 못했습니다
+멘붕이 왔습니다|당황했습니다/혼란스러웠습니다
+멘붕이었어요|당황했습니다/혼란스러웠습니다
+멘붕|당황함/혼란스러움
+현타가 왔습니다|회의감이 들었습니다/허탈했습니다
+킹받았습니다|화가 났습니다/속상했습니다
+킹받았어요|화가 났습니다/속상했습니다
+쩔었습니다|인상 깊었습니다/매우 좋았습니다
+개좋았습니다|매우 좋았습니다
+개힘들었습니다|매우 힘들었습니다
+개힘들었어요|매우 힘들었습니다
+개어려웠어요|매우 어려웠습니다
+개재밌었어요|매우 재미있었습니다
+짱이었습니다|매우 좋았습니다/인상 깊었습니다
+짱이었어요|매우 좋았습니다/인상 깊었습니다
+짱|매우 좋음/최고
+레알|정말
+찐으로|진심으로/정말로
+겁나|매우
+개많이|매우 많이
+솔까|솔직히 말하면
+솔까말|솔직히 말하면
+ㅇㅈ|인정합니다
+ㄹㅇ|정말
+걍|그냥
+글고|그리고
+근데|그런데
+암튼|아무튼
+땜에|때문에
+할라고|하려고
+`);
+addPairs('면접 말투','틀린 문장은 아니에요. 문맥에 맞으면 정중한 면접 말투로 바꿔 보세요.',`
+싶어요|싶습니다
+했어요|했습니다
+배웠어요|배웠습니다
+느꼈어요|느꼈습니다
+깨달았어요|깨달았습니다
+좋아해요|좋아합니다
+생각해요|생각합니다
+노력했어요|노력했습니다
+도왔어요|도왔습니다
+참여했어요|참여했습니다
+있어요|있습니다
+없어요|없습니다
+할 거예요|하겠습니다
+것 같아요|것 같습니다
+거 같아요|것 같습니다
+재밌었어요|재미있었습니다
+좋았어요|좋았습니다
+어려웠어요|어려웠습니다
+힘들었어요|힘들었습니다
+즐거웠어요|즐거웠습니다
+뿌듯했어요|뿌듯했습니다
+됐어요|됐습니다
+해요|합니다
+예요|입니다
+이에요|입니다
+`);
+function findCorrections(text){
+ const found=[];const hangul=/[가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9]/;
+ for(const r of CORRECTION_RULES){if(r.options.length===1&&r.from===r.options[0])continue;let pos=0;
+ while((pos=text.indexOf(r.from,pos))!==-1){const start=pos,end=pos+r.from.length;pos=end;
+ const suffix=text.slice(end);const left=start===0||!hangul.test(text[start-1]);
+ const right=end===text.length||!hangul.test(text[end]);
+ // Speech endings can attach to a stem; slang never matches a fragment of a longer word.
+ const tone=r.category==='면접 말투';const slang=r.category==='은어·구어 표현';
+ if((left||tone)&&(right||(!tone&&!slang&&STEM_ENDINGS.test(suffix)))){const tail=right?'':(suffix.match(/^[가-힣]+/)||[''])[0];found.push({...r,start,end:end+tail.length,original:r.from+tail,options:r.options.map(s=>s+tail)});}
+ }}
+ // Longest candidate wins when two rules overlap; identical repeated words stay separate.
+ found.sort((a,b)=>(b.end-b.start)-(a.end-a.start)||a.start-b.start);
+ const unique=[];for(const r of found)if(!unique.some(x=>r.start<x.end&&x.start<r.end))unique.push(r);
+ return unique.sort((a,b)=>a.start-b.start);
+}
 
 const CHECKS=['질문에서 묻는 내용에 맞게 답했어요.','내 생각이나 결론을 먼저 말했어요.','내가 실제로 한 행동과 경험이 들어 있어요.','배운 점이나 앞으로의 계획이 있어요.','과장 없이 내 말로 자연스럽게 말했어요.'];
 const PRACTICE_CHECKS=['또렷한 목소리로 말했어요.','질문에 맞게 끝까지 답했어요.','정한 시간 안에 마무리했어요.'];
@@ -114,28 +391,49 @@ function save(){updateProgress();try{if(saveBlocked)return;localStorage.setItem(
 let toastHandle;
 function toast(msg){$('toast').textContent=msg;$('toast').hidden=false;clearTimeout(toastHandle);toastHandle=setTimeout(()=>$('toast').hidden=true,3500);}
 function updateProgress(){const n=state.filter(s=>s.answer.trim()).length;$('completion').textContent='작성 '+n+' / 8';$('progress-bar').style.width=(n/8*100)+'%';state.forEach((s,i)=>{const el=$('status-'+i);if(el)el.textContent=s.answer.trim()?'답변 작성됨 · 체크 '+s.checks.filter(Boolean).length+'/5':'아직 작성 전';});}
+const feedbackUndo=new Map();
 function showAnswerFeedback(i){
  const box=$('feedback-'+i);box.hidden=false;box.replaceChildren();
- const add=(tag,text,cls)=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;box.appendChild(e);return e;};
+ const add=(tag,text,cls,parent=box)=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;parent.appendChild(e);return e;};
  add('h3','내가 고르는 답변 피드백');
- add('p','기기 안에서 규칙으로 살펴본 제안이에요. 원문은 바뀌지 않아요. 필요한 내용을 골라 위 답변을 직접 수정하세요.','hint');
- const result=answerFeedback(state[i].answer);
- if(result.empty)add('p','아직 전체 답변이 비어 있어요. 먼저 내 이야기를 적어보세요. 아래 문장 틀은 작성할 때 참고할 수 있어요.');
- for(const [title,items] of [['기본 정리',result.basic],['면접 말투 제안',result.tone]]){add('h4',title);if(!items.length){add('p','답변을 작성하면 이 항목의 제안을 확인할 수 있어요.','small');continue;}const ul=add('ul','');for(const t of items){const li=document.createElement('li');li.textContent=t;ul.appendChild(li);}}
- add('h4','이 질문의 문장 틀');
- add('p','[괄호] 안은 내 실제 이야기로 채워요. 해당하지 않는 문장은 쓰지 않아도 돼요. 경험·결과·배운 점을 새로 꾸미지 마세요.','small');
+ add('p','내 기기 안에서 검사해요. 수정할 항목을 골라 미리 본 뒤 적용하세요. 원문은 적용 전까지 바뀌지 않아요.','hint');
+ const source=state[i].answer,result=answerFeedback(source),candidates=findCorrections(source),choices=[];
+ const status=add('p','','small');status.setAttribute('role','status');
+ if(!source.trim())add('p','아직 전체 답변이 비어 있어요. 먼저 내 이야기를 적어보세요.');
+ else if(!candidates.length)add('p','등록된 규칙에서 추가 수정 후보를 찾지 못했어요. 모든 맞춤법·띄어쓰기 오류를 검사한 결과는 아니에요.');
+ else add('p',candidates.length+'곳의 수정 후보가 있어요. 말투·은어 제안은 내 뜻과 맞는지 확인하세요.');
+ for(const [n,c] of candidates.entries()){
+ const item=add('div','','correction-item');add('span',c.category,'correction-tag',item);
+ add('p',source.slice(Math.max(0,c.start-18),c.start)+'【'+c.original+'】'+source.slice(c.end,c.end+18),'correction-context',item);
+ const label=add('label','','correction-choice',item),check=document.createElement('input');check.type='checkbox';check.id='suggest-'+i+'-'+n;label.appendChild(check);add('span','“'+c.original+'” 수정하기','',label);
+ const sel=add('select','','',item);sel.setAttribute('aria-label',c.original+'의 수정 표현');
+ for(const option of c.options){const el=document.createElement('option');el.value=option;el.textContent='→ '+option;sel.appendChild(el);}
+ add('p',c.reason,'small',item);choices.push({c,check,sel});
+ }
+ const preview=add('textarea','','correction-preview');preview.readOnly=true;preview.rows=6;preview.setAttribute('aria-label','선택한 수정 미리보기');preview.value=source;
+ const composePreview=()=>{let out=source;for(const x of choices.filter(x=>x.check.checked).sort((a,b)=>b.c.start-a.c.start))out=out.slice(0,x.c.start)+x.sel.value+out.slice(x.c.end);return out;};
+ const row=add('div','','row'),apply=add('button','선택한 수정 적용','yellow',row);apply.type='button';apply.disabled=true;
+ const refresh=()=>{preview.value=composePreview();const count=choices.filter(x=>x.check.checked).length;apply.disabled=count===0;status.textContent=count+'개 선택 · 아래 미리보기에서 확인하세요.';};
+ for(const x of choices){x.check.onchange=refresh;x.sel.onchange=refresh;}
+ const commit=(value,manual)=>{state[i].answer=value;state[i].manual=manual;$('answer-'+i).value=value;updateAnswerInfo(i);save();showAnswerFeedback(i);};
+ apply.onclick=()=>{if(state[i].answer!==source){showAnswerFeedback(i);toast('답변이 바뀌어 다시 검사했어요.');return;}const after=composePreview();feedbackUndo.set(i,{before:source,after,manual:state[i].manual});commit(after,true);toast('선택한 수정만 적용했어요.');};
+ const previous=feedbackUndo.get(i);if(previous&&previous.after===source){const undo=add('button','마지막 수정 되돌리기','',row);undo.type='button';undo.onclick=()=>{if(state[i].answer!==previous.after)return;feedbackUndo.delete(i);commit(previous.before,previous.manual);toast('적용 전 답변으로 되돌렸어요.');};}
+ add('p','되돌리기는 이 화면을 새로고침하기 전, 마지막 적용에 사용할 수 있어요. 적용한 답변은 기존 자동 저장으로 보관해요.','small');
+ add('h4','기본 정리');const ul=add('ul','');for(const line of result.basic.filter(x=>!x.startsWith('등록된 기본 규칙')))add('li',line,'',ul);
+ add('p','안/않, 되/돼처럼 문맥에 따라 달라지는 표현과 등록되지 않은 은어는 놓칠 수 있어요. 바뀐 문장을 소리 내어 읽고 뜻이 같은지 확인하세요.','small');
+ add('h4','이 질문의 문장 틀');add('p','[괄호] 안은 내 실제 이야기로 채워요. 경험·결과·배운 점을 새로 꾸미지 마세요.','small');
  for(const line of ANSWER_FRAMES[i])add('p',line,'feedback-frame');
- const row=add('div','','row');const edit=document.createElement('button');edit.type='button';edit.textContent='위 답변 직접 수정하기';edit.onclick=()=>$('answer-'+i).focus();row.appendChild(edit);const close=document.createElement('button');close.type='button';close.textContent='피드백 접기';close.onclick=()=>{box.hidden=true;const b=$('feedback-button-'+i);b.setAttribute('aria-expanded','false');b.focus();};row.appendChild(close);
+ const bottom=add('div','','row');const edit=add('button','위 답변 직접 수정하기','',bottom);edit.type='button';edit.onclick=()=>$('answer-'+i).focus();
+ const close=add('button','피드백 접기','',bottom);close.type='button';close.onclick=()=>{box.hidden=true;$('feedback-button-'+i).setAttribute('aria-expanded','false');$('feedback-button-'+i).focus();};
  $('feedback-button-'+i).setAttribute('aria-expanded','true');
 }
-
 
 function renderCards(){
  $('cards').innerHTML=QUESTIONS.map((q,i)=>`<details class="qcard" id="card-${i}" ${i===0?'open':''}><summary><span class="num">${String(i+1).padStart(2,'0')}</span><span class="qname">${q.title}<small id="status-${i}"></small></span></summary><div class="qbody"><p class="question">${q.q}</p><div class="meaning"><b>이 질문의 뜻</b><br>${q.meaning}</div>${i===0?'<p class="note">원본 안내: 자기소개는 1분 이내로 준비해요.</p>':''}<div class="step"><span class="step-title">01. 떠오르는 경험 고르기</span><p class="hint">나에게 해당하는 단어를 골라요. 선택한 단어를 떠올리며 실제 경험을 적어보세요.</p><div class="chips">${q.keywords.map((k,j)=>`<button type="button" id="kw-${i}-${j}" data-keyword="${j}" aria-pressed="false">${k}</button>`).join('')}</div></div><div class="fields">${['thought','experience','plan'].map((k,j)=>`<div><label class="step-title" for="${k}-${i}">${['02. 내 생각','03. 내 경험','04. 앞으로의 계획'][j]}</label><p id="hint-${k}-${i}" class="hint">${q.hints[j]}</p><textarea id="${k}-${i}" data-field="${k}" aria-describedby="hint-${k}-${i}" placeholder="${['저는 …라고 생각합니다.','…한 적이 있습니다. 그때 저는 …했습니다.','앞으로 …하고 싶습니다.'][j]}"></textarea></div>`).join('')}</div><div class="step"><label class="step-title" for="answer-${i}">05. 나의 전체 답변</label><p class="hint" id="mode-${i}"></p><textarea id="answer-${i}" class="answer" data-field="answer" placeholder="위 세 칸을 쓰면 답변이 자동으로 연결돼요. 여기를 직접 고쳐도 좋아요."></textarea><div class="row"><button data-action="rebuild">세 입력으로 다시 구성</button><button data-action="copy">이 답변 복사</button></div><p class="small" id="count-${i}"></p><div class="row"><button type="button" class="yellow" id="feedback-button-${i}" data-action="feedback" aria-expanded="false" aria-controls="feedback-${i}">답변 피드백 살펴보기</button></div><section class="answer-feedback" id="feedback-${i}" hidden aria-label="${i+1}번 답변 피드백"></section><details class="sample"><summary>예시 답변 살펴보기 ＋</summary><p>${q.sample}<br><small>연습용 예시예요. 실제 경험과 확인한 학과 수업에 맞게 바꿔주세요.</small></p></details></div><div class="step"><h3>06. 답변 체크</h3><p class="hint">읽거나 말해본 뒤, 직접 체크해요.</p><div class="checks">${CHECKS.map((c,j)=>`<label class="check"><input type="checkbox" data-check="${j}" id="check-${i}-${j}"><span>${c}</span></label>`).join('')}</div></div><div class="row"><button class="primary" data-action="practice">이 질문으로 모의면접</button><button class="danger" data-action="reset">이 질문만 초기화</button></div></div></details>`).join('');
  QUESTIONS.forEach((q,i)=>{const card=$('card-'+i);for(const k of ['thought','experience','plan','answer'])$(k+'-'+i).value=state[i][k];q.keywords.forEach((k,j)=>$('kw-'+i+'-'+j).setAttribute('aria-pressed',state[i].keywords.includes(k)));CHECKS.forEach((_,j)=>$('check-'+i+'-'+j).checked=state[i].checks[j]);updateAnswerInfo(i);
  card.addEventListener('input',e=>{const k=e.target.dataset.field;if(!k)return;state[i][k]=e.target.value;if(k==='answer')state[i].manual=true;else if(!state[i].manual){state[i].answer=compose(state[i]);$('answer-'+i).value=state[i].answer;}updateAnswerInfo(i);save();});
  card.addEventListener('change',e=>{if(e.target.dataset.check!==undefined){state[i].checks[Number(e.target.dataset.check)]=e.target.checked;save();}});
- card.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.keyword!==undefined){const k=q.keywords[Number(b.dataset.keyword)],s=state[i];s.keywords=s.keywords.includes(k)?s.keywords.filter(x=>x!==k):s.keywords.concat(k);b.setAttribute('aria-pressed',s.keywords.includes(k));save();return;}switch(b.dataset.action){case'feedback':showAnswerFeedback(i);break;case'rebuild':if(state[i].manual&&!confirm('직접 수정한 전체 답변을 세 입력 내용으로 바꿀까요?'))return;state[i].manual=false;state[i].answer=compose(state[i]);$('answer-'+i).value=state[i].answer;updateAnswerInfo(i);save();toast('세 입력으로 답변을 다시 구성했어요.');break;case'copy':copy(state[i].answer,$('answer-'+i));break;case'practice':chooseQuestion(i);switchView('mock');break;case'reset':if(!confirm((i+1)+'번 질문의 입력, 답변, 체크와 연습 시간을 지울까요? 다른 질문은 유지돼요.'))return;state[i]=emptyState();timers[i]=newTimer();if(recordings[i]){URL.revokeObjectURL(recordings[i].url);recordings[i]=null;}const opened=QUESTIONS.map((_,n)=>$('card-'+n).open);renderCards();opened.forEach((v,n)=>$('card-'+n).open=v);save();$('card-'+i).querySelector('summary').focus();toast('이 질문을 초기화했어요.');break;}});
+ card.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.keyword!==undefined){const k=q.keywords[Number(b.dataset.keyword)],s=state[i];s.keywords=s.keywords.includes(k)?s.keywords.filter(x=>x!==k):s.keywords.concat(k);b.setAttribute('aria-pressed',s.keywords.includes(k));save();return;}switch(b.dataset.action){case'feedback':showAnswerFeedback(i);break;case'rebuild':if(state[i].manual&&!confirm('직접 수정한 전체 답변을 세 입력 내용으로 바꿀까요?'))return;state[i].manual=false;state[i].answer=compose(state[i]);$('answer-'+i).value=state[i].answer;updateAnswerInfo(i);save();toast('세 입력으로 답변을 다시 구성했어요.');break;case'copy':copy(state[i].answer,$('answer-'+i));break;case'practice':chooseQuestion(i);switchView('mock');break;case'reset':if(!confirm((i+1)+'번 질문의 입력, 답변, 체크와 연습 시간을 지울까요? 다른 질문은 유지돼요.'))return;state[i]=emptyState();feedbackUndo.delete(i);timers[i]=newTimer();if(recordings[i]){URL.revokeObjectURL(recordings[i].url);recordings[i]=null;}const opened=QUESTIONS.map((_,n)=>$('card-'+n).open);renderCards();opened.forEach((v,n)=>$('card-'+n).open=v);save();$('card-'+i).querySelector('summary').focus();toast('이 질문을 초기화했어요.');break;}});
  });updateProgress();
 }
 function updateAnswerInfo(i){if($('feedback-'+i)&&!$('feedback-'+i).hidden){$('feedback-'+i).hidden=true;$('feedback-button-'+i).setAttribute('aria-expanded','false');}$('mode-'+i).textContent=state[i].manual?'직접 수정 중 · 위 입력을 바꿔도 이 답변은 유지돼요.':'자동 구성 중 · 세 입력을 순서대로 연결해요. 완성된 문장으로 적으면 자연스러워요.';$('count-'+i).textContent='공백 포함 '+state[i].answer.length+'자 · 말하는 시간은 모의면접에서 확인해요.';}
