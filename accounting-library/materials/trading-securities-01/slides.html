@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서울관광고 회계원리 - 단기매매증권 3단계 마스터 (전자칠판용) · 학생용</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'Inter', 'sans-serif'],
+            mono: ['Consolas', 'Courier New', 'monospace']
+          },
+          colors: {
+            brand: {
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              dark: '#090d16',
+              panel: '#131b2e',
+              border: '#233252'
+            },
+            accounting: {
+              debit: '#38bdf8',   // 차변 (선명한 하늘색)
+              credit: '#fb7185',  // 대변 (선명한 코랄레드)
+              gold: '#facc15'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 전자칠판 및 아이패드 16:9 와이드 화면 최적화 (잘림 및 겹침 방지) */
+    .slide-canvas {
+      width: 100%;
+      height: 100%;
+      max-width: 1560px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .slide-page {
+      display: none;
+      opacity: 0;
+      transform: scale(0.99);
+      transition: opacity 0.28s ease-out, transform 0.28s ease-out;
+      height: 100%;
+      overflow: hidden;
+    }
+    .slide-page.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* 양방향 토글 블러 트랜지션 */
+    .answer-hidden {
+      filter: blur(12px);
+      user-select: none;
+      opacity: 0.18;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .answer-revealed {
+      filter: blur(0px);
+      user-select: auto;
+      opacity: 1;
+      pointer-events: auto;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* SVG 그래프 애니메이션 펄스 */
+    @keyframes pulse-pin {
+      0%, 100% { r: 8px; opacity: 1; }
+      50% { r: 12px; opacity: 0.65; }
+    }
+    .graph-pin-active {
+      animation: pulse-pin 1.4s infinite ease-in-out;
+    }
+
+    /* 전자칠판 및 아이패드 터치 버튼 반응 */
+    .touch-btn {
+      touch-action: manipulation;
+    }
+  </style>
+<style>.student-response{padding:20px;border:1px dashed #64748b;border-radius:12px;color:#cbd5e1;min-height:64px} @media(max-width:767px),(max-height:650px){body{height:auto!important;min-height:100vh;overflow:auto!important} main{overflow:visible!important}.slide-canvas,.slide-page{height:auto!important;overflow:visible!important}.slide-page{gap:24px}.slide-canvas{padding:16px!important}header{height:auto!important;min-height:56px;padding:8px!important;flex-wrap:wrap;gap:8px}footer{position:sticky;bottom:0;padding:8px!important;height:auto!important;flex-wrap:wrap;gap:8px}svg{max-width:100%}}</style></head>
+<body class="bg-brand-dark text-slate-100 font-sans h-screen w-screen flex flex-col justify-between overflow-hidden select-none">
+
+  <header class="h-14 bg-slate-950/90 border-b border-brand-border px-5 md:px-8 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-400 font-bold text-sm md:text-base">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>서울관광고 회계원리</span>
+      </div>
+      <div class="h-5 w-px bg-slate-700 hidden sm:block"></div>
+      <span class="text-sm md:text-lg font-bold text-slate-200 hidden sm:inline" id="top-title-text">
+        단기매매증권 3단계 마스터
+      </span>
+    </div>
+
+    <div class="flex items-center space-x-2.5 md:space-x-4">
+      <div class="text-sm md:text-base font-black px-3.5 py-1 bg-slate-900 border border-slate-700 rounded-xl text-slate-300">
+        <span id="page-current" class="text-emerald-400">1</span> <span class="text-slate-600">/</span> <span id="page-total">8</span>
+      </div>
+
+      <button onclick="toggleTocModal()" class="touch-btn p-2 md:p-2.5 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-xl transition" title="슬라이드 목록">
+        <i class="fa-solid fa-bars-staggered text-base"></i>
+      </button>
+
+      <button onclick="toggleAudio()" id="btn-sound" class="touch-btn p-2 md:p-2.5 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-xl transition" title="효과음">
+        <i class="fa-solid fa-volume-high text-base"></i>
+      </button>
+
+      <button onclick="toggleFullScreen()" class="touch-btn px-3 py-2 text-slate-200 hover:text-white bg-emerald-600/80 hover:bg-emerald-500 rounded-xl transition flex items-center gap-1.5 text-xs md:text-sm font-bold" title="전체화면 (F키)">
+        <i class="fa-solid fa-expand"></i>
+        <span class="hidden sm:inline">전체화면</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="w-full h-1 bg-slate-900 shrink-0">
+    <div id="slide-progress" class="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 transition-all duration-300" style="width: 12.5%;"></div>
+  </div>
+
+  <main class="flex-1 flex items-center justify-center p-2.5 md:p-5 overflow-hidden">
+    <div class="slide-canvas bg-brand-panel/95 border-2 border-brand-border rounded-3xl shadow-2xl p-5 md:p-8 relative">
+
+      <div class="slide-page active flex-col justify-between h-full text-center" data-title="단기매매증권 3단계 마스터">
+        <div class="flex justify-between items-center text-xs md:text-base text-slate-400">
+          <span class="flex items-center gap-2 font-semibold text-emerald-400">
+            <i class="fa-solid fa-hotel"></i> 서울관광고등학교 경영·금융 교과
+          </span>
+          <span class="font-medium">1학년 회계원리 (교과서 91~93p)</span>
+        </div>
+
+        <div class="my-auto py-2">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/15 border border-emerald-500/40 rounded-full text-emerald-300 font-bold text-sm md:text-lg mb-4 animate-pulse">
+            <i class="fa-solid fa-chart-line"></i> 주식 몰라도 그래프로 단번에 꿰뚫는 회계원리!
+          </div>
+
+          <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-4">
+            단기투자자산 : <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">단기매매증권</span>
+          </h1>
+
+          <p class="text-base md:text-2xl text-slate-200 font-normal max-w-3xl mx-auto leading-relaxed">
+            취득부터 12/31 기말평가, 처분까지 이어지는 <br class="hidden sm:inline">
+            <strong class="text-amber-300 underline underline-offset-8">공정가치 변동 그래프</strong>와 <strong class="text-cyan-300 underline underline-offset-8">수수료 회계처리 비법</strong>
+          </p>
+
+          <div class="mt-7 flex justify-center gap-4">
+            <button onclick="nextPage()" class="touch-btn px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-lg md:text-xl rounded-2xl shadow-xl shadow-emerald-500/30 transition transform hover:scale-105 active:scale-95 flex items-center gap-3">
+              <span>수업 시작하기</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 md:gap-6 pt-3 border-t border-slate-700/70 text-slate-300 text-xs md:text-base font-bold">
+          <div class="bg-slate-900/70 py-2.5 px-3 rounded-xl border border-slate-800">1단계 : 취득과 수수료비용</div>
+          <div class="bg-slate-900/70 py-2.5 px-3 rounded-xl border border-slate-800">2단계 : 12/31 공정가치 기말평가</div>
+          <div class="bg-slate-900/70 py-2.5 px-3 rounded-xl border border-slate-800">3단계 : 처분과 처분손익 가감</div>
+        </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="개념: 유가증권 분류와 단기매매증권">
+        <div>
+          <span class="text-xs md:text-sm font-black text-emerald-400 tracking-wider">STEP 0. 핵심 개념</span>
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mt-0.5">
+            호텔의 여유자금으로 주식을 샀다면? <span class="text-amber-300">유가증권의 분류</span>
+          </h2>
+          <p class="text-slate-300 text-sm md:text-base mt-1 font-medium">단기매매증권으로 분류하려면 반드시 아래 2가지 조건을 동시에 만족해야 합니다.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 my-auto">
+          <div class="bg-slate-900/90 border-2 border-blue-500/40 p-5 md:p-6 rounded-2xl relative">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-11 h-11 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-black text-xl">
+                1
+              </div>
+              <h3 class="text-xl md:text-2xl font-black text-white">단기 시세 차익 목적</h3>
+            </div>
+            <p class="text-slate-200 text-base md:text-lg leading-relaxed">
+              오랫동안 보유하려는 목적이 아니라, <br>
+              <strong class="text-amber-300 underline underline-offset-4">1년 이내에 값이 올랐을 때 팔아서</strong> 이익을 얻으려는 목적이어야 합니다.
+            </p>
+            <div class="mt-4 text-xs md:text-sm text-slate-400 bg-slate-950 p-3 rounded-xl border border-slate-800">
+              💡 1년 이상 장기 투자 목적이라면? ➔ <strong class="text-emerald-400">매도가능증권(투자자산)</strong>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 border-2 border-emerald-500/40 p-5 md:p-6 rounded-2xl relative">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xl">
+                2
+              </div>
+              <h3 class="text-xl md:text-2xl font-black text-white">시장성이 있을 것</h3>
+            </div>
+            <p class="text-slate-200 text-base md:text-lg leading-relaxed">
+              한국거래소(증권시장)에 상장되어 있어, <br>
+              <strong class="text-emerald-300 underline underline-offset-4">언제든 시장 가격(공정가치)으로 팔 수 있는 주식</strong>이어야 합니다.
+            </p>
+            <div class="mt-4 text-xs md:text-sm text-slate-400 bg-slate-950 p-3 rounded-xl border border-slate-800">
+              💡 거래가 안 되는 비상장 주식은 시장성이 없어 단기매매증권 분류 불가!
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="bg-slate-950 border border-brand-border p-3 md:p-3.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="text-sm md:text-base font-bold text-emerald-300 flex items-center gap-2.5">
+              <i class="fa-solid fa-circle-question text-amber-400 text-xl"></i>
+              <span><strong>선생님 발문:</strong> "둘 중 하나라도 만족하지 못하면 단기매매증권이 될 수 있을까요?"</span>
+            </div>
+            </div>
+          </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="1단계: 취득 회계처리">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-0.5 bg-blue-600 text-white text-xs md:text-sm font-black rounded-lg">1단계</span>
+            <span class="text-xs md:text-sm text-slate-400">교과서 92페이지 ① 취득 회계처리</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mt-0.5">
+            주식 취득: <span class="text-amber-300">"수수료를 자산에 더하지 않는 유일한 예외!"</span>
+          </h2>
+          <p class="text-slate-300 text-sm md:text-base mt-0.5">비품이나 상품을 살 때 들었던 운반비는 자산 가격에 더했죠? 하지만 단기매매증권은 다릅니다!</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto">
+          <div class="lg:col-span-5 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+            <div>
+              <div class="text-base md:text-lg font-black text-amber-300 flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i> 회계의 대원칙 vs 단기매매증권
+              </div>
+              <div class="space-y-3 text-sm md:text-base text-slate-200">
+                <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800">
+                  📦 <strong>일반 자산(상품·비품):</strong><br>
+                  매입 부대비용을 <span class="text-blue-400 font-bold">취득원가에 포함(+)</span>
+                </div>
+                <div class="p-3.5 bg-amber-500/10 rounded-xl border border-amber-500/40">
+                  ⚡ <strong>단기매매증권 (유일한 예외!):</strong><br>
+                  증권사 수수료는 자산에 절대 더하지 않고 즉시 <span class="text-amber-300 font-black underline">수수료비용(영업외비용)</span>으로 독립 분개!
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 text-xs md:text-sm text-rose-300 bg-rose-500/15 p-3 rounded-xl border border-rose-500/30">
+              🚨 <strong>시험 함정:</strong> 단기매매증권 510,000원으로 합쳐 적으면 0점!
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-3">
+              <span class="text-xs font-bold text-blue-400 block mb-1">[실습 예제 - 교과서 92p 예제 변형]</span>
+              <p class="text-base md:text-lg text-slate-100 font-semibold leading-relaxed">
+                단기 시세차익 목적으로 주식을 <strong class="text-amber-300">500,000원</strong>에 취득하고, 매입 수수료 <strong class="text-rose-400">10,000원</strong>을 포함하여 현금 510,000원을 지급하였다.
+              </p>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-xs md:text-sm font-bold text-slate-400 px-2 mb-1.5">
+                <span class="text-accounting-debit">차변 (자산 증가 &amp; 비용 발생)</span>
+                <span class="text-accounting-credit">대변 (자산 감소)</span>
+              </div>
+              <div class="p-4 bg-slate-950 rounded-xl border-2 border-slate-800">
+                <div class="student-response">차변과 대변의 계정과목과 금액을 직접 적어 보세요.</div></div>
+            </div>
+
+            <div class="mt-3 flex justify-end">
+              </div>
+          </div>
+        </div>
+
+        <div class="text-xs md:text-sm text-slate-400 text-center">
+          💡 이유: 단기매매증권은 시장에서 언제든 현금화할 자산이므로 순수한 시장 거래가격(공정가치)만 자산으로 인정합니다.
+        </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="2단계: 기말평가 회계처리">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-0.5 bg-amber-500 text-slate-950 text-xs md:text-sm font-black rounded-lg">2단계</span>
+            <span class="text-xs md:text-sm text-slate-400">교과서 92페이지 ② 기말평가</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mt-0.5">
+            12월 31일 결산: <span class="text-emerald-400">"팔지 않았어도 장부를 시가로 고친다!"</span>
+          </h2>
+          <p class="text-slate-300 text-sm md:text-base mt-0.5">결산일 현재 시장가격(공정가치)과 장부금액을 비교하여 장부를 최신화합니다.</p>
+        </div>
+
+        <div class="bg-slate-900/90 p-5 md:p-6 rounded-2xl border border-slate-700 my-auto">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pb-4 border-b border-slate-700">
+            <div>
+              <span class="text-xs md:text-sm text-slate-400">기존 장부금액 (취득원가)</span>
+              <div class="text-2xl md:text-3xl font-black text-blue-400">₩ 200,000</div>
+            </div>
+
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-700 text-sm md:text-base font-bold">
+              <button onclick="changeValuation(true)" id="tab-val-up" class="touch-btn px-4 py-2 rounded-lg bg-emerald-600 text-white transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-trend-up"></i> 주가 상승 시 (23만 원)
+              </button>
+              <button onclick="changeValuation(false)" id="tab-val-down" class="touch-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-trend-down"></i> 주가 하락 시 (17만 원)
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center mt-4">
+            <div class="lg:col-span-5">
+              <span id="badge-val" class="inline-block px-3 py-1 rounded-lg text-xs md:text-sm font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-2">
+                공정가치 230,000원으로 30,000원 상승!
+              </span>
+              <h4 id="title-val" class="text-xl md:text-2xl font-black text-white">단기매매증권평가이익 발생</h4>
+              <p id="desc-val" class="text-sm md:text-base text-slate-300 mt-1.5 leading-relaxed">
+                자산(단기매매증권)의 가치를 +30,000원 올려주고, 그만큼 회사의 당기 이익인 <strong class="text-emerald-400">영업외수익</strong>으로 기록합니다.
+              </p>
+            </div>
+
+            <div class="lg:col-span-7 bg-slate-950 p-4 md:p-5 rounded-xl border-2 border-slate-800">
+              <div class="text-xs text-slate-400 font-mono mb-2">12월 31일 결산 수정 분개</div>
+              <div class="student-response">차변과 대변의 계정과목과 금액을 직접 적어 보세요.</div><div class="mt-3 pt-2.5 border-t border-slate-800 flex justify-end">
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs md:text-base text-amber-300 flex items-center gap-2.5">
+          <i class="fa-solid fa-lightbulb text-lg"></i>
+          <span><strong>기억해 둘 점:</strong> 다음 해로 넘어가면 이 주식의 장부금액은 원래 샀던 20만 원이 아니라 <strong>평가된 시가(23만 원)</strong>로 바뀝니다!</span>
+        </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="3단계: 처분 회계처리">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-0.5 bg-emerald-600 text-white text-xs md:text-sm font-black rounded-lg">3단계</span>
+            <span class="text-xs md:text-sm text-slate-400">교과서 92페이지 ③ 처분 회계처리</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mt-0.5">
+            주식 처분: <span class="text-rose-400">"처분할 때 나간 수수료는 분개장에 이름이 없다?!"</span>
+          </h2>
+          <p class="text-slate-300 text-sm md:text-base mt-0.5">취득할 때 쓴 '수수료비용' 계정과 달리, 처분할 때는 수수료비용 계정을 절대 쓰지 않습니다!</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto items-stretch">
+          <div class="lg:col-span-5 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+            <div>
+              <span class="text-xs md:text-sm font-bold text-rose-400 uppercase tracking-wider">처분손익 황금 공식</span>
+              <div class="mt-2.5 p-3.5 bg-slate-950 rounded-xl border border-slate-800 space-y-2.5 text-sm md:text-base">
+                <div>순 처분가액 = <strong class="text-white">처분금액 - 매각수수료</strong></div>
+                <div class="p-2.5 bg-emerald-950/60 rounded-lg border border-emerald-500/40 text-emerald-300 font-bold text-xs md:text-sm">
+                  순 처분가액 &gt; 직전 장부가 ➔ 단기매매증권처분이익
+                </div>
+                <div class="p-2.5 bg-rose-950/60 rounded-lg border border-rose-500/40 text-rose-300 font-bold text-xs md:text-sm">
+                  순 처분가액 &lt; 직전 장부가 ➔ 단기매매증권처분손실
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 text-xs md:text-sm text-amber-300 bg-amber-500/15 p-3 rounded-xl border border-amber-500/30">
+              💡 <strong>처분 수수료의 처리:</strong><br>
+              이익이 나면 이익에서 <strong class="underline">빼고(차감)</strong>, 손실이 나면 손실에 <strong class="underline">더해줍니다(가산)!</strong>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+              <span class="text-xs font-bold text-emerald-400">[실습 예제 - 교과서 93p 2-(5) 변형]</span>
+              <p class="text-sm md:text-base text-slate-100 font-semibold mt-1 leading-relaxed">
+                장부금액 <strong class="text-white">130,000원</strong>인 주식을 <strong class="text-emerald-300">150,000원</strong>에 처분하고, 수수료 <strong class="text-rose-400">5,000원</strong>을 뺀 잔액을 보통예금으로 받았다.
+              </p>
+            </div>
+
+            <div class="bg-slate-950 p-4 rounded-xl border-2 border-slate-800 my-2">
+              <div class="text-xs md:text-sm text-amber-300 font-bold mb-2">
+                통장 입금액: 150,000 - 5,000 = <span class="underline">145,000원</span> (처분이익은 2만 원이 아닌 15,000원!)
+              </div>
+
+              <div class="student-response">차변과 대변의 계정과목과 금액을 직접 적어 보세요.</div></div>
+
+            <div class="flex justify-end">
+              </div>
+          </div>
+        </div>
+
+        <div class="text-xs md:text-sm text-slate-400 text-center">
+          암기 공식: "살 때 수수료는 따로 적고(비용), 팔 때 수수료는 이익/손실에 숨어든다!"
+        </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="핵심: 주가 변동과 회계처리 인터랙티브 그래프">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1">
+          <div>
+            <span class="text-xs md:text-sm font-black text-cyan-400 tracking-wider">★ 인터랙티브 모션 그래픽</span>
+            <h2 class="text-xl md:text-2xl lg:text-3xl font-black text-white">
+              "시장의 주가는 매일 춤추는데, 회계장부는 언제 바뀔까?"
+            </h2>
+          </div>
+          <div class="flex items-center gap-4 text-xs md:text-sm font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700 shrink-0">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-1 bg-cyan-400 rounded-full inline-block"></span>
+              <span class="text-cyan-300">시장 공정가치(매일 변동)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-1 border-b-2 border-dashed border-amber-400 inline-block"></span>
+              <span class="text-amber-300">회계 장부금액(결산·처분 시 갱신)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/90 border-2 border-slate-700 rounded-2xl p-3.5 md:p-4 my-auto flex flex-col justify-between gap-2.5">
+          <div class="grid grid-cols-3 gap-2.5 text-center">
+            <button onclick="selectGraphPhase(1)" id="graph-btn-1" class="touch-btn py-2 px-3 rounded-xl bg-blue-600 text-white font-black text-xs md:text-base transition shadow flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-cart-shopping"></i> 1단계: 3월 5일 취득
+            </button>
+            <button onclick="selectGraphPhase(2)" id="graph-btn-2" class="touch-btn py-2 px-3 rounded-xl bg-slate-800 text-slate-400 font-black text-xs md:text-base hover:text-white transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-scale-balanced"></i> 2단계: 12월 31일 기말평가
+            </button>
+            <button onclick="selectGraphPhase(3)" id="graph-btn-3" class="touch-btn py-2 px-3 rounded-xl bg-slate-800 text-slate-400 font-black text-xs md:text-base hover:text-white transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-coins"></i> 3단계: 이듬해 4월 20일 처분
+            </button>
+          </div>
+
+          <div class="w-full bg-slate-950 rounded-xl border border-slate-800 px-2 py-1 relative overflow-hidden">
+            <svg viewbox="0 0 920 205" class="w-full max-h-[26vh] md:max-h-[30vh] h-auto mx-auto block">
+              <line x1="85" y1="38" x2="870" y2="38" stroke="#1e293b" stroke-dasharray="4"></line>
+              <line x1="85" y1="88" x2="870" y2="88" stroke="#1e293b" stroke-dasharray="4"></line>
+              <line x1="85" y1="138" x2="870" y2="138" stroke="#1e293b" stroke-dasharray="4"></line>
+              <line x1="85" y1="175" x2="870" y2="175" stroke="#334155"></line>
+
+              <text x="75" y="43" fill="#94a3b8" text-anchor="end" font-weight="bold" font-size="13">15,000원</text>
+              <text x="75" y="93" fill="#94a3b8" text-anchor="end" font-weight="bold" font-size="13">13,000원</text>
+              <text x="75" y="143" fill="#94a3b8" text-anchor="end" font-weight="bold" font-size="13">10,000원</text>
+              <text x="75" y="180" fill="#94a3b8" text-anchor="end" font-weight="bold" font-size="13">0원</text>
+
+              <text x="145" y="196" fill="#60a5fa" text-anchor="middle" font-weight="bold" font-size="13">3월 5일 (취득)</text>
+              <text x="360" y="196" fill="#64748b" text-anchor="middle" font-size="12">여름~가을 (일상 변동)</text>
+              <text x="580" y="196" fill="#facc15" text-anchor="middle" font-weight="bold" font-size="13">12월 31일 (결산평가)</text>
+              <text x="815" y="196" fill="#4ade80" text-anchor="middle" font-weight="bold" font-size="13">4월 20일 (처분)</text>
+
+              <line x1="580" y1="20" x2="580" y2="175" stroke="#facc15" stroke-opacity="0.3" stroke-width="2" stroke-dasharray="3"></line>
+              <line x1="815" y1="20" x2="815" y2="175" stroke="#4ade80" stroke-opacity="0.3" stroke-width="2" stroke-dasharray="3"></line>
+
+              <path d="M 145 138 C 205 105, 245 165, 310 115 C 370 65, 440 130, 500 105 C 540 88, 560 92, 580 88 C 650 72, 710 95, 755 55 C 785 32, 800 42, 815 38" fill="none" stroke="#22d3ee" stroke-width="3.5" stroke-linecap="round"></path>
+
+              <path d="M 145 138 L 580 138 L 580 88 L 815 88" fill="none" stroke="#f59e0b" stroke-width="3.5" stroke-dasharray="6,4"></path>
+
+              <line x1="580" y1="138" x2="580" y2="88" stroke="#34d399" stroke-width="5" stroke-linecap="round"></line>
+              <text x="592" y="118" fill="#34d399" font-weight="bold" font-size="13">+3,000원 시가 상승 반영</text>
+
+              <g onclick="selectGraphPhase(1)" class="cursor-pointer">
+                <circle id="pin-1" cx="145" cy="138" r="8" fill="#3b82f6" stroke="#ffffff" stroke-width="2.5" class="graph-pin-active"></circle>
+                <text x="145" y="122" fill="#93c5fd" font-weight="bold" font-size="13" text-anchor="middle">취득원가 10,000원</text>
+              </g>
+
+              <g onclick="selectGraphPhase(2)" class="cursor-pointer">
+                <circle id="pin-2" cx="580" cy="88" r="7" fill="#f59e0b" stroke="#ffffff" stroke-width="2.5"></circle>
+                <text x="580" y="72" fill="#fde047" font-weight="bold" font-size="13" text-anchor="middle">공정가치 13,000원</text>
+              </g>
+
+              <g onclick="selectGraphPhase(3)" class="cursor-pointer">
+                <circle id="pin-3" cx="815" cy="38" r="7" fill="#10b981" stroke="#ffffff" stroke-width="2.5"></circle>
+                <text x="805" y="23" fill="#86efac" font-weight="bold" font-size="13" text-anchor="end">처분가액 15,000원</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2.5">
+            <div>
+              <span id="graph-phase-badge" class="px-2.5 py-0.5 bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-md text-xs font-bold">
+                [1단계: 3월 5일 취득 시점]
+              </span>
+              <p id="graph-phase-desc" class="text-sm md:text-base text-slate-100 font-semibold mt-1">
+                취득 시점의 시장 공정가치(10,000원)로 단기매매증권 장부를 최초 등록합니다.
+              </p>
+            </div>
+            <div id="graph-phase-entry" class="bg-slate-900 px-3.5 py-2 rounded-lg border border-slate-700 font-mono text-xs md:text-sm text-emerald-300 shrink-0 font-bold">
+              (차) 단기매매증권 10,000 / (대) 현금 10,000
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center text-xs md:text-sm text-slate-400">
+          💡 <strong>핵심 통찰:</strong> 주가는 매일 파도치지만 장부를 매일 고칠 수 없으므로, <strong>결산일(12/31)</strong>과 <strong>처분일</strong>에만 장부를 시가와 일치시킵니다!
+        </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="실전 챌린지: (주)제주항공 연속 분개">
+        <div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs md:text-sm font-black text-emerald-400 tracking-wider">실전 연속 분개 챌린지</span>
+            <span class="text-xs md:text-sm text-slate-400">서울관광고 실무형 종합 예제</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-black text-white mt-0.5">
+            "(주)제주항공 주식 3단계 연속 분개 마스터하기!"
+          </h2>
+        </div>
+
+        <div class="space-y-2.5 my-auto">
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+              <div class="text-sm md:text-base font-semibold text-slate-100">
+                <span class="text-blue-400 font-bold">[1] 3월 10일 취득:</span> 
+                단기 시세차익 목적으로 (주)제주항공 주식 100주를 1주당 10,000원에 사고, 수수료 20,000원을 포함해 현금 지급하다.
+              </div>
+              </div>
+            <div class="student-response">차변과 대변의 계정과목과 금액을 직접 적어 보세요.</div></div>
+
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+              <div class="text-sm md:text-base font-semibold text-slate-100">
+                <span class="text-amber-400 font-bold">[2] 12월 31일 기말평가:</span> 
+                결산일 현재 (주)제주항공 주식의 공정가치가 1주당 <strong class="text-emerald-300">12,000원</strong>으로 상승하였다.
+              </div>
+              </div>
+            <div class="student-response">차변과 대변의 계정과목과 금액을 직접 적어 보세요.</div></div>
+
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+              <div class="text-sm md:text-base font-semibold text-slate-100">
+                <span class="text-emerald-400 font-bold">[3] 이듬해 5월 20일 처분:</span> 
+                보유 주식 100주 전부를 1주당 <strong class="text-amber-300">15,000원</strong>에 처분하고, 수수료 30,000원을 뺀 금액이 보통예금에 입금되다.
+              </div>
+              </div>
+            <div class="student-response">차변과 대변의 계정과목과 금액을 직접 적어 보세요.</div></div>
+        </div>
+
+        <div class="text-center text-xs md:text-sm text-slate-400">
+          💡 처분 분개를 작성하기 전에 직전 결산일의 장부금액을 확인해 보세요.
+        </div>
+      </div>
+
+      <div class="slide-page flex-col justify-between h-full" data-title="정리: 3대 핵심 요약 &amp; 톡톡 퀴즈">
+        <div>
+          <span class="text-xs md:text-sm font-black text-emerald-400 tracking-wider">Final Check</span>
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-white mt-0.5">
+            오늘 배운 핵심 요약 &amp; 최종 형성평가
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 my-auto">
+          <div class="lg:col-span-5 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 space-y-3">
+            <h3 class="text-lg md:text-xl font-black text-amber-300 flex items-center gap-2">
+              <i class="fa-solid fa-bookmark"></i> 시험 필수 암기 3줄
+            </h3>
+            <div class="space-y-2.5 text-sm md:text-base text-slate-200">
+              <div class="p-3 bg-slate-950 rounded-xl border-l-4 border-blue-500">
+                <strong>1. 취득 수수료 = 독립된 영업외비용!</strong><br>
+                <span class="text-slate-400 text-xs md:text-sm">취득원가에 포함하지 않고 '수수료비용' 분개</span>
+              </div>
+              <div class="p-3 bg-slate-950 rounded-xl border-l-4 border-amber-500">
+                <strong>2. 12/31 기말평가 = 공정가치 일치!</strong><br>
+                <span class="text-slate-400 text-xs md:text-sm">평가이익(영업외수익) / 평가손실(영업외비용)</span>
+              </div>
+              <div class="p-3 bg-slate-950 rounded-xl border-l-4 border-emerald-500">
+                <strong>3. 처분 수수료 = 처분손익에서 가감!</strong><br>
+                <span class="text-slate-400 text-xs md:text-sm">'수수료비용' 계정을 쓰지 않고 이익에서 차감/손실에 가산</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+            <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2 mb-2">
+              <i class="fa-solid fa-gamepad text-emerald-400"></i> 교실 즉석 O/X 퀴즈
+            </h3>
+
+            <div class="space-y-3">
+              <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center gap-3">
+                  <div class="text-sm md:text-base text-slate-200 font-semibold">
+                    <span class="text-emerald-400 font-bold">Q1.</span> 단기매매증권 취득 시 발생한 수수료는 취득원가에 더한다?
+                  </div>
+                  <div class="flex gap-2 shrink-0">
+                    <button onclick="answerQuiz(1, 'O')" class="touch-btn w-10 h-9 bg-slate-800 hover:bg-blue-600 text-white font-black text-base rounded-lg transition">O</button>
+                    <button onclick="answerQuiz(1, 'X')" class="touch-btn w-10 h-9 bg-slate-800 hover:bg-rose-600 text-white font-black text-base rounded-lg transition">X</button>
+                  </div>
+                </div>
+                <div id="quiz-msg-1" class="hidden mt-2 text-xs md:text-sm font-bold p-2 rounded-lg"></div>
+              </div>
+
+              <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <div class="flex justify-between items-center gap-3">
+                  <div class="text-sm md:text-base text-slate-200 font-semibold">
+                    <span class="text-emerald-400 font-bold">Q2.</span> 단기매매증권을 처분할 때 든 수수료는 '수수료비용'으로 따로 적는다?
+                  </div>
+                  <div class="flex gap-2 shrink-0">
+                    <button onclick="answerQuiz(2, 'O')" class="touch-btn w-10 h-9 bg-slate-800 hover:bg-blue-600 text-white font-black text-base rounded-lg transition">O</button>
+                    <button onclick="answerQuiz(2, 'X')" class="touch-btn w-10 h-9 bg-slate-800 hover:bg-rose-600 text-white font-black text-base rounded-lg transition">X</button>
+                  </div>
+                </div>
+                <div id="quiz-msg-2" class="hidden mt-2 text-xs md:text-sm font-bold p-2 rounded-lg"></div>
+              </div>
+            </div>
+
+            <div class="mt-3 p-2.5 bg-emerald-950/40 border border-emerald-500/40 rounded-xl text-center text-emerald-300 font-bold text-sm md:text-base">
+              오늘 수업 끝! 수고하셨습니다. 이제 인쇄된 실습 활동지를 풀어봅시다 👏
+            </div>
+          </div>
+        </div>
+
+        <div class="text-xs md:text-sm text-slate-400 text-center">
+          서울관광고등학교 경영금융과 회계원리 1학년 수업용 자료
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="h-14 bg-slate-950/95 border-t border-brand-border px-5 md:px-10 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center space-x-3">
+      <button onclick="prevPage()" class="touch-btn px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm md:text-base font-bold transition flex items-center gap-2 shadow">
+        <i class="fa-solid fa-chevron-left text-xs"></i>
+        <span>이전</span>
+      </button>
+      <button onclick="nextPage()" class="touch-btn px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm md:text-base font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-600/30">
+        <span>다음</span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+      </button>
+    </div>
+
+    <div class="hidden md:flex items-center space-x-2" id="nav-dots">
+      </div>
+
+    <div class="text-xs md:text-sm text-slate-400 flex items-center gap-3">
+      <span class="hidden sm:inline"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-300 font-mono">◀</kbd> <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-300 font-mono">▶</kbd> 이동</span>
+      <span class="hidden sm:inline"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 text-slate-300 font-mono">F</kbd> 전체화면</span>
+    </div>
+  </footer>
+
+  <div id="modal-toc" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-slate-700 rounded-3xl max-w-xl w-full p-8 shadow-2xl">
+      <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-800">
+        <h3 class="text-2xl font-black text-white flex items-center gap-3">
+          <i class="fa-solid fa-list-check text-emerald-400"></i> 슬라이드 바로가기
+        </h3>
+        <button onclick="toggleTocModal()" class="touch-btn text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+      </div>
+      <div class="space-y-2.5 max-h-[60vh] overflow-y-auto" id="toc-container">
+        </div>
+    </div>
+  </div>
+
+  <script>
+    let curPage = 0;
+    const pages = document.querySelectorAll('.slide-page');
+    const totalPages = pages.length;
+    let soundEnabled = true;
+
+    // Web Audio API 기반 효과음
+    let audioCtx = null;
+    function playTone(type) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const t = audioCtx.currentTime;
+
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, t);
+          osc.frequency.exponentialRampToValueAtTime(300, t + 0.06);
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.06);
+          osc.start(t);
+          osc.stop(t + 0.06);
+        } else if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, t); // Do
+          osc.frequency.setValueAtTime(659.25, t + 0.09); // Mi
+          osc.frequency.setValueAtTime(783.99, t + 0.18); // Sol
+          gain.gain.setValueAtTime(0.15, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+          osc.start(t);
+          osc.stop(t + 0.35);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(250, t);
+          osc.frequency.setValueAtTime(180, t + 0.12);
+          gain.gain.setValueAtTime(0.15, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+          osc.start(t);
+          osc.stop(t + 0.25);
+        }
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('btn-sound');
+      if (soundEnabled) {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high text-lg"></i>';
+        btn.classList.remove('text-rose-400');
+        playTone('click');
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-lg"></i>';
+        btn.classList.add('text-rose-400');
+      }
+    }
+
+    // 슬라이드 갱신
+    function updatePageView() {
+      pages.forEach((p, idx) => {
+        if (idx === curPage) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+
+      const title = pages[curPage].getAttribute('data-title') || '회계원리';
+      document.getElementById('top-title-text').textContent = title;
+      document.getElementById('page-current').textContent = curPage + 1;
+      document.getElementById('page-total').textContent = totalPages;
+
+      const progress = ((curPage + 1) / totalPages) * 100;
+      document.getElementById('slide-progress').style.width = `${progress}%`;
+
+      updateDots();
+      playTone('click');
+    }
+
+    function nextPage() {
+      if (curPage < totalPages - 1) {
+        curPage++;
+        updatePageView();
+      }
+    }
+
+    function prevPage() {
+      if (curPage > 0) {
+        curPage--;
+        updatePageView();
+      }
+    }
+
+    function goToPage(idx) {
+      if (idx >= 0 && idx < totalPages) {
+        curPage = idx;
+        updatePageView();
+        toggleTocModal(false);
+      }
+    }
+
+    // 도트 네비게이션
+    function initDots() {
+      const container = document.getElementById('nav-dots');
+      container.innerHTML = '';
+      pages.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = `h-3 rounded-full transition-all duration-300 ${i === 0 ? 'bg-emerald-400 w-8' : 'bg-slate-700 hover:bg-slate-500 w-3'}`;
+        dot.onclick = () => goToPage(i);
+        container.appendChild(dot);
+      });
+    }
+
+    function updateDots() {
+      const dots = document.getElementById('nav-dots').children;
+      for (let i = 0; i < dots.length; i++) {
+        if (i === curPage) {
+          dots[i].className = 'h-3 rounded-full bg-emerald-400 w-8 transition-all duration-300';
+        } else {
+          dots[i].className = 'h-3 rounded-full bg-slate-700 hover:bg-slate-500 w-3 transition-all duration-300';
+        }
+      }
+    }
+
+    // 목차 모달 생성
+    function initToc() {
+      const container = document.getElementById('toc-container');
+      container.innerHTML = '';
+      pages.forEach((p, i) => {
+        const title = p.getAttribute('data-title') || `슬라이드 ${i + 1}`;
+        const item = document.createElement('button');
+        item.className = 'w-full text-left px-4 py-3.5 rounded-2xl text-lg font-bold text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition flex items-center justify-between';
+        item.innerHTML = `
+          <span><strong class="text-emerald-400 mr-3">${i + 1}.</strong> ${title}</span>
+          <i class="fa-solid fa-chevron-right text-sm text-slate-600"></i>
+        `;
+        item.onclick = () => goToPage(i);
+        container.appendChild(item);
+      });
+    }
+
+    function toggleTocModal(forceClose) {
+      const modal = document.getElementById('modal-toc');
+      if (forceClose === false) {
+        modal.classList.add('hidden');
+      } else {
+        modal.classList.toggle('hidden');
+      }
+    }
+
+    // 전체화면 토글
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // 키보드 조작
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextPage();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevPage();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullScreen();
+      } else if (e.key === 'Escape') {
+        toggleTocModal(false);
+      }
+    });
+
+
+    function changeValuation(isUp) {
+      const btnUp = document.getElementById('tab-val-up');
+      const btnDown = document.getElementById('tab-val-down');
+      const badge = document.getElementById('badge-val');
+      const title = document.getElementById('title-val');
+      const desc = document.getElementById('desc-val');
+      const debit = document.getElementById('txt-val-debit');
+      const credit = document.getElementById('txt-val-credit');
+
+      if (isUp) {
+        btnUp.className = 'touch-btn px-6 py-3 rounded-xl bg-emerald-600 text-white transition flex items-center gap-2';
+        btnDown.className = 'touch-btn px-6 py-3 rounded-xl text-slate-400 hover:text-white transition flex items-center gap-2';
+        
+        badge.className = 'inline-block px-4 py-1.5 rounded-lg text-base font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mb-3';
+        badge.textContent = '공정가치 230,000원으로 30,000원 상승!';
+        title.textContent = '단기매매증권평가이익 발생';
+        desc.innerHTML = '자산(단기매매증권)의 가치를 +30,000원 올려주고, 그만큼 회사의 당기 이익인 <strong class="text-emerald-400">영업외수익</strong>으로 기록합니다.';
+
+
+
+      } else {
+        btnDown.className = 'touch-btn px-6 py-3 rounded-xl bg-rose-600 text-white transition flex items-center gap-2';
+        btnUp.className = 'touch-btn px-6 py-3 rounded-xl text-slate-400 hover:text-white transition flex items-center gap-2';
+
+        badge.className = 'inline-block px-4 py-1.5 rounded-lg text-base font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 mb-3';
+        badge.textContent = '공정가치 170,000원으로 30,000원 하락!';
+        title.textContent = '단기매매증권평가손실 발생';
+        desc.innerHTML = '자산(단기매매증권)의 가치를 -30,000원 깎아주고, 그만큼 회사의 당기 손실인 <strong class="text-rose-400">영업외비용</strong>으로 기록합니다.';
+
+
+
+      }
+      playTone('click');
+    }
+
+    // ================= [슬라이드 6] SVG 주가 변동 인터랙티브 그래프 컨트롤 =================
+    function selectGraphPhase(phase) {
+      const btn1 = document.getElementById('graph-btn-1');
+      const btn2 = document.getElementById('graph-btn-2');
+      const btn3 = document.getElementById('graph-btn-3');
+      const pin1 = document.getElementById('pin-1');
+      const pin2 = document.getElementById('pin-2');
+      const pin3 = document.getElementById('pin-3');
+      const badge = document.getElementById('graph-phase-badge');
+      const desc = document.getElementById('graph-phase-desc');
+      const entry = document.getElementById('graph-phase-entry');
+
+      // 핀 애니메이션 초기화
+      [pin1, pin2, pin3].forEach(p => p.classList.remove('graph-pin-active'));
+      [btn1, btn2, btn3].forEach(b => {
+        b.className = 'touch-btn py-2 px-3 rounded-xl bg-slate-800 text-slate-400 font-black text-xs md:text-base hover:text-white transition flex items-center justify-center gap-1.5';
+      });
+
+      if (phase === 1) {
+        btn1.className = 'touch-btn py-2 px-3 rounded-xl bg-blue-600 text-white font-black text-xs md:text-base transition shadow flex items-center justify-center gap-1.5';
+        pin1.classList.add('graph-pin-active');
+        badge.className = 'px-2.5 py-0.5 bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-md text-xs font-bold';
+        badge.textContent = '[1단계: 3월 5일 취득 시점]';
+        desc.textContent = '취득 시점의 시장 공정가치(10,000원)로 단기매매증권 장부를 최초 등록합니다.';
+        entry.textContent = '(차) 단기매매증권 10,000 / (대) 현금 10,000';
+      } else if (phase === 2) {
+        btn2.className = 'touch-btn py-2 px-3 rounded-xl bg-amber-600 text-white font-black text-xs md:text-base transition shadow flex items-center justify-center gap-1.5';
+        pin2.classList.add('graph-pin-active');
+        badge.className = 'px-2.5 py-0.5 bg-amber-600/30 text-amber-300 border border-amber-500/40 rounded-md text-xs font-bold';
+        badge.textContent = '[2단계: 12월 31일 기말평가 시점]';
+        desc.textContent = '1년 내내 주가가 출렁였지만 장부는 그대로였다가, 결산일에 시가(13,000원)와 맞추며 +3,000원 가치 상승을 반영합니다!';
+        entry.textContent = '(차) 단기매매증권 3,000 / (대) 평가이익 3,000';
+      } else if (phase === 3) {
+        btn3.className = 'touch-btn py-2 px-3 rounded-xl bg-emerald-600 text-white font-black text-xs md:text-base transition shadow flex items-center justify-center gap-1.5';
+        pin3.classList.add('graph-pin-active');
+        badge.className = 'px-2.5 py-0.5 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-md text-xs font-bold';
+        badge.textContent = '[3단계: 이듬해 4월 20일 처분 시점]';
+        desc.textContent = '주식을 15,000원에 처분하여 장부에서 제거하고, 직전 장부가(13,000원)와의 차액인 2,000원을 처분이익으로 정산합니다!';
+        entry.textContent = '(대) 단기매매증권 13,000 / (대) 처분이익 2,000';
+      }
+      playTone('click');
+    }
+
+    // ================= [슬라이드 8] O/X 퀴즈 채점 =================
+    function answerQuiz(qNum, choice) {
+      const msg = document.getElementById(`quiz-msg-${qNum}`);
+      msg.className = 'mt-2 text-sm p-2';
+      msg.textContent = choice + '를 선택했습니다. 근거를 생각한 뒤 수업에서 확인하세요.';
+    }
+
+    // 윈도우 로드 초기화
+    window.onload = function() {
+      initDots();
+      initToc();
+      updatePageView();
+    };
+  </script>
+</body>
+</html>
