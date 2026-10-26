@@ -7,9 +7,19 @@
     "title": "단기매매증권의 취득·평가·처분",
     "description": "공정가치 변동 그래프로 흐름을 이해하고, 수수료와 단계별 회계처리를 연습해요.",
     "pages": "91~93",
-    "tags": ["취득", "기말평가", "처분", "수수료", "분개"],
+    "tags": [
+      "취득",
+      "기말평가",
+      "처분",
+      "수수료",
+      "분개"
+    ],
     "slides": "materials/trading-securities-01/slides.html",
     "worksheetHtml": "materials/trading-securities-01/worksheet.html",
-    "worksheetPdf": "materials/trading-securities-01/worksheet.pdf"
+    "worksheetPdf": "materials/trading-securities-01/worksheet.pdf",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 1,
+    "accountOrder": 1
   }
 ]

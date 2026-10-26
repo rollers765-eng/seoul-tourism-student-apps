@@ -1,32 +1,21 @@
 'use strict';
-const form=document.getElementById('filters');
-const cards=document.getElementById('cards');
-const count=document.getElementById('count');
-let materials=[];
+let materials=[];let selectedUnit='';let selectedAccount='';let selectedLesson='';
+const rows=document.getElementById('rows');
 function element(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
-function addLink(container,path,label,download,primary){
-  if(!path)return;
-  // Only repository-local HTML/PDF documents can be opened from catalog data.
-  if(!/^materials\/[a-zA-Z0-9_./-]+\.(html|pdf)$/.test(path)||path.split('/').includes('..'))return;
-  const a=element('a',label,primary?'primary':'');a.href=path;
-  if(download)a.download='';else{a.target='_blank';a.rel='noopener';a.setAttribute('aria-label',label+' (새 창)');}
-  container.append(a);
+function choice(label,active,action){const b=element('button',label,'choice');b.type='button';b.setAttribute('aria-pressed',String(active));b.addEventListener('click',action);return b;}
+function addLink(container,path,label,download,primary){if(!path||!/^materials\/[a-zA-Z0-9_./-]+\.(html|pdf)$/.test(path)||path.split('/').includes('..'))return;const a=element('a',label,primary?'file-link primary':'file-link');a.href=path;if(download)a.download='';else{a.target='_blank';a.rel='noopener';}a.setAttribute('aria-label',label+(download?' 다운로드':' 열기 (새 창)'));container.append(a);}
+function drawChoices(){
+ const units=document.getElementById('units');units.replaceChildren();const chapters=new Map();const seen=new Set();
+ for(const row of materials){const key=materialUnitKey(row);if(seen.has(key))continue;seen.add(key);const chapter=row.chapter||'단원';let group=chapters.get(chapter);if(!group){const section=element('div',undefined,'unit-group');section.append(element('h3',chapter));group=element('div',undefined,'unit-buttons');section.append(group);units.append(section);chapters.set(chapter,group);}group.append(choice(row.unit,key===selectedUnit,()=>{selectedUnit=key;selectedAccount=materials.find(r=>materialUnitKey(r)===key).account;selectedLesson='';render();}));}
+ const unitRows=materials.filter(r=>materialUnitKey(r)===selectedUnit);const accounts=document.getElementById('accounts');accounts.replaceChildren();for(const account of new Set(unitRows.map(r=>r.account)))accounts.append(choice(account,account===selectedAccount,()=>{selectedAccount=account;selectedLesson='';render();}));
+ const lessons=document.getElementById('lessons');lessons.replaceChildren();if(unitRows.length){lessons.append(choice('전체 차시',selectedLesson==='',()=>{selectedLesson='';render();}));for(const lesson of [...new Set(unitRows.filter(r=>r.account===selectedAccount).map(r=>r.lesson))].sort((a,b)=>a-b))lessons.append(choice(lesson+'차시',String(lesson)===selectedLesson,()=>{selectedLesson=String(lesson);render();}));}
 }
 function render(){
-  const filters=Object.fromEntries(['q','unit','account','lesson'].map(key=>[key,document.getElementById(key).value]));
-  const rows=materials.filter(row=>matchesMaterial(row,filters));
-  cards.replaceChildren();count.textContent=rows.length+'개 수업 · 전체 '+materials.length+'개';document.getElementById('empty').hidden=rows.length!==0;
-  for(const row of rows){
-    const article=element('article',undefined,'material');const icon=element('div',undefined,'lesson-icon');icon.setAttribute('aria-hidden','true');icon.append(element('span',String(row.lesson).padStart(2,'0')),element('small','LESSON'));
-    const body=element('div');body.append(element('p',row.unit+' / '+row.account+' · '+row.lesson+'차시','meta'),element('h3',row.title),element('p',row.description,'description'));
-    const tags=element('div',undefined,'tags');for(const tag of [...(row.tags||[]),'교과서 '+row.pages+'쪽'])tags.append(element('span',tag,'tag'));body.append(tags);
-    const links=element('div',undefined,'actions');addLink(links,row.slides,'슬라이드 열기 ↗',false,true);addLink(links,row.worksheetHtml,'활동지 HTML 열기 ↗');addLink(links,row.worksheetHtml,'HTML 다운로드',true);addLink(links,row.worksheetPdf,'활동지 PDF 열기 ↗');addLink(links,row.worksheetPdf,'PDF 다운로드',true);body.append(links);article.append(icon,body);cards.append(article);
-  }
+ drawChoices();const visible=materials.filter(r=>materialUnitKey(r)===selectedUnit&&r.account===selectedAccount&&(!selectedLesson||String(r.lesson)===selectedLesson));rows.replaceChildren();document.getElementById('count').textContent=visible.length+'개 수업';document.getElementById('empty').hidden=visible.length!==0;
+ const current=materials.find(r=>materialUnitKey(r)===selectedUnit);document.getElementById('breadcrumb').textContent=current?[current.chapter,current.unit,selectedAccount,selectedLesson?selectedLesson+'차시':'전체 차시'].filter(Boolean).join(' › '):'';
+ for(const row of visible){const tr=element('tr');const labels=['수업자료명','수업슬라이드','활동지 (열기)','활동지 (다운로드)','관련 키워드'];const cells=labels.map(label=>{const td=element('td');td.dataset.label=label;tr.append(td);return td;});const title=element('div');title.append(element('span',row.lesson+'차시','lesson-label'),element('h3',row.title));if(row.pages)title.append(element('p','교과서 '+row.pages+'쪽','page-label'));cells[0].append(title);
+ for(let i=1;i<=3;i++){const links=element('div',undefined,'links');if(i===1)addLink(links,row.slides,'슬라이드 ↗',false,true);if(i===2){addLink(links,row.worksheetHtml,'HTML ↗');addLink(links,row.worksheetPdf,'PDF ↗');}if(i===3){addLink(links,row.worksheetHtml,'HTML ↓',true);addLink(links,row.worksheetPdf,'PDF ↓',true);}if(!links.children.length)links.append(element('span','—'));cells[i].append(links);}
+ const tags=element('div',undefined,'tags');for(const tag of row.tags||[])tags.append(element('span',tag,'tag'));cells[4].append(tags);rows.append(tr);
+ }
 }
-function reset(){form.reset();render();document.getElementById('q').focus();}
-form.addEventListener('submit',e=>e.preventDefault());form.addEventListener('input',render);form.addEventListener('change',render);form.addEventListener('reset',()=>setTimeout(render,0));document.getElementById('clear-empty').addEventListener('click',reset);
-fetch('materials.json').then(r=>{if(!r.ok)throw Error('목록 요청 실패');return r.json();}).then(data=>{
-  if(!Array.isArray(data))throw Error('목록 형식 오류');materials=data.sort((a,b)=>a.unit.localeCompare(b.unit,'ko')||a.account.localeCompare(b.account,'ko')||a.lesson-b.lesson);
-  for(const key of ['unit','account','lesson']){const values=[...new Set(materials.map(row=>row[key]))].sort((a,b)=>key==='lesson'?a-b:String(a).localeCompare(String(b),'ko'));for(const value of values){const option=element('option',value+(key==='lesson'?'차시':''));option.value=value;document.getElementById(key).append(option);}}
-  render();
-}).catch(()=>{count.textContent='자료 목록을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.';const link=element('a','단기매매증권 1차시 자료 바로 열기');link.href='materials/trading-securities-01/worksheet.html';cards.append(link);});
+fetch('materials.json').then(r=>{if(!r.ok)throw Error('목록 요청 실패');return r.json();}).then(data=>{if(!Array.isArray(data))throw Error('목록 형식 오류');materials=sortMaterials(data);if(materials.length){selectedUnit=materialUnitKey(materials[0]);selectedAccount=materials[0].account;}render();}).catch(()=>{document.getElementById('units').textContent='목록을 불러오지 못했습니다. 새로고침해 주세요.';document.getElementById('count').textContent='목록 불러오기 실패';const tr=element('tr');const td=element('td');td.colSpan=5;const a=element('a','단기매매증권 1차시 활동지 바로 열기');a.href='materials/trading-securities-01/worksheet.html';td.append(a);tr.append(td);rows.replaceChildren(tr);});

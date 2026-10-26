@@ -2,19 +2,24 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="서울관광고등학교 회계원리 수업 자료집. 단원, 계정과목, 차시별로 수업 슬라이드와 활동지를 찾아보세요.">
-<title>회계원리 자료집 | 서울관광고등학교</title>
+<meta name="description" content="서울관광고등학교 회계원리 자료실. 단원과 계정과목, 차시 순서로 수업 슬라이드와 활동지를 열어보세요.">
+<meta name="theme-color" content="#a55725"><title>회계원리 자료실 | 서울관광고등학교</title>
 <link rel="stylesheet" href="style.css"><script defer src="catalog.js"></script><script defer src="app.js"></script>
 </head>
 <body>
-<a class="skip" href="#materials">자료 목록으로 건너뛰기</a>
-<header class="top"><a class="school" href="../"><span class="mark" aria-hidden="true">S</span><span>서울관광고등학교<small>경영·금융 교과</small></span></a><span class="top-label">수업 자료실</span></header>
+<a class="skip" href="#materials">수업자료 목록으로 건너뛰기</a>
+<header class="school-header"><div class="header-inner"><a href="../" aria-label="서울관광고등학교 학생용 웹앱 모음"><img class="signature" src="assets/school-signature.png" width="979" height="264" alt="서울관광고등학교 Seoul Tourism High School"></a><a class="hub-link" href="../">웹앱 모음 ↗</a></div></header>
 <main>
-<section class="hero"><div><p class="eyebrow">ACCOUNTING CLASSROOM</p><h1>차근차근 배우고,<br><em>회계로 연결하다.</em></h1><p class="intro">회계원리 교과 자료집<br>오늘의 수업 슬라이드와 활동지를 한곳에서 찾아보세요.</p><a class="hero-link" href="#materials">수업 자료 찾아보기 <span aria-hidden="true">↓</span></a></div><div class="ledger" aria-hidden="true"><div class="ledger-title">오늘의 회계 노트 <span>01</span></div><div class="ledger-columns"><b>차변</b><b>대변</b></div><div class="ledger-line"></div><div class="ledger-line short"></div><div class="ledger-line"></div><p>개념을 이해하고<br>거래를 기록하는 시간.</p><span class="ledger-tag">이해 → 연습 → 정리</span></div></section>
-<section class="library" id="materials" aria-labelledby="library-title"><div class="section-head"><div><p class="eyebrow">LEARNING MATERIALS</p><h2 id="library-title">수업 자료 찾기</h2></div><span class="student-badge">학생용 자료</span></div>
-<form id="filters" role="search"><label class="search-label" for="q">검색어</label><div class="search-row"><input type="search" id="q" placeholder="단원, 계정과목, 차시 또는 수업 내용을 검색하세요" autocomplete="off"><button type="reset" class="reset">초기화</button></div><div class="filter-row"><label>단원<select id="unit"><option value="">모든 단원</option></select></label><label>계정과목<select id="account"><option value="">모든 계정과목</option></select></label><label>차시<select id="lesson"><option value="">모든 차시</option></select></label></div></form>
-<div class="results-bar"><p id="count" role="status" aria-live="polite">자료를 불러오는 중입니다.</p><span>차시 순으로 보기</span></div><div id="cards"></div><div id="empty" hidden><h3>검색 결과가 없어요.</h3><p>검색어를 줄이거나 다른 단원·계정과목을 선택해 보세요.</p><button type="button" id="clear-empty">검색 조건 초기화</button></div><noscript><p>검색 기능은 JavaScript가 필요합니다. <a href="materials/trading-securities-01/slides.html">단기매매증권 1차시 슬라이드</a>와 <a href="materials/trading-securities-01/worksheet.html">학생용 활동지</a>를 바로 열 수 있습니다.</p></noscript>
+<section class="intro" aria-labelledby="page-title"><div><p class="eyebrow">서울관광고등학교 · 경영·금융 교과</p><h1 id="page-title">회계원리 <span>자료실</span></h1><p class="intro-text">단원부터 차시까지, 수업 순서대로 바로 열어보세요.</p></div><img class="characters" src="assets/school-characters.png" width="2048" height="592" alt="교복과 다양한 전공 직업 복장을 입은 학교 캐릭터들"></section>
+<section class="curriculum" aria-label="교육과정 순서로 자료 선택">
+<div class="step-row"><h2><span>1</span> 단원</h2><div id="units" class="unit-groups"><p class="loading">단원을 불러오는 중입니다.</p></div></div>
+<div class="step-row"><h2><span>2</span> 계정과목</h2><div id="accounts" class="choices"></div></div>
+<div class="step-row"><h2><span>3</span> 차시</h2><div id="lessons" class="choices"></div></div>
 </section>
-<aside class="guide"><div><span class="step">01</span><h3>수업은 슬라이드로</h3><p>목차와 이전·다음 버튼으로 수업 내용을 살펴보세요.</p></div><div><span class="step">02</span><h3>연습은 활동지로</h3><p>HTML은 바로 열거나 저장하고, PDF가 등록된 자료는 바로 내려받으세요.</p></div><div><span class="step">03</span><h3>인쇄해서 차근차근</h3><p>HTML 활동지의 인쇄 버튼에서 PDF로 저장할 수 있어요. 휴대폰에서는 활동지를 가로로 밀어 볼 수 있습니다.</p></div></aside>
-</main><footer><strong>서울관광고등학교 · 회계원리</strong><p>공개 학생용 자료에는 문제 정답을 포함하지 않습니다.<br>수업용 원본의 개념 설명과 그래프는 학습을 위해 유지합니다.</p><a href="../">학생용 웹앱 모음 ↗</a></footer>
+<section id="materials" class="materials" aria-labelledby="materials-title"><div class="list-heading"><div><p id="breadcrumb" class="breadcrumb"></p><h2 id="materials-title">수업자료</h2></div><p id="count" role="status" aria-live="polite">자료를 불러오는 중입니다.</p></div>
+<div class="table-wrap"><table><caption class="sr-only">수업자료명, 수업슬라이드, 활동지 열기, 활동지 다운로드, 관련 키워드</caption><colgroup><col class="title-col"><col class="slide-col"><col class="open-col"><col class="download-col"><col class="keyword-col"></colgroup><thead><tr><th scope="col">수업자료명</th><th scope="col">수업슬라이드</th><th scope="col">활동지 <span>(열기)</span></th><th scope="col">활동지 <span>(다운로드)</span></th><th scope="col">관련 키워드</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p id="empty" class="empty" hidden>등록된 수업자료가 없습니다.</p><p class="help">HTML은 화면에서 보고, PDF는 인쇄하거나 저장할 때 사용하세요.</p>
+<noscript><p><a href="materials/trading-securities-01/slides.html">단기매매증권 1차시 슬라이드</a> · <a href="materials/trading-securities-01/worksheet.html">활동지 HTML</a> · <a href="materials/trading-securities-01/worksheet.pdf">활동지 PDF</a></p></noscript>
+</section>
+</main><footer><span>서울관광고등학교 · 회계원리 자료실</span><span>학생용 자료 · 교사용 정답 제외</span></footer>
 </body></html>

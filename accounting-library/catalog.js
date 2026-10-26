@@ -1,5 +1,2 @@
-function matchesMaterial(row, filters) {
-  const haystack = [row.title,row.unit,row.account,row.lesson+'차시',row.description,row.pages,...(row.tags||[])].join(' ').normalize('NFKC').toLowerCase();
-  const words=(filters.q||'').normalize('NFKC').toLowerCase().trim().split(/\s+/).filter(Boolean);
-  return words.every(word=>haystack.includes(word)) && ['unit','account','lesson'].every(key=>!filters[key]||String(row[key])===String(filters[key]));
-}
+function materialUnitKey(row){return JSON.stringify([row.chapter||'단원',row.unit]);}
+function sortMaterials(items){return [...items].sort((a,b)=>(a.chapterOrder??999)-(b.chapterOrder??999)||(a.unitOrder??999)-(b.unitOrder??999)||(a.accountOrder??999)-(b.accountOrder??999)||Number(a.lesson)-Number(b.lesson));}

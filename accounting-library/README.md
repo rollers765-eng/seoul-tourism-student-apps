@@ -4,6 +4,12 @@
 
 공개 주소: https://rollers765-eng.github.io/seoul-tourism-student-apps/accounting-library/
 
+## 자료실 이용
+
+단원 → 계정과목 → 차시 버튼 순으로 선택합니다. 첫 단원과 계정과목은 자동 선택되어 첫 화면에서도 자료를 바로 열 수 있습니다. 목록은 수업자료명 / 수업슬라이드 / 활동지 열기 / 활동지 다운로드 / 관련 키워드 순서입니다. 휴대폰에서도 같은 순서로 표시합니다.
+
+교표·교명과 캐릭터는 사용자가 제공한 원본 PNG를 그대로 사용합니다.
+
 ## 수업 추가하기
 
 1. `materials/` 안에 새 영문 폴더를 만듭니다. 예: `cash-02`.
@@ -14,7 +20,11 @@
 ```json
 {
   "id": "cash-02",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
   "unit": "유동자산",
+  "unitOrder": 1,
+  "accountOrder": 1,
   "account": "현금",
   "lesson": 2,
   "title": "현금 거래의 회계처리",
@@ -26,6 +36,8 @@
   "worksheetPdf": "materials/cash-02/worksheet.pdf"
 }
 ```
+
+`chapter`에는 교과서 대단원을 기록합니다. `chapterOrder`, `unitOrder`, `accountOrder`는 교과서에 따른 표시 순서입니다. 같은 단원·계정과목의 자료는 같은 순서 값을 사용합니다. 등록한 단원만 버튼으로 표시되며, 자료 없는 단원을 임의로 만들어 표시하지 않습니다.
 
 없는 파일 항목은 `null`로 지정합니다. 파일명은 영문·숫자·하이픈·밑줄을 사용하고, 경로는 `materials/`로 시작합니다. `lesson`은 숫자, `id`는 자료마다 고유한 값을 사용합니다. PDF만 있는 활동지도 지원합니다. 파일 경로 대소문자와 JSON 쉼표를 확인하세요.
 
