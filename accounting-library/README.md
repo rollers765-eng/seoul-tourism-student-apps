@@ -1,6 +1,6 @@
 # 서울관광고등학교 회계원리 자료집
 
-기존 웹앱과 독립된 정적 자료집입니다. 이 폴더 안의 파일만 배포하며 기존 앱은 수정하지 않습니다.
+웹앱 모음 → 경영·금융 교과교실 → 회계원리 자료실의 구조입니다. 상위 교과교실 주소는 `../business-finance/`이며, 회계원리 자료실의 기존 주소와 자료 파일은 유지합니다.
 
 공개 주소: https://rollers765-eng.github.io/seoul-tourism-student-apps/accounting-library/
 
