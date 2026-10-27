@@ -608,7 +608,39 @@
       }
     }
   </style>
-</head>
+<style>
+@media (max-width: 767px) {
+ html,body {width:100%;height:100%;overflow:hidden;}
+ .top-bar {height:auto;min-height:54px;padding:6px 10px;gap:6px}
+ .top-bar>div:first-child {min-width:0;flex:1}
+ .school-badge {font-size:.75rem;padding:5px;white-space:nowrap}
+ .top-title {display:none}
+ .top-controls {gap:4px}
+ .top-controls .btn {font-size:.75rem;padding:6px;min-height:40px}
+ .page-counter {font-size:.8rem;padding:5px}
+ .main-stage {display:block;padding:8px;min-height:0;overflow:auto}
+ .slide-canvas {height:auto;min-height:100%;padding:16px 12px;border-radius:15px;display:block;overflow:visible}
+ .slide-page.active {height:auto;min-height:0;display:flex;gap:14px;overflow:visible}
+ .slide-header {flex-direction:column;gap:8px}
+ .slide-header>*, .slide-page>*, .slide-page div {min-width:0}
+ .core-question-pill {text-align:left;width:100%;white-space:normal}
+ .grid-2,.grid-3,.grid-4 {grid-template-columns:minmax(0,1fr);gap:10px}
+ .slide-page [style*="display: flex"],.slide-page [style*="display:flex"] {flex-wrap:wrap;max-width:100%}
+ .slide-page [style*="grid-template-columns"] {grid-template-columns:minmax(0,1fr)!important}
+ .slide-page [style*="min-width"] {min-width:0!important;max-width:100%}
+ .slide-title {font-size:1.45rem}
+ .prompt-bar {flex-wrap:wrap}
+ .journal-line-box {justify-content:flex-start;overflow-x:auto;max-width:100%}
+ .t-ledger {font-size:.8rem}
+ .t-ledger td,.t-ledger th {padding:5px}
+ .bottom-bar {height:auto;min-height:55px;padding:6px 10px;gap:6px}
+ .bottom-bar .btn {font-size:.8rem;padding:7px}
+ .nav-dots {display:none}
+ .bottom-bar>div:last-child {display:none}
+ .toc-list {grid-template-columns:1fr}
+ .modal-panel {padding:16px;max-height:85vh}
+}
+</style></head>
 <body>
 
   <!-- ================= 상단 앱 바 ================= -->
