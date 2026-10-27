@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서울관광고 회계원리 - 받을어음의 회계 처리 (전자칠판용)</title>
+  <style>
+    /* ==========================================================================
+       1. 기본 리셋 및 시스템 폰트, 색상 변수 설정 (100% 오프라인 작동)
+       ========================================================================== */
+    :root {
+      --bg-dark: #070b14;
+      --bg-panel: #11192c;
+      --bg-card: #18233c;
+      --bg-card-alt: #0d1424;
+      --border-color: #293b63;
+      --text-main: #f8fafc;
+      --text-sub: #cbd5e1;
+      --text-muted: #94a3b8;
+
+      /* 핵심 강조 및 회계 색상 */
+      --brand-emerald: #10b981;
+      --brand-teal: #14b8a6;
+      --brand-cyan: #06b6d4;
+      --brand-amber: #f59e0b;
+      --brand-gold: #facc15;
+      --brand-rose: #f43f5e;
+      --brand-purple: #a855f7;
+
+      /* 차변 / 대변 전용 고대비 색상 */
+      --debit-color: #38bdf8;
+      --debit-bg: rgba(56, 189, 248, 0.14);
+      --credit-color: #fb7185;
+      --credit-bg: rgba(251, 113, 133, 0.14);
+
+      /* 등장인물/기관 일관성 색상 */
+      --role-payee: #34d399;   /* 수취인(우리 회사/매출자) */
+      --role-issuer: #60a5fa;  /* 발행인(매입자/채무자) */
+      --role-bank: #facc15;    /* 은행/지명인(지급인) */
+      --role-other: #c084fc;   /* 제3거래처(배서양수인) */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: "Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ==========================================================================
+       2. 상단바 / 진행바 / 하단바 레이아웃
+       ========================================================================== */
+    .top-bar {
+      height: 58px;
+      background-color: rgba(7, 11, 20, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 30;
+    }
+
+    .school-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 12px;
+      color: #34d399;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .top-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #e2e8f0;
+      margin-left: 14px;
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-counter {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--text-sub);
+    }
+
+    .page-counter .cur {
+      color: #34d399;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 5px;
+      background: #0f172a;
+      flex-shrink: 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #06b6d4, #3b82f6);
+      width: 9%;
+      transition: width 0.3s ease;
+    }
+
+    /* 메인 슬라이드 캔버스 */
+    .main-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 22px;
+      overflow: hidden;
+    }
+
+    .slide-canvas {
+      width: 100%;
+      height: 100%;
+      max-width: 1620px;
+      background-color: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+      padding: 24px 34px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .slide-page {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      transform: scale(0.99);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      overflow: hidden;
+    }
+
+    .slide-page.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* 하단 내비게이션 바 */
+    .bottom-bar {
+      height: 60px;
+      background-color: rgba(7, 11, 20, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 30;
+    }
+
+    .nav-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot-btn {
+      height: 11px;
+      width: 11px;
+      border-radius: 999px;
+      background: #334155;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .dot-btn.active {
+      width: 30px;
+      background: #34d399;
+    }
+
+    /* ==========================================================================
+       3. 공통 타이포그래피, 버튼, 4단계 판단 배너, 분개 표시줄
+       ========================================================================== */
+    .slide-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .step-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      margin-bottom: 4px;
+    }
+
+    .slide-title {
+      font-size: clamp(1.55rem, 2.3vw, 2.25rem);
+      font-weight: 900;
+      line-height: 1.25;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+      color: var(--text-sub);
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    /* 핵심 반복 질문 배지 */
+    .core-question-pill {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(234, 88, 12, 0.15));
+      border: 2px solid rgba(250, 204, 21, 0.55);
+      border-radius: 16px;
+      padding: 8px 16px;
+      color: #fde047;
+      font-weight: 800;
+      font-size: clamp(0.9rem, 1.15vw, 1.08rem);
+      text-align: right;
+      flex-shrink: 0;
+      line-height: 1.35;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.12);
+    }
+
+    /* 버튼 공통 */
+    .btn {
+      touch-action: manipulation;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 10px 18px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #34d399, #10b981);
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-amber {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #090d16;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-dark {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+    }
+
+    .btn-dark:hover {
+      background: #334155;
+    }
+
+    .btn-toggled {
+      background: #334155 !important;
+      color: #cbd5e1 !important;
+      border: 1px solid #64748b !important;
+      box-shadow: none !important;
+    }
+
+    /* 정답 토글 블러 박스 */
+    .answer-box {
+      transition: filter 0.28s ease, opacity 0.28s ease, transform 0.28s ease;
+    }
+
+    .answer-hidden {
+      filter: blur(14px);
+      opacity: 0.16;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .answer-revealed {
+      filter: blur(0);
+      opacity: 1;
+      pointer-events: auto;
+      user-select: auto;
+    }
+
+    /* 분개 한 줄 표시 전용 박스 (필수 규칙: 차변과 대변을 같은 줄에 표시) */
+    .journal-line-box {
+      background: #090e1a;
+      border: 2px solid #2e4372;
+      border-radius: 14px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      gap: 16px;
+      font-family: "Pretendard", "Malgun Gothic", "Consolas", monospace;
+      font-size: clamp(1rem, 1.38vw, 1.38rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+
+    .journal-debit {
+      color: var(--debit-color);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .journal-credit {
+      color: var(--credit-color);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-tag {
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      vertical-align: middle;
+    }
+
+    /* 교사 발문 바 */
+    .prompt-bar {
+      background: #090e1a;
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .prompt-q {
+      font-size: clamp(1rem, 1.3vw, 1.22rem);
+      font-weight: 800;
+      color: #fde047;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ==========================================================================
+       4. 그리드 및 카드 컴포넌트, 애니메이션
+       ========================================================================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      width: 100%;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 18px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .card-dark {
+      background: var(--bg-card-alt);
+      border: 1.5px solid #223152;
+      border-radius: 14px;
+      padding: 12px 16px;
+      min-width: 0;
+    }
+
+    /* 거래 이동 애니메이션 */
+    @keyframes floatRight {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(10px); }
+    }
+
+    @keyframes floatLeft {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-10px); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.45); }
+      50% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+    }
+
+    .anim-right {
+      display: inline-block;
+      animation: floatRight 1.8s infinite ease-in-out;
+    }
+
+    .anim-left {
+      display: inline-block;
+      animation: floatLeft 1.8s infinite ease-in-out;
+    }
+
+    .pulse-card {
+      animation: pulseGlow 2.2s infinite;
+    }
+
+    /* 어음 그래픽 카드 스타일 */
+    .note-graphic {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #78350f;
+      border: 3px solid #f59e0b;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 900;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+      position: relative;
+    }
+
+    .note-graphic.new-note {
+      background: linear-gradient(135deg, #d1fae5, #6ee7b7);
+      color: #064e3b;
+      border-color: #10b981;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+    }
+
+    .note-graphic.bad-note {
+      background: linear-gradient(135deg, #ffe4e6, #fda4af);
+      color: #881337;
+      border-color: #f43f5e;
+    }
+
+    /* 원장 T계정 테이블 */
+    .t-ledger {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(1rem, 1.25vw, 1.2rem);
+      font-weight: 800;
+    }
+
+    .t-ledger th {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 10px 14px;
+      text-align: center;
+      border-bottom: 3px solid #94a3b8;
+      font-size: 1.3rem;
+    }
+
+    .t-ledger td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #293b63;
+    }
+
+    .t-ledger .divider-right {
+      border-right: 3px solid #94a3b8;
+    }
+
+    .t-ledger .total-row td {
+      border-top: 2px solid #94a3b8;
+      border-bottom: 4px double #94a3b8;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fde047;
+    }
+
+    /* 목차 모달 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-panel {
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 24px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 82vh;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .toc-list {
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding-right: 4px;
+    }
+
+    .toc-item {
+      text-align: left;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toc-item:hover, .toc-item.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #34d399;
+      color: #6ee7b7;
+    }
+
+    /* 움직임 줄이기 기기 설정 대응 */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= 상단 앱 바 ================= -->
+  <header class="top-bar">
+    <div style="display: flex; align-items: center;">
+      <div class="school-badge">
+        <span>🏫 서울관광고 회계원리</span>
+      </div>
+      <span class="top-title" id="top-slide-title">장면 1. 어음을 받는다는 것은?</span>
+    </div>
+
+    <div class="top-controls">
+      <div class="page-counter">
+        <span class="cur" id="page-current">1</span> / <span id="page-total">11</span>
+      </div>
+      <button class="btn btn-dark" onclick="toggleTocModal()" title="목차 열기">
+        <span>☰ 목차</span>
+      </button>
+      <button class="btn btn-primary" onclick="toggleFullScreen()" title="전체화면 (F키)">
+        <span>⛶ 전체화면</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= 상단 진행바 ================= -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-bar"></div>
+  </div>
+
+  <!-- ================= 메인 슬라이드 스테이지 ================= -->
+  <main class="main-stage">
+    <div class="slide-canvas">
+
+      <!-- =================================================================
+           [장면 1] 도입: “어음을 받는다는 것은?”
+           ================================================================= -->
+      <section class="slide-page active" data-title="장면 1. 도입: 어음을 받는다는 것은?">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 1 · 도입 (교과서 99쪽)</span>
+            <h1 class="slide-title">어음을 받는다는 것은 무슨 뜻일까요?</h1>
+            <p class="slide-subtitle">카페가 원두(상품)를 판매하고 현금 대신 어음을 받는 상황을 살펴봅시다.</p>
+          </div>
+          <div class="core-question-pill">
+            💡 핵심 질문: “이 거래로 어음을 통해 돈을 받을 권리가<br>생겼나요, 그대로인가요, 아니면 없어졌나요?”
+          </div>
+        </div>
+
+        <!-- 거래 시각화 도식 -->
+        <div class="card" style="my: auto; padding: 24px;">
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; align-items: center; gap: 20px;">
+            
+            <!-- 우리 카페 (매출자/수취인) -->
+            <div class="card-dark" style="border: 2px solid var(--role-payee); text-align: center; padding: 20px;">
+              <div style="font-size: 2.8rem; margin-bottom: 6px;">☕🏢</div>
+              <div style="color: var(--role-payee); font-weight: 900; font-size: 1.35rem;">우리 회사 (원두 로스터리)</div>
+              <div style="color: var(--text-sub); font-size: 1rem; margin-top: 4px; font-weight: 700;">상품 매출자 = 어음 수취인</div>
+            </div>
+
+            <!-- 이동 화살표 영역 -->
+            <div style="display: flex; flex-direction: column; gap: 18px; justify-content: center;">
+              <!-- 1. 원두 인도 -->
+              <div style="background: rgba(56, 189, 248, 0.12); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 14px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 800; color: #bae6fd; font-size: 1.15rem;">① 원두(상품) 판매</span>
+                <span class="anim-right" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8;">📦 ━━━▶</span>
+              </div>
+
+              <!-- 2. 어음 수취 -->
+              <div class="note-graphic" style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="anim-left" style="font-size: 1.6rem; font-weight: 900; color: #b45309;">◀━━━ 📜</span>
+                <div style="text-align: right;">
+                  <div style="font-size: 1.2rem; font-weight: 900;">② 현금 대신 ‘어음’ 수취!</div>
+                  <div style="font-size: 0.95rem; color: #92400e;">“만기일에 일정 금액을 꼭 드릴게요!”</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 거래처 카페 (매입자/발행인) -->
+            <div class="card-dark" style="border: 2px solid var(--role-issuer); text-align: center; padding: 20px;">
+              <div style="font-size: 2.8rem; margin-bottom: 6px;">🥐🏪</div>
+              <div style="color: var(--role-issuer); font-weight: 900; font-size: 1.35rem;">거래처 (베이커리 카페)</div>
+              <div style="color: var(--text-sub); font-size: 1rem; margin-top: 4px; font-weight: 700;">상품 매입자 = 어음 발행인</div>
+            </div>
+
+          </div>
+
+          <!-- 핵심 정의 강조 -->
+          <div style="margin-top: 20px; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; border-radius: 16px; padding: 16px 22px; text-align: center;">
+            <span style="font-size: clamp(1.3rem, 2vw, 1.85rem); font-weight: 900; color: #ffffff;">
+              ⭐ 핵심 공식 : <span style="color: #fde047;">받을어음</span> = <span style="color: #6ee7b7; text-decoration: underline; text-underline-offset: 6px;">어음을 통해 나중에 돈을 받을 권리 (자산)</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 발문 및 정답 토글 -->
+        <div>
+          <div class="prompt-bar">
+            <div class="prompt-q">
+              <span>🙋 교사 발문:</span>
+              <span>“지금 현금을 받은 걸까요, 나중에 돈을 받을 권리를 얻은 걸까요?”</span>
+            </div>
+            <button class="btn btn-primary" onclick="toggleAnswer('s1-ans', this, '정답 공개 👁️', '정답 숨기기 🔒')">
+              정답 공개 👁️
+            </button>
+          </div>
+          <div id="s1-ans" class="answer-box answer-hidden" style="margin-top: 10px; background: #064e3b; border: 2px solid #34d399; border-radius: 14px; padding: 12px 20px; text-align: center; font-size: 1.25rem; font-weight: 900; color: #ecfdf5;">
+            ✅ 정답: “지금 현금을 받은 것이 아니라, <span style="color: #fde047; text-decoration: underline;">정해진 날(만기일) 돈을 받을 권리</span>가 생겼습니다!”
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 2] 어려운 단어 쉽게 이해하기 (약속어음 vs 환어음)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 2. 핵심 용어와 약속어음·환어음 비교">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 2 · 어음의 기초와 종류 (교과서 99쪽)</span>
+            <h2 class="slide-title">어려운 단어 쉽게 이해하기 &amp; 약속어음 vs 환어음</h2>
+          </div>
+          <div class="core-question-pill" style="border-color: #34d399; color: #6ee7b7;">
+            📌 단원 포인트: 우리는 어음을 받는 <strong style="color: #fde047;">‘수취인(어음 채권자)’ 입장</strong>에서<br>차변·대변 분개를 배웁니다!
+          </div>
+        </div>
+
+        <!-- 상단 4대 필수 단어 카드 -->
+        <div class="grid-4">
+          <div class="card-dark" style="border-left: 5px solid #facc15;">
+            <div style="color: #fde047; font-weight: 900; font-size: 1.15rem;">📜 어음</div>
+            <div style="color: var(--text-main); font-size: 0.98rem; margin-top: 4px; font-weight: 700;">정해진 날에 일정 금액을 지급하기로 하는 증서</div>
+          </div>
+          <div class="card-dark" style="border-left: 5px solid #fb7185;">
+            <div style="color: #fda4af; font-weight: 900; font-size: 1.15rem;">📅 만기일</div>
+            <div style="color: var(--text-main); font-size: 0.98rem; margin-top: 4px; font-weight: 700;">어음에 적힌 돈을 지급하기로 정한 날</div>
+          </div>
+          <div class="card-dark" style="border-left: 5px solid var(--role-payee);">
+            <div style="color: #6ee7b7; font-weight: 900; font-size: 1.15rem;">🙌 수취인 (채권자)</div>
+            <div style="color: var(--text-main); font-size: 0.98rem; margin-top: 4px; font-weight: 700;">어음을 받는 사람 <span style="color:#fde047;">(★우리 회사 입장!)</span></div>
+          </div>
+          <div class="card-dark" style="border-left: 5px solid var(--role-issuer);">
+            <div style="color: #93c5fd; font-weight: 900; font-size: 1.15rem;">✍️ 발행인</div>
+            <div style="color: var(--text-main); font-size: 0.98rem; margin-top: 4px; font-weight: 700;">어음을 작성하여 발행하는 사람</div>
+          </div>
+        </div>
+
+        <!-- 하단 약속어음 vs 환어음 비교 도식 (교과서 99쪽 그림 일치) -->
+        <div class="grid-2" style="flex: 1; margin: 10px 0;">
+          
+          <!-- 왼쪽: 약속어음 (2자 관계) -->
+          <div class="card" style="border: 2px solid #38bdf8;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 1.3rem; font-weight: 900; color: #38bdf8;">① 약속어음 (2자 관계)</span>
+                <span class="badge-tag" style="background: rgba(56,189,248,0.2); color: #bae6fd;">발행인이 직접 지급 약속</span>
+              </div>
+              <p style="font-size: 0.98rem; color: var(--text-sub); font-weight: 700; margin-bottom: 12px;">
+                발행인(매입자)이 일정한 날짜와 장소에서 수취인(매출자)에게 <strong style="color: #fde047;">직접 지급하기로 약속</strong>한 증서
+              </p>
+            </div>
+
+            <!-- 약속어음 SVG 다이어그램 -->
+            <div style="background: #090e1a; border-radius: 14px; padding: 12px; border: 1px solid #1e293b;">
+              <svg viewBox="0 0 520 155" style="width: 100%; height: auto; display: block;">
+                <defs>
+                  <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#60a5fa" />
+                  </marker>
+                  <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#34d399" />
+                  </marker>
+                  <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#facc15" />
+                  </marker>
+                </defs>
+                <!-- 매입자(발행인=지급인) -->
+                <rect x="10" y="25" width="135" height="105" rx="12" fill="#172554" stroke="#60a5fa" stroke-width="2.5"/>
+                <text x="77" y="58" fill="#93c5fd" font-size="15" font-weight="900" text-anchor="middle">어음 채무자</text>
+                <text x="77" y="82" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle">매입자</text>
+                <text x="77" y="104" fill="#fde047" font-size="12" font-weight="800" text-anchor="middle">(발행인 = 지급인)</text>
+
+                <!-- 매출자(수취인) -->
+                <rect x="375" y="25" width="135" height="105" rx="12" fill="#064e3b" stroke="#34d399" stroke-width="2.5"/>
+                <text x="442" y="58" fill="#6ee7b7" font-size="15" font-weight="900" text-anchor="middle">어음 채권자</text>
+                <text x="442" y="82" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle">매출자 (우리)</text>
+                <text x="442" y="104" fill="#fde047" font-size="12" font-weight="800" text-anchor="middle">(수취인)</text>
+
+                <!-- 화살표 4개 (교과서 순서 일치) -->
+                <line x1="365" y1="36" x2="155" y2="36" stroke="#34d399" stroke-width="2.5" marker-end="url(#arr-green)"/>
+                <text x="260" y="30" fill="#a7f3d0" font-size="12" font-weight="800" text-anchor="middle">① 상품의 구입(매출)</text>
+
+                <line x1="155" y1="66" x2="365" y2="66" stroke="#facc15" stroke-width="2.5" marker-end="url(#arr-amber)"/>
+                <text x="260" y="60" fill="#fde047" font-size="12" font-weight="800" text-anchor="middle">② 약속어음의 발행</text>
+
+                <line x1="365" y1="96" x2="155" y2="96" stroke="#34d399" stroke-width="2.5" marker-end="url(#arr-green)"/>
+                <text x="260" y="90" fill="#a7f3d0" font-size="12" font-weight="800" text-anchor="middle">③ 어음 대금 청구(만기일)</text>
+
+                <line x1="155" y1="126" x2="365" y2="126" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arr-blue)"/>
+                <text x="260" y="120" fill="#93c5fd" font-size="12" font-weight="800" text-anchor="middle">④ 어음 대금 지급</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 환어음 (3자 관계) -->
+          <div class="card" style="border: 2px solid #f59e0b;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 1.3rem; font-weight: 900; color: #fbbf24;">② 환어음 (3자 관계)</span>
+                <span class="badge-tag" style="background: rgba(245,158,11,0.2); color: #fde68a;">발행인이 지명인에게 지급 위탁</span>
+              </div>
+              <p style="font-size: 0.98rem; color: var(--text-sub); font-weight: 700; margin-bottom: 12px;">
+                발행인이 <strong style="color: #fde047;">지명인(지급인)에게</strong> 수취인에 대한 어음 대금을 지급할 것을 <strong style="color: #fde047;">위탁</strong>한 증서
+              </p>
+            </div>
+
+            <!-- 환어음 SVG 다이어그램 (교과서 99쪽 삼각형 구조 일치) -->
+            <div style="background: #090e1a; border-radius: 14px; padding: 12px; border: 1px solid #1e293b;">
+              <svg viewBox="0 0 520 155" style="width: 100%; height: auto; display: block;">
+                <!-- 상단: 발행인 -->
+                <rect x="195" y="4" width="130" height="44" rx="10" fill="#172554" stroke="#60a5fa" stroke-width="2"/>
+                <text x="260" y="24" fill="#93c5fd" font-size="14" font-weight="900" text-anchor="middle">발행인 (매입자)</text>
+                <text x="260" y="41" fill="#cbd5e1" font-size="11" font-weight="700" text-anchor="middle">환어음 발행·지급 위탁</text>
+
+                <!-- 좌하단: 수취인 (우리) -->
+                <rect x="12" y="96" width="145" height="52" rx="10" fill="#064e3b" stroke="#34d399" stroke-width="2.5"/>
+                <text x="84" y="118" fill="#6ee7b7" font-size="14" font-weight="900" text-anchor="middle">매출자 (수취인)</text>
+                <text x="84" y="138" fill="#fde047" font-size="12" font-weight="800" text-anchor="middle">★ 어음 채권자(우리)</text>
+
+                <!-- 우하단: 지명인 (지급인) -->
+                <rect x="363" y="96" width="145" height="52" rx="10" fill="#422006" stroke="#facc15" stroke-width="2"/>
+                <text x="435" y="118" fill="#fde047" font-size="14" font-weight="900" text-anchor="middle">지명인 (지급인)</text>
+                <text x="435" y="138" fill="#fef08a" font-size="12" font-weight="800" text-anchor="middle">어음 채무자(인수·지급)</text>
+
+                <!-- 발행인 -> 수취인 (환어음 발행) -->
+                <line x1="192" y1="32" x2="95" y2="90" stroke="#facc15" stroke-width="2.5" marker-end="url(#arr-amber)"/>
+                <text x="115" y="56" fill="#fde047" font-size="12" font-weight="800" text-anchor="middle">④ 환어음 발행</text>
+
+                <!-- 발행인 -> 지명인 (외상매출금/지급위탁) -->
+                <line x1="328" y1="32" x2="425" y2="90" stroke="#60a5fa" stroke-width="2.5" marker-end="url(#arr-blue)"/>
+                <text x="405" y="56" fill="#93c5fd" font-size="12" font-weight="800" text-anchor="middle">①·② 지급 위탁</text>
+
+                <!-- 수취인 <-> 지명인 (인수 및 대금 지급) -->
+                <line x1="165" y1="112" x2="353" y2="112" stroke="#34d399" stroke-width="2" marker-end="url(#arr-green)"/>
+                <text x="260" y="106" fill="#a7f3d0" font-size="11.5" font-weight="800" text-anchor="middle">⑤·⑦ 인수 제시 및 만기 대금 청구</text>
+
+                <line x1="353" y1="136" x2="165" y2="136" stroke="#facc15" stroke-width="2.5" marker-end="url(#arr-amber)"/>
+                <text x="260" y="150" fill="#fde047" font-size="11.5" font-weight="800" text-anchor="middle">⑥·⑧ 인수 및 만기 어음 대금 지급</text>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 하단 수취인 입장 정리 -->
+        <div class="prompt-bar">
+          <div class="prompt-q">
+            <span>💡 핵심 확인:</span>
+            <span>약속어음이든 환어음이든, 상품을 팔고 어음을 받은 <strong>‘수취인’ 입장</strong>에서 생기는 자산 계정과목은?</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="s2-ans" class="answer-box answer-hidden" style="background: #064e3b; border: 2px solid #34d399; padding: 6px 16px; border-radius: 10px; font-weight: 900; font-size: 1.2rem; color: #fde047;">
+              차변: 받을어음 (자산 증가)
+            </span>
+            <button class="btn btn-primary" onclick="toggleAnswer('s2-ans', this, '정답 공개 👁️', '정답 숨기기 🔒')">
+              정답 공개 👁️
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 3] 어음 수취와 회수 (교과서 예제 11)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 3. 어음 수취와 회수 (예제 11)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 3 · 어음의 수취와 회수 (교과서 99~100쪽 예제 11)</span>
+            <h2 class="slide-title">시간의 흐름에 따른 어음 수취(차변)와 만기 회수(대변)</h2>
+          </div>
+          <!-- 타임라인 배지 -->
+          <div style="display: flex; align-items: center; gap: 8px; background: #090e1a; padding: 10px 16px; border-radius: 14px; border: 1px solid #334155; font-weight: 900; font-size: 0.98rem;">
+            <span style="color: #38bdf8;">📦 상품 판매</span>
+            <span style="color: #64748b;">➔</span>
+            <span style="color: #fde047;">📜 어음 수취(차변)</span>
+            <span style="color: #64748b;">➔</span>
+            <span style="color: #f43f5e;">📅 만기일 도래</span>
+            <span style="color: #64748b;">➔</span>
+            <span style="color: #34d399;">💵 대금 회수(대변)</span>
+          </div>
+        </div>
+
+        <!-- 수취 vs 회수 2단 카드 -->
+        <div class="grid-2" style="flex: 1; margin: 10px 0;">
+
+          <!-- 1. 4월 4일 어음 수취 -->
+          <div class="card" style="border: 2px solid var(--debit-color);">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: var(--debit-bg); color: var(--debit-color); font-size: 0.95rem; padding: 4px 12px;">교과서 예제 11 - ① 어음 수취</span>
+                <span style="color: #fde047; font-weight: 900;">받을어음 증가 ➔ 차변</span>
+              </div>
+              <div class="card-dark" style="margin-top: 10px; font-size: 1.08rem; font-weight: 800; line-height: 1.45; color: #f1f5f9;">
+                📅 <strong style="color: #38bdf8;">4월 4일:</strong> 춘천 상사에 상품 <strong style="color: #fde047;">₩1,000,000</strong>을 매출하고, 대금은 동점 발행 약속어음(#22)을 받다.
+              </div>
+            </div>
+
+            <!-- 4단계 판단 스텝 -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #0b1324; padding: 8px 14px; border-radius: 10px; border: 1px solid #1e293b;">
+                <span style="font-weight: 800; color: #94a3b8;">① 거래 상황 &amp; ② 관련 계정과목</span>
+                <button class="btn btn-dark" style="min-height: 34px; padding: 4px 12px; font-size: 0.88rem;" onclick="toggleAnswer('s3-a-step1', this, '판단 보기', '숨기기')">판단 보기</button>
+              </div>
+              <div id="s3-a-step1" class="answer-box answer-hidden" style="background: #172554; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 1rem; color: #e0f2fe;">
+                상품 판매 후 약속어음 수취 ➔ <strong style="color: #fde047;">받을어음(자산), 상품(자산)</strong>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #0b1324; padding: 8px 14px; border-radius: 10px; border: 1px solid #1e293b;">
+                <span style="font-weight: 800; color: #94a3b8;">③ 무엇이 증가·감소하는가? (받을 권리)</span>
+                <button class="btn btn-dark" style="min-height: 34px; padding: 4px 12px; font-size: 0.88rem;" onclick="toggleAnswer('s3-a-step2', this, '증감 보기', '숨기기')">증감 보기</button>
+              </div>
+              <div id="s3-a-step2" class="answer-box answer-hidden" style="background: #172554; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 1rem; color: #e0f2fe;">
+                어음으로 돈 받을 권리 생김! ➔ <strong style="color: #38bdf8;">받을어음 증가(차변)</strong> / <strong style="color: #fb7185;">상품 감소(대변)</strong>
+              </div>
+            </div>
+
+            <!-- 최종 분개 -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.92rem; font-weight: 800; color: var(--text-sub);">④ 4월 4일 최종 분개</span>
+                <button class="btn btn-blue" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s3-a-journal', this, '분개 정답 공개 👁️', '분개 숨기기 🔒')">분개 정답 공개 👁️</button>
+              </div>
+              <div id="s3-a-journal" class="answer-box answer-hidden journal-line-box">
+                <span class="journal-debit">(차) 받을어음 1,000,000</span>
+                <span class="journal-credit">(대) 상품 1,000,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 4월 30일 어음 대금 회수 -->
+          <div class="card" style="border: 2px solid var(--credit-color);">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: var(--credit-bg); color: var(--credit-color); font-size: 0.95rem; padding: 4px 12px;">교과서 예제 11 - ② 어음 대금 회수</span>
+                <span style="color: #fda4af; font-weight: 900;">받을어음 감소 ➔ 대변</span>
+              </div>
+              <div class="card-dark" style="margin-top: 10px; font-size: 1.08rem; font-weight: 800; line-height: 1.45; color: #f1f5f9;">
+                📅 <strong style="color: #fb7185;">4월 30일:</strong> 춘천 상사로부터 받은 약속어음 <strong style="color: #fde047;">₩1,000,000</strong>이 만기가 되어 현금으로 받다.
+              </div>
+            </div>
+
+            <!-- 4단계 판단 스텝 -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin: 10px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #0b1324; padding: 8px 14px; border-radius: 10px; border: 1px solid #1e293b;">
+                <span style="font-weight: 800; color: #94a3b8;">① 거래 상황 &amp; ② 관련 계정과목</span>
+                <button class="btn btn-dark" style="min-height: 34px; padding: 4px 12px; font-size: 0.88rem;" onclick="toggleAnswer('s3-b-step1', this, '판단 보기', '숨기기')">판단 보기</button>
+              </div>
+              <div id="s3-b-step1" class="answer-box answer-hidden" style="background: #3f1d2e; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 1rem; color: #ffe4e6;">
+                만기 어음 대금을 현금 회수 ➔ <strong style="color: #fde047;">현금(자산), 받을어음(자산)</strong>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; background: #0b1324; padding: 8px 14px; border-radius: 10px; border: 1px solid #1e293b;">
+                <span style="font-weight: 800; color: #94a3b8;">③ 무엇이 증가·감소하는가? (받을 권리)</span>
+                <button class="btn btn-dark" style="min-height: 34px; padding: 4px 12px; font-size: 0.88rem;" onclick="toggleAnswer('s3-b-step2', this, '증감 보기', '숨기기')">증감 보기</button>
+              </div>
+              <div id="s3-b-step2" class="answer-box answer-hidden" style="background: #3f1d2e; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 1rem; color: #ffe4e6;">
+                돈을 받아 어음 권리 소멸! ➔ <strong style="color: #38bdf8;">현금 증가(차변)</strong> / <strong style="color: #fb7185;">받을어음 감소(대변)</strong>
+              </div>
+            </div>
+
+            <!-- 최종 분개 -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.92rem; font-weight: 800; color: var(--text-sub);">④ 4월 30일 최종 분개</span>
+                <button class="btn btn-primary" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s3-b-journal', this, '분개 정답 공개 👁️', '분개 숨기기 🔒')">분개 정답 공개 👁️</button>
+              </div>
+              <div id="s3-b-journal" class="answer-box answer-hidden journal-line-box">
+                <span class="journal-debit">(차) 현금 1,000,000</span>
+                <span class="journal-credit">(대) 받을어음 1,000,000</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="prompt-bar">
+          <div class="prompt-q">
+            <span>📌 핵심 정리:</span>
+            <span>어음을 받으면 <strong>차변(받을어음 증가)</strong>, 만기에 대금을 회수하면 <strong>대변(받을어음 감소)</strong>에 기록합니다!</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 4] 받을어음 계정에 전기 (교과서 예제 11)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 4. 받을어음 계정에 전기 (예제 11)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 4 · 분개에서 원장으로 전기 (교과서 100쪽 예제 11)</span>
+            <h2 class="slide-title">분개장의 ‘받을어음’ 거래를 원장 T계정에 옮겨 적기(전기)</h2>
+            <p class="slide-subtitle">받을어음이 차변에 있으면 원장 왼쪽(차변)에, 대변에 있으면 원장 오른쪽(대변)에 적고 적요란에는 ‘상대 계정과목’을 씁니다.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary" onclick="revealAllLedger(true)">전체 전기 공개 👁️</button>
+            <button class="btn btn-dark" onclick="revealAllLedger(false)">전체 숨기기 🔒</button>
+          </div>
+        </div>
+
+        <!-- 좌측: 4개 분개 / 우측: 받을어음 T원장 -->
+        <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; flex: 1; margin: 10px 0; align-items: stretch;">
+
+          <!-- 왼쪽: 예제 11의 4개 분개 리스트 -->
+          <div class="card" style="justify-content: space-around;">
+            <div style="font-size: 1.1rem; font-weight: 900; color: #fde047; margin-bottom: 4px;">
+              📋 [교과서 예제 11] 4월 중 받을어음 분개장 (버튼을 눌러 순서대로 전기해 보세요)
+            </div>
+
+            <!-- 거래 1: 4/4 -->
+            <div class="card-dark" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-left: 4px solid var(--debit-color);">
+              <div style="font-weight: 800; font-size: 1rem;">
+                <span style="color: #fde047; margin-right: 6px;">4/4</span>
+                <span style="color: var(--debit-color);">(차) 받을어음 1,000,000</span>
+                <span style="margin-left: 10px; color: var(--credit-color);">(대) 상품 1,000,000</span>
+              </div>
+              <button class="btn btn-blue" id="btn-led-1" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem;" onclick="toggleAnswer('led-row-1', this, '① 전기 ➔', '숨기기')">① 전기 ➔</button>
+            </div>
+
+            <!-- 거래 2: 4/7 -->
+            <div class="card-dark" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-left: 4px solid var(--debit-color);">
+              <div style="font-weight: 800; font-size: 1rem;">
+                <span style="color: #fde047; margin-right: 6px;">4/7</span>
+                <span style="color: var(--debit-color);">(차) 받을어음 800,000</span>
+                <span style="margin-left: 10px; color: var(--credit-color);">(대) 상품 800,000</span>
+              </div>
+              <button class="btn btn-blue" id="btn-led-2" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem;" onclick="toggleAnswer('led-row-2', this, '② 전기 ➔', '숨기기')">② 전기 ➔</button>
+            </div>
+
+            <!-- 거래 3: 4/30 현금 -->
+            <div class="card-dark" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-left: 4px solid var(--credit-color);">
+              <div style="font-weight: 800; font-size: 1rem;">
+                <span style="color: #fde047; margin-right: 6px;">4/30</span>
+                <span style="color: var(--debit-color);">(차) 현금 1,000,000</span>
+                <span style="margin-left: 10px; color: var(--credit-color);">(대) 받을어음 1,000,000</span>
+              </div>
+              <button class="btn btn-primary" id="btn-led-3" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem;" onclick="toggleAnswer('led-row-3', this, '③ 전기 ➔', '숨기기')">③ 전기 ➔</button>
+            </div>
+
+            <!-- 거래 4: 4/30 당좌예금 -->
+            <div class="card-dark" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-left: 4px solid var(--credit-color);">
+              <div style="font-weight: 800; font-size: 1rem;">
+                <span style="color: #fde047; margin-right: 6px;">4/30</span>
+                <span style="color: var(--debit-color);">(차) 당좌예금 800,000</span>
+                <span style="margin-left: 10px; color: var(--credit-color);">(대) 받을어음 800,000</span>
+              </div>
+              <button class="btn btn-primary" id="btn-led-4" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem;" onclick="toggleAnswer('led-row-4', this, '④ 전기 ➔', '숨기기')">④ 전기 ➔</button>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 받을어음 T원장 -->
+          <div class="card" style="background: #090e1a; border: 2px solid #475569; justify-content: space-between;">
+            <div>
+              <table class="t-ledger">
+                <thead>
+                  <tr>
+                    <th colspan="6">받을어음</th>
+                  </tr>
+                  <tr style="background: #0f172a; color: #94a3b8; font-size: 0.92rem; border-bottom: 1px solid #334155;">
+                    <td style="width: 14%;">날짜</td>
+                    <td style="width: 18%;">적요(상대계정)</td>
+                    <td class="divider-right" style="width: 18%; text-align: right;">차변 금액</td>
+                    <td style="width: 14%;">날짜</td>
+                    <td style="width: 18%;">적요(상대계정)</td>
+                    <td style="width: 18%; text-align: right;">대변 금액</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- 1행: 좌 4/4 상품 1,000,000 | 우 4/30 현금 1,000,000 -->
+                  <tr>
+                    <td colspan="3" class="divider-right" style="padding: 0;">
+                      <div id="led-row-1" class="answer-box answer-hidden" style="display: flex; justify-content: space-between; padding: 12px 14px; color: var(--debit-color);">
+                        <span>4/4</span>
+                        <span style="color: #ffffff;">상 품</span>
+                        <span>1,000,000</span>
+                      </div>
+                    </td>
+                    <td colspan="3" style="padding: 0;">
+                      <div id="led-row-3" class="answer-box answer-hidden" style="display: flex; justify-content: space-between; padding: 12px 14px; color: var(--credit-color);">
+                        <span>4/30</span>
+                        <span style="color: #ffffff;">현 금</span>
+                        <span>1,000,000</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- 2행: 좌 4/7 상품 800,000 | 우 4/30 당좌예금 800,000 -->
+                  <tr>
+                    <td colspan="3" class="divider-right" style="padding: 0;">
+                      <div id="led-row-2" class="answer-box answer-hidden" style="display: flex; justify-content: space-between; padding: 12px 14px; color: var(--debit-color);">
+                        <span>4/7</span>
+                        <span style="color: #ffffff;">상 품</span>
+                        <span>800,000</span>
+                      </div>
+                    </td>
+                    <td colspan="3" style="padding: 0;">
+                      <div id="led-row-4" class="answer-box answer-hidden" style="display: flex; justify-content: space-between; padding: 12px 14px; color: var(--credit-color);">
+                        <span>4/30</span>
+                        <span style="color: #ffffff;">당좌예금</span>
+                        <span>800,000</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- 합계 행 -->
+                  <tr class="total-row">
+                    <td colspan="3" class="divider-right" style="padding: 0;">
+                      <div id="led-row-sum" class="answer-box answer-hidden" style="display: flex; justify-content: space-between; padding: 12px 14px;">
+                        <span>합 계</span>
+                        <span>1,800,000</span>
+                      </div>
+                    </td>
+                    <td colspan="3" style="padding: 0;">
+                      <div id="led-row-sum2" class="answer-box answer-hidden" style="display: flex; justify-content: space-between; padding: 12px 14px;">
+                        <span>합 계</span>
+                        <span>1,800,000</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #11192c; padding: 10px 14px; border-radius: 12px; border: 1px solid #334155;">
+              <span style="font-weight: 800; color: #fde047;">📊 양쪽 합계 및 회수 후 잔액 확인</span>
+              <button class="btn btn-amber" id="btn-led-sum" style="min-height: 36px; padding: 6px 14px; font-size: 0.9rem;" onclick="toggleLedgerSum(this)">합계·잔액 공개 👁️</button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="prompt-bar">
+          <div class="prompt-q">
+            <span>✅ 전기 핵심:</span>
+            <span>총 수취액 <strong>1,800,000원(차변)</strong>을 만기에 모두 회수하여 <strong>1,800,000원(대변)</strong>이 되었으므로, 회수 후 남아 있는 받을어음 잔액은 <strong style="color: #34d399;">0원</strong>입니다!</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 5] 추심 위임과 추심 완료 (교과서 예제 12)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 5. 추심 위임과 추심 완료 (예제 12)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 5 · 어음의 추심 위임 배서 (교과서 100~101쪽 예제 12)</span>
+            <h2 class="slide-title">은행에 어음 대금을 대신 받아 달라고 맡긴다면? (추심 위임)</h2>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div class="card-dark" style="padding: 8px 14px; border-color: #facc15;">
+              <strong style="color: #fde047;">추심(推尋):</strong> 받을 돈을 찾아내어 대신 받아 오는 것
+            </div>
+            <div class="card-dark" style="padding: 8px 14px; border-color: #38bdf8;">
+              <strong style="color: #38bdf8;">추심 위임:</strong> 거래 은행에 어음 대금을 대신 받아 달라고 맡기는 것
+            </div>
+          </div>
+        </div>
+
+        <!-- 2단계 흐름 비교 (10월 6일 추심 위임 vs 10월 10일 추심 완료) -->
+        <div class="grid-2" style="flex: 1; margin: 10px 0;">
+
+          <!-- 왼쪽: Step 1. 추심 위임 (10월 6일) -->
+          <div class="card" style="border: 2px solid #f59e0b;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: rgba(245,158,11,0.2); color: #fde047; font-size: 0.95rem; padding: 4px 12px;">1단계 · 은행에 어음을 맡긴 날 (10월 6일)</span>
+                <span style="color: #fde047; font-weight: 900;">⚠️ 받을어음 그대로!</span>
+              </div>
+
+              <!-- 그림 도식 -->
+              <div style="background: #090e1a; border-radius: 14px; padding: 12px; margin: 10px 0; display: flex; align-items: center; justify-content: space-around; border: 1px solid #1e293b;">
+                <div style="text-align: center;">
+                  <div style="font-size: 1.8rem;">🏢</div>
+                  <div style="font-weight: 900; color: var(--role-payee); font-size: 0.95rem;">우리 회사</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="color: #fde047; font-weight: 900; font-size: 0.92rem;">📜 어음(300,000원) 심부름 맡김 ➔</div>
+                  <div style="color: #fb7185; font-weight: 900; font-size: 0.92rem; margin-top: 4px;">💵 추심 수수료 현금 10,000원 지급 ➔</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 1.8rem;">🏦</div>
+                  <div style="font-weight: 900; color: var(--role-bank); font-size: 0.95rem;">거래 은행</div>
+                </div>
+              </div>
+
+              <div class="card-dark" style="font-size: 1rem; font-weight: 800; line-height: 1.4;">
+                📅 <strong style="color: #fde047;">10월 6일 (예제 12):</strong> 의성 상사에서 받은 약속어음 ₩300,000이 만기 도래하여 거래 은행에 추심 위임 배서하고, <strong style="color: #fb7185;">추심 수수료 ₩10,000을 현금 지급</strong>하다.
+              </div>
+              <div style="margin-top: 8px; font-size: 0.95rem; font-weight: 800; color: #fde68a;">
+                💡 맡기는 것 자체로는 어음 권리가 소멸하지 않으므로 <strong>받을어음은 줄지 않고, 지급한 수수료만 비용 처리</strong>합니다!
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 800; font-size: 0.92rem; color: var(--text-sub);">10월 6일 분개 (수수료만 분개!)</span>
+                <button class="btn btn-amber" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s5-j1', this, '10/6 분개 공개 👁️', '숨기기 🔒')">10/6 분개 공개 👁️</button>
+              </div>
+              <div id="s5-j1" class="answer-box answer-hidden journal-line-box">
+                <span class="journal-debit">(차) 수수료비용 10,000</span>
+                <span class="journal-credit">(대) 현금 10,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: Step 2. 추심 완료 (10월 10일) -->
+          <div class="card" style="border: 2px solid #10b981;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: rgba(16,185,129,0.2); color: #6ee7b7; font-size: 0.95rem; padding: 4px 12px;">2단계 · 은행이 돈을 받아 입금한 날 (10월 10일)</span>
+                <span style="color: #fb7185; font-weight: 900;">✅ 이때 받을어음 감소!</span>
+              </div>
+
+              <!-- 그림 도식 -->
+              <div style="background: #090e1a; border-radius: 14px; padding: 12px; margin: 10px 0; display: flex; align-items: center; justify-content: space-around; border: 1px solid #1e293b;">
+                <div style="text-align: center;">
+                  <div style="font-size: 1.8rem;">🏢</div>
+                  <div style="font-weight: 900; color: var(--role-payee); font-size: 0.95rem;">우리 회사</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="color: #34d399; font-weight: 900; font-size: 0.95rem;">◀━━ 💳 당좌예금 300,000원 입금 통지!</div>
+                  <div style="color: #fb7185; font-weight: 900; font-size: 0.92rem; margin-top: 4px;">❌ 이제 어음 받을 권리 소멸 (받을어음 감소)</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 1.8rem;">🏦</div>
+                  <div style="font-weight: 900; color: var(--role-bank); font-size: 0.95rem;">거래 은행</div>
+                </div>
+              </div>
+
+              <div class="card-dark" style="font-size: 1rem; font-weight: 800; line-height: 1.4;">
+                📅 <strong style="color: #34d399;">10월 10일 (예제 12):</strong> 거래 은행으로부터 위 어음이 무사히 추심되어 <strong style="color: #38bdf8;">당좌예금에 입금</strong>되었다는 통지를 받다.
+              </div>
+              <div style="margin-top: 8px; font-size: 0.95rem; font-weight: 800; color: #a7f3d0;">
+                💡 은행으로부터 <strong>추심 완료(입금) 통지를 받은 날</strong> 비로소 대변에 받을어음을 기록하여 감소시킵니다!
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 800; font-size: 0.92rem; color: var(--text-sub);">10월 10일 분개 (추심 완료 시 받을어음 감소!)</span>
+                <button class="btn btn-primary" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s5-j2', this, '10/10 분개 공개 👁️', '숨기기 🔒')">10/10 분개 공개 👁️</button>
+              </div>
+              <div id="s5-j2" class="answer-box answer-hidden journal-line-box">
+                <span class="journal-debit">(차) 당좌예금 300,000</span>
+                <span class="journal-credit">(대) 받을어음 300,000</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 하단 발문 -->
+        <div>
+          <div class="prompt-bar">
+            <div class="prompt-q">
+              <span>🙋 교사 발문:</span>
+              <span>“은행에 맡긴 순간(10/6)과 실제로 입금된 순간(10/10)은 같은가요?”</span>
+            </div>
+            <button class="btn btn-primary" onclick="toggleAnswer('s5-ans-q', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+          </div>
+          <div id="s5-ans-q" class="answer-box answer-hidden" style="margin-top: 8px; background: #064e3b; border: 2px solid #34d399; border-radius: 12px; padding: 10px 18px; text-align: center; font-weight: 900; font-size: 1.12rem; color: #ffffff;">
+            ❌ 다릅니다! <strong>은행에 맡긴 순간(10/6)에는 받을어음이 줄지 않고</strong>, <strong>실제로 추심되어 입금된 순간(10/10)에 받을어음이 감소</strong>합니다!
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 6] 배서 양도 (교과서 예제 12)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 6. 어음의 배서 양도 (예제 12)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 6 · 어음의 배서 양도 (교과서 101쪽 예제 12)</span>
+            <h2 class="slide-title">보유한 어음을 다른 거래처에 넘겨 상품 대금을 지급하다! (배서 양도)</h2>
+            <p class="slide-subtitle">배서 양도란 보유한 어음 뒷면에 이름을 적고(배서), 다른 사람에게 어음 권리를 넘겨(양도) 대금을 치르는 것입니다.</p>
+          </div>
+          <div class="core-question-pill">
+            💡 어음을 남에게 넘겨주었으니,<br>내가 돈 받을 권리는 <strong style="color: #fb7185;">즉시 없어집니다(대변)!</strong>
+          </div>
+        </div>
+
+        <!-- 배서 양도 시각 도식 -->
+        <div class="card" style="padding: 18px 24px;">
+          <div style="display: grid; grid-template-columns: 1fr 1.3fr 1fr; align-items: center; gap: 18px;">
+            
+            <div class="card-dark" style="border: 2px solid var(--role-payee); text-align: center;">
+              <div style="font-size: 2.2rem;">🏢</div>
+              <div style="color: var(--role-payee); font-weight: 900; font-size: 1.2rem;">우리 회사</div>
+              <div style="font-size: 0.92rem; color: var(--text-sub); margin-top: 4px;">제주 상사 발행 약속어음 보유 중</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="background: rgba(56, 189, 248, 0.14); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;">
+                <span class="anim-left" style="font-size: 1.4rem; color: #38bdf8; font-weight: 900;">◀━━━ 📦</span>
+                <span style="font-weight: 900; color: #e0f2fe; font-size: 1.05rem;">① 상품 ₩500,000 매입 (차변: 상품 증가)</span>
+              </div>
+
+              <div class="note-graphic" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;">
+                <span style="font-weight: 900; font-size: 1.05rem;">② 보관 중인 어음 뒷면에 배서하여 양도!</span>
+                <span class="anim-right" style="font-size: 1.4rem; font-weight: 900; color: #b45309;">📜 ━━━▶</span>
+              </div>
+            </div>
+
+            <div class="card-dark" style="border: 2px solid var(--role-other); text-align: center;">
+              <div style="font-size: 2.2rem;">🏬</div>
+              <div style="color: var(--role-other); font-weight: 900; font-size: 1.2rem;">서귀포 상사 (양수인)</div>
+              <div style="font-size: 0.92rem; color: var(--text-sub); margin-top: 4px;">이제 서귀포 상사가 어음 권리자!</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 예제 12의 10월 15일 & 10월 19일 비교 -->
+        <div class="grid-2" style="margin: 8px 0;">
+
+          <!-- 10월 15일 배서 양도일 -->
+          <div class="card" style="border: 2px solid #c084fc;">
+            <div>
+              <span class="badge-tag" style="background: rgba(192,132,252,0.2); color: #e9d5ff; font-size: 0.92rem;">교과서 예제 12 - 10월 15일 (배서 양도 시점)</span>
+              <p style="font-size: 1.04rem; font-weight: 800; color: #f8fafc; margin-top: 8px; line-height: 1.45;">
+                서귀포 상사로부터 상품 <strong style="color: #38bdf8;">₩500,000</strong>을 매입하고 대금은 제주 상사에서 받아 보관 중인 <strong style="color: #fde047;">약속어음을 배서 양도</strong>하다.
+              </p>
+            </div>
+            <div style="margin-top: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.92rem; font-weight: 800; color: #d8b4fe;">양도 즉시 내 받을어음 권리 소멸!</span>
+                <button class="btn btn-primary" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s6-j1', this, '10/15 분개 공개 👁️', '숨기기 🔒')">10/15 분개 공개 👁️</button>
+              </div>
+              <div id="s6-j1" class="answer-box answer-hidden journal-line-box">
+                <span class="journal-debit">(차) 상품 500,000</span>
+                <span class="journal-credit">(대) 받을어음 500,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 10월 19일 배서 양도 어음 만기 결제 확인일 -->
+          <div class="card" style="border: 2px solid #64748b;">
+            <div>
+              <span class="badge-tag" style="background: rgba(148,163,184,0.2); color: #cbd5e1; font-size: 0.92rem;">교과서 예제 12 - 10월 19일 (만기 결제 확인 시점)</span>
+              <p style="font-size: 1.04rem; font-weight: 800; color: #f8fafc; margin-top: 8px; line-height: 1.45;">
+                위 어음(10월 15일에 서귀포 상사에 배서 양도한 어음)이 <strong style="color: #fde047;">만기일에 결제되었음을 확인</strong>하다.
+              </p>
+            </div>
+            <div style="margin-top: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.92rem; font-weight: 800; color: #cbd5e1;">이미 10/15에 남에게 넘긴 어음이라면?</span>
+                <button class="btn btn-amber" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s6-j2', this, '10/19 정답 공개 👁️', '숨기기 🔒')">10/19 정답 공개 👁️</button>
+              </div>
+              <div id="s6-j2" class="answer-box answer-hidden journal-line-box" style="justify-content: center; color: #fde047;">
+                <span>분개 없음 <span style="font-size: 0.95rem; color: #cbd5e1; font-weight: 700;">(이미 10/15에 받을어음을 지웠으므로!)</span></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="prompt-bar">
+          <div class="prompt-q">
+            <span>📌 포인트:</span>
+            <span>배서 양도한 날(10/15)에 이미 대변으로 받을어음을 없앴으므로, 나중에 그 어음이 만기 결제되었다는 소식(10/19)을 들어도 <strong>‘분개 없음’</strong>입니다!</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 7] 추심 위임과 배서 양도 비교
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 7. 추심 위임 vs 배서 양도 핵심 비교">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 7 · 헷갈리기 쉬운 두 거래 완벽 비교</span>
+            <h2 class="slide-title">추심 위임 vs 배서 양도 — 언제 ‘받을어음’이 감소할까요?</h2>
+            <p class="slide-subtitle">어음 뒷면에 서명(배서)해서 건네준다는 점은 비슷해 보이지만, 회계 처리 시점은 완전히 다릅니다!</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary" onclick="toggleCompareAll(true)">비교 정답 모두 공개 👁️</button>
+            <button class="btn btn-dark" onclick="toggleCompareAll(false)">모두 숨기기 🔒</button>
+          </div>
+        </div>
+
+        <!-- 좌우 1:1 비교 카드 -->
+        <div class="grid-2" style="flex: 1; margin: 12px 0;">
+
+          <!-- 왼쪽: 추심 위임 -->
+          <div class="card" style="border: 2.5px solid #facc15;">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 12px;">
+                <div>
+                  <span class="badge-tag" style="background: rgba(250,204,21,0.2); color: #fde047;">은행 심부름</span>
+                  <h3 style="font-size: 1.65rem; font-weight: 900; color: #fde047; margin-top: 4px;">🏦 추심 위임</h3>
+                </div>
+                <div style="font-size: 2.5rem;">📜 ➔ 🏦</div>
+              </div>
+
+              <div class="card-dark" style="margin-top: 14px; font-size: 1.1rem; font-weight: 800;">
+                <div style="color: #94a3b8; font-size: 0.92rem; margin-bottom: 4px;">누구에게 왜 넘기나요?</div>
+                <div>거래 <strong>은행</strong>에 어음 대금을 <strong style="color: #fde047;">대신 받아 달라고 맡김</strong></div>
+              </div>
+
+              <div class="card-dark" style="margin-top: 12px; font-size: 1.1rem; font-weight: 800;">
+                <div style="color: #94a3b8; font-size: 0.92rem; margin-bottom: 4px;">맡긴 날 어음 권리는 누구의 것인가요?</div>
+                <div>여전히 <strong style="color: #34d399;">우리 회사의 권리 그대로!</strong> (은행은 대리인일 뿐)</div>
+              </div>
+            </div>
+
+            <!-- 판단 공개 박스 -->
+            <div style="background: #090e1a; border: 2px solid #f59e0b; border-radius: 16px; padding: 14px 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 900; color: #fde047; font-size: 1.08rem;">❓ 받을어음은 언제 감소(대변)하나요?</span>
+                <button class="btn btn-amber" id="btn-cmp-1" style="min-height: 38px; padding: 6px 14px; font-size: 0.92rem;" onclick="toggleAnswer('cmp-ans-1', this, '정답·이유 공개 👁️', '숨기기 🔒')">정답·이유 공개 👁️</button>
+              </div>
+              <div id="cmp-ans-1" class="answer-box answer-hidden" style="border-top: 1px solid #334155; padding-top: 10px;">
+                <div style="font-size: 1.25rem; font-weight: 900; color: #ffffff;">
+                  ⏰ <span style="color: #fde047; text-decoration: underline;">추심이 완료되어 통장에 입금된 날!</span>
+                </div>
+                <div style="font-size: 0.98rem; color: #cbd5e1; margin-top: 6px; font-weight: 700;">
+                  • <strong>맡긴 날:</strong> 받을어음 감소 안 함 (추심 수수료 지급만 분개)<br>
+                  • <strong>이유:</strong> 맡긴 것만으로는 돈 받을 권리가 소멸한 것이 아니기 때문!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 배서 양도 -->
+          <div class="card" style="border: 2.5px solid #c084fc;">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 12px;">
+                <div>
+                  <span class="badge-tag" style="background: rgba(192,132,252,0.2); color: #e9d5ff;">대금 결제 수단</span>
+                  <h3 style="font-size: 1.65rem; font-weight: 900; color: #d8b4fe; margin-top: 4px;">🏬 배서 양도</h3>
+                </div>
+                <div style="font-size: 2.5rem;">📜 ➔ 🏬</div>
+              </div>
+
+              <div class="card-dark" style="margin-top: 14px; font-size: 1.1rem; font-weight: 800;">
+                <div style="color: #94a3b8; font-size: 0.92rem; margin-bottom: 4px;">누구에게 왜 넘기나요?</div>
+                <div>보유 어음을 <strong>다른 거래처</strong>에 넘겨 <strong style="color: #d8b4fe;">상품 매입 대금 등을 지급</strong></div>
+              </div>
+
+              <div class="card-dark" style="margin-top: 12px; font-size: 1.1rem; font-weight: 800;">
+                <div style="color: #94a3b8; font-size: 0.92rem; margin-bottom: 4px;">넘긴 날 어음 권리는 누구의 것인가요?</div>
+                <div>어음을 넘겨받은 <strong style="color: #fb7185;">상대 거래처로 권리 완전 이전!</strong></div>
+              </div>
+            </div>
+
+            <!-- 판단 공개 박스 -->
+            <div style="background: #090e1a; border: 2px solid #c084fc; border-radius: 16px; padding: 14px 18px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 900; color: #e9d5ff; font-size: 1.08rem;">❓ 받을어음은 언제 감소(대변)하나요?</span>
+                <button class="btn btn-primary" id="btn-cmp-2" style="min-height: 38px; padding: 6px 14px; font-size: 0.92rem;" onclick="toggleAnswer('cmp-ans-2', this, '정답·이유 공개 👁️', '숨기기 🔒')">정답·이유 공개 👁️</button>
+              </div>
+              <div id="cmp-ans-2" class="answer-box answer-hidden" style="border-top: 1px solid #334155; padding-top: 10px;">
+                <div style="font-size: 1.25rem; font-weight: 900; color: #ffffff;">
+                  ⚡ <span style="color: #34d399; text-decoration: underline;">어음을 배서하여 넘겨준 그 즉시!</span>
+                </div>
+                <div style="font-size: 0.98rem; color: #cbd5e1; margin-top: 6px; font-weight: 700;">
+                  • <strong>넘긴 날:</strong> 즉시 대변에 받을어음 감소 기록<br>
+                  • <strong>이유:</strong> 대금 대신 어음의 권리를 타인에게 완전히 넘겨주었기 때문!
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="prompt-bar">
+          <div class="prompt-q">
+            <span>🎯 한 줄 암기:</span>
+            <span>“<strong>추심 위임</strong>은 은행이 돈을 받아와야 줄어들고, <strong>배서 양도</strong>는 거래처에 넘기는 즉시 줄어든다!”</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 8] 어음의 할인 (교과서 예제 12)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 8. 어음의 할인 (예제 12)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 8 · 어음의 할인 (교과서 101쪽 예제 12)</span>
+            <h2 class="slide-title">만기일 전에 급히 자금이 필요해 은행에 어음을 판다면? (어음의 할인)</h2>
+            <p class="slide-subtitle">만기일 전에 은행(금융기관)에 어음을 배서 양도하고, 만기까지의 이자 성격인 ‘할인료’를 뺀 금액을 받는 거래입니다.</p>
+          </div>
+          <div class="core-question-pill">
+            💡 할인료 계정과목 이름 주의!<br><strong style="color: #fb7185; font-size: 1.15rem;">‘매출채권처분손실’</strong>
+          </div>
+        </div>
+
+        <!-- 어음 할인 금액 분할 시각화 (1,000,000 = 970,000 + 30,000) -->
+        <div class="card" style="margin: 8px 0; padding: 18px 24px;">
+          <div style="font-size: 1.05rem; font-weight: 800; color: #f1f5f9; margin-bottom: 12px;">
+            📅 <strong style="color: #fde047;">10월 23일 (예제 12):</strong> 정선 상사로부터 받은 약속어음 <strong style="color: #fde047;">₩1,000,000</strong>을 거래 은행에서 할인받은 후에 <strong style="color: #fb7185;">할인료 ₩30,000</strong>을 차감한 실수금은 <strong style="color: #38bdf8;">당좌예입</strong>하다.
+          </div>
+
+          <!-- 1,000,000 = 970,000 + 30,000 시각적 블록 바 -->
+          <div style="background: #090e1a; border-radius: 16px; padding: 16px 20px; border: 1px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 900;">
+              <span style="color: #fde047; font-size: 1.15rem;">📜 없어진 어음 (대변: 받을어음 감소) = 1,000,000원</span>
+              <span style="color: #94a3b8; font-size: 1rem;">1,000,000 = 970,000 + 30,000</span>
+            </div>
+
+            <!-- 전체 어음 바 -->
+            <div style="width: 100%; height: 42px; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #090d16; font-weight: 900; font-size: 1.2rem; margin-bottom: 12px;">
+              없어진 어음 권리 : 받을어음 1,000,000원 (대변)
+            </div>
+
+            <!-- 쪼개진 차변 바 (970,000 + 30,000) -->
+            <div style="display: flex; width: 100%; gap: 8px; height: 54px;">
+              <div style="flex: 9.7; background: linear-gradient(90deg, #0284c7, #38bdf8); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff; font-weight: 900;">
+                <span style="font-size: 1.1rem;">💳 실제로 받은 돈 : 당좌예금 970,000원 (차변)</span>
+              </div>
+              <div style="flex: 2.3; background: linear-gradient(90deg, #e11d48, #fb7185); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff; font-weight: 900; padding: 0 8px;">
+                <span style="font-size: 0.98rem;">✂️ 할인료 30,000원 (차변)</span>
+                <span style="font-size: 0.85rem; color: #ffe4e6;">매출채권처분손실</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3가지 핵심 구별 카드 -->
+          <div class="grid-3" style="margin-top: 12px;">
+            <div class="card-dark" style="border-left: 4px solid #38bdf8; padding: 10px 14px;">
+              <div style="font-size: 0.88rem; color: #94a3b8; font-weight: 800;">① 실제로 받은 돈 (자산 증가 · 차변)</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: #38bdf8; margin-top: 2px;">당좌예금 970,000원</div>
+            </div>
+            <div class="card-dark" style="border-left: 4px solid #fb7185; padding: 10px 14px;">
+              <div style="font-size: 0.88rem; color: #94a3b8; font-weight: 800;">② 차감된 할인료 (비용 발생 · 차변)</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: #fb7185; margin-top: 2px;">매출채권처분손실 30,000원</div>
+            </div>
+            <div class="card-dark" style="border-left: 4px solid #fde047; padding: 10px 14px;">
+              <div style="font-size: 0.88rem; color: #94a3b8; font-weight: 800;">③ 없어진 어음 (자산 감소 · 대변)</div>
+              <div style="font-size: 1.15rem; font-weight: 900; color: #fde047; margin-top: 2px;">받을어음 1,000,000원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 한 줄 분개 정답 -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 900; color: #fde047; font-size: 1.05rem;">✍️ 10월 23일 어음 할인 분개 (차변 합계 1,000,000 = 대변 합계 1,000,000)</span>
+            <button class="btn btn-primary" onclick="toggleAnswer('s8-journal', this, '할인 분개 정답 공개 👁️', '분개 숨기기 🔒')">할인 분개 정답 공개 👁️</button>
+          </div>
+          <div id="s8-journal" class="answer-box answer-hidden journal-line-box">
+            <span class="journal-debit">(차) 당좌예금 970,000, 매출채권처분손실 30,000</span>
+            <span class="journal-credit">(대) 받을어음 1,000,000</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 9] 어음의 부도와 회수 (교과서 예제 13)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 9. 어음의 부도와 회수 (예제 13)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 9 · 어음의 부도와 회수 (교과서 102~103쪽 예제 13)</span>
+            <h2 class="slide-title">만기에 지급이 거절되었다면(부도)? 받을 권리가 즉시 사라질까요?</h2>
+            <p class="slide-subtitle">지급 거절(부도)이 나더라도 상환 청구권을 행사할 수 있으므로, 즉시 권리가 사라지는 것이 아니라 ‘부도어음’으로 대체합니다.</p>
+          </div>
+          <div class="core-question-pill" style="border-color: #f43f5e; color: #fda4af;">
+            🚨 부도 발생 시 핵심 흐름:<br><strong style="color: #fde047;">받을어음 감소(대변) ➔ 부도어음 대체(차변)</strong>
+          </div>
+        </div>
+
+        <!-- 부도 발생(10/2) 및 부도어음 회수(10/10) 2단 구성 -->
+        <div class="grid-2" style="flex: 1; margin: 8px 0;">
+
+          <!-- 1. 10월 2일 어음의 부도 -->
+          <div class="card" style="border: 2px solid #f43f5e;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: rgba(244,63,94,0.2); color: #fda4af; font-size: 0.95rem;">1단계 · 어음 부도 발생 (예제 13 - 10월 2일)</span>
+                <span style="color: #fde047; font-weight: 900;">부도어음으로 이름표 교체!</span>
+              </div>
+
+              <div class="card-dark" style="margin-top: 10px; font-size: 1.02rem; font-weight: 800; line-height: 1.45;">
+                📅 <strong style="color: #fb7185;">10월 2일:</strong> 동해 상점이 발행한 약속어음 <strong style="color: #fde047;">₩1,500,000</strong>이 만기 도래하여 이를 지급 제시하였으나, 은행으로부터 <strong style="color: #fb7185;">거절 통지(부도)</strong>를 받다.
+              </div>
+
+              <!-- 부도 전환 도식 -->
+              <div style="background: #090e1a; border-radius: 12px; padding: 12px; margin: 12px 0; display: flex; align-items: center; justify-content: space-around; border: 1px solid #334155;">
+                <div class="note-graphic" style="padding: 8px 14px; opacity: 0.65;">
+                  <div>구 권리: 받을어음</div>
+                  <div style="font-size: 0.9rem;">1,500,000원 (대변 감소)</div>
+                </div>
+                <div style="font-weight: 900; color: #fb7185; font-size: 1.15rem;">⚡ 지급 거절 대체 ➔</div>
+                <div class="note-graphic bad-note" style="padding: 8px 14px;">
+                  <div>🚨 부도어음 (차변)</div>
+                  <div style="font-size: 0.9rem;">1,500,000원 (청구권 유지!)</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.92rem; font-weight: 800; color: var(--text-sub);">10월 2일 부도 발생 분개</span>
+                <button class="btn btn-amber" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s9-j1', this, '10/2 분개 공개 👁️', '숨기기 🔒')">10/2 분개 공개 👁️</button>
+              </div>
+              <div id="s9-j1" class="answer-box answer-hidden journal-line-box">
+                <span class="journal-debit">(차) 부도어음 1,500,000</span>
+                <span class="journal-credit">(대) 받을어음 1,500,000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 10월 10일 부도어음과 이자 회수 -->
+          <div class="card" style="border: 2px solid #10b981;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: rgba(16,185,129,0.2); color: #6ee7b7; font-size: 0.95rem;">2단계 · 부도어음 + 법정이자 회수 (예제 13 - 10월 10일)</span>
+                <span style="color: #6ee7b7; font-weight: 900;">부도어음 감소 + 이자수익!</span>
+              </div>
+
+              <div class="card-dark" style="margin-top: 10px; font-size: 1.02rem; font-weight: 800; line-height: 1.45;">
+                📅 <strong style="color: #34d399;">10월 10일:</strong> 위의 부도어음을 동해 상점에 제시하여 <strong style="color: #fde047;">법정 이자 ₩50,000을 포함</strong>하여 어음 대금을 <strong style="color: #38bdf8;">현금으로 받다.</strong>
+              </div>
+
+              <!-- 회수 계산 도식 -->
+              <div style="background: #090e1a; border-radius: 12px; padding: 12px; margin: 12px 0; display: flex; align-items: center; justify-content: space-around; border: 1px solid #334155; font-weight: 900;">
+                <div style="text-align: center;">
+                  <div style="color: #fb7185; font-size: 0.9rem;">부도어음 (대변)</div>
+                  <div style="font-size: 1.15rem;">1,500,000원</div>
+                </div>
+                <div style="font-size: 1.3rem; color: #94a3b8;">+</div>
+                <div style="text-align: center;">
+                  <div style="color: #fde047; font-size: 0.9rem;">이자수익 (대변)</div>
+                  <div style="font-size: 1.15rem;">50,000원</div>
+                </div>
+                <div style="font-size: 1.3rem; color: #94a3b8;">=</div>
+                <div style="text-align: center; background: rgba(56,189,248,0.15); padding: 6px 12px; border-radius: 8px; border: 1px solid #38bdf8;">
+                  <div style="color: #38bdf8; font-size: 0.9rem;">현금 회수액 (차변)</div>
+                  <div style="font-size: 1.2rem; color: #ffffff;">1,550,000원</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.92rem; font-weight: 800; color: var(--text-sub);">10월 10일 부도어음 회수 분개</span>
+                <button class="btn btn-primary" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;" onclick="toggleAnswer('s9-j2', this, '10/10 분개 공개 👁️', '숨기기 🔒')">10/10 분개 공개 👁️</button>
+              </div>
+              <div id="s9-j2" class="answer-box answer-hidden journal-line-box" style="font-size: clamp(0.98rem, 1.25vw, 1.22rem);">
+                <span class="journal-debit">(차) 현금 1,550,000</span>
+                <span class="journal-credit">(대) 부도어음 1,500,000, 이자수익 50,000</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 회수 불가능 시 안내 (교과서 102쪽 기준, 대손충당금 여부에 따라 달라짐 반영) -->
+        <div class="prompt-bar">
+          <div class="prompt-q" style="font-size: 0.98rem; color: #cbd5e1;">
+            <span style="color: #fde047;">📌 참고 (부도어음 회수 불가능의 경우 · 교과서 102쪽):</span>
+            <span>부도어음이 끝내 회수 불가능하게 된 경우에는 대변에 부도어음을 줄이고 차변에 <strong>대손상각비(또는 대손충당금 잔액 여부에 따라 대손충당금)</strong>로 회계 처리합니다.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 10] 어음의 개서 (교과서 예제 13) - 오른쪽 잘림 해결
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 10. 어음의 개서 (예제 13)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 10 · 어음의 개서 (교과서 102~103쪽 예제 13)</span>
+            <h2 class="slide-title">만기를 연장하며 옛날 어음(구어음)과 새 어음(신어음)을 맞바꾸다! (개서)</h2>
+            <p class="slide-subtitle">개서(改書)란 만기일에 지급을 연기해 주면서 만기가 도래한 <strong style="color: #fcd34d;">구어음(기존 어음)</strong>과 새로 발행한 <strong style="color: #6ee7b7;">신어음(새 어음)</strong>을 교환하는 것입니다.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+            <span class="note-graphic" style="padding: 6px 12px; font-size: 0.92rem; white-space: nowrap;">📜 구어음 (기존 어음)</span>
+            <span style="font-weight: 900; color: #94a3b8;">⇄</span>
+            <span class="note-graphic new-note" style="padding: 6px 12px; font-size: 0.92rem; white-space: nowrap;">✨ 신어음 (새 어음)</span>
+          </div>
+        </div>
+
+        <!-- 수취인 입장(10/14 받을어음 개서) vs 지급인 입장(10/26 지급어음 개서) -->
+        <div class="grid-2" style="flex: 1; margin: 8px 0;">
+
+          <!-- 왼쪽: 10월 14일 받을어음 개서 (이자 신어음 포함) -->
+          <div class="card" style="border: 2px solid #10b981;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: rgba(16,185,129,0.2); color: #6ee7b7; font-size: 0.92rem;">교과서 예제 13 - 10월 14일 (받을어음 개서)</span>
+                <span style="color: #fde047; font-weight: 900; font-size: 0.95rem;">이자 3,500원을 새 어음에 포함!</span>
+              </div>
+
+              <div class="card-dark" style="margin-top: 8px; font-size: 0.98rem; font-weight: 800; line-height: 1.4;">
+                📅 <strong style="color: #34d399;">10월 14일:</strong> 을지 상점 발행 약속어음 <strong style="color: #fde047;">₩700,000</strong>이 만기가 되었으나, 동점의 요청에 따라 만기를 3개월 연장해 주며 <strong style="color: #6ee7b7;">이자 ₩3,500을 포함하여 새로운 어음을 교부받다.</strong>
+              </div>
+
+              <!-- 구어음 반납 & 신어음 수취 시각 도식 -->
+              <div style="background: #090e1a; border-radius: 12px; padding: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #334155;">
+                <div class="note-graphic" style="padding: 8px 10px; text-align: center; flex: 1;">
+                  <div style="font-size: 0.8rem;">대변 (구어음 반환·감소)</div>
+                  <div style="font-size: 0.98rem;">받을어음(구어음) 700,000</div>
+                </div>
+                <div style="font-weight: 900; color: #fde047; font-size: 0.88rem; text-align: center; flex-shrink: 0;">
+                  + 이자수익<br>3,500 ➔
+                </div>
+                <div class="note-graphic new-note" style="padding: 8px 10px; text-align: center; flex: 1;">
+                  <div style="font-size: 0.8rem;">차변 (신어음 수취·증가)</div>
+                  <div style="font-size: 0.98rem;">받을어음(신어음) 703,500</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.88rem; font-weight: 800; color: #a7f3d0;">차변 받을어음 = 신어음 / 대변 받을어음 = 구어음</span>
+                <button class="btn btn-primary" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem;" onclick="toggleAnswer('s10-j1', this, '10/14 분개 공개 👁️', '숨기기 🔒')">10/14 분개 공개 👁️</button>
+              </div>
+              <div id="s10-j1" class="answer-box answer-hidden journal-line-box" style="font-size: clamp(0.84rem, 1.05vw, 1.12rem); padding: 10px 12px; gap: 8px;">
+                <span class="journal-debit">(차) 받을어음 703,500<span class="badge-tag" style="background:#064e3b; color:#6ee7b7; padding: 1px 5px; font-size: 0.72rem;">신어음</span></span>
+                <span class="journal-credit">(대) 받을어음 700,000<span class="badge-tag" style="background:#78350f; color:#fde68a; padding: 1px 5px; font-size: 0.72rem;">구어음</span>, 이자수익 3,500</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 10월 26일 지급어음 개서 (이자 현금 지급) -->
+          <div class="card" style="border: 2px solid #38bdf8;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge-tag" style="background: rgba(56,189,248,0.2); color: #bae6fd; font-size: 0.92rem;">교과서 예제 13 - 10월 26일 (지급어음 개서)</span>
+                <span style="color: #93c5fd; font-weight: 900; font-size: 0.95rem;">이자 2,000원은 현금 지급!</span>
+              </div>
+
+              <div class="card-dark" style="margin-top: 8px; font-size: 0.98rem; font-weight: 800; line-height: 1.4;">
+                📅 <strong style="color: #38bdf8;">10월 26일:</strong> 자금 사정의 악화에 따라 예산 상점에 발행해 주었던 당점 발행 약속어음 <strong style="color: #fde047;">₩400,000</strong>의 1개월 연장을 요청하였으며, 이를 승낙받아 새로운 어음을 교부하다. 단, <strong style="color: #fb7185;">기간 이자 ₩2,000은 현금 지급</strong>하다.
+              </div>
+
+              <!-- 지급어음 구어음 회수 & 신어음 발행 도식 -->
+              <div style="background: #090e1a; border-radius: 12px; padding: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #334155;">
+                <div class="note-graphic" style="padding: 8px 10px; text-align: center; flex: 1;">
+                  <div style="font-size: 0.8rem;">차변 (구어음 회수·부채감소)</div>
+                  <div style="font-size: 0.98rem;">지급어음(구어음) 400,000</div>
+                </div>
+                <div style="font-weight: 900; color: #38bdf8; font-size: 0.88rem; text-align: center; flex-shrink: 0;">
+                  ⇄ 교환<br>(이자 현금)
+                </div>
+                <div class="note-graphic new-note" style="padding: 8px 10px; text-align: center; flex: 1;">
+                  <div style="font-size: 0.8rem;">대변 (신어음 발행·부채증가)</div>
+                  <div style="font-size: 0.98rem;">지급어음(신어음) 400,000</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.88rem; font-weight: 800; color: #bae6fd;">차변 지급어음 = 구어음 / 대변 지급어음 = 신어음</span>
+                <button class="btn btn-blue" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem;" onclick="toggleAnswer('s10-j2', this, '10/26 분개 공개 👁️', '숨기기 🔒')">10/26 분개 공개 👁️</button>
+              </div>
+              <div id="s10-j2" class="answer-box answer-hidden journal-line-box" style="font-size: clamp(0.84rem, 1.05vw, 1.12rem); padding: 10px 12px; gap: 8px;">
+                <span class="journal-debit">(차) 지급어음 400,000<span class="badge-tag" style="background:#78350f; color:#fde68a; padding: 1px 5px; font-size: 0.72rem;">구어음</span>, 이자비용 2,000</span>
+                <span class="journal-credit">(대) 지급어음 400,000<span class="badge-tag" style="background:#064e3b; color:#6ee7b7; padding: 1px 5px; font-size: 0.72rem;">신어음</span>, 현금 2,000</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="prompt-bar">
+          <div class="prompt-q">
+            <span>📌 구어음·신어음 방향 비교:</span>
+            <span><strong>받을어음(자산)</strong> 개서는 차변이 <strong style="color:#6ee7b7;">신어음</strong>·대변이 <strong style="color:#fde047;">구어음</strong>이고, <strong>지급어음(부채)</strong> 개서는 차변이 <strong style="color:#fde047;">구어음</strong>·대변이 <strong style="color:#6ee7b7;">신어음</strong>입니다!</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           [장면 11] 마무리 확인 (6문항 OX & 이유 토글)
+           ================================================================= -->
+      <section class="slide-page" data-title="장면 11. 마무리 확인 (복습 퀴즈 6제)">
+        <div class="slide-header">
+          <div>
+            <span class="step-tag">장면 11 · 최종 마무리 확인</span>
+            <h2 class="slide-title">오늘 배운 「받을어음의 회계 처리」 핵심 O / X 최종 점검!</h2>
+            <p class="slide-subtitle">먼저 O / X를 생각한 뒤 버튼을 눌러 정답과 이유를 확인해 봅시다.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary" onclick="toggleAllQuizzes(true)">전체 정답 공개 👁️</button>
+            <button class="btn btn-dark" onclick="toggleAllQuizzes(false)">전체 숨기기 🔒</button>
+          </div>
+        </div>
+
+        <!-- 6문제 2열x3행 그리드 -->
+        <div class="grid-2" style="flex: 1; margin: 10px 0; gap: 12px;">
+
+          <!-- 문제 1 -->
+          <div class="card-dark" style="display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <span style="font-size: 1.05rem; font-weight: 900; color: #f8fafc;">
+                <strong style="color: #38bdf8;">Q1.</strong> 상품을 판매하고 어음을 받으면 <strong>받을어음은 증가</strong>한다.
+              </span>
+              <button class="btn btn-blue" id="q-btn-1" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem; flex-shrink: 0;" onclick="toggleAnswer('q-ans-1', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+            </div>
+            <div id="q-ans-1" class="answer-box answer-hidden" style="margin-top: 8px; background: #064e3b; border: 1px solid #34d399; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 0.96rem; color: #ecfdf5;">
+              ⭕ <strong style="color: #fde047;">정답: O</strong> — 어음을 통해 돈을 받을 권리(자산)가 새로 생겼으므로 차변에 받을어음이 증가합니다.
+            </div>
+          </div>
+
+          <!-- 문제 2 -->
+          <div class="card-dark" style="display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <span style="font-size: 1.05rem; font-weight: 900; color: #f8fafc;">
+                <strong style="color: #38bdf8;">Q2.</strong> 거래 은행에 <strong>추심을 맡긴 즉시</strong> 받을어음이 감소한다.
+              </span>
+              <button class="btn btn-blue" id="q-btn-2" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem; flex-shrink: 0;" onclick="toggleAnswer('q-ans-2', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+            </div>
+            <div id="q-ans-2" class="answer-box answer-hidden" style="margin-top: 8px; background: #4c0519; border: 1px solid #fb7185; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 0.96rem; color: #ffe4e6;">
+              ❌ <strong style="color: #fde047;">정답: X</strong> — 추심을 의뢰한 것만으로는 어음상의 권리가 소멸하지 않으므로 받을어음은 줄지 않습니다.
+            </div>
+          </div>
+
+          <!-- 문제 3 -->
+          <div class="card-dark" style="display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <span style="font-size: 1.05rem; font-weight: 900; color: #f8fafc;">
+                <strong style="color: #38bdf8;">Q3.</strong> <strong>추심 완료</strong>로 당좌예금에 입금되면 받을어음이 감소한다.
+              </span>
+              <button class="btn btn-blue" id="q-btn-3" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem; flex-shrink: 0;" onclick="toggleAnswer('q-ans-3', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+            </div>
+            <div id="q-ans-3" class="answer-box answer-hidden" style="margin-top: 8px; background: #064e3b; border: 1px solid #34d399; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 0.96rem; color: #ecfdf5;">
+              ⭕ <strong style="color: #fde047;">정답: O</strong> — 어음 대금이 실제로 회수되어 돈 받을 권리가 소멸했으므로 대변에 받을어음이 감소합니다.
+            </div>
+          </div>
+
+          <!-- 문제 4 -->
+          <div class="card-dark" style="display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <span style="font-size: 1.05rem; font-weight: 900; color: #f8fafc;">
+                <strong style="color: #38bdf8;">Q4.</strong> 상품 대금 지급을 위해 보유 어음을 <strong>배서 양도하면 받을어음이 감소</strong>한다.
+              </span>
+              <button class="btn btn-blue" id="q-btn-4" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem; flex-shrink: 0;" onclick="toggleAnswer('q-ans-4', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+            </div>
+            <div id="q-ans-4" class="answer-box answer-hidden" style="margin-top: 8px; background: #064e3b; border: 1px solid #34d399; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 0.96rem; color: #ecfdf5;">
+              ⭕ <strong style="color: #fde047;">정답: O</strong> — 어음상의 채권을 타인에게 양도하여 내 권리가 넘어갔으므로 즉시 대변에 받을어음이 감소합니다.
+            </div>
+          </div>
+
+          <!-- 문제 5 -->
+          <div class="card-dark" style="display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <span style="font-size: 1.05rem; font-weight: 900; color: #f8fafc;">
+                <strong style="color: #38bdf8;">Q5.</strong> 어음이 만기에 지급 거절(부도)되면 <strong>부도 즉시 돈 받을 권리가 완전히 사라진다.</strong>
+              </span>
+              <button class="btn btn-blue" id="q-btn-5" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem; flex-shrink: 0;" onclick="toggleAnswer('q-ans-5', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+            </div>
+            <div id="q-ans-5" class="answer-box answer-hidden" style="margin-top: 8px; background: #4c0519; border: 1px solid #fb7185; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 0.96rem; color: #ffe4e6;">
+              ❌ <strong style="color: #fde047;">정답: X</strong> — 권리가 즉시 사라지는 것이 아니라 상환 청구권을 행사할 수 있도록 ‘부도어음’ 계정으로 대체합니다.
+            </div>
+          </div>
+
+          <!-- 문제 6 -->
+          <div class="card-dark" style="display: flex; flex-direction: column; justify-content: space-between; border: 1.5px solid #293b63;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <span style="font-size: 1.05rem; font-weight: 900; color: #f8fafc;">
+                <strong style="color: #38bdf8;">Q6.</strong> 어음 <strong>개서</strong> 시 기존 어음(구어음)과 새 어음(신어음)은 <strong>서로 다른 어음</strong>이다.
+              </span>
+              <button class="btn btn-blue" id="q-btn-6" style="min-height: 36px; padding: 6px 12px; font-size: 0.9rem; flex-shrink: 0;" onclick="toggleAnswer('q-ans-6', this, '정답 확인 👁️', '숨기기 🔒')">정답 확인 👁️</button>
+            </div>
+            <div id="q-ans-6" class="answer-box answer-hidden" style="margin-top: 8px; background: #064e3b; border: 1px solid #34d399; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 0.96rem; color: #ecfdf5;">
+              ⭕ <strong style="color: #fde047;">정답: O</strong> — 만기가 도래한 구어음을 회수·반환하고 새로 발행한 신어음과 교환하므로 구어음과 신어음을 구분해 분개합니다.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="prompt-bar">
+          <div class="prompt-q" style="color: #6ee7b7;">
+            <span>👏 수고하셨습니다!</span>
+            <span>이제 배부된 <strong>A4 활동지</strong>에 오늘 배운 받을어음의 거래별 분개를 직접 작성해 봅시다!</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ================= 하단 컨트롤 바 ================= -->
+  <footer class="bottom-bar">
+    <div class="nav-btn-group">
+      <button class="btn btn-dark" onclick="prevSlide()" id="btn-prev">
+        <span>◀ 이전 슬라이드</span>
+      </button>
+      <button class="btn btn-primary" onclick="nextSlide()" id="btn-next">
+        <span>다음 슬라이드 ▶</span>
+      </button>
+    </div>
+
+    <div class="nav-dots" id="nav-dots"></div>
+
+    <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">
+      <span>키보드 ◀ ▶ 화살표 또는 화면 터치로 이동</span>
+    </div>
+  </footer>
+
+  <!-- ================= 목차 모달 ================= -->
+  <div class="modal-backdrop" id="toc-modal">
+    <div class="modal-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+        <h3 style="font-size: 1.4rem; font-weight: 900; color: #ffffff;">📑 받을어음의 회계 처리 — 장면 바로가기</h3>
+        <button class="btn btn-dark" style="min-height: 36px; padding: 6px 14px;" onclick="toggleTocModal(false)">✕ 닫기</button>
+      </div>
+      <div class="toc-list" id="toc-list"></div>
+    </div>
+  </div>
+
+  <!-- ================= 스크립트 (100% 오프라인 바닐라 JS, 무음) ================= -->
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide-page');
+    const totalSlides = slides.length;
+
+    // 슬라이드 화면 업데이트
+    function updateSlideView() {
+      slides.forEach((slide, idx) => {
+        if (idx === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      const title = slides[currentSlide].getAttribute('data-title') || `장면 ${currentSlide + 1}`;
+      document.getElementById('top-slide-title').textContent = title;
+      document.getElementById('page-current').textContent = currentSlide + 1;
+      document.getElementById('page-total').textContent = totalSlides;
+
+      const progressPercent = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+      updateDots();
+      updateTocActive();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlideView();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlideView();
+      }
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlideView();
+        toggleTocModal(false);
+      }
+    }
+
+    // 하단 도트 초기화 및 업데이트
+    function initDots() {
+      const dotsContainer = document.getElementById('nav-dots');
+      dotsContainer.innerHTML = '';
+      slides.forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `dot-btn ${idx === 0 ? 'active' : ''}`;
+        dot.title = `${idx + 1}번 슬라이드`;
+        dot.onclick = () => goToSlide(idx);
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function updateDots() {
+      const dots = document.getElementById('nav-dots').children;
+      for (let i = 0; i < dots.length; i++) {
+        if (i === currentSlide) {
+          dots[i].classList.add('active');
+        } else {
+          dots[i].classList.remove('active');
+        }
+      }
+    }
+
+    // 목차 모달 초기화 및 제어
+    function initToc() {
+      const list = document.getElementById('toc-list');
+      list.innerHTML = '';
+      slides.forEach((slide, idx) => {
+        const item = document.createElement('button');
+        item.className = 'toc-item';
+        item.textContent = slide.getAttribute('data-title') || `장면 ${idx + 1}`;
+        item.onclick = () => goToSlide(idx);
+        list.appendChild(item);
+      });
+    }
+
+    function updateTocActive() {
+      const items = document.getElementById('toc-list').children;
+      for (let i = 0; i < items.length; i++) {
+        if (i === currentSlide) {
+          items[i].classList.add('active');
+        } else {
+          items[i].classList.remove('active');
+        }
+      }
+    }
+
+    function toggleTocModal(forceState) {
+      const modal = document.getElementById('toc-modal');
+      if (typeof forceState === 'boolean') {
+        modal.classList.toggle('open', forceState);
+      } else {
+        modal.classList.toggle('open');
+      }
+    }
+
+    // 전체화면 제어
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // 독립형 정답 토글 함수 (한 번 누르면 보이고 다시 누르면 숨겨짐)
+    function toggleAnswer(boxId, btnEl, openLabel, closeLabel) {
+      const box = document.getElementById(boxId);
+      if (!box) return;
+
+      const isHidden = box.classList.contains('answer-hidden');
+      if (isHidden) {
+        box.classList.remove('answer-hidden');
+        box.classList.add('answer-revealed');
+        if (btnEl) {
+          btnEl.textContent = closeLabel;
+          btnEl.classList.add('btn-toggled');
+        }
+      } else {
+        box.classList.remove('answer-revealed');
+        box.classList.add('answer-hidden');
+        if (btnEl) {
+          btnEl.textContent = openLabel;
+          btnEl.classList.remove('btn-toggled');
+        }
+      }
+    }
+
+    // 장면 4: 원장 합계 양쪽 동시 토글
+    function toggleLedgerSum(btnEl) {
+      const sum1 = document.getElementById('led-row-sum');
+      const sum2 = document.getElementById('led-row-sum2');
+      const isHidden = sum1.classList.contains('answer-hidden');
+
+      [sum1, sum2].forEach(el => {
+        el.classList.toggle('answer-hidden', !isHidden);
+        el.classList.toggle('answer-revealed', isHidden);
+      });
+
+      if (isHidden) {
+        btnEl.textContent = '합계·잔액 숨기기 🔒';
+        btnEl.classList.add('btn-toggled');
+      } else {
+        btnEl.textContent = '합계·잔액 공개 👁️';
+        btnEl.classList.remove('btn-toggled');
+      }
+    }
+
+    // 장면 4: 원장 전체 일괄 공개/숨기기
+    function revealAllLedger(show) {
+      const items = [
+        { id: 'led-row-1', btn: 'btn-led-1', open: '① 전기 ➔', close: '숨기기' },
+        { id: 'led-row-2', btn: 'btn-led-2', open: '② 전기 ➔', close: '숨기기' },
+        { id: 'led-row-3', btn: 'btn-led-3', open: '③ 전기 ➔', close: '숨기기' },
+        { id: 'led-row-4', btn: 'btn-led-4', open: '④ 전기 ➔', close: '숨기기' }
+      ];
+
+      items.forEach(item => {
+        const box = document.getElementById(item.id);
+        const btn = document.getElementById(item.btn);
+        box.classList.toggle('answer-hidden', !show);
+        box.classList.toggle('answer-revealed', show);
+        btn.textContent = show ? item.close : item.open;
+        btn.classList.toggle('btn-toggled', show);
+      });
+
+      const sum1 = document.getElementById('led-row-sum');
+      const sum2 = document.getElementById('led-row-sum2');
+      const sumBtn = document.getElementById('btn-led-sum');
+      [sum1, sum2].forEach(el => {
+        el.classList.toggle('answer-hidden', !show);
+        el.classList.toggle('answer-revealed', show);
+      });
+      sumBtn.textContent = show ? '합계·잔액 숨기기 🔒' : '합계·잔액 공개 👁️';
+      sumBtn.classList.toggle('btn-toggled', show);
+    }
+
+    // 장면 7: 추심위임 vs 배서양도 비교 일괄 토글
+    function toggleCompareAll(show) {
+      [1, 2].forEach(num => {
+        const box = document.getElementById(`cmp-ans-${num}`);
+        const btn = document.getElementById(`btn-cmp-${num}`);
+        box.classList.toggle('answer-hidden', !show);
+        box.classList.toggle('answer-revealed', show);
+        btn.textContent = show ? '숨기기 🔒' : '정답·이유 공개 👁️';
+        btn.classList.toggle('btn-toggled', show);
+      });
+    }
+
+    // 장면 11: 마무리 확인 6문제 일괄 토글
+    function toggleAllQuizzes(show) {
+      for (let i = 1; i <= 6; i++) {
+        const box = document.getElementById(`q-ans-${i}`);
+        const btn = document.getElementById(`q-btn-${i}`);
+        box.classList.toggle('answer-hidden', !show);
+        box.classList.toggle('answer-revealed', show);
+        btn.textContent = show ? '숨기기 🔒' : '정답 확인 👁️';
+        btn.classList.toggle('btn-toggled', show);
+      }
+    }
+
+    // 키보드 좌우 화살표 이동 지원
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullScreen();
+      } else if (e.key === 'Escape') {
+        toggleTocModal(false);
+      }
+    });
+
+    window.onload = function() {
+      initDots();
+      initToc();
+      updateSlideView();
+    };
+  </script>
+</body>
+</html>
