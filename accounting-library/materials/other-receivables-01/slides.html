@@ -6,25 +6,40 @@
 <title>기타 채권의 회계 처리 - 서울관광고등학교 회계원리</title>
 <style>
   :root {
-    --bg: #f8fafc;
-    --surface: #ffffff;
-    --text: #0f172a;
-    --muted: #475569;
-    --border: #cbd5e1;
-    --primary: #2563eb;
-    --primary-bg: #eff6ff;
-    --teal: #0d9488;
-    --teal-bg: #f0fdfa;
-    --amber: #d97706;
+    --ink: #2d232e;
+    --ink-soft: #5c4d5e;
+    --bg-outer: #f3eef8;
+    --slide-bg: #fffdf9;
+    --card-bg: #ffffff;
+    --line: #2d232e;
+    --line-soft: #e2d9eb;
+
+    /* 파스텔 포인트 컬러 */
+    --pink: #ff7597;
+    --pink-bg: #ffeef3;
+    --pink-border: #ffb3c6;
+
+    --blue: #3b82f6;
+    --blue-bg: #eff6ff;
+    --blue-border: #93c5fd;
+
+    --mint: #10b981;
+    --mint-bg: #ecfdf5;
+    --mint-border: #6ee7b7;
+
+    --amber: #f59e0b;
     --amber-bg: #fffbeb;
-    --rose: #e11d48;
-    --rose-bg: #fff1f2;
-    --purple: #7c3aed;
+    --amber-border: #fcd34d;
+
+    --purple: #8b5cf6;
     --purple-bg: #f5f3ff;
-    --green: #16a34a;
-    --green-bg: #f0fdf4;
-    --radius: 16px;
-    --shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    --purple-border: #c4b5fd;
+
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --shadow-pop: 0 4px 0 #2d232e;
+    --shadow-soft: 0 3px 0 #d8cce2;
   }
 
   * {
@@ -34,35 +49,47 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
-    line-height: 1.55;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "맑은 고딕", sans-serif;
+    background-color: var(--bg-outer);
+    background-image: radial-gradient(#dcd0e8 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
+    color: var(--ink);
+    line-height: 1.4;
     word-break: keep-all;
     overflow-wrap: break-word;
-    padding-bottom: 60px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 12px;
   }
 
-  /* 상단 헤더 및 목차 */
-  header {
-    background: var(--surface);
-    border-bottom: 2px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  }
-
-  .header-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 12px 16px;
+  /* 16:9 와이드 슬라이드 프레임 (콘텐츠가 길어지면 잘리지 않고 자연스럽게 확장) */
+  .slide-deck {
+    width: 100%;
+    max-width: 1440px;
+    min-height: calc(min(100vw - 24px, 1440px) * 9 / 16);
+    background: var(--slide-bg);
+    border: 3px solid var(--line);
+    border-radius: 26px;
+    box-shadow: 0 8px 0 var(--line), 0 14px 30px rgba(45, 35, 46, 0.12);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    overflow: visible;
   }
 
-  .title-row {
+  /* 상단 헤더 & 목차 */
+  .deck-header {
+    background: #fff5f8;
+    border-bottom: 3px solid var(--line);
+    border-radius: 23px 23px 0 0;
+    padding: 10px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-top {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -70,1312 +97,1345 @@
     gap: 8px;
   }
 
-  .school-badge {
-    display: inline-block;
-    background: var(--primary-bg);
-    color: var(--primary);
-    font-weight: 800;
-    font-size: 0.9rem;
+  .brand-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .school-pill {
+    background: var(--pink);
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.82rem;
     padding: 4px 10px;
     border-radius: 999px;
-    border: 1px solid #bfdbfe;
+    border: 2px solid var(--line);
+    box-shadow: 0 2px 0 var(--line);
   }
 
   h1 {
-    font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
     font-weight: 900;
-    color: var(--text);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    color: var(--ink);
   }
 
-  .core-steps {
+  /* 스캐폴딩 4단계 배지 */
+  .scaffold-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--muted);
-    background: #f1f5f9;
-    padding: 6px 12px;
-    border-radius: 10px;
+    gap: 4px;
+    background: #ffffff;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
   }
 
-  .core-steps span.step {
-    color: var(--primary);
-    background: #fff;
+  .scaffold-step {
     padding: 2px 8px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--amber-bg);
+    border: 1.5px solid var(--line);
   }
 
-  nav.toc {
+  .scaffold-arrow {
+    color: var(--pink);
+    font-weight: 900;
+  }
+
+  /* 탭 내비게이션 */
+  nav.slide-nav {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
   }
 
-  .nav-btn {
+  .nav-tab {
     appearance: none;
-    border: 2px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 0.95rem;
-    font-weight: 800;
-    padding: 8px 14px;
-    border-radius: 10px;
+    border: 2.5px solid var(--line);
+    background: #ffffff;
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 900;
+    padding: 6px 13px;
+    border-radius: 12px;
     cursor: pointer;
-    min-height: 44px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    transition: background-color 0.15s, border-color 0.15s;
+    gap: 5px;
+    box-shadow: 0 2px 0 var(--line);
+    transition: transform 0.1s;
   }
 
-  .nav-btn.active {
-    background: var(--primary);
-    color: #ffffff;
-    border-color: var(--primary);
+  .nav-tab:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--line);
   }
 
-  /* 메인 레이아웃 */
-  main {
-    max-width: 1280px;
-    margin: 20px auto 0;
-    padding: 0 16px;
+  .nav-tab.active {
+    background: var(--amber);
+    color: var(--ink);
   }
 
-  .section-page {
+  /* 슬라이드 본문 영역 */
+  .slide-body {
+    flex: 1;
+    padding: 14px 18px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .slide-page {
     display: none;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
+    flex: 1;
   }
 
-  .section-page.active {
+  .slide-page.active {
     display: flex;
   }
 
-  /* 공통 카드 */
-  .card {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-    padding: clamp(16px, 2.5vw, 24px);
-    box-shadow: var(--shadow);
-  }
-
-  .section-header {
+  .slide-title-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    border-bottom: 2px solid #f1f5f9;
-    padding-bottom: 12px;
-    margin-bottom: 16px;
+    gap: 8px;
   }
 
-  .section-title {
-    font-size: clamp(1.3rem, 2.5vw, 1.65rem);
+  .slide-h2 {
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
     font-weight: 900;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .tag {
+  .sticker {
     display: inline-block;
-    font-size: 0.85rem;
-    font-weight: 800;
-    padding: 4px 10px;
-    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    box-shadow: 0 2px 0 var(--line);
   }
-  .tag-blue { background: var(--primary-bg); color: var(--primary); }
-  .tag-teal { background: var(--teal-bg); color: var(--teal); }
-  .tag-amber { background: var(--amber-bg); color: var(--amber); }
-  .tag-purple { background: var(--purple-bg); color: var(--purple); }
-  .tag-rose { background: var(--rose-bg); color: var(--rose); }
+  .st-blue { background: #bfdbfe; }
+  .st-mint { background: #a7f3d0; }
+  .st-amber { background: #fde68a; }
+  .st-purple { background: #ddd6fe; }
+  .st-pink { background: #fecdd3; }
 
-  /* 반응형 그리드 */
+  /* 그리드 레이아웃 */
   .grid-4 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
 
   .grid-2 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    align-items: stretch;
   }
 
-  @media (max-width: 640px) {
-    .grid-4, .grid-2 {
-      grid-template-columns: 1fr;
+  @media (max-width: 1024px) {
+    .grid-4 {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
-  /* 비교 카드 */
-  .compare-card {
-    border: 2px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-    background: #fff;
+  @media (max-width: 720px) {
+    .grid-4, .grid-2 {
+      grid-template-columns: 1fr;
+    }
+    .scaffold-bar {
+      border-radius: 12px;
+    }
+  }
+
+  /* 카드 공통 */
+  .pop-card {
+    background: var(--card-bg);
+    border: 2.5px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  .compare-card h3 {
-    font-size: 1.25rem;
-    font-weight: 900;
-  }
-
-  .compare-desc {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  /* 주의 박스 & 발문 박스 */
-  .notice-box {
-    background: var(--amber-bg);
-    border: 2px solid #fcd34d;
-    border-radius: 14px;
-    padding: 16px;
-    font-size: 1.05rem;
-    font-weight: 700;
-  }
-
-  .question-box {
-    background: var(--rose-bg);
-    border: 2px solid #fda4af;
-    border-radius: 14px;
-    padding: 16px;
+  .tx-header {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .question-title {
-    font-size: 1.15rem;
-    font-weight: 900;
-    color: var(--rose);
-  }
-
-  /* 삽화 스테이지 */
-  .scene-stage {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-
-  .scene-actors {
-    display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-around;
-    gap: 16px;
-    padding: 8px 0;
-  }
-
-  .actor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 6px;
-    min-width: 110px;
-  }
-
-  .actor-svg {
-    width: 96px;
-    height: 96px;
-    display: block;
-  }
-
-  .actor-name {
-    font-weight: 800;
-    font-size: 0.95rem;
-    background: #fff;
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 999px;
-  }
-
-  .speech-bubble {
-    background: #ffffff;
-    border: 2px solid var(--text);
-    border-radius: 12px;
-    padding: 8px 12px;
-    font-size: 0.95rem;
-    font-weight: 800;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    max-width: 240px;
-  }
-
-  /* 애니메이션 흐름 영역 */
-  .flow-lane {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 8px;
-    min-width: 150px;
-    flex: 1;
+    flex-wrap: wrap;
   }
 
-  .flow-track {
-    position: relative;
-    width: 100%;
-    max-width: 260px;
-    height: 44px;
-    background: #e2e8f0;
-    border-radius: 999px;
+  .date-badge {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.85rem;
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+
+  .tx-summary {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--ink);
+    background: #f8f5fc;
+    padding: 7px 10px;
+    border-radius: 10px;
+    border: 1.5px dashed #b8a6c9;
+  }
+
+  /* ★ 좌우 수평 정렬 스테이지 (어긋남 방지 핵심) ★ */
+  .stage-box {
+    background: #fff9fb;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 10px;
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stage-row {
+    display: grid;
+    grid-template-columns: 112px 1fr 112px;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  @media (max-width: 440px) {
+    .stage-row {
+      grid-template-columns: 88px 1fr 88px;
+      gap: 4px;
+    }
+  }
+
+  .char-col {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    padding: 0 12px;
+    text-align: center;
+    gap: 4px;
   }
 
-  .moving-pill {
+  .char-svg {
+    width: 74px;
+    height: 74px;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .char-label {
+    font-size: 0.78rem;
+    font-weight: 900;
+    background: #ffffff;
+    border: 2px solid var(--line);
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .char-bubble {
+    font-size: 0.78rem;
+    font-weight: 800;
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 3px 7px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.06);
+  }
+
+  /* 중앙 도식/화살표 컬럼 (고정 정지 상태, 어긋남 없음) */
+  .flow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .arrow-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-weight: 900;
-    font-size: 0.95rem;
-    padding: 6px 14px;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 12px;
     border-radius: 999px;
-    background: var(--primary);
-    color: #fff;
-    white-space: nowrap;
-    animation: slideRight 2.6s infinite ease-in-out;
+    border: 2px solid var(--line);
+    font-weight: 900;
+    font-size: 0.88rem;
+    box-shadow: 0 2px 0 var(--line);
+    width: 100%;
+    max-width: 220px;
   }
 
-  .moving-pill.reverse {
-    background: var(--teal);
-    animation: slideLeft 2.6s infinite ease-in-out;
+  .arrow-sub {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--ink-soft);
   }
 
-  @keyframes slideRight {
-    0% { transform: translateX(-35%); opacity: 0.7; }
-    50% { transform: translateX(35%); opacity: 1; }
-    100% { transform: translateX(-35%); opacity: 0.7; }
+  /* 도표 / 스택 바 */
+  .visual-stack {
+    display: flex;
+    width: 100%;
+    border: 2.5px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 0 var(--line);
   }
 
-  @keyframes slideLeft {
-    0% { transform: translateX(35%); opacity: 0.7; }
-    50% { transform: translateX(-35%); opacity: 1; }
-    100% { transform: translateX(35%); opacity: 0.7; }
+  .stack-item {
+    padding: 7px 6px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: 900;
+    font-size: 0.85rem;
   }
 
-  /* 토글 버튼 및 패널 */
-  .toggle-group {
+  .stack-item + .stack-item {
+    border-left: 2.5px solid var(--line);
+  }
+
+  .stack-item small {
+    font-size: 0.74rem;
+    font-weight: 800;
+    opacity: 0.9;
+  }
+
+  /* 스캐폴딩 토글 버튼 (독립 토글) */
+  .toggle-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 6px;
   }
 
-  .toggle-btn {
+  .scaf-btn {
     appearance: none;
-    border: 2px solid var(--primary);
+    border: 2px solid var(--line);
     background: #ffffff;
-    color: var(--primary);
-    font-size: 1rem;
-    font-weight: 800;
-    padding: 10px 16px;
+    color: var(--ink);
+    font-size: 0.86rem;
+    font-weight: 900;
+    padding: 7px 11px;
     border-radius: 10px;
     cursor: pointer;
-    min-height: 46px;
+    min-height: 38px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    box-shadow: 0 2px 0 var(--line);
   }
 
-  .toggle-btn[aria-expanded="true"] {
-    background: var(--primary);
-    color: #ffffff;
+  .scaf-btn[aria-expanded="true"] {
+    background: var(--blue-bg);
+    border-color: var(--blue);
+    color: #1d4ed8;
   }
 
-  .toggle-btn.btn-teal {
-    border-color: var(--teal);
-    color: var(--teal);
-  }
-  .toggle-btn.btn-teal[aria-expanded="true"] {
-    background: var(--teal);
-    color: #ffffff;
+  .scaf-btn.btn-step2[aria-expanded="true"] {
+    background: var(--mint-bg);
+    border-color: var(--mint);
+    color: #047857;
   }
 
-  .toggle-btn.btn-amber {
+  .scaf-btn.btn-step3[aria-expanded="true"] {
+    background: var(--amber-bg);
     border-color: var(--amber);
-    color: var(--amber);
-  }
-  .toggle-btn.btn-amber[aria-expanded="true"] {
-    background: var(--amber);
-    color: #ffffff;
+    color: #b45309;
   }
 
-  .toggle-panel {
+  .scaf-panel {
     display: none;
-    margin-top: 10px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: #f8fafc;
-    border: 2px solid var(--border);
-    font-size: 1.05rem;
-    font-weight: 700;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 2px solid var(--line);
+    background: #ffffff;
+    font-size: 0.92rem;
+    font-weight: 800;
   }
 
-  .toggle-panel.show {
+  .scaf-panel.show {
     display: block;
   }
 
-  /* 분개 한 줄 표시 영역 (좁은 화면 가로 스크롤 허용) */
-  .journal-scroll {
+  /* 증감 배지 도식 */
+  .inc-dec-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .id-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 900;
+    border: 1.5px solid var(--line);
+  }
+  .chip-d { background: var(--blue-bg); color: #1e40af; }
+  .chip-c { background: var(--amber-bg); color: #92400e; }
+
+  /* 분개 한 줄 표시 */
+  .journal-box {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    background: #0f172a;
-    color: #f8fafc;
-    padding: 14px 18px;
-    border-radius: 12px;
-    border: 2px solid #334155;
+    background: #231b24;
+    color: #ffffff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--line);
   }
 
   .journal-line {
     white-space: nowrap;
-    font-size: clamp(1.05rem, 2vw, 1.25rem);
-    font-weight: 800;
-    letter-spacing: 0.01em;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    font-weight: 900;
     font-variant-numeric: tabular-nums;
   }
 
-  .journal-line .side-d {
-    color: #60a5fa;
-  }
-  .journal-line .side-c {
-    color: #fbbf24;
-  }
+  .j-debit { color: #7dd3fc; }
+  .j-credit { color: #fde047; }
 
-  /* 금액 막대/블록 시각화 */
-  .bar-stack {
+  /* 하단 발문 & 주의사항 배너 */
+  .prompt-banner {
+    background: var(--pink-bg);
+    border: 2.5px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 14px;
     display: flex;
     flex-wrap: wrap;
-    width: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid var(--text);
-    margin: 10px 0;
-  }
-
-  .bar-seg {
-    padding: 12px 10px;
-    text-align: center;
-    font-weight: 900;
-    font-size: 0.95rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    box-shadow: var(--shadow-soft);
   }
 
-  .badge-Principal { background: #dbeafe; color: #1e40af; }
-  .badge-Interest { background: #fef3c7; color: #b45309; }
-  .badge-Book { background: #e2e8f0; color: #1e293b; }
-  .badge-Gain { background: #dcfce7; color: #15803d; }
-
-  .tx-date {
-    display: inline-block;
-    background: var(--text);
-    color: #fff;
+  .prompt-q {
+    font-size: 0.98rem;
     font-weight: 900;
-    font-size: 0.95rem;
-    padding: 4px 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-
-  .tx-desc {
-    font-size: 1.15rem;
-    font-weight: 800;
-    margin-bottom: 12px;
-    color: var(--text);
-  }
-
-  /* 혼합 복습 리스트 */
-  .quiz-list {
+    color: #be123c;
     display: flex;
-    flex-direction: column;
-    gap: 14px;
+    align-items: center;
+    gap: 6px;
   }
 
-  .quiz-item {
-    border: 2px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-    background: #fff;
-  }
-
-  .quiz-situation {
-    font-size: 1.15rem;
-    font-weight: 800;
-    margin-bottom: 8px;
+  /* 6번 복습 그리드 */
+  .review-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="title-row">
-      <div>
-        <span class="school-badge">서울관광고등학교 1학년 회계원리 (교과서 104~106쪽)</span>
-        <h1>기타 채권의 회계 처리</h1>
+<!-- 공통 SVG 캐릭터 심볼 정의 (치이카와 감성 마스코트 & 픽토그램) -->
+<svg width="0" height="0" style="position:absolute; visibility:hidden;" aria-hidden="true">
+  <defs>
+    <!-- 1. 치이 (하얀 곰돌이 바리스타 - 우리 회사) -->
+    <g id="char-chii">
+      <circle cx="24" cy="22" r="11" fill="#ffffff" stroke="#2d232e" stroke-width="3.5"/>
+      <circle cx="24" cy="22" r="6" fill="#ffc2d1"/>
+      <circle cx="76" cy="22" r="11" fill="#ffffff" stroke="#2d232e" stroke-width="3.5"/>
+      <circle cx="76" cy="22" r="6" fill="#ffc2d1"/>
+      <rect x="16" y="20" width="68" height="62" rx="32" fill="#ffffff" stroke="#2d232e" stroke-width="3.5"/>
+      <!-- 앞치마 -->
+      <path d="M24 66 Q50 72 76 66 L72 82 Q50 84 28 82 Z" fill="#93c5fd" stroke="#2d232e" stroke-width="3"/>
+      <!-- 볼터치 -->
+      <ellipse cx="30" cy="52" rx="6" ry="3.5" fill="#ff8fab"/>
+      <ellipse cx="70" cy="52" rx="6" ry="3.5" fill="#ff8fab"/>
+      <!-- 눈 & 입 -->
+      <circle cx="37" cy="45" r="4" fill="#2d232e"/>
+      <circle cx="35.5" cy="43.5" r="1.5" fill="#ffffff"/>
+      <circle cx="63" cy="45" r="4" fill="#2d232e"/>
+      <circle cx="61.5" cy="43.5" r="1.5" fill="#ffffff"/>
+      <path d="M45 52 Q47.5 55 50 52 Q52.5 55 55 52" fill="none" stroke="#2d232e" stroke-width="2.8" stroke-linecap="round"/>
+    </g>
+
+    <!-- 2. 하치 (파란 앞머리 고양이 - 거래처/사원) -->
+    <g id="char-hachi">
+      <polygon points="20,34 18,12 38,22" fill="#60a5fa" stroke="#2d232e" stroke-width="3.5" stroke-linejoin="round"/>
+      <polygon points="80,34 82,12 62,22" fill="#60a5fa" stroke="#2d232e" stroke-width="3.5" stroke-linejoin="round"/>
+      <rect x="16" y="20" width="68" height="62" rx="32" fill="#ffffff" stroke="#2d232e" stroke-width="3.5"/>
+      <!-- 파란 가르마 무늬 -->
+      <path d="M22 36 Q35 20 50 32 Q65 20 78 36 Q65 26 50 38 Q35 26 22 36 Z" fill="#60a5fa"/>
+      <ellipse cx="30" cy="52" rx="6" ry="3.5" fill="#ff8fab"/>
+      <ellipse cx="70" cy="52" rx="6" ry="3.5" fill="#ff8fab"/>
+      <circle cx="37" cy="45" r="4" fill="#2d232e"/>
+      <circle cx="35.5" cy="43.5" r="1.5" fill="#ffffff"/>
+      <circle cx="63" cy="45" r="4" fill="#2d232e"/>
+      <circle cx="61.5" cy="43.5" r="1.5" fill="#ffffff"/>
+      <path d="M46 51 Q50 56 54 51" fill="none" stroke="#2d232e" stroke-width="2.8" stroke-linecap="round"/>
+    </g>
+
+    <!-- 3. 우사 (노란 귀 토끼 - 거래처/파트너) -->
+    <g id="char-usa">
+      <rect x="28" y="4" width="14" height="30" rx="7" fill="#fef08a" stroke="#2d232e" stroke-width="3.5"/>
+      <rect x="58" y="4" width="14" height="30" rx="7" fill="#fef08a" stroke="#2d232e" stroke-width="3.5"/>
+      <rect x="16" y="24" width="68" height="60" rx="30" fill="#fef9c3" stroke="#2d232e" stroke-width="3.5"/>
+      <ellipse cx="30" cy="55" rx="6" ry="3.5" fill="#ff8fab"/>
+      <ellipse cx="70" cy="55" rx="6" ry="3.5" fill="#ff8fab"/>
+      <circle cx="37" cy="48" r="4" fill="#2d232e"/>
+      <circle cx="35.5" cy="46.5" r="1.5" fill="#ffffff"/>
+      <circle cx="63" cy="48" r="4" fill="#2d232e"/>
+      <circle cx="61.5" cy="46.5" r="1.5" fill="#ffffff"/>
+      <path d="M45 54 Q47.5 57 50 54 Q52.5 57 55 54" fill="none" stroke="#2d232e" stroke-width="2.8" stroke-linecap="round"/>
+    </g>
+
+    <!-- 4. 귀여운 민트 자동차 픽토그램 -->
+    <g id="pic-car">
+      <path d="M18 56 L28 34 L68 34 L78 56 Z" fill="#6ee7b7" stroke="#2d232e" stroke-width="3.5" stroke-linejoin="round"/>
+      <rect x="10" y="52" width="80" height="20" rx="8" fill="#10b981" stroke="#2d232e" stroke-width="3.5"/>
+      <rect x="32" y="39" width="32" height="12" rx="4" fill="#ffffff" stroke="#2d232e" stroke-width="2.5"/>
+      <circle cx="28" cy="72" r="10" fill="#2d232e"/>
+      <circle cx="28" cy="72" r="4" fill="#ffffff"/>
+      <circle cx="72" cy="72" r="10" fill="#2d232e"/>
+      <circle cx="72" cy="72" r="4" fill="#ffffff"/>
+    </g>
+
+    <!-- 5. 상품 상자 픽토그램 -->
+    <g id="pic-box">
+      <rect x="18" y="30" width="64" height="52" rx="8" fill="#fbbf24" stroke="#2d232e" stroke-width="3.5"/>
+      <polygon points="14,32 50,14 86,32" fill="#fde68a" stroke="#2d232e" stroke-width="3.5" stroke-linejoin="round"/>
+      <rect x="42" y="30" width="16" height="24" fill="#fffbeb" stroke="#2d232e" stroke-width="3"/>
+    </g>
+  </defs>
+</svg>
+
+<div class="slide-deck">
+  <!-- 상단 고정 헤더 -->
+  <header class="deck-header">
+    <div class="header-top">
+      <div class="brand-group">
+        <span class="school-pill">서울관광고 1학년 회계원리 (104~106쪽)</span>
+        <h1>✨ 기타 채권의 회계 처리</h1>
       </div>
-      <div class="core-steps" aria-label="핵심 판단 순서">
-        <span>핵심 판단:</span>
-        <span class="step">1. 무슨 거래인가?</span> →
-        <span class="step">2. 어떤 계정과목인가?</span> →
-        <span class="step">3. 무엇이 증감하는가?</span> →
-        <span class="step">4. 차변·대변 분개</span>
+      <div class="scaffold-bar" aria-label="회계 판단 4단계">
+        <span class="scaffold-step">① 무슨 거래?</span>
+        <span class="scaffold-arrow">▸</span>
+        <span class="scaffold-step">② 어떤 계정과목?</span>
+        <span class="scaffold-arrow">▸</span>
+        <span class="scaffold-step">③ 무엇이 증감?</span>
+        <span class="scaffold-arrow">▸</span>
+        <span class="scaffold-step">④ 차변·대변 분개</span>
       </div>
     </div>
 
-    <nav class="toc" aria-label="단원 목차">
-      <button type="button" class="nav-btn active" onclick="showPage('page-1', this)">1. 네 계정과목 비교</button>
-      <button type="button" class="nav-btn" onclick="showPage('page-2', this)">2. 단기대여금</button>
-      <button type="button" class="nav-btn" onclick="showPage('page-3', this)">3. 미수금</button>
-      <button type="button" class="nav-btn" onclick="showPage('page-4', this)">4. 선급금</button>
-      <button type="button" class="nav-btn" onclick="showPage('page-5', this)">5. 가지급금</button>
-      <button type="button" class="nav-btn" onclick="showPage('page-6', this)">6. 혼합 복습</button>
+    <nav class="slide-nav" aria-label="단원 슬라이드 이동">
+      <button type="button" class="nav-tab active" onclick="goSlide('s1', this)">1. 네 계정 비교</button>
+      <button type="button" class="nav-tab" onclick="goSlide('s2', this)">2. 단기대여금</button>
+      <button type="button" class="nav-tab" onclick="goSlide('s3', this)">3. 미수금</button>
+      <button type="button" class="nav-tab" onclick="goSlide('s4', this)">4. 선급금</button>
+      <button type="button" class="nav-tab" onclick="goSlide('s5', this)">5. 가지급금</button>
+      <button type="button" class="nav-tab" onclick="goSlide('s6', this)">6. 혼합 복습</button>
     </nav>
-  </div>
-</header>
+  </header>
 
-<main>
+  <main class="slide-body">
 
-  <!-- ==================== 1. 네 계정과목 비교 ==================== -->
-  <section id="page-1" class="section-page active">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><span class="tag tag-blue">한눈에 보기</span> 1. 기타 채권 네 계정과목 비교</h2>
-        <div class="toggle-group" style="margin-top:0;">
-          <button type="button" class="toggle-btn" onclick="toggleGroup('page-1', true)">현재 화면 모두 열기</button>
-          <button type="button" class="toggle-btn btn-teal" onclick="toggleGroup('page-1', false)">모두 닫기</button>
+    <!-- ==================== SLIDE 1: 네 계정과목 비교 ==================== -->
+    <section id="s1" class="slide-page active">
+      <div class="slide-title-bar">
+        <h2 class="slide-h2"><span class="sticker st-pink">한눈에 비교</span> 기타 채권 4총사 스캐폴딩 도식</h2>
+        <div class="toggle-bar">
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s1', true)">전체 열기</button>
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s1', false)">전체 닫기</button>
         </div>
       </div>
 
       <div class="grid-4">
-        <!-- 단기대여금 -->
-        <div class="compare-card">
-          <span class="tag tag-blue" style="align-self:flex-start;">자금 대여</span>
-          <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="44" fill="#eff6ff" stroke="#93c5fd" stroke-width="3"/>
-            <rect x="20" y="42" width="42" height="26" rx="4" fill="#2563eb"/>
-            <circle cx="41" cy="55" r="7" fill="#93c5fd"/>
-            <rect x="52" y="24" width="30" height="36" rx="3" fill="#ffffff" stroke="#1e40af" stroke-width="3"/>
-            <line x1="58" y1="34" x2="76" y2="34" stroke="#2563eb" stroke-width="3"/>
-            <line x1="58" y1="44" x2="72" y2="44" stroke="#2563eb" stroke-width="3"/>
-          </svg>
-          <h3>단기대여금</h3>
-          <p class="compare-desc">차용 증서를 받고 돈을 빌려주어 1년 이내에 회수할 채권</p>
-          <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'cmp-1')">핵심 포인트 보기</button>
-          <div id="cmp-1" class="toggle-panel">
-            나중에 <strong>원금(현금)</strong>을 돌려받으며, 대가로 받는 이자는 <strong>이자수익</strong>으로 처리합니다. (상대 계정: 단기차입금)
+        <!-- 1. 단기대여금 -->
+        <div class="pop-card" style="background:#f8fbff;">
+          <div class="tx-header">
+            <span class="sticker st-blue">자금 대여</span>
+            <span style="font-size:0.8rem; font-weight:900; color:var(--ink-soft);">상대: 단기차입금</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+            <div>
+              <h3 style="font-size:1.2rem; font-weight:900;">단기대여금</h3>
+              <p style="font-size:0.88rem; font-weight:800; color:var(--ink-soft);">돈을 빌려주고<br>1년 이내 회수</p>
+            </div>
+          </div>
+          <div class="visual-stack">
+            <div class="stack-item" style="flex:1; background:var(--blue-bg);">대여 시<small>차변(+) 발생</small></div>
+            <div class="stack-item" style="flex:1; background:#fff;">만기 시<small>현금(원금) 회수</small></div>
+          </div>
+          <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'c1-p')">핵심 포인트</button>
+          <div id="c1-p" class="scaf-panel">
+            원금 회수는 <strong>단기대여금 감소</strong>, 대가로 받은 이자는 <strong>이자수익</strong>!
           </div>
         </div>
 
-        <!-- 미수금 -->
-        <div class="compare-card">
-          <span class="tag tag-teal" style="align-self:flex-start;">상품 외 외상 판매</span>
-          <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="44" fill="#f0fdfa" stroke="#5eead4" stroke-width="3"/>
-            <path d="M20 62 L28 42 L62 42 L72 62 Z" fill="#0d9488"/>
-            <rect x="16" y="58" width="66" height="14" rx="4" fill="#115e59"/>
-            <circle cx="30" cy="74" r="8" fill="#334155"/>
-            <circle cx="66" cy="74" r="8" fill="#334155"/>
-          </svg>
-          <h3>미수금</h3>
-          <p class="compare-desc">상품 외 자산(차량, 비품 등)을 외상으로 팔아 발생한 채권</p>
-          <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'cmp-2')">핵심 포인트 보기</button>
-          <div id="cmp-2" class="toggle-panel">
-            판매용 상품을 외상으로 팔면 <strong>외상매출금</strong>, 사용하던 비품·차량을 외상으로 팔면 <strong>미수금</strong>입니다. (상대 계정: 미지급금)
+        <!-- 2. 미수금 -->
+        <div class="pop-card" style="background:#f4fdf9;">
+          <div class="tx-header">
+            <span class="sticker st-mint">상품 외 처분</span>
+            <span style="font-size:0.8rem; font-weight:900; color:var(--ink-soft);">상대: 미지급금</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" viewBox="0 0 100 100"><use href="#pic-car"/></svg>
+            <div>
+              <h3 style="font-size:1.2rem; font-weight:900;">미수금</h3>
+              <p style="font-size:0.88rem; font-weight:800; color:var(--ink-soft);">상품 외 자산을<br>외상으로 판매</p>
+            </div>
+          </div>
+          <div class="visual-stack">
+            <div class="stack-item" style="flex:1; background:var(--mint-bg);">상품 외상<small>외상매출금</small></div>
+            <div class="stack-item" style="flex:1; background:#fff;">비품·차량 외상<small>미수금</small></div>
+          </div>
+          <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 'c2-p')">핵심 포인트</button>
+          <div id="c2-p" class="scaf-panel">
+            쓰던 차량·비품 외상 처분 후 약속일에 <strong>현금 회수</strong>!
           </div>
         </div>
 
-        <!-- 선급금 -->
-        <div class="compare-card">
-          <span class="tag tag-amber" style="align-self:flex-start;">계약금 선지급</span>
-          <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="44" fill="#fffbeb" stroke="#fcd34d" stroke-width="3"/>
-            <rect x="26" y="34" width="48" height="42" rx="5" fill="#d97706"/>
-            <polygon points="26,34 50,20 74,34" fill="#fbbf24"/>
-            <rect x="44" y="34" width="12" height="18" fill="#fef3c7"/>
-          </svg>
-          <h3>선급금</h3>
-          <p class="compare-desc">상품 매입을 위해 계약금을 미리 지급한 채권</p>
-          <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'cmp-3')">핵심 포인트 보기</button>
-          <div id="cmp-3" class="toggle-panel">
-            현금이 아니라 <strong>상품을 인도받을 권리</strong>입니다. 상품이 도착하면 매입 대금에서 차감(충당)합니다. (상대 계정: 선수금)
+        <!-- 3. 선급금 -->
+        <div class="pop-card" style="background:#fffdf4;">
+          <div class="tx-header">
+            <span class="sticker st-amber">계약금 지급</span>
+            <span style="font-size:0.8rem; font-weight:900; color:var(--ink-soft);">상대: 선수금</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" viewBox="0 0 100 100"><use href="#pic-box"/></svg>
+            <div>
+              <h3 style="font-size:1.2rem; font-weight:900;">선급금</h3>
+              <p style="font-size:0.88rem; font-weight:800; color:var(--ink-soft);">상품 매입 대금을<br>미리 지급 (계약금)</p>
+            </div>
+          </div>
+          <div class="visual-stack">
+            <div class="stack-item" style="flex:1; background:var(--amber-bg);">계약 시<small>선급금 증가</small></div>
+            <div class="stack-item" style="flex:1; background:#fff;">인수 시<small>상품 대금 충당</small></div>
+          </div>
+          <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 'c3-p')">핵심 포인트</button>
+          <div id="c3-p" class="scaf-panel">
+            현금 회수가 아니라 <strong>상품을 받을 권리</strong>! 도착 시 대변에서 차감.
           </div>
         </div>
 
-        <!-- 가지급금 -->
-        <div class="compare-card">
-          <span class="tag tag-purple" style="align-self:flex-start;">미확정 임시 지급</span>
-          <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="44" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="3"/>
-            <rect x="26" y="38" width="48" height="36" rx="6" fill="#7c3aed"/>
-            <path d="M40 38 V30 C40 26 60 26 60 30 V38" fill="none" stroke="#5b21b6" stroke-width="4"/>
-            <text x="50" y="64" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="900">?</text>
-          </svg>
-          <h3>가지급금</h3>
-          <p class="compare-desc">현금을 지급했으나 계정과목이나 금액이 미확정일 때 임시 기록</p>
-          <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'cmp-4')">핵심 포인트 보기</button>
-          <div id="cmp-4" class="toggle-panel">
-            출장 후 사용 내역과 금액이 확정되면 <strong>여비교통비</strong> 등 확정 계정으로 대체하여 <strong>전액 정리</strong>합니다. (상대 계정: 가수금)
+        <!-- 4. 가지급금 -->
+        <div class="pop-card" style="background:#faf8ff;">
+          <div class="tx-header">
+            <span class="sticker st-purple">임시 기록</span>
+            <span style="font-size:0.8rem; font-weight:900; color:var(--ink-soft);">상대: 가수금</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-hachi"/></svg>
+            <div>
+              <h3 style="font-size:1.2rem; font-weight:900;">가지급금</h3>
+              <p style="font-size:0.88rem; font-weight:800; color:var(--ink-soft);">과목·금액 미확정<br>출장비 임시 지급</p>
+            </div>
+          </div>
+          <div class="visual-stack">
+            <div class="stack-item" style="flex:1; background:var(--purple-bg);">출장 전<small>가지급금 기록</small></div>
+            <div class="stack-item" style="flex:1; background:#fff;">복귀 후<small>비용 정산 소멸</small></div>
+          </div>
+          <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'c4-p')">핵심 포인트</button>
+          <div id="c4-p" class="scaf-panel">
+            복귀 후 <strong>여비교통비</strong>로 확정되면 가지급금 <strong>전액 정리</strong>!
           </div>
         </div>
       </div>
 
-      <div class="notice-box" style="margin-top: 18px;">
-        <p style="font-size:1.15rem; margin-bottom:6px; color:#b45309;">⚠️ 꼭 주의할 점!</p>
-        <p>1. 네 계정 모두 <strong>자산(채권)</strong>이지만, 모두 현금 회수를 기다리는 것은 아닙니다.</p>
-        <p>2. 미리 지급한 돈이라고 해서 무조건 선급금이나 가지급금으로 분류하지 않습니다. <strong>무엇을 위해 지급했는지</strong> 먼저 확인하세요!</p>
-        <button type="button" class="toggle-btn btn-amber" style="margin-top:10px;" aria-expanded="false" onclick="toggleOne(this, 'cmp-notice')">해설 확인하기</button>
-        <div id="cmp-notice" class="toggle-panel">
-          • <strong>단기대여금·미수금</strong>: 약속한 날짜에 <strong>현금 회수</strong>를 기다립니다.<br>
-          • <strong>선급금</strong>: 현금이 아니라 주문한 <strong>상품 인수</strong>를 기다립니다.<br>
-          • <strong>가지급금</strong>: 출장 다녀온 뒤 <strong>실제 사용한 비용 계정으로 정산(대체)</strong>하기를 기다립니다.
+      <!-- 하단 주의 배너 -->
+      <div class="prompt-banner">
+        <div class="prompt-q">
+          <span>🚨 주의!</span>
+          <span>네 계정 모두 자산이지만 모두 현금 회수를 기다리는 것은 아닙니다. 미리 준 돈이라고 다 같은 계정이 아니에요!</span>
+        </div>
+        <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's1-warn')">비교 도식 열기</button>
+      </div>
+      <div id="s1-warn" class="scaf-panel">
+        <div class="inc-dec-grid">
+          <span class="id-chip chip-d">💵 현금 회수 대기: 단기대여금 · 미수금</span>
+          <span class="id-chip chip-c">📦 상품 인수 대기: 선급금</span>
+          <span class="id-chip" style="background:var(--purple-bg); color:#5b21b6;">🧾 비용 확정(정산) 대기: 가지급금</span>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ==================== 2. 단기대여금 ==================== -->
-  <section id="page-2" class="section-page">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><span class="tag tag-blue">교과서 예제 15</span> 2. 단기대여금 (8/1 대여 → 10/31 회수)</h2>
-        <div class="toggle-group" style="margin-top:0;">
-          <button type="button" class="toggle-btn" onclick="toggleGroup('page-2', true)">현재 화면 모두 열기</button>
-          <button type="button" class="toggle-btn btn-teal" onclick="toggleGroup('page-2', false)">모두 닫기</button>
+    <!-- ==================== SLIDE 2: 단기대여금 ==================== -->
+    <section id="s2" class="slide-page">
+      <div class="slide-title-bar">
+        <h2 class="slide-h2"><span class="sticker st-blue">예제 15</span> 단기대여금 (8/1 대여 ➔ 10/31 원금·이자 회수)</h2>
+        <div class="toggle-bar">
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s2', true)">전체 열기</button>
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s2', false)">전체 닫기</button>
         </div>
       </div>
 
       <div class="grid-2">
-        <!-- 8/1 거래 -->
-        <div class="card" style="background:#fcfdff;">
-          <span class="tx-date">8월 1일 (대여 시점)</span>
-          <p class="tx-desc">차용 증서를 받고 화천 상사에 현금 3,000,000원을 3개월간 대여하다.</p>
+        <!-- 8/1 -->
+        <div class="pop-card">
+          <div class="tx-header">
+            <span class="date-badge">8월 1일 (빌려준 날)</span>
+            <span class="sticker st-blue">STEP 1. 대여 발생</span>
+          </div>
+          <p class="tx-summary">차용 증서를 받고 화천 상사에 현금 3,000,000원을 3개월간 대여하다.</p>
 
-          <div class="scene-stage">
-            <div class="scene-actors">
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle cx="50" cy="32" r="16" fill="#fcd34d"/>
-                  <path d="M24 86 C24 58 76 58 76 86 Z" fill="#2563eb"/>
-                  <rect x="34" y="54" width="32" height="32" rx="4" fill="#1d4ed8"/>
-                </svg>
-                <span class="actor-name">우리 회사 (카페)</span>
-                <div class="speech-bubble">3개월 뒤에 돌려주세요!</div>
+          <!-- 좌우 수평 정렬 스테이지 -->
+          <div class="stage-box">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+                <span class="char-label">우리 회사</span>
+                <span class="char-bubble">3개월 뒤 갚아요!</span>
               </div>
 
-              <div class="flow-lane">
-                <div class="flow-track">
-                  <div class="moving-pill">현금 3,000,000원 →</div>
-                </div>
-                <span style="font-size:0.9rem; font-weight:800; color:var(--muted);">차용 증서 수령 (1년 이내 회수)</span>
+              <div class="flow-col">
+                <div class="arrow-pill" style="background:var(--blue-bg);">💵 현금 3,000,000원 ➔</div>
+                <div class="arrow-pill" style="background:#ffffff;">⬅ 📄 차용 증서 (3개월)</div>
               </div>
 
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <rect x="22" y="24" width="56" height="62" rx="6" fill="#64748b"/>
-                  <rect x="32" y="34" width="14" height="14" fill="#e2e8f0"/>
-                  <rect x="54" y="34" width="14" height="14" fill="#e2e8f0"/>
-                  <rect x="32" y="56" width="14" height="14" fill="#e2e8f0"/>
-                  <rect x="54" y="56" width="14" height="14" fill="#e2e8f0"/>
-                </svg>
-                <span class="actor-name">화천 상사</span>
-                <div class="speech-bubble">차용 증서 드립니다.</div>
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-usa"/></svg>
+                <span class="char-label">화천 상사</span>
+                <span class="char-bubble">증서 여기요!</span>
               </div>
             </div>
           </div>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'loan-801-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'loan-801-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'loan-801-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's2-1a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's2-1b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's2-1c')">③ 분개</button>
           </div>
-
-          <div id="loan-801-1" class="toggle-panel">
-            • 3개월(1년 이내) 조건으로 돈을 빌려주었으므로 <strong>단기대여금</strong>(자산)과 <strong>현금</strong>(자산)을 사용합니다.
+          <div id="s2-1a" class="scaf-panel">3개월(1년 이내) 대여 ➔ <strong>단기대여금</strong>(자산) / 현금 지급 ➔ <strong>현금</strong>(자산)</div>
+          <div id="s2-1b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 단기대여금(자산) 증가 +3,000,000</span>
+              <span class="id-chip chip-c">대변: 현금(자산) 감소 -3,000,000</span>
+            </div>
           </div>
-          <div id="loan-801-2" class="toggle-panel">
-            • 돈을 돌려받을 권리인 <strong>단기대여금(자산) 증가 → 차변</strong><br>
-            • 빌려준 만큼 <strong>현금(자산) 감소 → 대변</strong>
-          </div>
-          <div id="loan-801-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 단기대여금 3,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 현금 3,000,000</span>
-              </div>
+          <div id="s2-1c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 단기대여금 3,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 현금 3,000,000</span></div>
             </div>
           </div>
         </div>
 
-        <!-- 10/31 거래 -->
-        <div class="card" style="background:#fcfdff;">
-          <span class="tx-date">10월 31일 (회수 시점)</span>
-          <p class="tx-desc">화천 상사에 대여한 3,000,000원과 그 이자 15,000원을 현금 회수하여 당좌 예입하다.</p>
+        <!-- 10/31 -->
+        <div class="pop-card">
+          <div class="tx-header">
+            <span class="date-badge">10월 31일 (돌려받은 날)</span>
+            <span class="sticker st-amber">STEP 2. 원금 + 이자 회수</span>
+          </div>
+          <p class="tx-summary">대여한 3,000,000원과 이자 15,000원을 현금 회수하여 당좌 예입하다.</p>
 
-          <div class="scene-stage">
-            <div class="scene-actors">
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle cx="50" cy="32" r="16" fill="#fcd34d"/>
-                  <path d="M24 86 C24 58 76 58 76 86 Z" fill="#2563eb"/>
-                </svg>
-                <span class="actor-name">우리 회사 (당좌예금)</span>
-                <div class="speech-bubble">총 3,015,000원 입금!</div>
+          <!-- 좌우 수평 정렬 스테이지 + 원금/이자 도식 -->
+          <div class="stage-box">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+                <span class="char-label">당좌예금 입금</span>
+                <span class="char-bubble">총 3,015,000원!</span>
               </div>
 
-              <div class="flow-lane">
-                <div class="flow-track">
-                  <div class="moving-pill reverse">← 3,015,000원 회수</div>
-                </div>
-                <div class="bar-stack">
-                  <div class="bar-seg badge-Principal" style="flex: 3;">
-                    <span>원금 3,000,000원</span>
-                    <small>(단기대여금 회수)</small>
+              <div class="flow-col">
+                <div class="visual-stack">
+                  <div class="stack-item" style="flex:3; background:#dbeafe; color:#1e40af;">
+                    원금 3,000,000원<small>단기대여금 회수</small>
                   </div>
-                  <div class="bar-seg badge-Interest" style="flex: 1.3;">
-                    <span>이자 15,000원</span>
-                    <small>(이자수익 발생)</small>
+                  <div class="stack-item" style="flex:1.4; background:#fef3c7; color:#b45309;">
+                    이자 15,000원<small>이자수익 발생</small>
                   </div>
                 </div>
+                <span class="arrow-sub">⬅ 화천 상사에서 전액 회수하여 당좌예입</span>
+              </div>
+
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-usa"/></svg>
+                <span class="char-label">화천 상사</span>
+                <span class="char-bubble">이자까지 갚아요!</span>
               </div>
             </div>
           </div>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'loan-1031-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'loan-1031-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'loan-1031-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's2-2a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's2-2b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's2-2c')">③ 분개</button>
           </div>
-
-          <div id="loan-1031-1" class="toggle-panel">
-            • 당좌 예입한 총액은 <strong>당좌예금</strong>(자산), 빌려주었던 원금은 <strong>단기대여금</strong>(자산), 추가로 받은 이자는 <strong>이자수익</strong>(수익)입니다.
+          <div id="s2-2a" class="scaf-panel">당좌예입 총액 ➔ <strong>당좌예금</strong>(자산) / 원금 회수 ➔ <strong>단기대여금</strong>(자산) / 이자 ➔ <strong>이자수익</strong>(수익)</div>
+          <div id="s2-2b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 당좌예금(자산) 증가 +3,015,000</span>
+              <span class="id-chip chip-c">대변: 단기대여금(자산) 감소 3,000,000 · 이자수익(수익) 발생 15,000</span>
+            </div>
           </div>
-          <div id="loan-1031-2" class="toggle-panel">
-            • 원금과 이자를 합쳐 당좌 예입했으므로 <strong>당좌예금(자산) 3,015,000원 증가 → 차변</strong><br>
-            • 원금을 돌려받아 <strong>단기대여금(자산) 3,000,000원 감소 → 대변</strong><br>
-            • 이자만큼 <strong>이자수익(수익) 15,000원 발생 → 대변</strong>
-          </div>
-          <div id="loan-1031-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 당좌예금 3,015,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 단기대여금 3,000,000, 이자수익 15,000</span>
-              </div>
+          <div id="s2-2c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 당좌예금 3,015,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 단기대여금 3,000,000, 이자수익 15,000</span></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 발문 -->
-      <div class="question-box" style="margin-top: 16px;">
-        <div class="question-title">💬 발문: “10월 31일에 받은 금액 3,015,000원 전체가 수익일까요?”</div>
-        <div>
-          <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'q-loan')">이유 확인하기</button>
-          <div id="q-loan" class="toggle-panel">
-            아닙니다! <span class="badge-Principal" style="padding:2px 8px; border-radius:6px;">원금 3,000,000원</span>은 원래 우리 회사의 돈(단기대여금)을 <strong>자산 회수</strong>한 것이므로 수익이 아닙니다. 빌려준 대가로 추가로 받은 <span class="badge-Interest" style="padding:2px 8px; border-radius:6px;">이자 15,000원</span>만 <strong>이자수익</strong>입니다.
-          </div>
-        </div>
+      <div class="prompt-banner">
+        <div class="prompt-q">💬 발문: “받은 금액 3,015,000원 전체가 수익일까요?”</div>
+        <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's2-q')">정답 이유 확인</button>
       </div>
-    </div>
-  </section>
+      <div id="s2-q" class="scaf-panel">
+        아닙니다! <span class="id-chip chip-d">원금 3,000,000원</span>은 빌려주었던 <strong>자산(단기대여금)의 회수</strong>이고, 빌려준 대가로 받은 <span class="id-chip chip-c">이자 15,000원</span>만 <strong>수익(이자수익)</strong>입니다.
+      </div>
+    </section>
 
-  <!-- ==================== 3. 미수금 ==================== -->
-  <section id="page-3" class="section-page">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><span class="tag tag-teal">교과서 예제 15</span> 3. 미수금 (상품 vs 사용하던 자산 비교)</h2>
-        <div class="toggle-group" style="margin-top:0;">
-          <button type="button" class="toggle-btn" onclick="toggleGroup('page-3', true)">현재 화면 모두 열기</button>
-          <button type="button" class="toggle-btn btn-teal" onclick="toggleGroup('page-3', false)">모두 닫기</button>
+    <!-- ==================== SLIDE 3: 미수금 ==================== -->
+    <section id="s3" class="slide-page">
+      <div class="slide-title-bar">
+        <h2 class="slide-h2"><span class="sticker st-mint">예제 15</span> 미수금 (상품 vs 사용하던 자산 비교)</h2>
+        <div class="toggle-bar">
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s3', true)">전체 열기</button>
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s3', false)">전체 닫기</button>
         </div>
       </div>
 
-      <!-- 상품 vs 사용 자산 비교 -->
-      <div class="scene-stage">
-        <p style="font-weight:900; font-size:1.1rem; margin-bottom:10px;">🔍 같은 물건이라도 우리 회사가 어떤 목적으로 가지고 있었는지에 따라 계정과목이 달라집니다!</p>
-        <div class="grid-2">
-          <div class="compare-card" style="border-color:#93c5fd; background:#eff6ff;">
-            <span class="tag tag-blue" style="align-self:flex-start;">주된 영업 활동 (상품 판매)</span>
-            <p class="compare-desc">카페에서 <strong>판매용 텀블러·원두(상품)</strong>를 외상으로 팔았을 때</p>
-            <p style="font-size:1.2rem; font-weight:900; color:var(--primary);">→ 외상매출금</p>
-          </div>
-          <div class="compare-card" style="border-color:#5eead4; background:#f0fdfa;">
-            <span class="tag tag-teal" style="align-self:flex-start;">상품 외 자산 처분</span>
-            <p class="compare-desc">영업용으로 <strong>사용하던 차량이나 냉장고(유형자산)</strong>를 외상으로 팔았을 때</p>
-            <p style="font-size:1.2rem; font-weight:900; color:var(--teal);">→ 미수금</p>
-          </div>
+      <!-- 상단 비교 도식: 같은 물건이라도 목적에 따라 다름 -->
+      <div class="visual-stack">
+        <div class="stack-item" style="flex:1; background:var(--blue-bg);">
+          🧋 판매용 상품(텀블러·원두) 외상 판매 ➔ <strong>외상매출금</strong>
+        </div>
+        <div class="stack-item" style="flex:1; background:var(--mint-bg);">
+          🚗 영업용 사용 자산(차량·냉장고) 외상 판매 ➔ <strong>미수금</strong>
         </div>
       </div>
 
       <div class="grid-2">
-        <!-- 8/10 거래 -->
-        <div class="card" style="background:#fcfdff;">
-          <span class="tx-date">8월 10일 (차량 외상 처분)</span>
-          <p class="tx-desc">영업용으로 사용하던 차량을 5,000,000원(장부가액 4,000,000원)에 처분하고 대금은 월말에 받기로 하다.</p>
+        <!-- 8/10 -->
+        <div class="pop-card">
+          <div class="tx-header">
+            <span class="date-badge">8월 10일 (차량 외상 처분)</span>
+            <span class="sticker st-mint">장부 400만 vs 처분 500만</span>
+          </div>
+          <p class="tx-summary">사용하던 차량을 5,000,000원(장부가액 4,000,000원)에 처분하고 대금은 월말에 받기로 하다.</p>
 
-          <div class="scene-stage">
-            <div class="scene-actors">
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <path d="M18 60 L28 38 L66 38 L78 60 Z" fill="#0d9488"/>
-                  <rect x="12" y="56" width="76" height="16" rx="5" fill="#115e59"/>
-                  <circle cx="28" cy="74" r="9" fill="#1e293b"/>
-                  <circle cx="70" cy="74" r="9" fill="#1e293b"/>
-                </svg>
-                <span class="actor-name">영업용 차량 (장부 400만 원)</span>
+          <div class="stage-box">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#pic-car"/></svg>
+                <span class="char-label">영업용 차량</span>
+                <span class="char-bubble">장부 400만 원</span>
               </div>
 
-              <div class="flow-lane">
-                <div class="flow-track">
-                  <div class="moving-pill" style="background:var(--teal);">처분금액 5,000,000원 (월말 수령)</div>
-                </div>
-                <div class="bar-stack">
-                  <div class="bar-seg badge-Book" style="flex: 4;">
-                    <span>장부금액 4,000,000원</span>
-                    <small>(차량운반구 감소)</small>
+              <div class="flow-col">
+                <div class="visual-stack">
+                  <div class="stack-item" style="flex:4; background:#e2e8f0; color:#1e293b;">
+                    장부금액 4,000,000원<small>차량운반구 감소</small>
                   </div>
-                  <div class="bar-seg badge-Gain" style="flex: 1.5;">
-                    <span>차이 +1,000,000원</span>
-                    <small>(유형자산처분이익)</small>
+                  <div class="stack-item" style="flex:1.5; background:#dcfce7; color:#15803d;">
+                    차이 +1,000,000원<small>유형자산처분이익</small>
                   </div>
                 </div>
+                <span class="arrow-sub">처분금액 총 5,000,000원 (월말 수령 약속)</span>
+              </div>
+
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-hachi"/></svg>
+                <span class="char-label">매수 거래처</span>
+                <span class="char-bubble">월말에 500만 원!</span>
               </div>
             </div>
           </div>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'mi-810-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'mi-810-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'mi-810-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's3-1a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's3-1b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's3-1c')">③ 분개</button>
           </div>
-
-          <div id="mi-810-1" class="toggle-panel">
-            • 상품이 아닌 <strong>차량운반구</strong>를 외상으로 팔았으므로 받을 돈은 <strong>미수금</strong>(자산), 장부금액보다 비싸게 팔아 생긴 이익은 <strong>유형자산처분이익</strong>(수익)입니다.
+          <div id="s3-1a" class="scaf-panel">상품 외 외상 대금 ➔ <strong>미수금</strong>(자산) / 나간 차 ➔ <strong>차량운반구</strong>(자산) / 차액 이익 ➔ <strong>유형자산처분이익</strong>(수익)</div>
+          <div id="s3-1b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 미수금(자산) 증가 +5,000,000</span>
+              <span class="id-chip chip-c">대변: 차량운반구 감소 4,000,000 · 유형자산처분이익 발생 1,000,000</span>
+            </div>
           </div>
-          <div id="mi-810-2" class="toggle-panel">
-            • 월말에 받을 권리 <strong>미수금(자산) 5,000,000원 증가 → 차변</strong><br>
-            • 사용하던 <strong>차량운반구(자산) 장부가액 4,000,000원 감소 → 대변</strong><br>
-            • 처분금액(500만 원) - 장부금액(400만 원) = <strong>유형자산처분이익(수익) 1,000,000원 발생 → 대변</strong>
-          </div>
-          <div id="mi-810-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 미수금 5,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 차량운반구 4,000,000, 유형자산처분이익 1,000,000</span>
-              </div>
+          <div id="s3-1c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 미수금 5,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 차량운반구 4,000,000, 유형자산처분이익 1,000,000</span></div>
             </div>
           </div>
         </div>
 
-        <!-- 8/31 거래 -->
-        <div class="card" style="background:#fcfdff;">
-          <span class="tx-date">8월 31일 (대금 회수)</span>
-          <p class="tx-desc">미수된 차량 판매 대금을 현금으로 회수하다.</p>
+        <!-- 8/31 -->
+        <div class="pop-card">
+          <div class="tx-header">
+            <span class="date-badge">8월 31일 (대금 회수)</span>
+            <span class="sticker st-blue">미수금 채권 소멸</span>
+          </div>
+          <p class="tx-summary">미수된 차량 판매 대금을 현금으로 회수하다.</p>
 
-          <div class="scene-stage">
-            <div class="scene-actors">
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle cx="50" cy="34" r="16" fill="#fcd34d"/>
-                  <path d="M24 86 C24 58 76 58 76 86 Z" fill="#0d9488"/>
-                </svg>
-                <span class="actor-name">우리 회사</span>
-                <div class="speech-bubble">약속한 500만 원 수령!</div>
+          <div class="stage-box">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+                <span class="char-label">우리 회사</span>
+                <span class="char-bubble">500만 원 입금!</span>
               </div>
 
-              <div class="flow-lane">
-                <div class="flow-track">
-                  <div class="moving-pill reverse">← 현금 5,000,000원 입금</div>
-                </div>
-                <span style="font-size:0.95rem; font-weight:800; color:var(--teal);">8/10 기록한 미수금 채권 소멸</span>
+              <div class="flow-col">
+                <div class="arrow-pill" style="background:var(--mint-bg);">⬅ 💵 현금 5,000,000원 회수</div>
+                <div class="arrow-pill" style="background:#f1f5f9;">8/10 미수금 5,000,000원 소멸</div>
+              </div>
+
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-hachi"/></svg>
+                <span class="char-label">매수 거래처</span>
+                <span class="char-bubble">약속대로 드려요!</span>
               </div>
             </div>
           </div>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'mi-831-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'mi-831-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'mi-831-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's3-2a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's3-2b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's3-2c')">③ 분개</button>
           </div>
-
-          <div id="mi-831-1" class="toggle-panel">
-            • 현금을 받고 기존에 잡아 두었던 미수금 채권을 지우므로 <strong>현금</strong>(자산)과 <strong>미수금</strong>(자산)을 사용합니다.
+          <div id="s3-2a" class="scaf-panel">현금 수령 ➔ <strong>현금</strong>(자산) / 외상 채권 회수 ➔ <strong>미수금</strong>(자산)</div>
+          <div id="s3-2b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 현금(자산) 증가 +5,000,000</span>
+              <span class="id-chip chip-c">대변: 미수금(자산) 감소 -5,000,000</span>
+            </div>
           </div>
-          <div id="mi-831-2" class="toggle-panel">
-            • 대금을 받아 <strong>현금(자산) 5,000,000원 증가 → 차변</strong><br>
-            • 받을 권리가 해결되어 <strong>미수금(자산) 5,000,000원 감소 → 대변</strong>
-          </div>
-          <div id="mi-831-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 현금 5,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 미수금 5,000,000</span>
-              </div>
+          <div id="s3-2c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 현금 5,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 미수금 5,000,000</span></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 발문 -->
-      <div class="question-box" style="margin-top: 16px;">
-        <div class="question-title">💬 발문: “상품 외 자산을 팔았는데 왜 외상매출금이 아닐까요?”</div>
-        <div>
-          <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'q-misu')">이유 확인하기</button>
-          <div id="q-misu" class="toggle-panel">
-            <strong>외상매출금</strong>은 기업의 주된 영업 목적인 <strong>상품(재고자산)</strong>을 외상으로 매출했을 때만 사용합니다. 영업용으로 쓰던 차량이나 비품은 상품이 아니므로 <strong>미수금</strong>으로 구분하여 기록해야 회사의 본래 영업 실적을 정확히 알 수 있습니다.
-          </div>
-        </div>
+      <div class="prompt-banner">
+        <div class="prompt-q">💬 발문: “상품 외 자산을 팔았는데 왜 외상매출금이 아닐까요?”</div>
+        <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's3-q')">정답 이유 확인</button>
       </div>
-    </div>
-  </section>
+      <div id="s3-q" class="scaf-panel">
+        <strong>외상매출금</strong>은 주된 영업 목적인 <strong>상품</strong>을 외상 판매했을 때만 씁니다. 사용하던 차량·비품은 상품이 아니므로 <strong>미수금</strong>으로 구분합니다.
+      </div>
+    </section>
 
-  <!-- ==================== 4. 선급금 ==================== -->
-  <section id="page-4" class="section-page">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><span class="tag tag-amber">교과서 예제 16</span> 4. 선급금 (2/3 계약금 지급 → 2/18 상품 인수)</h2>
-        <div class="toggle-group" style="margin-top:0;">
-          <button type="button" class="toggle-btn" onclick="toggleGroup('page-4', true)">현재 화면 모두 열기</button>
-          <button type="button" class="toggle-btn btn-teal" onclick="toggleGroup('page-4', false)">모두 닫기</button>
+    <!-- ==================== SLIDE 4: 선급금 ==================== -->
+    <section id="s4" class="slide-page">
+      <div class="slide-title-bar">
+        <h2 class="slide-h2"><span class="sticker st-amber">예제 16</span> 선급금 (2/3 계약금 지급 ➔ 2/18 상품 인수 및 충당)</h2>
+        <div class="toggle-bar">
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s4', true)">전체 열기</button>
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s4', false)">전체 닫기</button>
         </div>
       </div>
 
       <div class="grid-2">
-        <!-- 2/3 거래 -->
-        <div class="card" style="background:#fcfdff;">
-          <span class="tx-date">2월 3일 (계약금 지급)</span>
-          <p class="tx-desc">진주 상사에 상품 10,000,000원을 주문하고, 계약금으로 수표 1,000,000원을 발행하여 지급하다.</p>
+        <!-- 2/3 -->
+        <div class="pop-card">
+          <div class="tx-header">
+            <span class="date-badge">2월 3일 (계약금 지급)</span>
+            <span class="sticker st-amber">STEP 1. 계약금 100만 원</span>
+          </div>
+          <p class="tx-summary">진주 상사에 상품 10,000,000원을 주문하고, 계약금으로 수표 1,000,000원을 발행하여 지급하다.</p>
 
-          <div class="scene-stage">
-            <div class="scene-actors">
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle cx="50" cy="32" r="16" fill="#fcd34d"/>
-                  <path d="M24 86 C24 58 76 58 76 86 Z" fill="#d97706"/>
-                </svg>
-                <span class="actor-name">우리 회사</span>
-                <div class="speech-bubble">주문서 + 수표 100만 원!</div>
+          <div class="stage-box">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+                <span class="char-label">우리 회사</span>
+                <span class="char-bubble">계약금 수표예요!</span>
               </div>
 
-              <div class="flow-lane">
-                <div class="flow-track">
-                  <div class="moving-pill" style="background:var(--amber);">계약금 1,000,000원 →</div>
-                </div>
-                <span style="font-size:0.9rem; font-weight:800; color:var(--muted);">상품은 아직 도착 전! (받을 권리 발생)</span>
+              <div class="flow-col">
+                <div class="arrow-pill" style="background:var(--amber-bg);">🧾 당좌수표 1,000,000원 ➔</div>
+                <span class="arrow-sub">주문 총액 1,000만 원 중 실제 지급한 100만 원만 기록!</span>
               </div>
 
-              <div class="actor">
-                <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <rect x="20" y="28" width="60" height="54" rx="6" fill="#78350f"/>
-                  <rect x="34" y="42" width="32" height="24" fill="#fef3c7"/>
-                </svg>
-                <span class="actor-name">진주 상사</span>
-                <div class="speech-bubble">상품 준비해 보내드릴게요!</div>
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-usa"/></svg>
+                <span class="char-label">진주 상사</span>
+                <span class="char-bubble">상품 보내드릴게요!</span>
               </div>
             </div>
           </div>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'pre-203-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'pre-203-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'pre-203-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's4-1a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's4-1b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's4-1c')">③ 분개</button>
           </div>
-
-          <div id="pre-203-1" class="toggle-panel">
-            • 상품 매입을 위해 미리 지급한 계약금은 <strong>선급금</strong>(자산), 우리 회사가 당좌수표를 발행하여 지급했으므로 <strong>당좌예금</strong>(자산)입니다. (주문 총액 1,000만 원 중 실제 지급한 계약금 100만 원만 회계 처리합니다.)
+          <div id="s4-1a" class="scaf-panel">미리 준 계약금 ➔ <strong>선급금</strong>(자산) / 수표 발행 지급 ➔ <strong>당좌예금</strong>(자산)</div>
+          <div id="s4-1b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 선급금(자산) 증가 +1,000,000</span>
+              <span class="id-chip chip-c">대변: 당좌예금(자산) 감소 -1,000,000</span>
+            </div>
           </div>
-          <div id="pre-203-2" class="toggle-panel">
-            • 상품을 인도받을 권리인 <strong>선급금(자산) 1,000,000원 증가 → 차변</strong><br>
-            • 수표 발행으로 <strong>당좌예금(자산) 1,000,000원 감소 → 대변</strong>
-          </div>
-          <div id="pre-203-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 선급금 1,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 당좌예금 1,000,000</span>
-              </div>
+          <div id="s4-1c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 선급금 1,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 당좌예금 1,000,000</span></div>
             </div>
           </div>
         </div>
 
-        <!-- 2/18 거래 -->
-        <div class="card" style="background:#fcfdff;">
-          <span class="tx-date">2월 18일 (상품 도착 및 대금 정산)</span>
-          <p class="tx-desc">진주 상사에 주문한 상품이 도착하여 계약금을 차감한 잔액 중 6,000,000원을 현금으로 지급하고, 나머지 잔액은 외상으로 하다.</p>
+        <!-- 2/18 -->
+        <div class="pop-card">
+          <div class="tx-header">
+            <span class="date-badge">2월 18일 (상품 도착)</span>
+            <span class="sticker st-blue">STEP 2. 계약금 차감 후 결제</span>
+          </div>
+          <p class="tx-summary">주문한 상품이 도착하여 계약금을 차감한 잔액 중 6,000,000원은 현금 지급하고, 나머지는 외상으로 하다.</p>
 
-          <div class="scene-stage">
-            <p style="font-weight:900; font-size:1rem; text-align:center; margin-bottom:6px;">📦 상품 10,000,000원 인수 대금 구성</p>
-            <div class="bar-stack">
-              <div class="bar-seg" style="flex: 1.4; background:#fef3c7; color:#b45309; border-right:2px solid var(--text);">
-                <span>계약금 충당 1,000,000원</span>
-                <small>(2/3 선급금 감소)</small>
+          <div class="stage-box">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#pic-box"/></svg>
+                <span class="char-label">상품 도착</span>
+                <span class="char-bubble">총 1,000만 원!</span>
               </div>
-              <div class="bar-seg" style="flex: 2.5; background:#dbeafe; color:#1e40af; border-right:2px solid var(--text);">
-                <span>현금 지급 6,000,000원</span>
-                <small>(현금 감소)</small>
+
+              <div class="flow-col">
+                <div class="visual-stack">
+                  <div class="stack-item" style="flex:1.2; background:#fef3c7; color:#b45309;">
+                    계약금 100만<small>선급금 감소</small>
+                  </div>
+                  <div class="stack-item" style="flex:2; background:#dbeafe; color:#1e40af;">
+                    현금 600만<small>현금 감소</small>
+                  </div>
+                  <div class="stack-item" style="flex:1.4; background:#fce7f3; color:#be185d;">
+                    외상 300만<small>외상매입금</small>
+                  </div>
+                </div>
+                <span class="arrow-sub">2/3 선급금 100만 원 충당(소멸) + 현금 600만 + 외상 300만</span>
               </div>
-              <div class="bar-seg" style="flex: 1.6; background:#fce7f3; color:#be185d;">
-                <span>나머지 외상 3,000,000원</span>
-                <small>(외상매입금 증가)</small>
+
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-usa"/></svg>
+                <span class="char-label">진주 상사</span>
+                <span class="char-bubble">정산 완료!</span>
               </div>
             </div>
-            <div class="flow-track" style="max-width:100%; margin-top:8px;">
-              <div class="moving-pill" style="background:var(--amber);">2/3 선급금 1,000,000원 → 상품 대금으로 충당 완료!</div>
+          </div>
+
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's4-2a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's4-2b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's4-2c')">③ 분개</button>
+          </div>
+          <div id="s4-2a" class="scaf-panel">인수한 물건 ➔ <strong>상품</strong> / 계약금 충당 ➔ <strong>선급금</strong> / 현금 지급 ➔ <strong>현금</strong> / 상품 외상 ➔ <strong>외상매입금</strong></div>
+          <div id="s4-2b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 상품(자산) +10,000,000</span>
+              <span class="id-chip chip-c">대변: 선급금 -1,000,000 · 현금 -6,000,000 · 외상매입금(부채) +3,000,000</span>
             </div>
           </div>
-
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'pre-218-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'pre-218-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'pre-218-3')">3. 분개 확인</button>
-          </div>
-
-          <div id="pre-218-1" class="toggle-panel">
-            • 들어온 물건은 <strong>상품</strong>(자산), 미리 낸 계약금 정리는 <strong>선급금</strong>(자산), 오늘 낸 돈은 <strong>현금</strong>(자산), 상품 대금의 외상 잔액은 <strong>외상매입금</strong>(부채)입니다.
-          </div>
-          <div id="pre-218-2" class="toggle-panel">
-            • 상품 인수로 <strong>상품(자산) 10,000,000원 증가 → 차변</strong><br>
-            • 계약금을 대금에 충당하여 <strong>선급금(자산) 1,000,000원 감소 → 대변</strong><br>
-            • 잔액 중 일부 지급으로 <strong>현금(자산) 6,000,000원 감소 → 대변</strong><br>
-            • 남은 대금 <strong>외상매입금(부채) 3,000,000원 증가 → 대변</strong>
-          </div>
-          <div id="pre-218-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 상품 10,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 선급금 1,000,000, 현금 6,000,000, 외상매입금 3,000,000</span>
-              </div>
+          <div id="s4-2c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 상품 10,000,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 선급금 1,000,000, 현금 6,000,000, 외상매입금 3,000,000</span></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 발문 & 회계 TIP -->
-      <div class="grid-2" style="margin-top: 16px;">
-        <div class="question-box">
-          <div class="question-title">💬 발문: “2월 18일에 계약금 100만 원을 다시 내는 걸까요, 이미 낸 돈을 충당하는 걸까요?”</div>
+      <!-- 발문 + 선급비용 비교 -->
+      <div class="prompt-banner">
+        <div class="prompt-q">💬 발문: “계약금을 다시 내는 걸까요, 이미 낸 돈을 충당하는 걸까요?”</div>
+        <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's4-q')">정답 & 선급비용 비교</button>
+      </div>
+      <div id="s4-q" class="scaf-panel">
+        • 2/3에 <strong>이미 낸 계약금(선급금 100만 원)을 매입 대금에 충당(상계)</strong>하므로 대변에서 선급금이 감소합니다.<br>
+        • <strong>회계 TIP</strong>: <strong>선급금</strong>은 상품·재고자산 매입 계약금이고, <strong>선급비용</strong>은 아직 제공받지 않은 용역(보험료·임차료 등)의 대가를 미리 낸 것입니다.
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 5: 가지급금 ==================== -->
+    <section id="s5" class="slide-page">
+      <div class="slide-title-bar">
+        <h2 class="slide-h2"><span class="sticker st-purple">예제 16 + 보충</span> 가지급금 (출장 전 임시 지급 ➔ 출장 후 정산)</h2>
+        <div class="toggle-bar">
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s5', true)">전체 열기</button>
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s5', false)">전체 닫기</button>
+        </div>
+      </div>
+
+      <!-- 상단: 2/24 출장 전 임시 지급 -->
+      <div class="pop-card" style="padding:10px 14px;">
+        <div class="grid-2" style="align-items:center;">
           <div>
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'q-pre')">정답 확인하기</button>
-            <div id="q-pre" class="toggle-panel">
-              2월 3일에 <strong>이미 낸 계약금(선급금 1,000,000원)을 상품 대금에 충당(상계)</strong>하는 것입니다! 따라서 상품을 인수할 때 차변의 선급금이 대변으로 가면서 감소(소멸)하고, 나머지 9,000,000원만 현금(6,000,000원)과 외상(3,000,000원)으로 결제합니다.
+            <div class="tx-header" style="margin-bottom:6px;">
+              <span class="date-badge">2월 24일 (출장 전 임시 지급 - 예제 16)</span>
+              <span class="sticker st-purple">금액 미확정</span>
+            </div>
+            <p class="tx-summary">서귀포로 출장 가는 사원 홍길동에게 교통비로 150,000원을 미리 지급하다.</p>
+            <div class="toggle-bar" style="margin-top:8px;">
+              <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's5-1a')">① 계정과목</button>
+              <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's5-1b')">② 증감 이유</button>
+              <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's5-1c')">③ 분개</button>
             </div>
           </div>
-        </div>
 
-        <div class="notice-box" style="background:#f8fafc; border-color:var(--border);">
-          <p style="font-size:1.1rem; color:var(--primary); margin-bottom:6px;">💡 교과서 회계 TIP: 선급금과 선급비용의 비교</p>
-          <p>• <strong>선급금(계약금)</strong>: 상품이나 재고 자산의 구입 시 인수에 앞서 대금의 일부 또는 전부를 지급하는 금액</p>
-          <p>• <strong>선급비용</strong>: 비용의 선급액으로, 아직 제공되지 않은 용역의 대가를 지급한 것 (일정한 기간 동안 특정 서비스를 받을 수 있는 권리)</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== 5. 가지급금 ==================== -->
-  <section id="page-5" class="section-page">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><span class="tag tag-purple">교과서 예제 16 + 보충</span> 5. 가지급금 (출장 전 임시 지급 → 출장 후 정산)</h2>
-        <div class="toggle-group" style="margin-top:0;">
-          <button type="button" class="toggle-btn" onclick="toggleGroup('page-5', true)">현재 화면 모두 열기</button>
-          <button type="button" class="toggle-btn btn-teal" onclick="toggleGroup('page-5', false)">모두 닫기</button>
-        </div>
-      </div>
-
-      <!-- 2/24 출장 전 임시 지급 -->
-      <div class="card" style="background:#fcfdff; margin-bottom:20px;">
-        <span class="tx-date">2월 24일 (출장 전 개산 지급 - 교과서 예제 16)</span>
-        <p class="tx-desc">서귀포로 출장 가는 사원 홍길동에게 교통비로 150,000원을 미리 지급하다.</p>
-
-        <div class="scene-stage">
-          <div class="scene-actors">
-            <div class="actor">
-              <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="50" cy="32" r="16" fill="#fcd34d"/>
-                <path d="M24 86 C24 58 76 58 76 86 Z" fill="#2563eb"/>
-              </svg>
-              <span class="actor-name">우리 회사</span>
-              <div class="speech-bubble">얼마 쓸지 모르니 일단 15만 원!</div>
-            </div>
-
-            <div class="flow-lane">
-              <div class="flow-track">
-                <div class="moving-pill" style="background:var(--purple);">임시 경비 150,000원 →</div>
+          <div class="stage-box" style="margin:0;">
+            <div class="stage-row">
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+                <span class="char-label">우리 회사</span>
               </div>
-              <span style="font-size:0.9rem; font-weight:800; color:var(--purple);">정확한 사용 내역·금액 미확정 → 가지급금 기록</span>
-            </div>
-
-            <div class="actor">
-              <svg class="actor-svg" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="45" cy="32" r="15" fill="#fed7aa"/>
-                <path d="M20 86 C20 60 70 60 70 86 Z" fill="#7c3aed"/>
-                <rect x="64" y="52" width="22" height="28" rx="4" fill="#475569"/>
-              </svg>
-              <span class="actor-name">사원 홍길동 (서귀포 출장)</span>
-              <div class="speech-bubble">다녀와서 영수증 정산할게요!</div>
+              <div class="flow-col">
+                <div class="arrow-pill" style="background:var(--purple-bg);">❓ 임시 여비 150,000원 ➔</div>
+                <span class="arrow-sub">다녀와서 정산! (가지급금)</span>
+              </div>
+              <div class="char-col">
+                <svg class="char-svg" viewBox="0 0 100 100"><use href="#char-hachi"/></svg>
+                <span class="char-label">사원 홍길동</span>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="toggle-group">
-          <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'ga-224-1')">1. 계정과목 판단</button>
-          <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'ga-224-2')">2. 증가·감소 이유</button>
-          <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'ga-224-3')">3. 분개 확인</button>
+        <div id="s5-1a" class="scaf-panel">사용 내역·금액 미확정 임시 지급 ➔ <strong>가지급금</strong>(자산) / 현금 지급 ➔ <strong>현금</strong>(자산)</div>
+        <div id="s5-1b" class="scaf-panel">
+          <div class="inc-dec-grid">
+            <span class="id-chip chip-d">차변: 가지급금(자산) 증가 +150,000</span>
+            <span class="id-chip chip-c">대변: 현금(자산) 감소 -150,000</span>
+          </div>
         </div>
-
-        <div id="ga-224-1" class="toggle-panel">
-          • 현금 지출은 있었으나 출장지에서 실제로 얼마를 쓸지 금액이 확정되지 않았으므로 임시 계정인 <strong>가지급금</strong>(자산)으로 처리합니다.
-        </div>
-        <div id="ga-224-2" class="toggle-panel">
-          • 정산받을 권리인 임시 채권 <strong>가지급금(자산) 150,000원 증가 → 차변</strong><br>
-          • 어림잡아 지급한 <strong>현금(자산) 150,000원 감소 → 대변</strong>
-        </div>
-        <div id="ga-224-3" class="toggle-panel">
-          <div class="journal-scroll">
-            <div class="journal-line">
-              <span class="side-d">(차) 가지급금 150,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 현금 150,000</span>
-            </div>
+        <div id="s5-1c" class="scaf-panel">
+          <div class="journal-box">
+            <div class="journal-line"><span class="j-debit">(차) 가지급금 150,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 현금 150,000</span></div>
           </div>
         </div>
       </div>
 
-      <!-- 두 가지 정산 사례 비교 (독립된 경우임을 명시) -->
-      <div class="notice-box" style="margin-bottom:16px;">
-        📌 <strong>출장 후 정산하기</strong>: 아래 두 사례는 2월 24일 지급한 <strong>가지급금 150,000원 전액을 대변에서 정리</strong>하는 서로 다른 두 가지 경우입니다. (연속된 거래가 아닙니다!)
-      </div>
-
+      <!-- 하단: 두 가지 독립된 정산 사례 비교 -->
       <div class="grid-2">
-        <!-- 사례 A: 교과서 예제 16 (돈이 남은 경우) -->
-        <div class="card" style="background:#fcfdff; border-color:#c4b5fd;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-            <span class="tx-date" style="margin-bottom:0;">2월 28일 (잔액 반환)</span>
-            <span class="tag tag-purple">교과서 예제 16</span>
+        <!-- 사례 1: 교과서 예제 16 (돈이 남은 경우) -->
+        <div class="pop-card" style="border-color:var(--purple);">
+          <div class="tx-header">
+            <span class="date-badge">2월 28일 (잔액 반환 정산)</span>
+            <span class="sticker st-purple">교과서 예제 16</span>
           </div>
-          <p class="tx-desc">출장에서 돌아온 사원 홍길동의 여비를 정산한 결과, 여비 정산액 110,000원을 차감한 잔액을 현금으로 반환하다.</p>
+          <p class="tx-summary">여비 정산 결과, 여비 정산액 110,000원을 차감한 잔액을 현금으로 반환하다.</p>
 
-          <div class="scene-stage">
-            <p style="font-weight:900; font-size:0.95rem; text-align:center; margin-bottom:6px;">가지급금 150,000원 전액 정리 = 실제 비용 11만 원 + 반환 현금 4만 원</p>
-            <div class="bar-stack">
-              <div class="bar-seg" style="flex: 11; background:#ede9fe; color:#5b21b6; border-right:2px solid var(--text);">
-                <span>실제 여비 110,000원</span>
-                <small>(여비교통비 발생)</small>
-              </div>
-              <div class="bar-seg" style="flex: 4; background:#dcfce7; color:#15803d;">
-                <span>남은 돈 40,000원</span>
-                <small>(현금 회수)</small>
-              </div>
+          <div class="visual-stack">
+            <div class="stack-item" style="flex:11; background:var(--purple-bg); color:#5b21b6;">
+              실제 비용 110,000원<small>여비교통비(차변)</small>
+            </div>
+            <div class="stack-item" style="flex:4; background:var(--mint-bg); color:#047857;">
+              반환 현금 40,000원<small>현금 회수(차변)</small>
             </div>
           </div>
+          <p class="arrow-sub" style="text-align:center;">▲ 처음 지급한 <strong>가지급금 150,000원 전액</strong>이 대변에서 정리됨!</p>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'ga-228-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'ga-228-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'ga-228-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's5-2a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's5-2b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's5-2c')">③ 분개</button>
           </div>
-
-          <div id="ga-228-1" class="toggle-panel">
-            • 확정된 출장 여비는 <strong>여비교통비</strong>(비용), 돌려받은 잔액은 <strong>현금</strong>(자산), 임시 기록했던 돈은 <strong>가지급금</strong>(자산)입니다.
+          <div id="s5-2a" class="scaf-panel">출장 여비 확정 ➔ <strong>여비교통비</strong>(비용) / 남은 돈 회수 ➔ <strong>현금</strong>(자산) / 임시 계정 정리 ➔ <strong>가지급금</strong>(자산)</div>
+          <div id="s5-2b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 여비교통비 발생 110,000 · 현금 증가 40,000</span>
+              <span class="id-chip chip-c">대변: 가지급금 전액 감소 -150,000</span>
+            </div>
           </div>
-          <div id="ga-228-2" class="toggle-panel">
-            • 출장비 확정으로 <strong>여비교통비(비용) 110,000원 발생 → 차변</strong><br>
-            • 남은 돈을 돌려받아 <strong>현금(자산) 40,000원 증가 → 차변</strong><br>
-            • 처음 지급했던 <strong>가지급금(자산) 150,000원 전액 감소(소멸) → 대변</strong>
-          </div>
-          <div id="ga-228-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 여비교통비 110,000, 현금 40,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 가지급금 150,000</span>
-              </div>
+          <div id="s5-2c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 여비교통비 110,000, 현금 40,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 가지급금 150,000</span></div>
             </div>
           </div>
         </div>
 
-        <!-- 사례 B: 보충 예제 (돈이 부족한 경우) -->
-        <div class="card" style="background:#fcfdff; border-color:#fda4af;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-            <span class="tx-date" style="margin-bottom:0; background:var(--rose);">만약 출장비가 부족했다면?</span>
-            <span class="tag tag-rose">보충 예제 (다른 경우)</span>
+        <!-- 사례 2: 보충 예제 (돈이 부족한 경우 - 별도 사례) -->
+        <div class="pop-card" style="border-color:var(--pink);">
+          <div class="tx-header">
+            <span class="date-badge" style="background:var(--pink);">부족액 추가 지급 시</span>
+            <span class="sticker st-pink">보충 예제 (별도 경우)</span>
           </div>
-          <p class="tx-desc">실제 사용액이 170,000원이고 부족액 20,000원을 현금으로 추가 지급하다.</p>
+          <p class="tx-summary">실제 사용액이 170,000원이고 부족액 20,000원을 현금으로 추가 지급하다.</p>
 
-          <div class="scene-stage">
-            <p style="font-weight:900; font-size:0.95rem; text-align:center; margin-bottom:6px;">실제 비용 170,000원 = 가지급금 15만 원 정리 + 부족액 현금 2만 원 추가 지급</p>
-            <div class="bar-stack">
-              <div class="bar-seg" style="flex: 15; background:#ede9fe; color:#5b21b6; border-right:2px solid var(--text);">
-                <span>가지급금 정리 150,000원</span>
-                <small>(가지급금 전액 감소)</small>
-              </div>
-              <div class="bar-seg" style="flex: 3; background:#ffe4e6; color:#be123c;">
-                <span>부족액 20,000원</span>
-                <small>(현금 추가 지급)</small>
-              </div>
+          <div class="visual-stack">
+            <div class="stack-item" style="flex:15; background:var(--purple-bg); color:#5b21b6;">
+              가지급금 정리 150,000원<small>가지급금 소멸(대변)</small>
+            </div>
+            <div class="stack-item" style="flex:3; background:var(--pink-bg); color:#be123c;">
+              부족액 20,000원<small>현금 지급(대변)</small>
             </div>
           </div>
+          <p class="arrow-sub" style="text-align:center;">▲ 차변 <strong>여비교통비 170,000원</strong> 확정 & 가지급금 150,000원 전액 정리! (위 사례와 별개의 경우)</p>
 
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'ga-sup-1')">1. 계정과목 판단</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'ga-sup-2')">2. 증가·감소 이유</button>
-            <button type="button" class="toggle-btn btn-amber" aria-expanded="false" onclick="toggleOne(this, 'ga-sup-3')">3. 분개 확인</button>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 's5-3a')">① 계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 's5-3b')">② 증감 이유</button>
+            <button type="button" class="scaf-btn btn-step3" aria-expanded="false" onclick="togglePanel(this, 's5-3c')">③ 분개</button>
           </div>
-
-          <div id="ga-sup-1" class="toggle-panel">
-            • 실제 사용한 총액 170,000원은 <strong>여비교통비</strong>(비용), 기존 임시 지급액 150,000원은 <strong>가지급금</strong>(자산), 더 내어 준 20,000원은 <strong>현금</strong>(자산)입니다.
+          <div id="s5-3a" class="scaf-panel">총 사용 여비 ➔ <strong>여비교통비</strong>(비용) / 임시 계정 정리 ➔ <strong>가지급금</strong>(자산) / 부족액 추가 지급 ➔ <strong>현금</strong>(자산)</div>
+          <div id="s5-3b" class="scaf-panel">
+            <div class="inc-dec-grid">
+              <span class="id-chip chip-d">차변: 여비교통비(비용) 발생 170,000</span>
+              <span class="id-chip chip-c">대변: 가지급금 전액 감소 150,000 · 현금 감소 20,000</span>
+            </div>
           </div>
-          <div id="ga-sup-2" class="toggle-panel">
-            • 실제 출장비 총액 <strong>여비교통비(비용) 170,000원 발생 → 차변</strong><br>
-            • 처음 지급했던 <strong>가지급금(자산) 150,000원 전액 감소(소멸) → 대변</strong><br>
-            • 부족액 추가 지급으로 <strong>현금(자산) 20,000원 감소 → 대변</strong>
-          </div>
-          <div id="ga-sup-3" class="toggle-panel">
-            <div class="journal-scroll">
-              <div class="journal-line">
-                <span class="side-d">(차) 여비교통비 170,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="side-c">(대) 가지급금 150,000, 현금 20,000</span>
-              </div>
+          <div id="s5-3c" class="scaf-panel">
+            <div class="journal-box">
+              <div class="journal-line"><span class="j-debit">(차) 여비교통비 170,000</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="j-credit">(대) 가지급금 150,000, 현금 20,000</span></div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ==================== 6. 짧은 혼합 복습 ==================== -->
-  <section id="page-6" class="section-page">
-    <div class="card">
-      <div class="section-header">
-        <h2 class="section-title"><span class="tag tag-blue">마무리 점검</span> 6. 짧은 혼합 복습 (어떤 계정과목일까요?)</h2>
-        <div class="toggle-group" style="margin-top:0;">
-          <button type="button" class="toggle-btn" onclick="toggleGroup('page-6', true)">전체 정답 열기</button>
-          <button type="button" class="toggle-btn btn-teal" onclick="toggleGroup('page-6', false)">모두 닫기</button>
+    <!-- ==================== SLIDE 6: 짧은 혼합 복습 ==================== -->
+    <section id="s6" class="slide-page">
+      <div class="slide-title-bar">
+        <h2 class="slide-h2"><span class="sticker st-amber">마무리 퀴즈</span> 짧은 혼합 복습 (어떤 계정과목일까요?)</h2>
+        <div class="toggle-bar">
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s6', true)">전체 정답 열기</button>
+          <button type="button" class="scaf-btn" onclick="toggleAllIn('s6', false)">전체 닫기</button>
         </div>
       </div>
 
-      <div class="quiz-list">
-        <!-- 문항 1 -->
-        <div class="quiz-item">
-          <p class="quiz-situation">상황 1. 거래처에 차용 증서를 받고 돈을 2개월간 빌려줌</p>
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'qz-1a')">계정과목 확인</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'qz-1b')">판단 이유 확인</button>
+      <div class="review-grid">
+        <!-- Q1 -->
+        <div class="pop-card">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" style="width:54px;height:54px;" viewBox="0 0 100 100"><use href="#char-chii"/></svg>
+            <p class="tx-summary" style="flex:1; margin:0;">1. 거래처에 돈을 2개월간 빌려줌</p>
           </div>
-          <div id="qz-1a" class="toggle-panel">정답: <strong style="color:var(--primary); font-size:1.2rem;">단기대여금</strong></div>
-          <div id="qz-1b" class="toggle-panel">이유: 돈을 빌려주고 회수 기간이 2개월(1년 이내)이므로 유동자산인 <strong>단기대여금</strong>으로 기록합니다.</div>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'r1-a')">계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 'r1-b')">이유</button>
+          </div>
+          <div id="r1-a" class="scaf-panel"><strong style="color:var(--blue); font-size:1.1rem;">단기대여금</strong></div>
+          <div id="r1-b" class="scaf-panel">회수 기간이 2개월(1년 이내)인 자금 대여 채권입니다.</div>
         </div>
 
-        <!-- 문항 2 -->
-        <div class="quiz-item">
-          <p class="quiz-situation">상황 2. 카페 매장에서 사용하던 냉장고(비품)를 외상으로 판매</p>
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'qz-2a')">계정과목 확인</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'qz-2b')">판단 이유 확인</button>
+        <!-- Q2 -->
+        <div class="pop-card">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" style="width:54px;height:54px;" viewBox="0 0 100 100"><use href="#pic-car"/></svg>
+            <p class="tx-summary" style="flex:1; margin:0;">2. 사용하던 냉장고를 외상으로 판매</p>
           </div>
-          <div id="qz-2a" class="toggle-panel">정답: <strong style="color:var(--teal); font-size:1.2rem;">미수금</strong></div>
-          <div id="qz-2b" class="toggle-panel">이유: 판매용 상품이 아니라 영업에 사용하던 유형자산(비품)을 외상으로 처분했으므로 <strong>미수금</strong>입니다.</div>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'r2-a')">계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 'r2-b')">이유</button>
+          </div>
+          <div id="r2-a" class="scaf-panel"><strong style="color:var(--mint); font-size:1.1rem;">미수금</strong></div>
+          <div id="r2-b" class="scaf-panel">판매용 상품이 아닌 사용하던 자산(비품)을 외상 처분했습니다.</div>
         </div>
 
-        <!-- 문항 3 -->
-        <div class="quiz-item">
-          <p class="quiz-situation">상황 3. 판매용 원두(상품)를 매입하기로 하고 계약금을 선지급</p>
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'qz-3a')">계정과목 확인</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'qz-3b')">판단 이유 확인</button>
+        <!-- Q3 -->
+        <div class="pop-card">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" style="width:54px;height:54px;" viewBox="0 0 100 100"><use href="#pic-box"/></svg>
+            <p class="tx-summary" style="flex:1; margin:0;">3. 원두 매입 계약금을 선지급</p>
           </div>
-          <div id="qz-3a" class="toggle-panel">정답: <strong style="color:var(--amber); font-size:1.2rem;">선급금</strong></div>
-          <div id="qz-3b" class="toggle-panel">이유: 상품 매입을 위해 인수 전에 계약금을 미리 지급하여 상품을 받을 권리가 생겼으므로 <strong>선급금</strong>입니다.</div>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'r3-a')">계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 'r3-b')">이유</button>
+          </div>
+          <div id="r3-a" class="scaf-panel"><strong style="color:var(--amber); font-size:1.1rem;">선급금</strong></div>
+          <div id="r3-b" class="scaf-panel">상품(원두)을 인수하기 전에 매입 계약금을 미리 지급했습니다.</div>
         </div>
 
-        <!-- 문항 4 -->
-        <div class="quiz-item">
-          <p class="quiz-situation">상황 4. 사용 내역·금액 확정 전 직원 출장 경비를 임시 지급</p>
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'qz-4a')">계정과목 확인</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'qz-4b')">판단 이유 확인</button>
+        <!-- Q4 -->
+        <div class="pop-card">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" style="width:54px;height:54px;" viewBox="0 0 100 100"><use href="#char-hachi"/></svg>
+            <p class="tx-summary" style="flex:1; margin:0;">4. 사용 내역·금액 확정 전 직원 출장 경비 임시 지급</p>
           </div>
-          <div id="qz-4a" class="toggle-panel">정답: <strong style="color:var(--purple); font-size:1.2rem;">가지급금</strong></div>
-          <div id="qz-4b" class="toggle-panel">이유: 현금을 지급했으나 구체적인 계정과목과 확정 금액을 출장 복귀 후에야 알 수 있으므로 임시 계정인 <strong>가지급금</strong>으로 처리합니다.</div>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'r4-a')">계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 'r4-b')">이유</button>
+          </div>
+          <div id="r4-a" class="scaf-panel"><strong style="color:var(--purple); font-size:1.1rem;">가지급금</strong></div>
+          <div id="r4-b" class="scaf-panel">계정과목과 금액이 확정되기 전에 어림잡아 지급한 임시 계정입니다.</div>
         </div>
 
-        <!-- 문항 5 -->
-        <div class="quiz-item">
-          <p class="quiz-situation">상황 5. 카페에서 판매용 텀블러(상품)를 외상으로 판매</p>
-          <div class="toggle-group">
-            <button type="button" class="toggle-btn" aria-expanded="false" onclick="toggleOne(this, 'qz-5a')">계정과목 확인</button>
-            <button type="button" class="toggle-btn btn-teal" aria-expanded="false" onclick="toggleOne(this, 'qz-5b')">판단 이유 확인</button>
+        <!-- Q5 -->
+        <div class="pop-card">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <svg class="char-svg" style="width:54px;height:54px;" viewBox="0 0 100 100"><use href="#char-usa"/></svg>
+            <p class="tx-summary" style="flex:1; margin:0;">5. 판매용 텀블러를 외상판매</p>
           </div>
-          <div id="qz-5a" class="toggle-panel">정답: <strong style="color:var(--rose); font-size:1.2rem;">외상매출금</strong></div>
-          <div id="qz-5b" class="toggle-panel">이유: 주된 영업 목적인 판매용 <strong>상품</strong>을 외상으로 매출했으므로 미수금이 아니라 매출채권인 <strong>외상매출금</strong>입니다.</div>
+          <div class="toggle-bar">
+            <button type="button" class="scaf-btn" aria-expanded="false" onclick="togglePanel(this, 'r5-a')">계정과목</button>
+            <button type="button" class="scaf-btn btn-step2" aria-expanded="false" onclick="togglePanel(this, 'r5-b')">이유</button>
+          </div>
+          <div id="r5-a" class="scaf-panel"><strong style="color:var(--pink); font-size:1.1rem;">외상매출금</strong></div>
+          <div id="r5-b" class="scaf-panel">주된 영업 목적인 판매용 상품을 외상으로 매출한 채권입니다.</div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-</main>
+  </main>
+</div>
 
 <script>
-  // 목차 탭 전환 (강제 순서 없이 원하는 화면으로 즉시 이동)
-  function showPage(pageId, btnEl) {
-    var pages = document.querySelectorAll('.section-page');
-    for (var i = 0; i < pages.length; i++) {
-      pages[i].classList.remove('active');
+  // 슬라이드 탭 이동
+  function goSlide(slideId, tabBtn) {
+    var slides = document.querySelectorAll('.slide-page');
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].classList.remove('active');
     }
-    var target = document.getElementById(pageId);
-    if (target) {
-      target.classList.add('active');
-    }
+    var target = document.getElementById(slideId);
+    if (target) target.classList.add('active');
 
-    var btns = document.querySelectorAll('.nav-btn');
-    for (var j = 0; j < btns.length; j++) {
-      btns[j].classList.remove('active');
+    var tabs = document.querySelectorAll('.nav-tab');
+    for (var j = 0; j < tabs.length; j++) {
+      tabs[j].classList.remove('active');
     }
-    if (btnEl) {
-      btnEl.classList.add('active');
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (tabBtn) tabBtn.classList.add('active');
   }
 
-  // 개별 토글 버튼 열기/닫기
-  function toggleOne(btnEl, panelId) {
+  // 개별 토글 열기/닫기
+  function togglePanel(btn, panelId) {
     var panel = document.getElementById(panelId);
     if (!panel) return;
-    var isOpen = panel.classList.contains('show');
-    if (isOpen) {
+    var isShown = panel.classList.contains('show');
+    if (isShown) {
       panel.classList.remove('show');
-      btnEl.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-expanded', 'false');
     } else {
       panel.classList.add('show');
-      btnEl.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-expanded', 'true');
     }
   }
 
-  // 특정 섹션 내 토글 일괄 열기/닫기
-  function toggleGroup(sectionId, shouldOpen) {
-    var section = document.getElementById(sectionId);
-    if (!section) return;
-    var panels = section.querySelectorAll('.toggle-panel');
+  // 현재 슬라이드 내 토글 일괄 제어
+  function toggleAllIn(slideId, openState) {
+    var slide = document.getElementById(slideId);
+    if (!slide) return;
+    var panels = slide.querySelectorAll('.scaf-panel');
     for (var i = 0; i < panels.length; i++) {
-      if (shouldOpen) {
-        panels[i].classList.add('show');
-      } else {
-        panels[i].classList.remove('show');
-      }
+      if (openState) panels[i].classList.add('show');
+      else panels[i].classList.remove('show');
     }
-    var btns = section.querySelectorAll('.toggle-btn[aria-expanded]');
+    var btns = slide.querySelectorAll('.scaf-btn[aria-expanded]');
     for (var j = 0; j < btns.length; j++) {
-      btns[j].setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+      btns[j].setAttribute('aria-expanded', openState ? 'true' : 'false');
     }
   }
 </script>
