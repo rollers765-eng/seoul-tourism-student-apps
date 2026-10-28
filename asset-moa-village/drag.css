@@ -1,0 +1,2 @@
+.chip{touch-action:none}.drag-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%) scale(1.08);opacity:.95;box-shadow:0 8px 18px #5439}
+
