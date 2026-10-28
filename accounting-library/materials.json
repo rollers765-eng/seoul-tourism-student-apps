@@ -44,5 +44,28 @@
     "chapterOrder": 2,
     "unitOrder": 2,
     "accountOrder": 1
+  },
+  {
+    "id": "other-receivables-01",
+    "unit": "기타 채권",
+    "account": "단기대여금·미수금·선급금·가지급금",
+    "lesson": 1,
+    "title": "기타 채권의 발생·회수·정산",
+    "description": "네 가지 기타 채권을 구별하고 분개와 정산을 연습합니다.",
+    "pages": "104~106",
+    "tags": [
+      "단기대여금",
+      "미수금",
+      "선급금",
+      "가지급금",
+      "분개",
+      "정산"
+    ],
+    "slides": "materials/other-receivables-01/slides.html",
+    "worksheetPdf": "materials/other-receivables-01/worksheet.pdf",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 3,
+    "accountOrder": 1
   }
 ]
