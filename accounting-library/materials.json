@@ -67,5 +67,47 @@
     "chapterOrder": 2,
     "unitOrder": 3,
     "accountOrder": 1
+  },
+  {
+    "id": "cash-over-short-01",
+    "unit": "현금과 예금",
+    "account": "현금·현금과부족",
+    "title": "현금과 현금과부족의 회계 처리",
+    "description": "슬라이드로 회계 처리를 확인하고 활동지로 직접 연습합니다.",
+    "tags": [
+      "현금",
+      "현금과부족",
+      "잡이익",
+      "잡손실",
+      "분개"
+    ],
+    "slides": "materials/cash-over-short-01/slides.html",
+    "worksheetPdf": "materials/cash-over-short-01/worksheet.pdf",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 0,
+    "accountOrder": 1,
+    "lesson": 1
+  },
+  {
+    "id": "checking-overdraft-01",
+    "unit": "현금과 예금",
+    "account": "당좌예금·당좌차월",
+    "title": "당좌예금과 당좌차월의 회계 처리",
+    "description": "슬라이드로 회계 처리를 확인하고 활동지로 직접 연습합니다.",
+    "tags": [
+      "당좌예금",
+      "당좌차월",
+      "수표",
+      "분개",
+      "전기"
+    ],
+    "slides": "materials/checking-overdraft-01/slides.html",
+    "worksheetPdf": "materials/checking-overdraft-01/worksheet.pdf",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 0,
+    "accountOrder": 2,
+    "lesson": 1
   }
 ]

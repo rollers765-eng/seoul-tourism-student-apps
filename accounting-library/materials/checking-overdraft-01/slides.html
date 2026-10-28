@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>당좌예금과 당좌차월의 회계 처리</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Pretendard & Cute Rounded Font (Jua) -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #3b2f2f;
+      --red-t: #dc2626;
+    }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 18% 18%, #fff1f5 0%, #f0f9ff 55%, #fefce8 100%);
+      color: #33272a;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      user-select: none;
+    }
+    .font-cute {
+      font-family: 'Jua', 'Pretendard', sans-serif;
+      letter-spacing: 0.01em;
+    }
+    /* Cute Thick Sketch Border like Chiikawa */
+    .chii-card {
+      border: 3px solid #3b2f2f;
+      box-shadow: 0 5px 0 #3b2f2f;
+      border-radius: 1.25rem;
+      background-color: #ffffff;
+    }
+    .chii-card-sm {
+      border: 2.5px solid #3b2f2f;
+      box-shadow: 0 3px 0 #3b2f2f;
+      border-radius: 0.9rem;
+    }
+    .chii-btn {
+      border: 2.5px solid #3b2f2f;
+      box-shadow: 0 3px 0 #3b2f2f;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+    }
+    .chii-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #3b2f2f;
+    }
+    /* Textbook Red T-Account Styling (No 차변/대변 labels inside) */
+    .red-t-header {
+      border-bottom: 3.5px solid #dc2626;
+    }
+    .red-t-divider {
+      border-right: 3.5px solid #dc2626;
+    }
+    /* 16:9 Stage Container - Strictly fitted inside viewport without clipping */
+    .stage-16-9 {
+      width: min(96vw, calc(94vh * 16 / 9));
+      height: min(94vh, calc(96vw * 9 / 16));
+    }
+    @keyframes softPop {
+      from { opacity: 0; transform: scale(0.992); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .slide-fade {
+      animation: softPop 0.18s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="w-screen h-screen flex items-center justify-center overflow-hidden p-1">
+
+  <!-- 16:9 Fixed Ratio Presentation Canvas -->
+  <div class="stage-16-9 chii-card bg-white flex flex-col justify-between overflow-hidden relative">
+
+    <!-- Top Compact Header (Height ~10%) -->
+    <header class="h-[10%] min-h-[44px] bg-[#fff8fa] border-b-[3px] border-[#3b2f2f] px-4 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-sky-200 border-2 border-[#3b2f2f] flex items-center justify-center shadow-sm shrink-0">
+          <svg class="w-6 h-6" viewBox="0 0 60 60">
+            <polygon points="10,22 16,6 26,17" fill="#7dd3fc" stroke="#3b2f2f" stroke-width="3.5" stroke-linejoin="round"/>
+            <polygon points="50,22 44,6 34,17" fill="#7dd3fc" stroke="#3b2f2f" stroke-width="3.5" stroke-linejoin="round"/>
+            <ellipse cx="30" cy="35" rx="22" ry="18" fill="#fff" stroke="#3b2f2f" stroke-width="3.5"/>
+            <path d="M10 27 Q20 15 30 25 Q40 15 50 27 Q44 17 30 17 Q16 17 10 27 Z" fill="#7dd3fc"/>
+            <circle cx="22" cy="32" r="2.8" fill="#3b2f2f"/>
+            <circle cx="38" cy="32" r="2.8" fill="#3b2f2f"/>
+            <path d="M26 37 Q30 40 34 37" fill="none" stroke="#3b2f2f" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="bg-[#38bdf8] text-[#3b2f2f] text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border-2 border-[#3b2f2f] shrink-0">회계원리 · 88~90쪽</span>
+        <h1 class="font-cute text-base lg:text-lg text-[#3b2f2f] tracking-tight truncate">당좌예금과 당좌차월의 회계 처리</h1>
+      </div>
+
+      <!-- Section Quick Tabs -->
+      <nav class="hidden xl:flex items-center gap-1 text-xs">
+        <button onclick="goToSlide(0)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="0">1. 도입</button>
+        <button onclick="goToSlide(2)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="1">2. 당좌예금 원장</button>
+        <button onclick="goToSlide(4)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="2">3. 예제 06</button>
+        <button onclick="goToSlide(6)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="3">4. 당좌차월·예제 07</button>
+        <button onclick="goToSlide(10)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="4">5. 종합 연습(7문항)</button>
+        <button onclick="goToSlide(12)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="5">6. 약식 T계정</button>
+        <button onclick="goToSlide(13)" class="sec-pill px-2.5 py-0.5 rounded-full font-bold transition" data-sec="6">7. 요약</button>
+      </nav>
+
+      <!-- Page Counter -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span id="section-badge" class="bg-[#fef08a] text-[#3b2f2f] text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border-2 border-[#3b2f2f]">1. 도입</span>
+        <span id="slide-counter" class="font-mono text-[11px] font-extrabold bg-white text-[#3b2f2f] px-2.5 py-0.5 rounded-full border-2 border-[#3b2f2f]">1 / 14</span>
+      </div>
+    </header>
+
+    <!-- Slide Body (Height 80%, Strictly Fitted) -->
+    <main id="slide-content" class="flex-1 min-h-0 w-full px-5 py-2.5 flex flex-col justify-between gap-2 overflow-hidden slide-fade"></main>
+
+    <!-- Bottom Navigation Bar (Height ~10%) -->
+    <footer class="h-[10%] min-h-[42px] bg-[#f8fafc] border-t-[3px] border-[#3b2f2f] px-5 flex items-center justify-between shrink-0">
+      <button id="prev-btn" onclick="prevSlide()" class="chii-btn flex items-center gap-1.5 px-3.5 py-1 rounded-xl font-extrabold text-xs bg-white text-[#3b2f2f] hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none">
+        ◀ 이전 슬라이드
+      </button>
+
+      <!-- Progress Dots -->
+      <div id="dots-container" class="flex items-center gap-1.5"></div>
+
+      <button id="next-btn" onclick="nextSlide()" class="chii-btn flex items-center gap-1.5 px-4 py-1 rounded-xl font-extrabold text-xs bg-[#ffd166] text-[#3b2f2f] hover:bg-[#ffca4b]">
+        다음 슬라이드 ▶
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- Application Script -->
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 14;
+
+    // Interactive State Store (All support two-way toggle open/close)
+    const appState = {
+      // Slide 4: 차변/대변 미니 퀴즈
+      drCrQuiz: { q1: null, q2: null, q3: null, q4: null },
+      // Slide 5: 예제 06 (추가 연습 예제)
+      ex06Step: 1,
+      ex06Reveal: { s1: false, s2: false, s3: false },
+      // Slide 8: 당좌차월 기초 분개 빈칸
+      overdraftIntro: { dr: false, cr1: false, cr2: false },
+      // Slide 9: 예제 07 (추가 연습 예제)
+      ex07Step: 1,
+      ex07Reveal: { s1: false, s2: false, s3: false },
+      // Slide 11: 종합 연습 기본 거래 (문제 1~4)
+      compBasicIdx: 0,
+      compBasicReveal: { p1: false, p2: false, p3: false, p4: false },
+      // Slide 12: 종합 연습 연속 거래 (문제 5~7)
+      compContReveal: { p5: false, p6: false, p7: false },
+      // Slide 13: 빨간색 약식 T계정 전기
+      tAccountReveal: {
+        chkDr1: false, chkDr2: false, chkCr1: false, chkBal: false,
+        ovDr1: false, ovCr1: false
+      }
+    };
+
+    const slideMeta = [
+      { section: "1. 도입", secIdx: 0 },
+      { section: "1. 도입", secIdx: 0 },
+      { section: "2. 당좌예금 원장", secIdx: 1 },
+      { section: "2. 당좌예금 원장", secIdx: 1 },
+      { section: "3. 예제 06", secIdx: 2 },
+      { section: "3. 예제 06", secIdx: 2 },
+      { section: "4. 당좌차월·예제 07", secIdx: 3 },
+      { section: "4. 당좌차월·예제 07", secIdx: 3 },
+      { section: "4. 당좌차월·예제 07", secIdx: 3 },
+      { section: "4. 당좌차월·예제 07", secIdx: 3 },
+      { section: "5. 종합 연습(7문항)", secIdx: 4 },
+      { section: "5. 종합 연습(7문항)", secIdx: 4 },
+      { section: "6. 약식 T계정", secIdx: 5 },
+      { section: "7. 요약", secIdx: 6 }
+    ];
+
+    function fmtNum(n) {
+      return n.toLocaleString('ko-KR');
+    }
+
+    // Chiikawa-inspired SVG Mascots
+    function svgChii(mood = 'normal', size = 'w-12 h-12') {
+      const eyes = mood === 'cry'
+        ? `<circle cx="22" cy="32" r="3" fill="#3b2f2f"/><circle cx="38" cy="32" r="3" fill="#3b2f2f"/><path d="M18 36 Q20 42 22 36" fill="#60a5fa"/><path d="M38 36 Q40 42 42 36" fill="#60a5fa"/>`
+        : mood === 'sparkle'
+        ? `<circle cx="22" cy="31" r="3.5" fill="#3b2f2f"/><circle cx="21" cy="30" r="1.2" fill="#fff"/><circle cx="38" cy="31" r="3.5" fill="#3b2f2f"/><circle cx="37" cy="30" r="1.2" fill="#fff"/>`
+        : `<circle cx="22" cy="31" r="2.8" fill="#3b2f2f"/><circle cx="38" cy="31" r="2.8" fill="#3b2f2f"/>`;
+      const mouth = mood === 'cry'
+        ? `<path d="M26 40 Q30 36 34 40" fill="none" stroke="#3b2f2f" stroke-width="2.5" stroke-linecap="round"/>`
+        : `<path d="M26 36 Q28 39 30 36 Q32 39 34 36" fill="none" stroke="#3b2f2f" stroke-width="2.3" stroke-linecap="round"/>`;
+      return `
+        <svg class="${size} shrink-0" viewBox="0 0 60 60">
+          <circle cx="15" cy="14" r="8.5" fill="#ffffff" stroke="#3b2f2f" stroke-width="3.2"/>
+          <circle cx="15" cy="14" r="4" fill="#fbcfe8"/>
+          <circle cx="45" cy="14" r="8.5" fill="#ffffff" stroke="#3b2f2f" stroke-width="3.2"/>
+          <circle cx="45" cy="14" r="4" fill="#fbcfe8"/>
+          <ellipse cx="30" cy="34" rx="23" ry="19" fill="#ffffff" stroke="#3b2f2f" stroke-width="3.2"/>
+          <ellipse cx="17" cy="36" rx="4" ry="2.2" fill="#fda4af"/>
+          <ellipse cx="43" cy="36" rx="4" ry="2.2" fill="#fda4af"/>
+          ${eyes}
+          ${mouth}
+        </svg>
+      `;
+    }
+
+    function svgHachi(size = 'w-12 h-12') {
+      return `
+        <svg class="${size} shrink-0" viewBox="0 0 60 60">
+          <polygon points="10,22 16,6 26,17" fill="#7dd3fc" stroke="#3b2f2f" stroke-width="3.2" stroke-linejoin="round"/>
+          <polygon points="50,22 44,6 34,17" fill="#7dd3fc" stroke="#3b2f2f" stroke-width="3.2" stroke-linejoin="round"/>
+          <ellipse cx="30" cy="35" rx="23" ry="18.5" fill="#ffffff" stroke="#3b2f2f" stroke-width="3.2"/>
+          <path d="M10 27 Q20 15 30 25 Q40 15 50 27 Q44 17 30 17 Q16 17 10 27 Z" fill="#7dd3fc"/>
+          <ellipse cx="17" cy="37" rx="4" ry="2.2" fill="#fda4af"/>
+          <ellipse cx="43" cy="37" rx="4" ry="2.2" fill="#fda4af"/>
+          <circle cx="22" cy="32" r="2.8" fill="#3b2f2f"/>
+          <circle cx="38" cy="32" r="2.8" fill="#3b2f2f"/>
+          <path d="M26 37 Q28 40 30 37 Q32 40 34 37" fill="none" stroke="#3b2f2f" stroke-width="2.3" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    function svgUsa(size = 'w-12 h-12') {
+      return `
+        <svg class="${size} shrink-0" viewBox="0 0 60 60">
+          <ellipse cx="21" cy="13" rx="5.5" ry="11" fill="#fef08a" stroke="#3b2f2f" stroke-width="3.2"/>
+          <ellipse cx="39" cy="13" rx="5.5" ry="11" fill="#fef08a" stroke="#3b2f2f" stroke-width="3.2"/>
+          <ellipse cx="30" cy="37" rx="22" ry="17.5" fill="#fef9c3" stroke="#3b2f2f" stroke-width="3.2"/>
+          <ellipse cx="17" cy="39" rx="4" ry="2.2" fill="#fda4af"/>
+          <ellipse cx="43" cy="39" rx="4" ry="2.2" fill="#fda4af"/>
+          <circle cx="22" cy="34" r="2.8" fill="#3b2f2f"/>
+          <circle cx="38" cy="34" r="2.8" fill="#3b2f2f"/>
+          <path d="M27 39 Q30 43 33 39" fill="#fda4af" stroke="#3b2f2f" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    function renderSlide() {
+      const main = document.getElementById('slide-content');
+      main.classList.remove('slide-fade');
+      void main.offsetWidth;
+      main.classList.add('slide-fade');
+
+      const meta = slideMeta[currentSlide];
+      document.getElementById('section-badge').textContent = meta.section;
+      document.getElementById('slide-counter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+      document.querySelectorAll('.sec-pill').forEach(btn => {
+        const sec = parseInt(btn.getAttribute('data-sec'), 10);
+        if (sec === meta.secIdx) {
+          btn.className = "sec-pill px-2.5 py-0.5 rounded-full font-extrabold bg-[#38bdf8] text-[#3b2f2f] border-2 border-[#3b2f2f]";
+        } else {
+          btn.className = "sec-pill px-2.5 py-0.5 rounded-full font-bold text-slate-500 hover:bg-sky-100";
+        }
+      });
+
+      document.getElementById('prev-btn').disabled = (currentSlide === 0);
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.innerHTML = currentSlide === totalSlides - 1 ? `처음으로 ↺` : `다음 슬라이드 ▶`;
+
+      renderDots();
+      main.innerHTML = getSlideHTML(currentSlide);
+    }
+
+    function renderDots() {
+      const container = document.getElementById('dots-container');
+      let html = '';
+      for (let i = 0; i < totalSlides; i++) {
+        const active = (i === currentSlide);
+        html += `<button onclick="goToSlide(${i})" class="h-2.5 rounded-full border-2 border-[#3b2f2f] transition-all ${active ? 'w-6 bg-[#38bdf8]' : 'w-2.5 bg-white hover:bg-sky-100'}"></button>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide < totalSlides - 1) ? currentSlide + 1 : 0;
+      renderSlide();
+    }
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderSlide();
+      }
+    }
+    function goToSlide(idx) {
+      currentSlide = idx;
+      renderSlide();
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    function getSlideHTML(idx) {
+      switch (idx) {
+        case 0: return renderSlide1();
+        case 1: return renderSlide2();
+        case 2: return renderSlide3();
+        case 3: return renderSlide4();
+        case 4: return renderSlide5();
+        case 5: return renderSlide6();
+        case 6: return renderSlide7();
+        case 7: return renderSlide8();
+        case 8: return renderSlide9();
+        case 9: return renderSlide10();
+        case 10: return renderSlide11();
+        case 11: return renderSlide12();
+        case 12: return renderSlide13();
+        case 13: return renderSlide14();
+        default: return '';
+      }
+    }
+
+    // =========================================================================
+    // SLIDE 1: [도입] 당좌예금이란? (카페 · 은행 · 거래처 3자 수평 그림)
+    // =========================================================================
+    function renderSlide1() {
+      return `
+        <div class="flex items-center justify-between bg-[#e0f2fe] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgHachi('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-sky-800">1. 도입 · 당좌예금이란 무엇일까?</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">거액의 원두 대금, 현금 다발 대신 「수표」로 지급한다면?</h2>
+            </div>
+          </div>
+          <span class="bg-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">교과서 88쪽</span>
+        </div>
+
+        <!-- 3-Column Horizontal Diagram: 카페 -> 거래처 -> 은행 -->
+        <div class="grid grid-cols-3 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Step 1: 카페 (당점) -->
+          <div class="chii-card-sm bg-[#fff8fa] p-3.5 flex flex-col justify-between text-center">
+            <div class="flex items-center justify-between">
+              <span class="bg-pink-500 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">① 우리 카페 (발행인)</span>
+              <span class="text-xl">☕</span>
+            </div>
+            <div class="my-auto flex flex-col items-center gap-1.5">
+              ${svgChii('sparkle', 'w-14 h-14')}
+              <h3 class="font-cute text-base lg:text-lg text-[#3b2f2f]">당좌예금 계좌 개설 & 수표 발행</h3>
+              <p class="text-xs font-bold text-slate-600 leading-snug">
+                은행에 <strong>당좌예금</strong>을 넣어 두고,<br/>원두 대금을 줄 때 <strong>당좌수표를 발행</strong>해요!
+              </p>
+            </div>
+            <div class="bg-white rounded-xl p-2 border-2 border-[#3b2f2f] text-xs font-extrabold text-pink-700">
+              수표 발행 시 ➔ (대변) 당좌예금 감소
+            </div>
+          </div>
+
+          <!-- Step 2: 거래처 (동점) -->
+          <div class="chii-card-sm bg-[#fefce8] p-3.5 flex flex-col justify-between text-center">
+            <div class="flex items-center justify-between">
+              <span class="bg-amber-500 text-[#3b2f2f] text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">② 원두 거래처 (수취인)</span>
+              <span class="text-xl">🚚</span>
+            </div>
+            <div class="my-auto flex flex-col items-center gap-1.5">
+              ${svgUsa('w-14 h-14')}
+              <h3 class="font-cute text-base lg:text-lg text-[#3b2f2f]">수표를 받아 은행에 제시</h3>
+              <p class="text-xs font-bold text-slate-600 leading-snug">
+                카페가 발행한 수표를 받아서<br/>은행에 가져가면 현금으로 바꿔요!
+              </p>
+            </div>
+            <div class="bg-white rounded-xl p-2 border-2 border-[#3b2f2f] text-xs font-extrabold text-amber-800">
+              거래처 입장: 남이 발행한 수표 = 현금!
+            </div>
+          </div>
+
+          <!-- Step 3: 은행 (지급인) -->
+          <div class="chii-card-sm bg-[#ecfdf5] p-3.5 flex flex-col justify-between text-center">
+            <div class="flex items-center justify-between">
+              <span class="bg-emerald-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">③ 은행 (당좌예금 관리)</span>
+              <span class="text-xl">🏦</span>
+            </div>
+            <div class="my-auto flex flex-col items-center gap-1.5">
+              ${svgHachi('w-14 h-14')}
+              <h3 class="font-cute text-base lg:text-lg text-[#3b2f2f]">카페의 당좌예금에서 지급</h3>
+              <p class="text-xs font-bold text-slate-600 leading-snug">
+                수표를 확인하고 카페의 <strong>당좌예금 잔액</strong>에서 돈을 인출해 거래처에 지급해요!
+              </p>
+            </div>
+            <div class="bg-white rounded-xl p-2 border-2 border-[#3b2f2f] text-xs font-extrabold text-emerald-800">
+              당좌예금 = 수표 발행을 위한 예금(자산)
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#3b2f2f] text-white rounded-xl px-4 py-1.5 text-center text-xs font-bold shrink-0">
+          💡 실제 오늘날 모든 소상공인이 수표를 쓰진 않지만, <strong>기업 회계의 수표·예금·부채 원리를 배우기 위해 꼭 필요한 핵심 계정</strong>이에요!
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 2: [도입] 오늘의 6가지 학습 목표
+    // =========================================================================
+    function renderSlide2() {
+      const goals = [
+        { num: "01", title: "당좌예금의 실무 역할", desc: "은행과 당좌거래 약정을 맺고 수표를 발행해 대금을 지급하는 원리를 설명할 수 있어요.", bg: "bg-[#ffe4ec]" },
+        { num: "02", title: "입금 vs 수표 발행 구분", desc: "당좌예금 입금(차변)과 수표 발행 지급(대변)의 계정 변화를 구분할 수 있어요.", bg: "bg-[#e0f2fe]" },
+        { num: "03", title: "당좌예금 총계정원장 읽기", desc: "교과서의 당좌예금 원장에서 차변·대변 기록과 잔액 흐름을 읽을 수 있어요.", bg: "bg-[#fef9c3]" },
+        { num: "04", title: "당좌차월 약정과 의미", desc: "예금 잔액 초과분을 은행에서 일시적으로 빌려 쓰는 부채(당좌차월)를 이해해요.", bg: "bg-[#d1fae5]" },
+        { num: "05", title: "당좌차월 발생·상환 분개", desc: "당좌차월 발생(대변)과 입금을 통한 상환(차변)을 정확히 분개할 수 있어요.", bg: "bg-[#ede9fe]" },
+        { num: "06", title: "빨간 T계정 직접 전기하기", desc: "당좌예금과 당좌차월 약식 T계정에 거래를 전기하고 잔액을 확인할 수 있어요.", bg: "bg-[#ffedd5]" }
+      ];
+
+      return `
+        <div class="flex items-center justify-between bg-[#fef9c3] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgChii('sparkle', 'w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-amber-800">1. 도입 · 학습 목표</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">오늘 수업을 마치면 우리가 할 수 있어요!</h2>
+            </div>
+          </div>
+          <span class="bg-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">6가지 핵심 목표</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 flex-1 min-h-0 items-stretch">
+          ${goals.map(g => `
+            <div class="chii-card-sm ${g.bg} p-3 flex flex-col justify-between">
+              <div class="flex items-center gap-2">
+                <span class="bg-[#3b2f2f] text-white font-mono text-xs font-extrabold px-2 py-0.5 rounded-lg">${g.num}</span>
+                <h3 class="font-cute text-base text-[#3b2f2f]">${g.title}</h3>
+              </div>
+              <p class="text-xs font-bold text-slate-700 bg-white/90 p-2.5 rounded-xl border-2 border-[#3b2f2f] leading-relaxed">
+                ${g.desc}
+              </p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="bg-[#3b2f2f] text-white rounded-xl px-4 py-1.5 text-center text-xs font-bold shrink-0">
+          🚀 자, 이제 교과서 88쪽 <strong>「당좌예금 총계정원장」</strong>부터 차근차근 살펴볼까요?
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 3: [교과서 88쪽] 당좌예금 총계정원장 핵심 구조 이해
+    // =========================================================================
+    function renderSlide3() {
+      return `
+        <div class="flex items-center justify-between bg-[#e0f2fe] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgHachi('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-sky-800">2. 교과서 88쪽 · 당좌예금 총계정원장</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">당좌예금(자산)의 증가와 감소는 원장에 어떻게 기록될까?</h2>
+            </div>
+          </div>
+          <span class="bg-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">자산 계정 원리</span>
+        </div>
+
+        <!-- Strictly Side-by-Side: Left Principle Cards (5 cols) + Right Ledger Structure (7 cols) -->
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Left 5 Cols -->
+          <div class="col-span-5 flex flex-col justify-between gap-2.5">
+            <div class="chii-card-sm bg-[#ecfdf5] p-3 flex-1 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">원칙 ① 차변 (왼쪽)</span>
+                <span class="font-cute text-base text-emerald-900">당좌예금 증가 (+)</span>
+              </div>
+              <div class="bg-white rounded-xl p-2.5 border-2 border-[#3b2f2f] text-xs font-extrabold space-y-1">
+                <div class="text-emerald-800 text-sm">📥 당좌예금에 입금 ➔ 차변</div>
+                <div class="text-slate-600">• 현금을 당좌예금 계좌에 입금했을 때</div>
+                <div class="text-slate-600">• 우리가 발행했던 당좌수표를 다시 회수했을 때</div>
+              </div>
+            </div>
+
+            <div class="chii-card-sm bg-[#fff1f2] p-3 flex-1 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="bg-rose-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">원칙 ② 대변 (오른쪽)</span>
+                <span class="font-cute text-base text-rose-900">당좌예금 감소 (-)</span>
+              </div>
+              <div class="bg-white rounded-xl p-2.5 border-2 border-[#3b2f2f] text-xs font-extrabold space-y-1">
+                <div class="text-rose-800 text-sm">📤 수표 발행으로 지급 ➔ 대변</div>
+                <div class="text-slate-600">• 상품을 사고 대금을 수표 발행해 지급했을 때</div>
+                <div class="text-slate-600">• 외상매입금을 수표 발행해 갚았을 때</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 7 Cols: Reconstructed Textbook Ledger Diagram -->
+          <div class="col-span-7 chii-card-sm bg-white p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-indigo-700">📒 당좌예금 총계정원장 구조 (이해용 예시 모형)</span>
+              <span class="text-[11px] font-bold bg-amber-100 px-2 py-0.5 rounded border border-[#3b2f2f]">※ 구조 이해를 위한 예시 숫자</span>
+            </div>
+
+            <!-- T-Ledger Table -->
+            <div class="rounded-xl border-2 border-[#3b2f2f] overflow-hidden my-auto">
+              <div class="bg-sky-100 border-b-2 border-[#3b2f2f] py-1.5 text-center font-cute text-base text-[#3b2f2f]">
+                당 좌 예 금 (자산)
+              </div>
+              <div class="grid grid-cols-2 bg-slate-100 border-b-2 border-[#3b2f2f] text-center font-extrabold text-xs py-1">
+                <div class="border-r-2 border-[#3b2f2f] text-emerald-800">차변 (입금 · 증가 +)</div>
+                <div class="text-rose-800">대변 (수표 발행 · 감소 -)</div>
+              </div>
+              <div class="grid grid-cols-2 text-xs min-h-[115px]">
+                <div class="border-r-2 border-[#3b2f2f] p-2.5 space-y-2 bg-emerald-50/40">
+                  <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border border-[#3b2f2f] font-bold">
+                    <span>3/1 전기이월 (기초잔액)</span>
+                    <span class="font-mono font-extrabold text-emerald-700">500,000</span>
+                  </div>
+                  <div class="flex justify-between items-center bg-emerald-100 p-1.5 rounded-lg border border-[#3b2f2f] font-extrabold">
+                    <span>3/5 현금 (당좌예입)</span>
+                    <span class="font-mono text-emerald-800">300,000</span>
+                  </div>
+                </div>
+                <div class="p-2.5 space-y-2 bg-rose-50/40">
+                  <div class="flex justify-between items-center bg-rose-100 p-1.5 rounded-lg border border-[#3b2f2f] font-extrabold">
+                    <span>3/12 상품 (수표 발행)</span>
+                    <span class="font-mono text-rose-800">200,000</span>
+                  </div>
+                  <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border border-dashed border-[#3b2f2f] font-bold text-slate-600">
+                    <span>👉 현재 남은 잔액은?</span>
+                    <span class="font-mono font-extrabold text-indigo-700">600,000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-100 rounded-xl px-3 py-1.5 text-xs font-extrabold text-[#3b2f2f] flex items-center justify-between">
+              <span>💡 차변 합계(800,000) - 대변 합계(200,000) = <strong>현재 당좌예금 잔액 600,000원</strong></span>
+              <span class="text-indigo-700">차변 = 증가 / 대변 = 감소</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 4: [당좌예금 원장] 차변 vs 대변 선택 활동 (양방향 토글)
+    // =========================================================================
+    function selectDrCrQuiz(qKey, choice) {
+      if (appState.drCrQuiz[qKey] === choice) {
+        appState.drCrQuiz[qKey] = null;
+      } else {
+        appState.drCrQuiz[qKey] = choice;
+      }
+      renderSlide();
+    }
+
+    function renderSlide4() {
+      const items = [
+        { key: 'q1', icon: '📥', title: '현금 400,000원을 당좌예금 계좌에 입금하다', ans: '차변', exp: '당좌예금에 입금하면 당좌예금(자산)이 증가하므로 차변!' },
+        { key: 'q2', icon: '🧾', title: '상품 250,000원을 매입하고 수표를 발행하여 지급하다', ans: '대변', exp: '수표를 발행해 지급하면 당좌예금(자산)이 감소하므로 대변!' },
+        { key: 'q3', icon: '💸', title: '외상매입금 180,000원을 수표를 발행하여 갚다', ans: '대변', exp: '수표 발행으로 대금을 지급했으므로 당좌예금 감소 → 대변!' },
+        { key: 'q4', icon: '🔄', title: '우리가 이전에 발행했던 당좌수표 100,000원을 회수하다', ans: '차변', exp: '당점발행수표를 돌려받으면 빠져나갈 예금이 줄어 당좌예금 증가 → 차변!' }
+      ];
+
+      return `
+        <div class="flex items-center justify-between bg-[#fef9c3] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgUsa('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-amber-800">2. 당좌예금 원장 · 확인 활동</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">다음 거래에서 「당좌예금」 계정은 차변일까, 대변일까? (재클릭 시 가림)</h2>
+            </div>
+          </div>
+          <span class="bg-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">4문항 체크</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 items-stretch">
+          ${items.map(item => {
+            const val = appState.drCrQuiz[item.key];
+            const done = val !== null;
+            const ok = val === item.ans;
+            return `
+              <div class="chii-card-sm p-3 flex flex-col justify-between ${!done ? 'bg-white' : (ok ? 'bg-[#d1fae5]' : 'bg-[#ffe4e6]')}">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl bg-slate-100 p-1.5 rounded-xl border-2 border-[#3b2f2f]">${item.icon}</span>
+                    <span class="font-cute text-sm lg:text-base text-[#3b2f2f] leading-snug">${item.title}</span>
+                  </div>
+                  <div class="flex gap-1.5 shrink-0">
+                    <button onclick="selectDrCrQuiz('${item.key}', '차변')" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${val === '차변' ? 'bg-emerald-600 text-white' : 'bg-white text-[#3b2f2f]'}">차변(+)</button>
+                    <button onclick="selectDrCrQuiz('${item.key}', '대변')" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${val === '대변' ? 'bg-rose-600 text-white' : 'bg-white text-[#3b2f2f]'}">대변(-)</button>
+                  </div>
+                </div>
+                <div onclick="selectDrCrQuiz('${item.key}', '${val}')" class="pt-1.5 border-t-2 border-dashed border-[#3b2f2f]/20 text-xs font-extrabold flex items-center justify-between ${done ? 'cursor-pointer' : ''}">
+                  ${done ? `
+                    <span class="${ok ? 'text-emerald-900' : 'text-rose-900'}">${ok ? '⭕ 정답!' : '❌ 다시 생각!'} ${item.exp}</span>
+                    <span class="text-[10px] bg-white/80 px-2 py-0.5 rounded border border-[#3b2f2f] text-slate-600 shrink-0">가리기 ↺</span>
+                  ` : `<span class="text-slate-400">👆 우측의 [차변(+)] 또는 [대변(-)] 버튼을 눌러보세요!</span>`}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="bg-[#3b2f2f] text-white rounded-xl px-4 py-1.5 text-center text-xs font-bold shrink-0">
+          💡 핵심 공식: <strong>당좌예금 입금(증가) = 차변</strong> / <strong>수표 발행 지급(감소) = 대변</strong>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 5: [교과서 89쪽: 예제 06] 단계별 스캐폴딩 풀이 (추가 연습 예제 명시)
+    // =========================================================================
+    function setEx06Step(step) {
+      appState.ex06Step = step;
+      renderSlide();
+    }
+    function toggleEx06Reveal(key) {
+      appState.ex06Reveal[key] = !appState.ex06Reveal[key];
+      renderSlide();
+    }
+
+    function renderSlide5() {
+      const step = appState.ex06Step;
+      const rev = appState.ex06Reveal;
+
+      // 3 Sequential transactions for Checking Account
+      const trans = {
+        1: {
+          badge: "거래 ① · 당좌예금 입금",
+          text: "현금 500,000원을 은행에 가지고 가서 당좌예금 계좌에 입금하다.",
+          step1: "현금(자산) 500,000원 감소 / 당좌예금(자산) 500,000원 증가",
+          step2: "증가한 당좌예금은 차변(왼쪽), 감소한 현금은 대변(오른쪽)",
+          drAcc: "당좌예금", drAmt: 500000,
+          crAcc: "현 금", crAmt: 500000,
+          key: 's1'
+        },
+        2: {
+          badge: "거래 ② · 수표 발행 지급",
+          text: "상품 300,000원을 매입하고, 대금은 당좌수표를 발행하여 지급하다.",
+          step1: "상품(자산) 300,000원 증가 / 수표 발행으로 당좌예금(자산) 300,000원 감소",
+          step2: "증가한 상품은 차변(왼쪽), 감소한 당좌예금은 대변(오른쪽)",
+          drAcc: "상 품", drAmt: 300000,
+          crAcc: "당좌예금", crAmt: 300000,
+          key: 's2'
+        },
+        3: {
+          badge: "거래 ③ · 당점발행수표 회수",
+          text: "외상매출금 150,000원을 회수하면서, 우리 회사가 이전에 발행했던 당좌수표를 돌려받다.",
+          step1: "당점 수표 회수로 당좌예금(자산) 150,000원 증가 / 외상매출금(자산) 150,000원 감소",
+          step2: "증가한 당좌예금은 차변(왼쪽), 감소한 외상매출금은 대변(오른쪽)",
+          drAcc: "당좌예금", drAmt: 150000,
+          crAcc: "외상매출금", crAmt: 150000,
+          key: 's3'
+        }
+      }[step];
+
+      const isRev = rev[trans.key];
+      const ledgerBal = step === 1 ? 500000 : (step === 2 ? 200000 : 350000);
+
+      return `
+        <div class="flex items-center justify-between bg-[#e0f2fe] chii-card-sm px-4 py-1.5 shrink-0">
+          <div class="flex items-center gap-2.5">
+            ${svgChii('sparkle', 'w-9 h-9')}
+            <div>
+              <span class="text-[11px] font-extrabold text-sky-800">3. 교과서 89쪽 예제 06 원리 · 추가 연습 예제</span>
+              <h2 class="font-cute text-base lg:text-lg text-[#3b2f2f]">상황 파악 ➔ 증감 판단 ➔ 차·대변 판단 ➔ 분개 및 원장 전기</h2>
+            </div>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="setEx06Step(1)" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${step === 1 ? 'bg-indigo-600 text-white' : 'bg-white'}">① 당좌예입</button>
+            <button onclick="setEx06Step(2)" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${step === 2 ? 'bg-rose-600 text-white' : 'bg-white'}">② 수표 발행</button>
+            <button onclick="setEx06Step(3)" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${step === 3 ? 'bg-emerald-600 text-white' : 'bg-white'}">③ 당점수표 회수</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Left 7 Cols: 4-Step Scaffolding -->
+          <div class="col-span-7 chii-card-sm bg-white p-3.5 flex flex-col justify-between">
+            <div class="bg-[#fefce8] rounded-xl p-2.5 border-2 border-[#3b2f2f]">
+              <div class="flex items-center justify-between mb-1">
+                <span class="bg-[#3b2f2f] text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">${trans.badge}</span>
+                <span class="text-[10px] font-bold text-amber-900">※ 교과서 원문 수치 확인 전 추가 연습 예제</span>
+              </div>
+              <p class="font-bold text-xs lg:text-sm text-[#3b2f2f]">📋 ${trans.text}</p>
+            </div>
+
+            <!-- Step 1 & Step 2 Thinking Flow -->
+            <div class="grid grid-cols-2 gap-2.5 text-xs">
+              <div class="bg-slate-50 p-2.5 rounded-xl border-2 border-[#3b2f2f]">
+                <div class="font-extrabold text-indigo-700 mb-0.5">🔍 1단계: 증가·감소 판단</div>
+                <div class="font-bold text-slate-700 leading-snug">${trans.step1}</div>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-xl border-2 border-[#3b2f2f]">
+                <div class="font-extrabold text-emerald-700 mb-0.5">⚖️ 2단계: 차변·대변 판단</div>
+                <div class="font-bold text-slate-700 leading-snug">${trans.step2}</div>
+              </div>
+            </div>
+
+            <!-- Step 3: Journal Entry Reveal -->
+            <div class="rounded-xl border-2 border-[#3b2f2f] overflow-hidden">
+              <div class="grid grid-cols-2 bg-slate-100 border-b-2 border-[#3b2f2f] text-center font-extrabold text-xs py-1">
+                <div class="border-r-2 border-[#3b2f2f]">차변 (왼쪽)</div>
+                <div>대변 (오른쪽)</div>
+              </div>
+              <div class="grid grid-cols-2 p-2.5 text-sm items-center bg-white">
+                <div class="border-r-2 border-[#3b2f2f] pr-3 flex justify-between items-center">
+                  ${isRev ? `
+                    <button onclick="toggleEx06Reveal('${trans.key}')" class="chii-btn font-cute text-base text-indigo-800 bg-indigo-100 px-2.5 py-0.5 rounded">(차) ${trans.drAcc} 🙈</button>
+                  ` : `
+                    <button onclick="toggleEx06Reveal('${trans.key}')" class="chii-btn bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded text-xs font-extrabold">👆 분개 확인/가리기</button>
+                  `}
+                  <span class="font-mono font-extrabold">${fmtNum(trans.drAmt)}</span>
+                </div>
+                <div class="pl-3 flex justify-between items-center">
+                  ${isRev ? `
+                    <button onclick="toggleEx06Reveal('${trans.key}')" class="chii-btn font-cute text-base text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded">(대) ${trans.crAcc} 🙈</button>
+                  ` : `
+                    <span class="text-xs font-bold text-slate-400">(대변 계정)</span>
+                  `}
+                  <span class="font-mono font-extrabold">${fmtNum(trans.crAmt)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 5 Cols: Real-time Posting to Checking Account Ledger -->
+          <div class="col-span-5 chii-card-sm bg-[#fffef5] p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-slate-700">📊 4단계: 당좌예금 원장 전기</span>
+              <span class="bg-sky-200 text-[#3b2f2f] text-xs font-extrabold px-2.5 py-0.5 rounded-full border-2 border-[#3b2f2f]">
+                잔액: ${fmtNum(ledgerBal)}원
+              </span>
+            </div>
+
+            <div class="bg-white rounded-xl border-2 border-[#3b2f2f] p-2.5 my-auto">
+              <div class="red-t-header text-center pb-1">
+                <span class="font-cute text-base lg:text-lg text-[#3b2f2f]">당 좌 예 금</span>
+              </div>
+              <div class="grid grid-cols-2 min-h-[95px] text-xs">
+                <div class="red-t-divider p-2 space-y-1.5">
+                  <div class="flex justify-between bg-emerald-100 px-2 py-1 rounded border border-[#3b2f2f] font-extrabold">
+                    <span>① 현금</span><span class="font-mono">500,000</span>
+                  </div>
+                  ${step >= 3 ? `
+                    <div class="flex justify-between bg-emerald-200 px-2 py-1 rounded border border-[#3b2f2f] font-extrabold">
+                      <span>③ 외상매출금</span><span class="font-mono">150,000</span>
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="p-2 space-y-1.5">
+                  ${step >= 2 ? `
+                    <div class="flex justify-between bg-rose-100 px-2 py-1 rounded border border-[#3b2f2f] font-extrabold">
+                      <span>② 상품</span><span class="font-mono">300,000</span>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+              <div class="border-t-2 border-[#3b2f2f] pt-1.5 grid grid-cols-2 text-[11px] font-mono font-extrabold">
+                <div class="pr-2 flex justify-between text-emerald-800"><span>차변 합계</span><span>${step < 3 ? '500,000' : '650,000'}</span></div>
+                <div class="pl-2 flex justify-between border-l border-[#3b2f2f] text-rose-800"><span>대변 합계</span><span>${step === 1 ? '0' : '300,000'}</span></div>
+              </div>
+            </div>
+
+            <div class="bg-[#3b2f2f] text-white rounded-xl p-2 text-center text-[11px] font-bold">
+              ${step === 1 ? '① 입금 시 차변에 500,000원 기록! (상단 ② 수표 발행 클릭 ▶)' : (step === 2 ? '② 수표 발행 시 대변에 300,000원 기록! (상단 ③ 클릭 ▶)' : '③ 당점수표 회수 시 다시 차변에 150,000원 기록!')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 6: [핵심 비교] 수표 발행 지급 vs 당점발행수표 재수취 vs 동점발행수표 수취
+    // =========================================================================
+    function renderSlide6() {
+      return `
+        <div class="flex items-center justify-between bg-[#ffe4ec] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgUsa('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-pink-800">3. 예제 06 심화 · 절대 헷갈리면 안 되는 수표 3총사!</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">「수표를 새로 발행해 줄 때」 vs 「수표를 받을 때」 완벽 비교</h2>
+            </div>
+          </div>
+          <span class="bg-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">혼동 주의!</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Case 1 -->
+          <div class="chii-card-sm bg-[#fff1f2] p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="bg-rose-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">상황 ① 수표 발행 지급</span>
+              <span class="text-xl">✍️</span>
+            </div>
+            <div class="my-auto space-y-2">
+              <h3 class="font-cute text-base lg:text-lg text-rose-900">우리가 수표를 새로 발행해 대금을 지급할 때</h3>
+              <p class="text-xs font-bold text-slate-600">
+                우리 회사의 당좌예금 통장에서 돈이 빠져나가므로 <strong>당좌예금 감소!</strong>
+              </p>
+            </div>
+            <div class="bg-white rounded-xl p-2.5 border-2 border-[#3b2f2f] text-center">
+              <div class="text-[11px] font-extrabold text-slate-500">분개 위치와 계정</div>
+              <div class="font-cute text-base text-rose-700 mt-0.5">(대변) 당좌예금</div>
+            </div>
+          </div>
+
+          <!-- Case 2 -->
+          <div class="chii-card-sm bg-[#eef2ff] p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="bg-indigo-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">상황 ② 당점수표 재수취</span>
+              <span class="text-xl">🪃</span>
+            </div>
+            <div class="my-auto space-y-2">
+              <h3 class="font-cute text-base lg:text-lg text-indigo-900">우리가 이전에 발행했던 수표를 다시 돌려받을 때</h3>
+              <p class="text-xs font-bold text-slate-600">
+                당점(우리 회사) 수표가 돌아왔으니 <strong>「당 ➔ 당」</strong>에 따라 <strong>당좌예금 증가!</strong>
+              </p>
+            </div>
+            <div class="bg-white rounded-xl p-2.5 border-2 border-[#3b2f2f] text-center">
+              <div class="text-[11px] font-extrabold text-slate-500">분개 위치와 계정</div>
+              <div class="font-cute text-base text-indigo-700 mt-0.5">(차변) 당좌예금</div>
+            </div>
+          </div>
+
+          <!-- Case 3 -->
+          <div class="chii-card-sm bg-[#ecfdf5] p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">상황 ③ 동점수표 수취</span>
+              <span class="text-xl">💵</span>
+            </div>
+            <div class="my-auto space-y-2">
+              <h3 class="font-cute text-base lg:text-lg text-emerald-900">다른 회사(거래처)가 발행한 수표를 받을 때</h3>
+              <p class="text-xs font-bold text-slate-600">
+                동점(타인) 발행 수표는 통화대용증권! <strong>「동 ➔ 현」</strong>에 따라 <strong>현금 증가!</strong>
+              </p>
+            </div>
+            <div class="bg-white rounded-xl p-2.5 border-2 border-[#3b2f2f] text-center">
+              <div class="text-[11px] font-extrabold text-slate-500">분개 위치와 계정</div>
+              <div class="font-cute text-base text-emerald-700 mt-0.5">(차변) 현 금</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#3b2f2f] text-white rounded-xl px-4 py-1.5 text-center text-xs font-bold shrink-0">
+          🔑 우리가 수표를 <strong>발행해 주면 (대) 당좌예금</strong> / 우리가 발행했던 수표를 <strong>돌려받으면 (차) 당좌예금</strong>!
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 7: [교과서 90쪽] 당좌차월의 의미와 약정 (부채!)
+    // =========================================================================
+    function renderSlide7() {
+      return `
+        <div class="flex items-center justify-between bg-[#fef9c3] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgChii('cry', 'w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-amber-900">4. 교과서 90쪽 · 당좌차월이란?</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">당좌예금 잔액이 부족한데 수표를 발행해야 한다면?</h2>
+            </div>
+          </div>
+          <span class="bg-rose-500 text-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">당좌차월 = 부채!</span>
+        </div>
+
+        <!-- Side-by-Side Concept Card & Flow -->
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Left 6 Cols: Definition & Warning -->
+          <div class="col-span-6 chii-card-sm bg-white p-4 flex flex-col justify-between">
+            <div>
+              <span class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-0.5 rounded-full border border-[#3b2f2f]">핵심 정의</span>
+              <h3 class="font-cute text-lg lg:text-xl text-[#3b2f2f] mt-2">
+                🤝 「은행과 미리 정한 당좌차월 약정」에 따라!
+              </h3>
+              <p class="text-xs lg:text-sm font-bold text-slate-700 mt-1 leading-relaxed bg-indigo-50 p-3 rounded-xl border-2 border-[#3b2f2f]">
+                당좌예금 잔액을 초과한 금액을 은행으로부터 <strong>일시적으로 빌려 사용하는 것</strong>을 <span class="text-rose-700 font-extrabold underline">당좌차월(부채)</span>이라고 해요.
+              </p>
+            </div>
+
+            <div class="bg-[#fff1f2] rounded-xl p-3 border-2 border-[#3b2f2f] flex items-center gap-3">
+              <span class="text-2xl">⚠️</span>
+              <div class="text-xs font-extrabold text-rose-900 leading-snug">
+                <strong>주의!</strong> 은행과 <u>당좌차월 약정(한도 계약)</u>이 없는데 잔액을 초과해 수표를 발행하면 부도 처리돼요! 반드시 <strong>약정이 있을 때만 한도 내에서 초과 발행</strong>할 수 있어요.
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 6 Cols: Liability Rules (발생 vs 상환) -->
+          <div class="col-span-6 flex flex-col justify-between gap-3">
+            <div class="chii-card-sm bg-[#fff1f2] p-3.5 flex-1 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="bg-rose-600 text-white text-xs font-extrabold px-3 py-0.5 rounded-full border border-[#3b2f2f]">① 당좌차월 발생 (빌릴 때)</span>
+                <span class="font-cute text-base text-rose-800">부채의 증가 ➔ 대변!</span>
+              </div>
+              <p class="text-xs font-bold text-slate-700">
+                내 당좌예금 잔액을 다 쓰고 부족한 금액만큼 은행에서 빌렸으므로 <strong>대변에 「당좌차월」</strong>을 기록해요.
+              </p>
+              <div class="bg-white rounded-lg p-2 border-2 border-[#3b2f2f] text-center font-cute text-sm text-rose-700">
+                (대변) 당좌차월 XXX
+              </div>
+            </div>
+
+            <div class="chii-card-sm bg-[#ecfdf5] p-3.5 flex-1 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="bg-emerald-600 text-white text-xs font-extrabold px-3 py-0.5 rounded-full border border-[#3b2f2f]">② 당좌차월 상환 (갚을 때)</span>
+                <span class="font-cute text-base text-emerald-800">부채의 감소 ➔ 차변!</span>
+              </div>
+              <p class="text-xs font-bold text-slate-700">
+                이후 당좌예금에 돈을 입금하면 <strong>먼저 은행에 진 빚(당좌차월)부터 갚고(차변)</strong>, 남는 돈만 당좌예금이 돼요!
+              </p>
+              <div class="bg-white rounded-lg p-2 border-2 border-[#3b2f2f] text-center font-cute text-sm text-emerald-700">
+                (차변) 당좌차월 XXX
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 8: [교과서 90쪽] 당좌차월 원리 예시 (내 예금 10만 + 빌린 돈 20만, 대변 2줄!)
+    // =========================================================================
+    function toggleOverdraftIntro(part) {
+      appState.overdraftIntro[part] = !appState.overdraftIntro[part];
+      renderSlide();
+    }
+    function toggleAllOverdraftIntro() {
+      const st = appState.overdraftIntro;
+      const all = st.dr && st.cr1 && st.cr2;
+      appState.overdraftIntro = { dr: !all, cr1: !all, cr2: !all };
+      renderSlide();
+    }
+
+    function renderSlide8() {
+      const st = appState.overdraftIntro;
+      const all = st.dr && st.cr1 && st.cr2;
+
+      return `
+        <div class="flex items-center justify-between bg-[#fef9c3] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgHachi('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-amber-900">4. 당좌차월 핵심 원리 예시</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">내 예금 100,000원뿐인데 300,000원짜리 수표를 발행했다면?</h2>
+            </div>
+          </div>
+          <button onclick="toggleAllOverdraftIntro()" class="chii-btn ${all ? 'bg-slate-200' : 'bg-[#ffd166]'} px-3 py-1 rounded-full text-xs font-extrabold">
+            ${all ? '전체 가리기 ↺' : '전체 정답 보기'}
+          </button>
+        </div>
+
+        <!-- Problem Banner -->
+        <div class="chii-card-sm bg-white px-4 py-2 flex items-center justify-between shrink-0">
+          <p class="font-bold text-xs lg:text-sm text-[#3b2f2f]">
+            📋 <strong>예시 거래:</strong> 당좌예금 잔액이 <span class="bg-sky-200 px-1.5 py-0.5 rounded border border-[#3b2f2f] font-extrabold">100,000원</span>이고 당좌차월 약정이 있는 상태에서, <span class="bg-amber-200 px-1.5 py-0.5 rounded border border-[#3b2f2f] font-extrabold">상품 300,000원</span>을 구입하고 수표를 발행하여 지급했다.
+          </p>
+        </div>
+
+        <!-- Side-by-Side: Left Visual Breakdown (5 cols) + Right Journal with 2 Credit Lines (7 cols) -->
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Left 5 Cols: Visual Bar Graphic -->
+          <div class="col-span-5 chii-card-sm bg-[#f8fafc] p-3.5 flex flex-col justify-between">
+            <span class="text-xs font-extrabold text-indigo-700">🎨 그림으로 보는 수표 300,000원의 구성</span>
+
+            <div class="space-y-2 my-auto">
+              <div class="bg-amber-100 p-2 rounded-xl border-2 border-[#3b2f2f] text-center font-extrabold text-xs">
+                🛍️ 구입한 상품 총액 = <span class="font-mono text-sm">300,000원</span>
+              </div>
+
+              <div class="text-center font-cute text-base text-[#3b2f2f]">⬇️ 수표 300,000원 발행 내역 쪼개기 ⬇️</div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-1 bg-sky-200 p-2.5 rounded-xl border-2 border-[#3b2f2f] text-center">
+                  <div class="text-[11px] font-extrabold text-sky-900">① 내 예금 사용</div>
+                  <div class="font-cute text-sm text-[#3b2f2f] mt-0.5">당좌예금</div>
+                  <div class="font-mono font-extrabold text-xs">100,000원</div>
+                </div>
+                <div class="col-span-2 bg-rose-200 p-2.5 rounded-xl border-2 border-[#3b2f2f] text-center">
+                  <div class="text-[11px] font-extrabold text-rose-900">② 부족해서 은행에서 빌린 돈</div>
+                  <div class="font-cute text-sm text-rose-900 mt-0.5">당좌차월 (부채 증가)</div>
+                  <div class="font-mono font-extrabold text-xs">200,000원</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-[11px] font-extrabold text-slate-600 text-center">
+              👉 내 예금 100,000원부터 모두 소진하고, 초과분 200,000원이 당좌차월!
+            </div>
+          </div>
+
+          <!-- Right 7 Cols: Journal Entry (Debit 1 Row, Credit 2 Rows) -->
+          <div class="col-span-7 chii-card-sm bg-white overflow-hidden flex flex-col justify-between">
+            <div class="grid grid-cols-2 bg-slate-100 border-b-2 border-[#3b2f2f] text-center font-extrabold text-xs py-1.5 shrink-0">
+              <div class="border-r-2 border-[#3b2f2f] text-indigo-800">차변 (왼쪽) — 1줄 작성</div>
+              <div class="text-rose-800">대변 (오른쪽) — 계정이 2개이므로 2줄 작성!</div>
+            </div>
+
+            <div class="grid grid-cols-2 flex-1 items-stretch">
+              <!-- Debit Side: 1 Row -->
+              <div class="border-r-2 border-[#3b2f2f] p-4 flex items-center justify-between bg-amber-50/40">
+                ${st.dr ? `
+                  <button onclick="toggleOverdraftIntro('dr')" class="chii-btn font-cute text-base lg:text-lg text-[#3b2f2f] bg-amber-200 px-3 py-1 rounded-lg">(차) 상 품 🙈</button>
+                ` : `
+                  <button onclick="toggleOverdraftIntro('dr')" class="chii-btn bg-amber-100 text-[#3b2f2f] px-3 py-1.5 rounded-lg font-extrabold text-xs">👆 차변 계정 확인</button>
+                `}
+                <span class="font-mono font-extrabold text-lg">300,000</span>
+              </div>
+
+              <!-- Credit Side: 2 Rows -->
+              <div class="divide-y-2 divide-[#3b2f2f] flex flex-col justify-around">
+                <div class="p-3 flex items-center justify-between flex-1">
+                  ${st.cr1 ? `
+                    <button onclick="toggleOverdraftIntro('cr1')" class="chii-btn bg-sky-100 px-3 py-1 rounded-lg flex items-center gap-1.5">
+                      <span class="font-cute text-base text-sky-900">(대) 당좌예금</span>
+                      <span class="text-[10px] font-bold text-sky-700">← 내 예금 🙈</span>
+                    </button>
+                  ` : `
+                    <button onclick="toggleOverdraftIntro('cr1')" class="chii-btn bg-sky-50 text-sky-800 px-3 py-1 rounded-lg font-extrabold text-xs">👆 ① 내 예금 감소분 확인</button>
+                  `}
+                  <span class="font-mono font-extrabold text-base">100,000</span>
+                </div>
+
+                <div class="p-3 flex items-center justify-between flex-1">
+                  ${st.cr2 ? `
+                    <button onclick="toggleOverdraftIntro('cr2')" class="chii-btn bg-rose-100 px-3 py-1 rounded-lg flex items-center gap-1.5">
+                      <span class="font-cute text-base text-rose-900">(대) 당좌차월</span>
+                      <span class="text-[10px] font-bold text-rose-700">← 빌린 돈 🙈</span>
+                    </button>
+                  ` : `
+                    <button onclick="toggleOverdraftIntro('cr2')" class="chii-btn bg-rose-50 text-rose-800 px-3 py-1 rounded-lg font-extrabold text-xs">👆 ② 은행에서 빌린 돈 확인</button>
+                  `}
+                  <span class="font-mono font-extrabold text-base">200,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 9: [교과서 90쪽: 예제 07] 당좌차월 발생과 상환 단계별 연습 (추가 연습 예제)
+    // =========================================================================
+    function setEx07Step(step) {
+      appState.ex07Step = step;
+      renderSlide();
+    }
+    function toggleEx07Reveal(key) {
+      appState.ex07Reveal[key] = !appState.ex07Reveal[key];
+      renderSlide();
+    }
+
+    function renderSlide9() {
+      const step = appState.ex07Step;
+      const rev = appState.ex07Reveal;
+
+      return `
+        <div class="flex items-center justify-between bg-[#ffe4ec] chii-card-sm px-4 py-1.5 shrink-0">
+          <div class="flex items-center gap-2.5">
+            ${svgChii('sparkle', 'w-9 h-9')}
+            <div>
+              <span class="text-[11px] font-extrabold text-pink-800">4. 교과서 90쪽 예제 07 원리 · 추가 연습 예제</span>
+              <h2 class="font-cute text-base lg:text-lg text-[#3b2f2f]">당좌차월이 발생한 뒤, 현금을 입금하면 어떻게 처리할까?</h2>
+            </div>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="setEx07Step(1)" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${step === 1 ? 'bg-rose-600 text-white' : 'bg-white'}">1단계: 차월 발생</button>
+            <button onclick="setEx07Step(2)" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${step === 2 ? 'bg-amber-500 text-[#3b2f2f]' : 'bg-white'}">2단계: 일부 상환</button>
+            <button onclick="setEx07Step(3)" class="chii-btn px-2.5 py-1 rounded-lg font-extrabold text-xs ${step === 3 ? 'bg-emerald-600 text-white' : 'bg-white'}">3단계: 전액 상환+예입</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Left 7 Cols -->
+          <div class="col-span-7 chii-card-sm bg-white p-3.5 flex flex-col justify-between">
+            ${step === 1 ? `
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="bg-rose-100 text-rose-800 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">1단계 · 당좌차월 발생</span>
+                  <span class="text-[10px] font-bold text-slate-500">기초 당좌예금 100,000원 / 차월 한도 500,000원</span>
+                </div>
+                <h3 class="font-cute text-base lg:text-lg text-[#3b2f2f] mt-1">상품 400,000원을 매입하고 대금은 수표를 발행하여 지급하다!</h3>
+                <p class="text-xs font-bold text-slate-600">• 내 예금 100,000원 소진 + 부족분 300,000원은 <strong>(대변) 당좌차월</strong> 발생!</p>
+              </div>
+              <div class="rounded-xl border-2 border-[#3b2f2f] overflow-hidden">
+                <div class="grid grid-cols-2 bg-rose-50 border-b-2 border-[#3b2f2f] text-center font-extrabold text-xs py-1">
+                  <div class="border-r-2 border-[#3b2f2f]">차변 (1줄)</div><div>대변 (2줄)</div>
+                </div>
+                <div class="grid grid-cols-2 text-xs lg:text-sm items-center">
+                  <div class="border-r-2 border-[#3b2f2f] p-3 flex justify-between font-extrabold"><span>(차) 상 품</span><span class="font-mono">400,000</span></div>
+                  <div class="divide-y border-slate-300">
+                    ${rev.s1 ? `
+                      <div onclick="toggleEx07Reveal('s1')" class="p-2 flex justify-between font-extrabold text-sky-800 bg-sky-50 cursor-pointer"><span>(대) 당좌예금 🙈</span><span class="font-mono">100,000</span></div>
+                      <div onclick="toggleEx07Reveal('s1')" class="p-2 flex justify-between font-extrabold text-rose-800 bg-rose-100 cursor-pointer"><span>(대) 당좌차월 🙈</span><span class="font-mono">300,000</span></div>
+                    ` : `
+                      <div class="p-3 text-center"><button onclick="toggleEx07Reveal('s1')" class="chii-btn bg-rose-100 text-rose-900 px-3 py-1 rounded text-xs font-extrabold">👆 대변 2줄 분개 확인</button></div>
+                    `}
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            ${step === 2 ? `
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="bg-amber-200 text-[#3b2f2f] text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">2단계 · 당좌차월 일부 상환</span>
+                  <span class="text-[10px] font-bold text-rose-700">현재 당좌차월(빚) 잔액: 300,000원</span>
+                </div>
+                <h3 class="font-cute text-base lg:text-lg text-[#3b2f2f] mt-1">당좌예금 계좌에 현금 120,000원을 입금하다!</h3>
+                <p class="text-xs font-bold text-slate-600">• 빚(당좌차월 300,000원)이 남아 있으므로, 입금한 120,000원은 <strong>전액 당좌차월 상환(차변)</strong>에 쓰입니다!</p>
+              </div>
+              <div class="rounded-xl border-2 border-[#3b2f2f] overflow-hidden">
+                <div class="grid grid-cols-2 bg-amber-50 border-b-2 border-[#3b2f2f] text-center font-extrabold text-xs py-1">
+                  <div class="border-r-2 border-[#3b2f2f]">차변 (1줄)</div><div>대변 (1줄)</div>
+                </div>
+                <div class="grid grid-cols-2 p-3 text-xs lg:text-sm items-center">
+                  <div class="border-r-2 border-[#3b2f2f] pr-3 flex justify-between items-center">
+                    ${rev.s2 ? `<button onclick="toggleEx07Reveal('s2')" class="chii-btn font-cute text-sm lg:text-base text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded">(차) 당좌차월 🙈</button>` : `<button onclick="toggleEx07Reveal('s2')" class="chii-btn bg-amber-100 text-[#3b2f2f] px-2.5 py-1 rounded text-xs font-extrabold">👆 차변 계정 확인</button>`}
+                    <span class="font-mono font-extrabold">120,000</span>
+                  </div>
+                  <div class="pl-3 flex justify-between font-extrabold"><span>(대) 현 금</span><span class="font-mono">120,000</span></div>
+                </div>
+              </div>
+            ` : ''}
+
+            ${step === 3 ? `
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="bg-emerald-200 text-emerald-900 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-[#3b2f2f]">3단계 · 잔여 차월 전액 상환 + 당좌예금 입금</span>
+                  <span class="text-[10px] font-bold text-rose-700">남은 당좌차월(빚): 180,000원</span>
+                </div>
+                <h3 class="font-cute text-base lg:text-lg text-[#3b2f2f] mt-1">당좌예금 계좌에 현금 250,000원을 입금하다!</h3>
+                <p class="text-xs font-bold text-slate-600">• 남은 빚 <strong>당좌차월 180,000원을 먼저 갚고</strong>, 나머지 70,000원은 <strong>당좌예금 증가(차변 2줄)</strong>!</p>
+              </div>
+              <div class="rounded-xl border-2 border-[#3b2f2f] overflow-hidden">
+                <div class="grid grid-cols-2 bg-emerald-50 border-b-2 border-[#3b2f2f] text-center font-extrabold text-xs py-1">
+                  <div class="border-r-2 border-[#3b2f2f]">차변 (2줄)</div><div>대변 (1줄)</div>
+                </div>
+                <div class="grid grid-cols-2 text-xs lg:text-sm items-center">
+                  <div class="border-r-2 border-[#3b2f2f] divide-y">
+                    ${rev.s3 ? `
+                      <div onclick="toggleEx07Reveal('s3')" class="p-2 flex justify-between font-extrabold text-rose-800 bg-rose-50 cursor-pointer"><span>(차) 당좌차월 🙈</span><span class="font-mono">180,000</span></div>
+                      <div onclick="toggleEx07Reveal('s3')" class="p-2 flex justify-between font-extrabold text-sky-800 bg-sky-100 cursor-pointer"><span>(차) 당좌예금 🙈</span><span class="font-mono">70,000</span></div>
+                    ` : `
+                      <div class="p-3 text-center"><button onclick="toggleEx07Reveal('s3')" class="chii-btn bg-emerald-100 text-emerald-900 px-3 py-1 rounded text-xs font-extrabold">👆 차변 2줄 분개 확인</button></div>
+                    `}
+                  </div>
+                  <div class="p-3 flex justify-between font-extrabold"><span>(대) 현 금</span><span class="font-mono">250,000</span></div>
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="bg-slate-50 rounded-xl p-2 border-2 border-[#3b2f2f] text-[11px] font-bold space-y-0.5">
+              <div>① 40만 수표 발행: (차) 상품 400,000 / (대) 당좌예금 100,000 · <strong>당좌차월 300,000</strong></div>
+              <div>② 12만 현금 입금: (차) <strong>당좌차월 120,000</strong> / (대) 현금 120,000 (남은 차월 180,000)</div>
+              <div>③ 25만 현금 입금: (차) <strong>당좌차월 180,000 · 당좌예금 70,000</strong> / (대) 현금 250,000</div>
+            </div>
+          </div>
+
+          <!-- Right 5 Cols: Balance Monitor -->
+          <div class="col-span-5 chii-card-sm bg-[#fffef5] p-3.5 flex flex-col justify-between">
+            <span class="text-xs font-extrabold text-slate-700">📊 단계별 잔액 변화 비교</span>
+
+            <div class="grid grid-cols-2 gap-2.5 my-auto">
+              <div class="bg-sky-50 rounded-xl p-3 border-2 border-[#3b2f2f] text-center">
+                <div class="text-xs font-extrabold text-sky-800">🏦 당좌예금 (자산)</div>
+                <div class="font-mono font-extrabold text-lg text-[#3b2f2f] my-1">
+                  ${step === 1 ? '0원' : (step === 2 ? '0원' : '70,000원')}
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  ${step === 1 ? '기초 10만 전액 소진' : (step === 2 ? '아직 차월 상환 중' : '빚 완납 후 7만 예입!')}
+                </div>
+              </div>
+
+              <div class="bg-rose-50 rounded-xl p-3 border-2 border-[#3b2f2f] text-center">
+                <div class="text-xs font-extrabold text-rose-800">💳 당좌차월 (부채)</div>
+                <div class="font-mono font-extrabold text-lg text-rose-700 my-1">
+                  ${step === 1 ? '300,000원' : (step === 2 ? '180,000원' : '0원')}
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  ${step === 1 ? '초과 발행으로 발생' : (step === 2 ? '12만 상환 후 잔액' : '나머지 18만 전액 상환!')}
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-[#3b2f2f] text-white rounded-xl p-2.5 text-xs font-bold text-center">
+              💡 당좌차월 잔액이 있을 때 당좌예입하면 <strong>무조건 당좌차월(부채)부터 먼저 차변에서 상환</strong>합니다!
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 10: [종합 연습 안내] 예제 06 + 예제 07 통합 7문항 로드맵
+    // =========================================================================
+    function renderSlide10() {
+      return `
+        <div class="flex items-center justify-between bg-[#fef08a] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgChii('sparkle', 'w-10 h-10')}
+            ${svgHachi('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-amber-900">5. 예제 06 + 예제 07 종합 연습 (총 7문항)</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">기본 거래(4문항)와 연속 거래(3문항)를 완벽히 마스터하자!</h2>
+            </div>
+          </div>
+          <span class="bg-white px-3 py-1 rounded-full text-xs font-extrabold border-2 border-[#3b2f2f]">단순·복합분개 구분</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-5 flex-1 min-h-0 items-stretch my-auto py-1">
+          <!-- Part A: Basic 4 Problems -->
+          <div class="chii-card-sm bg-[#e0f2fe] p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="bg-sky-700 text-white text-xs font-extrabold px-3 py-1 rounded-full border-2 border-[#3b2f2f]">PART 1 · 기본 독립 거래 (문제 1~4)</span>
+              <span class="font-cute text-base text-sky-900">다음 슬라이드 (11/14)</span>
+            </div>
+            <div class="bg-white rounded-xl p-3 border-2 border-[#3b2f2f] text-xs font-bold space-y-1.5">
+              <div>• <strong>문제 1:</strong> 현금을 당좌예금 계좌에 입금하는 거래</div>
+              <div>• <strong>문제 2:</strong> 상품을 매입하고 수표를 발행하여 지급하는 거래</div>
+              <div>• <strong>문제 3:</strong> 타인(동점)이 발행한 수표를 수취하는 거래 <span class="text-emerald-700 font-extrabold">(동→현)</span></div>
+              <div>• <strong>문제 4:</strong> 우리 회사(당점)가 이전에 발행한 수표를 재수취하는 거래 <span class="text-indigo-700 font-extrabold">(당→당)</span></div>
+            </div>
+            <button onclick="goToSlide(10)" class="chii-btn bg-sky-400 text-[#3b2f2f] py-2 rounded-xl font-cute text-base">
+              👉 기본 거래 4문항 풀러 가기 ▶
+            </button>
+          </div>
+
+          <!-- Part B: Continuous 3 Problems + Red T-Account -->
+          <div class="chii-card-sm bg-[#ffe4ec] p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="bg-rose-600 text-white text-xs font-extrabold px-3 py-1 rounded-full border-2 border-[#3b2f2f]">PART 2 · 연속 거래 & T계정 전기 (문제 5~7)</span>
+              <span class="font-cute text-base text-rose-900">12~13번 슬라이드</span>
+            </div>
+            <div class="bg-white rounded-xl p-3 border-2 border-[#3b2f2f] text-xs font-bold space-y-1.5">
+              <div>• <strong>기초 조건 명시:</strong> 기초 당좌예금 잔액 <strong>200,000원</strong> (당좌차월 한도 500,000원)</div>
+              <div>• <strong>문제 5 (5/3):</strong> 잔액(20만) 초과 수표 발행 (50만) ➔ <span class="text-rose-700 font-extrabold">당좌차월 30만 발생</span></div>
+              <div>• <strong>문제 6 (5/10):</strong> 외상매출금 45만 회수 시 현금 수취 후 즉시 당좌예입 ➔ <span class="text-emerald-700 font-extrabold">차월 30만 상환 + 당좌예금 15만</span></div>
+              <div>• <strong>문제 7 (5/18):</strong> 당점발행수표 10만 재수취 ➔ <span class="text-indigo-700 font-extrabold">당좌예금 10만 증가</span></div>
+            </div>
+            <button onclick="goToSlide(11)" class="chii-btn bg-pink-400 text-white py-2 rounded-xl font-cute text-base">
+              👉 연속 거래 3문항 풀러 가기 ▶
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 11: [종합 연습 PART 1] 기본 거래 4문항 (문제 1~4, 2x2 그리드 + 양방향 토글)
+    // =========================================================================
+    function toggleCompBasic(pKey) {
+      appState.compBasicReveal[pKey] = !appState.compBasicReveal[pKey];
+      renderSlide();
+    }
+    function toggleAllCompBasic() {
+      const r = appState.compBasicReveal;
+      const all = r.p1 && r.p2 && r.p3 && r.p4;
+      appState.compBasicReveal = { p1: !all, p2: !all, p3: !all, p4: !all };
+      renderSlide();
+    }
+
+    function renderSlide11() {
+      const r = appState.compBasicReveal;
+      const all = r.p1 && r.p2 && r.p3 && r.p4;
+
+      const problems = [
+        {
+          key: 'p1', num: '문제 1 (기본 · 당좌예입)',
+          q: '현금 400,000원을 은행의 당좌예금 계좌에 입금하다.',
+          dr: '(차) 당좌예금 400,000', cr: '(대) 현 금 400,000',
+          exp: '당좌예금에 입금하면 당좌예금(자산)이 증가하므로 차변에 기록합니다.'
+        },
+        {
+          key: 'p2', num: '문제 2 (기본 · 수표 발행)',
+          q: '거래처의 외상매입금 350,000원을 수표를 발행하여 지급하다.',
+          dr: '(차) 외상매입금 350,000', cr: '(대) 당좌예금 350,000',
+          exp: '우리가 수표를 발행해 지급하면 당좌예금(자산)이 감소하므로 대변에 기록합니다.'
+        },
+        {
+          key: 'p3', num: '문제 3 (기본 · 타인발행수표 수취)',
+          q: '상품 280,000원을 매출하고 대금은 거래처(동점)가 발행한 수표로 받다.',
+          dr: '(차) 현 금 280,000', cr: '(대) 상 품 매 출 280,000',
+          exp: '다른 회사가 발행한 수표는 통화대용증권(동→현)이므로 차변에 현금으로 처리합니다.'
+        },
+        {
+          key: 'p4', num: '문제 4 (기본 · 당점발행수표 재수취)',
+          q: '외상매출금 220,000원을 회수하면서 우리 회사가 이전에 발행했던 수표를 돌려받다. (현재 당좌예금 잔액은 충분함)',
+          dr: '(차) 당좌예금 220,000', cr: '(대) 외상매출금 220,000',
+          exp: '우리 회사가 발행했던 수표를 회수하면(당→당) 차변에 당좌예금 증가로 처리합니다.'
+        }
+      ];
+
+      return `
+        <div class="flex items-center justify-between bg-[#e0f2fe] chii-card-sm px-4 py-1.5 shrink-0">
+          <div class="flex items-center gap-2.5">
+            ${svgHachi('w-9 h-9')}
+            <div>
+              <span class="text-[11px] font-extrabold text-sky-800">5. 종합 연습 · 기본 독립 거래 (문제 1 ~ 4)</span>
+              <h2 class="font-cute text-base lg:text-lg text-[#3b2f2f]">먼저 계정과목과 금액을 생각한 뒤 [정답 확인]을 눌러보세요! (재클릭 시 가림)</h2>
+            </div>
+          </div>
+          <button onclick="toggleAllCompBasic()" class="chii-btn ${all ? 'bg-slate-200' : 'bg-[#ffd166]'} px-3 py-1 rounded-full text-xs font-extrabold">
+            ${all ? '전체 가리기 ↺' : '전체 정답 확인'}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 flex-1 min-h-0 items-stretch">
+          ${problems.map(p => {
+            const shown = r[p.key];
+            return `
+              <div class="chii-card-sm p-3 flex flex-col justify-between ${shown ? 'bg-[#ecfdf5]' : 'bg-white'}">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="bg-[#3b2f2f] text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">${p.num}</span>
+                    <button onclick="toggleCompBasic('${p.key}')" class="chii-btn px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold ${shown ? 'bg-white text-slate-700' : 'bg-indigo-600 text-white'}">
+                      ${shown ? '정답 가리기 ↺' : '정답 확인 ▶'}
+                    </button>
+                  </div>
+                  <p class="text-xs font-extrabold text-[#3b2f2f] leading-snug">📋 ${p.q}</p>
+                </div>
+
+                ${shown ? `
+                  <div onclick="toggleCompBasic('${p.key}')" title="클릭하면 다시 가려집니다" class="bg-white rounded-xl p-2 border-2 border-[#3b2f2f] cursor-pointer space-y-1">
+                    <div class="grid grid-cols-2 font-mono font-extrabold text-xs text-center border-b border-slate-200 pb-1">
+                      <span class="text-indigo-800 border-r border-slate-300">${p.dr}</span>
+                      <span class="text-rose-800">${p.cr}</span>
+                    </div>
+                    <div class="text-[11px] font-bold text-emerald-900 flex items-center justify-between">
+                      <span>💡 ${p.exp}</span>
+                      <span>🙈</span>
+                    </div>
+                  </div>
+                ` : `
+                  <div onclick="toggleCompBasic('${p.key}')" class="bg-slate-50 rounded-xl p-2.5 border-2 border-dashed border-slate-300 text-center text-xs font-bold text-slate-400 cursor-pointer hover:bg-slate-100">
+                    👆 단순분개 (차변 1줄 / 대변 1줄) — 클릭하여 정답 확인!
+                  </div>
+                `}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 12: [종합 연습 PART 2] 연속 거래 3문항 (문제 5~7, 기초잔액 명시 & 줄 수 엄격 구분)
+    // =========================================================================
+    function toggleCompCont(pKey) {
+      appState.compContReveal[pKey] = !appState.compContReveal[pKey];
+      renderSlide();
+    }
+    function toggleAllCompCont() {
+      const r = appState.compContReveal;
+      const all = r.p5 && r.p6 && r.p7;
+      appState.compContReveal = { p5: !all, p6: !all, p7: !all };
+      renderSlide();
+    }
+
+    function renderSlide12() {
+      const r = appState.compContReveal;
+      const all = r.p5 && r.p6 && r.p7;
+
+      return `
+        <div class="flex items-center justify-between bg-[#ffe4ec] chii-card-sm px-4 py-1.5 shrink-0">
+          <div class="flex items-center gap-2.5">
+            ${svgChii('sparkle', 'w-9 h-9')}
+            <div>
+              <span class="text-[11px] font-extrabold text-pink-800">5. 종합 연습 · 연속 거래 (문제 5 ~ 7) — 다음 슬라이드 T계정과 연결!</span>
+              <h2 class="font-cute text-base lg:text-lg text-[#3b2f2f]">📌 기초 조건: 5월 1일 당좌예금 잔액 200,000원, 당좌차월 잔액 0원 (차월 한도 500,000원)</h2>
+            </div>
+          </div>
+          <button onclick="toggleAllCompCont()" class="chii-btn ${all ? 'bg-slate-200' : 'bg-[#ffd166]'} px-3 py-1 rounded-full text-xs font-extrabold">
+            ${all ? '전체 가리기 ↺' : '전체 정답 확인'}
+          </button>
+        </div>
+
+        <!-- 3 Horizontal Cards for Problems 5, 6, 7 -->
+        <div class="grid grid-cols-3 gap-3.5 flex-1 min-h-0 items-stretch">
+          <!-- Problem 5 (Complex: Dr 1, Cr 2) -->
+          <div class="chii-card-sm p-3 flex flex-col justify-between ${r.p5 ? 'bg-[#fff1f2]' : 'bg-white'}">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="bg-rose-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full">문제 5 · 5월 3일 (복합)</span>
+                <button onclick="toggleCompCont('p5')" class="chii-btn px-2 py-0.5 rounded text-[11px] font-extrabold bg-white">${r.p5 ? '가리기 ↺' : '정답 확인'}</button>
+              </div>
+              <div class="text-[11px] font-extrabold text-sky-800 bg-sky-50 px-2 py-0.5 rounded border border-[#3b2f2f] mb-1">
+                직전 잔액: 당좌예금 200,000원 / 차월 0원
+              </div>
+              <p class="text-xs font-bold text-[#3b2f2f] leading-snug">
+                📋 상품 <strong>500,000원</strong>을 매입하고, 대금은 당좌수표를 발행하여 지급하다.
+              </p>
+            </div>
+
+            ${r.p5 ? `
+              <div onclick="toggleCompCont('p5')" class="bg-white rounded-xl border-2 border-[#3b2f2f] overflow-hidden cursor-pointer text-xs">
+                <div class="grid grid-cols-2 bg-slate-100 border-b border-[#3b2f2f] text-center font-extrabold py-0.5 text-[10px]">
+                  <div class="border-r border-[#3b2f2f]">차변 (1줄)</div><div>대변 (2줄)</div>
+                </div>
+                <div class="grid grid-cols-2 items-center font-mono font-extrabold text-[11px]">
+                  <div class="border-r border-[#3b2f2f] p-2">(차) 상품<br/>500,000</div>
+                  <div class="divide-y divide-slate-200">
+                    <div class="p-1.5 text-sky-800">(대) 당좌예금 200,000</div>
+                    <div class="p-1.5 text-rose-700">(대) 당좌차월 300,000</div>
+                  </div>
+                </div>
+                <div class="bg-rose-50 px-2 py-1 text-[10px] font-bold text-rose-900 border-t border-[#3b2f2f]">
+                  💡 예금 20만 소진 후 초과분 30만 당좌차월 발생! (잔액: 차월 30만) 🙈
+                </div>
+              </div>
+            ` : `
+              <div onclick="toggleCompCont('p5')" class="bg-slate-50 rounded-xl p-3 border-2 border-dashed border-slate-300 text-center text-xs font-bold text-slate-400 cursor-pointer">
+                👆 복합분개 (차변 1줄 / 대변 2줄)<br/>클릭하여 정답 확인!
+              </div>
+            `}
+          </div>
+
+          <!-- Problem 6 (Complex: Dr 2, Cr 1) -->
+          <div class="chii-card-sm p-3 flex flex-col justify-between ${r.p6 ? 'bg-[#ecfdf5]' : 'bg-white'}">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full">문제 6 · 5월 10일 (복합)</span>
+                <button onclick="toggleCompCont('p6')" class="chii-btn px-2 py-0.5 rounded text-[11px] font-extrabold bg-white">${r.p6 ? '가리기 ↺' : '정답 확인'}</button>
+              </div>
+              <div class="text-[11px] font-extrabold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-[#3b2f2f] mb-1">
+                직전 잔액: 당좌예금 0원 / 당좌차월 300,000원
+              </div>
+              <p class="text-xs font-bold text-[#3b2f2f] leading-snug">
+                📋 당좌예금 계좌에 현금 <strong>450,000원</strong>을 입금하여 당좌차월을 우선 상환하다.
+              </p>
+            </div>
+
+            ${r.p6 ? `
+              <div onclick="toggleCompCont('p6')" class="bg-white rounded-xl border-2 border-[#3b2f2f] overflow-hidden cursor-pointer text-xs">
+                <div class="grid grid-cols-2 bg-slate-100 border-b border-[#3b2f2f] text-center font-extrabold py-0.5 text-[10px]">
+                  <div class="border-r border-[#3b2f2f]">차변 (2줄)</div><div>대변 (1줄)</div>
+                </div>
+                <div class="grid grid-cols-2 items-center font-mono font-extrabold text-[11px]">
+                  <div class="border-r border-[#3b2f2f] divide-y divide-slate-200">
+                    <div class="p-1.5 text-rose-700">(차) 당좌차월 300,000</div>
+                    <div class="p-1.5 text-sky-800">(차) 당좌예금 150,000</div>
+                  </div>
+                  <div class="p-2">(대) 현금<br/>450,000</div>
+                </div>
+                <div class="bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-900 border-t border-[#3b2f2f]">
+                  💡 차월 30만 전액 상환 후 나머지 15만 당좌예금! (잔액: 예금 15만) 🙈
+                </div>
+              </div>
+            ` : `
+              <div onclick="toggleCompCont('p6')" class="bg-slate-50 rounded-xl p-3 border-2 border-dashed border-slate-300 text-center text-xs font-bold text-slate-400 cursor-pointer">
+                👆 복합분개 (차변 2줄 / 대변 1줄)<br/>클릭하여 정답 확인!
+              </div>
+            `}
+          </div>
+
+          <!-- Problem 7 (Simple: Dr 1, Cr 1) -->
+          <div class="chii-card-sm p-3 flex flex-col justify-between ${r.p7 ? 'bg-[#eef2ff]' : 'bg-white'}">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="bg-indigo-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full">문제 7 · 5월 18일 (단순)</span>
+                <button onclick="toggleCompCont('p7')" class="chii-btn px-2 py-0.5 rounded text-[11px] font-extrabold bg-white">${r.p7 ? '가리기 ↺' : '정답 확인'}</button>
+              </div>
+              <div class="text-[11px] font-extrabold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-[#3b2f2f] mb-1">
+                직전 잔액: 당좌예금 150,000원 / 차월 0원
+              </div>
+              <p class="text-xs font-bold text-[#3b2f2f] leading-snug">
+                📋 외상매출금 <strong>100,000원</strong>을 회수하면서 우리 회사가 이전에 발행했던 당좌수표를 돌려받다.
+              </p>
+            </div>
+
+            ${r.p7 ? `
+              <div onclick="toggleCompCont('p7')" class="bg-white rounded-xl border-2 border-[#3b2f2f] overflow-hidden cursor-pointer text-xs">
+                <div class="grid grid-cols-2 bg-slate-100 border-b border-[#3b2f2f] text-center font-extrabold py-0.5 text-[10px]">
+                  <div class="border-r border-[#3b2f2f]">차변 (1줄)</div><div>대변 (1줄)</div>
+                </div>
+                <div class="grid grid-cols-2 items-center font-mono font-extrabold text-[11px] p-2.5">
+                  <div class="border-r border-[#3b2f2f] pr-2 text-sky-800">(차) 당좌예금<br/>100,000</div>
+                  <div class="pl-2">(대) 외상매출금<br/>100,000</div>
+                </div>
+                <div class="bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-900 border-t border-[#3b2f2f]">
+                  💡 차월 잔액이 없으므로 당점수표 회수액은 당좌예금 증가! (잔액: 25만) 🙈
+                </div>
+              </div>
+            ` : `
+              <div onclick="toggleCompCont('p7')" class="bg-slate-50 rounded-xl p-3 border-2 border-dashed border-slate-300 text-center text-xs font-bold text-slate-400 cursor-pointer">
+                👆 단순분개 (차변 1줄 / 대변 1줄)<br/>클릭하여 정답 확인!
+              </div>
+            `}
+          </div>
+        </div>
+
+        <div class="bg-[#3b2f2f] text-white rounded-xl px-4 py-1.5 text-center text-xs font-bold shrink-0">
+          👉 이제 다음 슬라이드에서 위 연속 거래(문제 5~7)를 <strong>빨간색 약식 T계정</strong>에 직접 전기해 볼까요?
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 13: [총계정원장 약식 T계정] 빨간색 T자 선, 차변/대변 글자 미표시, 빈칸 시작
+    // =========================================================================
+    function toggleTAcc(key) {
+      appState.tAccountReveal[key] = !appState.tAccountReveal[key];
+      renderSlide();
+    }
+    function toggleAllTAcc() {
+      const t = appState.tAccountReveal;
+      const all = t.chkDr1 && t.chkDr2 && t.chkCr1 && t.chkBal && t.ovDr1 && t.ovCr1;
+      appState.tAccountReveal = {
+        chkDr1: !all, chkDr2: !all, chkCr1: !all, chkBal: !all,
+        ovDr1: !all, ovCr1: !all
+      };
+      renderSlide();
+    }
+
+    function renderSlide13() {
+      const t = appState.tAccountReveal;
+      const all = t.chkDr1 && t.chkDr2 && t.chkCr1 && t.chkBal && t.ovDr1 && t.ovCr1;
+
+      return `
+        <div class="flex items-center justify-between bg-[#fef9c3] chii-card-sm px-4 py-1.5 shrink-0">
+          <div class="flex items-center gap-2.5">
+            ${svgUsa('w-9 h-9')}
+            <div>
+              <span class="text-[11px] font-extrabold text-amber-900">6. 총계정원장 약식 T계정 전기 (연속 거래 5~7번)</span>
+              <h2 class="font-cute text-base lg:text-lg text-[#3b2f2f]">직접 머릿속으로 전기한 뒤 각 칸을 클릭해 정답과 잔액을 확인하세요!</h2>
+            </div>
+          </div>
+          <button onclick="toggleAllTAcc()" class="chii-btn ${all ? 'bg-slate-200' : 'bg-[#ffd166]'} px-3 py-1 rounded-full text-xs font-extrabold">
+            ${all ? '전체 초기화(가리기) ↺' : '전체 전기 확인'}
+          </button>
+        </div>
+
+        <!-- Problem Condition Box (Explicitly provides beginning balance in body text, NOT pre-filled in T-account) -->
+        <div class="chii-card-sm bg-white px-4 py-2 text-xs font-bold text-[#3b2f2f] flex flex-wrap items-center justify-between gap-2 shrink-0">
+          <div>📌 <strong>기초잔액 조건:</strong> 5/1 기초 당좌예금 잔액 <strong>200,000원</strong> (당좌차월 기초잔액 0원)</div>
+          <div class="flex gap-3 text-[11px] text-slate-600">
+            <span>• <strong>5/3:</strong> 상품 500,000원 매입, 수표 발행</span>
+            <span>• <strong>5/10:</strong> 현금 450,000원 당좌예입</span>
+            <span>• <strong>5/18:</strong> 외상매출금 100,000원 당점수표 회수</span>
+          </div>
+        </div>
+
+        <!-- Asymmetric Grid: More space (7 cols) for 당좌예금 (more items), 5 cols for 당좌차월 -->
+        <div class="grid grid-cols-12 gap-4 flex-1 min-h-0 items-stretch">
+          <!-- Left 7 Cols: 당좌예금 (More entries -> Wider & Taller space) -->
+          <div class="col-span-7 chii-card-sm bg-white p-3.5 flex flex-col justify-between">
+            <!-- Account Title Centered on Top, Red T-Line, NO 차변/대변 labels inside -->
+            <div class="red-t-header text-center pb-1.5">
+              <span class="font-cute text-xl text-[#3b2f2f]">당 좌 예 금</span>
+            </div>
+
+            <div class="grid grid-cols-2 flex-1 items-stretch text-xs">
+              <!-- Left Side of Red T -->
+              <div class="red-t-divider p-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                  <!-- Slot 1: 5/1 기초잔액 + 5/10 현금 -->
+                  ${t.chkDr1 ? `
+                    <div onclick="toggleTAcc('chkDr1')" class="bg-sky-50 p-2 rounded-lg border-2 border-[#3b2f2f] cursor-pointer space-y-1 font-extrabold">
+                      <div class="flex justify-between text-slate-700"><span>5/1 기초잔액</span><span class="font-mono">200,000</span></div>
+                      <div class="flex justify-between text-sky-900"><span>5/10 현금</span><span class="font-mono">150,000</span></div>
+                    </div>
+                  ` : `
+                    <button onclick="toggleTAcc('chkDr1')" class="w-full chii-btn bg-slate-50 hover:bg-sky-50 py-2.5 rounded-lg text-xs font-extrabold text-slate-500">
+                      👆 5/1 기초 · 5/10 입금 전기 확인
+                    </button>
+                  `}
+
+                  <!-- Slot 2: 5/18 외상매출금 -->
+                  ${t.chkDr2 ? `
+                    <div onclick="toggleTAcc('chkDr2')" class="bg-emerald-50 p-2 rounded-lg border-2 border-[#3b2f2f] cursor-pointer flex justify-between font-extrabold text-emerald-900">
+                      <span>5/18 외상매출금 🙈</span><span class="font-mono">100,000</span>
+                    </div>
+                  ` : `
+                    <button onclick="toggleTAcc('chkDr2')" class="w-full chii-btn bg-slate-50 hover:bg-emerald-50 py-2 rounded-lg text-xs font-extrabold text-slate-500">
+                      👆 5/18 당점수표 회수 전기 확인
+                    </button>
+                  `}
+                </div>
+
+                <div class="text-[11px] font-extrabold text-slate-400 text-right pt-1">
+                  ${t.chkDr1 && t.chkDr2 ? '합계: 450,000원' : ''}
+                </div>
+              </div>
+
+              <!-- Right Side of Red T -->
+              <div class="p-3 flex flex-col justify-between">
+                <div class="space-y-2">
+                  <!-- Slot 3: 5/3 상품 -->
+                  ${t.chkCr1 ? `
+                    <div onclick="toggleTAcc('chkCr1')" class="bg-rose-50 p-2 rounded-lg border-2 border-[#3b2f2f] cursor-pointer flex justify-between font-extrabold text-rose-900">
+                      <span>5/3 상품 🙈</span><span class="font-mono">200,000</span>
+                    </div>
+                  ` : `
+                    <button onclick="toggleTAcc('chkCr1')" class="w-full chii-btn bg-slate-50 hover:bg-rose-50 py-2.5 rounded-lg text-xs font-extrabold text-slate-500">
+                      👆 5/3 수표 발행 감소분 전기 확인
+                    </button>
+                  `}
+
+                  <!-- Slot 4: 기말 잔액 확인 -->
+                  ${t.chkBal ? `
+                    <div onclick="toggleTAcc('chkBal')" class="bg-amber-100 p-2 rounded-lg border-2 border-dashed border-[#3b2f2f] cursor-pointer flex justify-between font-extrabold text-amber-900">
+                      <span>★ 당좌예금 잔액 🙈</span><span class="font-mono">250,000</span>
+                    </div>
+                  ` : `
+                    <button onclick="toggleTAcc('chkBal')" class="w-full chii-btn bg-amber-50 hover:bg-amber-100 py-2 rounded-lg text-xs font-extrabold text-amber-900">
+                      👆 최종 당좌예금 잔액 확인
+                    </button>
+                  `}
+                </div>
+
+                <div class="text-[11px] font-extrabold text-slate-400 text-right pt-1">
+                  ${t.chkCr1 && t.chkBal ? '차변 450,000 - 대변 200,000 = 잔액 250,000' : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 5 Cols: 당좌차월 (Fewer entries -> Compact space) -->
+          <div class="col-span-5 chii-card-sm bg-white p-3.5 flex flex-col justify-between">
+            <!-- Account Title Centered on Top, Red T-Line, NO 차변/대변 labels inside -->
+            <div class="red-t-header text-center pb-1.5">
+              <span class="font-cute text-xl text-[#3b2f2f]">당 좌 차 월</span>
+            </div>
+
+            <div class="grid grid-cols-2 flex-1 items-stretch text-xs">
+              <!-- Left Side of Red T -->
+              <div class="red-t-divider p-3 flex flex-col justify-between">
+                <div>
+                  ${t.ovDr1 ? `
+                    <div onclick="toggleTAcc('ovDr1')" class="bg-emerald-50 p-2.5 rounded-lg border-2 border-[#3b2f2f] cursor-pointer flex justify-between font-extrabold text-emerald-900">
+                      <span>5/10 현금 🙈</span><span class="font-mono">300,000</span>
+                    </div>
+                  ` : `
+                    <button onclick="toggleTAcc('ovDr1')" class="w-full chii-btn bg-slate-50 hover:bg-emerald-50 py-3 rounded-lg text-xs font-extrabold text-slate-500">
+                      👆 5/10 차월 상환 전기
+                    </button>
+                  `}
+                </div>
+
+                <div class="bg-slate-100 rounded-lg p-2 text-center text-[11px] font-extrabold text-slate-600">
+                  ${t.ovDr1 && t.ovCr1 ? '🎉 당좌차월 잔액: 0원' : '전기 후 잔액을 확인하세요'}
+                </div>
+              </div>
+
+              <!-- Right Side of Red T -->
+              <div class="p-3 flex flex-col justify-between">
+                <div>
+                  ${t.ovCr1 ? `
+                    <div onclick="toggleTAcc('ovCr1')" class="bg-rose-50 p-2.5 rounded-lg border-2 border-[#3b2f2f] cursor-pointer flex justify-between font-extrabold text-rose-900">
+                      <span>5/3 상품 🙈</span><span class="font-mono">300,000</span>
+                    </div>
+                  ` : `
+                    <button onclick="toggleTAcc('ovCr1')" class="w-full chii-btn bg-slate-50 hover:bg-rose-50 py-3 rounded-lg text-xs font-extrabold text-slate-500">
+                      👆 5/3 차월 발생 전기
+                    </button>
+                  `}
+                </div>
+
+                <div class="text-[11px] font-bold text-slate-400 text-center">
+                  ${t.ovDr1 && t.ovCr1 ? '300,000 = 300,000 (완납)' : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // SLIDE 14: [마무리] 4대 핵심 비교 카드
+    // =========================================================================
+    function renderSlide14() {
+      const cards = [
+        {
+          badge: "핵심 1 · 당좌예금 입금",
+          title: "당좌예금 입금",
+          nature: "자산 증가 (+)",
+          side: "차 변 (왼쪽)",
+          desc: "현금을 당좌예입하거나, 당점발행수표를 회수했을 때",
+          bg: "bg-[#e0f2fe]",
+          accent: "text-sky-800",
+          pill: "bg-sky-600 text-white"
+        },
+        {
+          badge: "핵심 2 · 수표 발행 지급",
+          title: "수표 발행으로 지급",
+          nature: "당좌예금(자산) 감소 (-)",
+          side: "대 변 (오른쪽)",
+          desc: "상품 매입 대금이나 외상대금을 당좌수표 발행해 지급했을 때",
+          bg: "bg-[#fff1f2]",
+          accent: "text-rose-800",
+          pill: "bg-rose-600 text-white"
+        },
+        {
+          badge: "핵심 3 · 당좌차월 발생",
+          title: "당좌차월 발생",
+          nature: "부채 증가 (+)",
+          side: "대 변 (오른쪽)",
+          desc: "약정 한도 내에서 당좌예금 잔액을 초과하여 수표를 발행했을 때",
+          bg: "bg-[#fef9c3]",
+          accent: "text-amber-900",
+          pill: "bg-amber-500 text-[#3b2f2f]"
+        },
+        {
+          badge: "핵심 4 · 당좌차월 상환",
+          title: "당좌차월 상환",
+          nature: "부채 감소 (-)",
+          side: "차 변 (왼쪽)",
+          desc: "당좌차월 잔액이 있는 상태에서 당좌예금 계좌에 입금했을 때",
+          bg: "bg-[#d1fae5]",
+          accent: "text-emerald-900",
+          pill: "bg-emerald-600 text-white"
+        }
+      ];
+
+      return `
+        <div class="flex items-center justify-between bg-[#fef08a] chii-card-sm px-4 py-2 shrink-0">
+          <div class="flex items-center gap-3">
+            ${svgChii('sparkle', 'w-10 h-10')}
+            ${svgHachi('w-10 h-10')}
+            ${svgUsa('w-10 h-10')}
+            <div>
+              <span class="text-xs font-extrabold text-amber-900">7. 오늘 수업 완벽 마무리!</span>
+              <h2 class="font-cute text-lg lg:text-xl text-[#3b2f2f]">한눈에 비교하는 「당좌예금 vs 당좌차월」 4대 핵심 카드</h2>
+            </div>
+          </div>
+          <button onclick="goToSlide(0)" class="chii-btn bg-white px-3.5 py-1 rounded-full text-xs font-extrabold">🔄 처음으로</button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-3.5 flex-1 min-h-0 items-stretch my-auto py-1">
+          ${cards.map(c => `
+            <div class="chii-card-sm ${c.bg} p-3.5 flex flex-col justify-between text-center">
+              <span class="${c.pill} text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border-2 border-[#3b2f2f] mx-auto">${c.badge}</span>
+              <div class="my-auto space-y-1.5">
+                <h3 class="font-cute text-lg ${c.accent}">${c.title}</h3>
+                <div class="bg-white rounded-xl p-2.5 border-2 border-[#3b2f2f] space-y-1">
+                  <div class="text-xs font-extrabold text-slate-600">${c.nature}</div>
+                  <div class="font-cute text-xl text-[#3b2f2f]">${c.side}</div>
+                </div>
+              </div>
+              <p class="text-[11px] font-bold text-slate-700 bg-white/80 p-2 rounded-lg border border-[#3b2f2f] leading-snug">
+                ${c.desc}
+              </p>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="bg-[#3b2f2f] text-white rounded-xl px-4 py-2 text-center font-cute text-sm lg:text-base tracking-wide shrink-0">
+          👏 수고했어요! 「당좌예금(자산: 차변 증가·대변 감소)」과 「당좌차월(부채: 대변 발생·차변 상환)」을 꼭 기억하세요!
+        </div>
+      `;
+    }
+
+    window.onload = function () {
+      renderSlide();
+    };
+  </script>
+</body>
+</html>
