@@ -1,8 +1,12 @@
 const assert=require('node:assert/strict');
-const {joystickVector}=require('../interview-metaverse/controls.js');
+const {joystickVector,canUseMovementKeys}=require('../interview-metaverse/controls.js');
 assert.deepEqual(joystickVector(0,0,50),{x:0,z:0});
 assert.deepEqual(joystickVector(25,-25,50),{x:0.5,z:-0.5});
 const p=joystickVector(100,0,50);assert.equal(p.x,1);assert.equal(p.z,0);
 const d=joystickVector(80,80,50);assert(Math.abs(Math.hypot(d.x,d.z)-1)<1e-9);
 assert.deepEqual(joystickVector(NaN,1,0),{x:0,z:0});
+assert.equal(canUseMovementKeys({tagName:'TEXTAREA'}),false);
+assert.equal(canUseMovementKeys({tagName:'INPUT'}),false);
+assert.equal(canUseMovementKeys({tagName:'DIV',isContentEditable:true}),false);
+assert.equal(canUseMovementKeys({tagName:'BUTTON'}),true);
 console.log('joystick bounds and direction pass');
