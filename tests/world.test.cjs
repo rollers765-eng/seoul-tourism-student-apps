@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict');
+const W=require('../interview-metaverse/world.js');
+assert.equal(W.zoneAt(0),'lobby');
+assert.equal(W.zoneAt(24),'cafezone');
+assert.equal(W.zoneAt(-24),'cafe');
+assert.equal(W.zoneAt(-48),'tour');
+assert.equal(W.zoneAt(-72),'cook');
+const s=W.nearestSeat('cafe',0,3);
+assert.equal(s.type,'waiting');
+assert.equal(W.nearestSeat('cafe',5,5),null);
+assert.equal(W.nearestSeat('cafe',-2.95,-1.8).type,'interview');
+assert.equal(W.nearestSeat('lobby',0,4),null);
+assert.deepEqual(W.stepToward({x:0,z:0},{x:10,z:0},2),{x:2,z:0,arrived:false});
+assert.deepEqual(W.stepToward({x:9,z:0},{x:10,z:0},2),{x:10,z:0,arrived:true});
+assert.deepEqual(W.gait(3,0,false),{left:0,right:0});
+assert.notEqual(W.gait(3,1,false).left,0);
+assert(W.gait(3,1,true).left!==W.gait(3,1,false).left);
+console.log('world navigation, seats and walking pass');
