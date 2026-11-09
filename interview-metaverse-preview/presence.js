@@ -2,7 +2,7 @@
 'use strict';
 const rooms=new Set(['lobby','cafe','tour','cook','cafezone']);
 function sanitizePeer(p){if(!p||!rooms.has(p.room)||!Number.isFinite(p.x)||!Number.isFinite(p.z)||Math.abs(p.x)>12.1||p.z< -9.1||p.z>7)return null;return {room:p.room,x:Math.round(p.x*100)/100,z:Math.round(p.z*100)/100};}
-function sanitizeReaction(text){return ['응원해요!','함께 힘내요!','반가워요!'].includes(text)?text:null;}
+function sanitizeReaction(text){return ['응원해요!','함께 힘내요!','반가워요!','사랑합니다!'].includes(text)?text:null;}
 function startPresence(options){
   if(!root.supabase||!root.supabase.createClient){options.onStatus('offline');return null;}
   let channel,connected=false,stopped=false,current=null,lastTracked=null,lastTrackTime=0,peers=Object.create(null),presenceSignatures=Object.create(null);
@@ -23,4 +23,3 @@ function startPresence(options){
 }
 const api={sanitizePeer,sanitizeReaction,startPresence};if(typeof module!=='undefined')module.exports=api;root.InterviewPresence=api;
 })(typeof window==='undefined'?globalThis:window);
-

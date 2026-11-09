@@ -1,0 +1,5 @@
+(function(root){'use strict';
+const clips={'카페경영과 학생들 면접 대기장소로 이동해주세요.':'audio/announce-cafe.mp3','관광서비스과 학생들 면접 대기장소로 이동해주세요.':'audio/announce-tour.mp3','외식조리과 학생들 면접 대기장소로 이동해주세요.':'audio/announce-cook.mp3','대기석에 앉아서 안내를 받아 입장해주세요.':'audio/announce-gate.mp3','이제 면접 준비되었니?':'audio/ambassador-ready.mp3','떨지 말고 화이팅!':'audio/ambassador-cheer.mp3','사랑합니다!':'audio/student-greeting.mp3'};
+function create(AudioClass){let active=null;return {play(text,onEnd,onError){const path=clips[text];if(!path||!AudioClass)return false;const audio=new AudioClass(path);active=audio;let done=false;const finish=(ok)=>{if(done||active!==audio)return;done=true;active=null;(ok?onEnd:onError)();};audio.onended=()=>finish(true);audio.onerror=()=>finish(false);try{const promise=audio.play();if(promise&&promise.catch)promise.catch(()=>finish(false));}catch(e){finish(false);}return true;},stop(){if(active){const audio=active;active=null;audio.pause();audio.currentTime=0;}},busy(){return active!==null;}};}
+const api={clips,create};if(typeof module!=='undefined')module.exports=api;root.InterviewVoice=api;
+})(typeof window==='undefined'?globalThis:window);
