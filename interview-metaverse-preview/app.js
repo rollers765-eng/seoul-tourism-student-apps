@@ -23,7 +23,7 @@ $('breathe').onclick=()=>actionSequence('breathe',['심호흡 1','심호흡 2','
 $('pray').onclick=()=>actionSequence('pray',['아는 문제만 나오게 해주세요.','합격하게 해주세요.']);
 $('together').onclick=()=>showModal('<h2>👥 함께하기</h2><p>같은 공간에 있는 분들께 인사와 응원을 보내요.</p><div class="choices"><button data-cheer="응원해요!">👏 응원해요!</button><button data-cheer="함께 힘내요!">💪 함께 힘내요!</button><button data-cheer="반가워요!">👋 반가워요!</button></div><p class="small">같은 공간에 접속한 분들께 정해진 문구를 보내요. 연결되지 않으면 내 화면에만 표시돼요.</p>');
 $('modalBody').addEventListener('click',async e=>{const b=e.target.closest('[data-cheer]');if(!b)return;const text=b.dataset.cheer;closeModal();showBubble(text,player);const sent=livePresence?await livePresence.cheer(room,text):false;if(!sent)message('👥 '+text+' · 연결이 없어 내 화면에만 보여요');});
-let isRunning=false,isSitting=false,jumpStart=0,jumpBase=0,jumpSafe=null,jumpWarningIndex=0,invitedRoom=null,lastSeat=null;const jumpWarnings=['위험합니다. 내려오세요. 벌점 부여합니다.','위험합니다. 성좀샘이 달려오십니다.','소민샘이 벌점 부여하신다고 합니다.'];
+let isRunning=false,isSitting=false,jumpStart=0,jumpBase=0,jumpSafe=null,jumpWarningIndex=0,invitedRoom=null,lastSeat=null;const jumpWarnings=['위험합니다. 내려오세요. 벌점 부여합니다.','위험합니다. 성종샘이 달려오십니다.','소민샘이 벌점 부여하신다고 합니다.'];
 $('run').onclick=()=>{isRunning=!isRunning;$('run').setAttribute('aria-pressed',String(isRunning));message(isRunning?'달리기 켜짐 · 조이스틱을 움직여 보세요.':'천천히 걸어가요.');};
 $('jump').onclick=()=>{if(isSitting){message('먼저 일어나 주세요.');return;}if(!jumpStart){jumpStart=performance.now();jumpBase=player?.position.y||0;jumpSafe={x:currentPosition().x,z:currentPosition().z};}message('가볍게 점프!');};
 function sayAt(text,target){$('dialogueStatus').textContent=text;if(worldScene&&target)worldScene.setBubble(target,text);speak(text);}
