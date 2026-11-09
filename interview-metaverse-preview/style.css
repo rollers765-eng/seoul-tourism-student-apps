@@ -24,3 +24,4 @@ nav[aria-label="생활과 휴식"]{z-index:2;max-width:calc(100% - 24px);gap:3px
 
 @media(max-width:600px){header #location{display:none}}
 
+#announcementToggle{border-radius:10px;background:#e8f1e7;color:#315f4c;padding:8px 10px;font-weight:750;font-size:12px;margin-top:4px}

@@ -20,9 +20,24 @@ function blocked(x,z,peers=[]){
 }
 function entrancePath(zone,from){const x=centers[zone];return [{x:from.x,z:3.35},{x,z:3.35},{x,z:.8,action:'entrance'}];}
 function interviewSeatPath(zone){return [{x:centers[zone],z:-1.45,action:'seat'}];}
+function shouldBlockEntrance(zone,localX,fromZ,toZ,invitedRoom){return ['cafe','tour','cook'].includes(zone)&&invitedRoom!==zone&&Math.abs(localX)<2.4&&fromZ>.35&&toZ<=.35;}
+function routeToInterviewSeat(zone,from,peers=[]){
+ if(!['cafe','tour','cook'].includes(zone)||!from||!Number.isFinite(from.x)||!Number.isFinite(from.z))return null;
+ const origin=centers[zone],step=.25,minX=origin-7,maxX=origin+7,minZ=-8.5,maxZ=5.75;
+ const gx=x=>Math.round((x-origin)/step),gz=z=>Math.round(z/step),pos=(x,z)=>({x:origin+x*step,z:z*step}),key=(x,z)=>x+','+z;
+ const safePeers=peers.filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.z)&&Math.hypot(from.x-p.x,from.z-p.z)>=.68);
+ function clearLine(a,b){const n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/.05));let prev=a;for(let i=1;i<=n;i++){const next={x:a.x+(b.x-a.x)*i/n,z:a.z+(b.z-a.z)*i/n};if(!canMove(prev,next,safePeers))return false;prev=next;}return true;}
+ const starts=[];for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){const x=gx(from.x)+dx,z=gz(from.z)+dz,p=pos(x,z);if(!blocked(p.x,p.z,safePeers)&&clearLine(from,p))starts.push({x,z,d:Math.hypot(p.x-from.x,p.z-from.z)});}starts.sort((a,b)=>a.d-b.d);if(!starts.length)return null;
+ const seats=[-3,-1.5,0,1.5,3].map(x=>({x,z:layout.interviewSeatZ})).sort((a,b)=>Math.hypot(origin+a.x-from.x,a.z-from.z)-Math.hypot(origin+b.x-from.x,b.z-from.z));
+ for(const seat of seats){const target={x:origin+seat.x,z:seat.z+.95};if(blocked(target.x,target.z,safePeers)||safePeers.some(p=>Math.hypot(p.x-(origin+seat.x),p.z-seat.z)<1))continue;const goal={x:gx(target.x),z:gz(target.z)},goalPos=pos(goal.x,goal.z);if(blocked(goalPos.x,goalPos.z,safePeers)||!clearLine(goalPos,target))continue;
+ const start=starts[0],startKey=key(start.x,start.z),open=[{x:start.x,z:start.z,g:0,f:Math.abs(start.x-goal.x)+Math.abs(start.z-goal.z)}],scores=new Map([[startKey,0]]),parents=new Map();let found=null;
+ while(open.length){open.sort((a,b)=>a.f-b.f);const cur=open.shift(),ck=key(cur.x,cur.z);if(cur.g!==scores.get(ck))continue;if(cur.x===goal.x&&cur.z===goal.z){found=ck;break;}for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){const x=cur.x+dx,z=cur.z+dz,p=pos(x,z),nk=key(x,z),g=cur.g+1;if(p.x<minX||p.x>maxX||p.z<minZ||p.z>maxZ||blocked(p.x,p.z,safePeers)||g>=(scores.get(nk)??Infinity))continue;scores.set(nk,g);parents.set(nk,ck);open.push({x,z,g,f:g+Math.abs(x-goal.x)+Math.abs(z-goal.z)});}}
+ if(!found)continue;const raw=[];for(let k=found;k;k=parents.get(k)){const [x,z]=k.split(',').map(Number);raw.push(pos(x,z));if(k===startKey)break;}raw.reverse();raw.push(target);
+ const waypoints=[];let here=from,i=0;while(i<raw.length){let j=raw.length-1;while(j>i&&!clearLine(here,raw[j]))j--;waypoints.push(raw[j]);here=raw[j];i=j+1;}if(waypoints.length){waypoints[waypoints.length-1]={...waypoints[waypoints.length-1],action:'seat',seat};return {seat,waypoints};}
+ }return null;
+}
 function wanderTarget(home,index){const angle=index*2.399;return {x:home.x+Math.cos(angle)*.65,z:home.z+Math.sin(angle)*.65};}
 function spawn(zone){return {x:centers[zone]+(zone==='cafezone'?2.4:0),z:5.3};}
 function canMove(from,to,peers=[]){if(blocked(to.x,to.z,[]))return false;return !peers.some(p=>{if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;const before=Math.hypot(from.x-p.x,from.z-p.z),after=Math.hypot(to.x-p.x,to.z-p.z);return after<.68 && !(before<.68 && after>before);});}
-const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,spawn,canMove,entrancePath,interviewSeatPath,wanderTarget};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
+const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,spawn,canMove,entrancePath,interviewSeatPath,routeToInterviewSeat,shouldBlockEntrance,wanderTarget};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
 })(typeof window==='undefined'?globalThis:window);
-
