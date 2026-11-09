@@ -8,10 +8,11 @@ let best=null,dist=1.05;for(const s of seats){const d=Math.hypot(x-s.x,z-s.z);if
 function stepToward(from,to,speed){const dx=to.x-from.x,dz=to.z-from.z,d=Math.hypot(dx,dz);if(d<=speed||d===0)return {x:to.x,z:to.z,arrived:true};return {x:from.x+dx/d*speed,z:from.z+dz/d*speed,arrived:false};}
 function gait(time,amount,run){if(!amount)return {left:0,right:0};const a=Math.sin(time*(run?.016:.011))*(run?.75:.43)*amount;return {left:a,right:-a};}
 function surfaceAt(x,z){const inBox=(cx,cz,w,d)=>Math.abs(x-cx)<=w/2&&Math.abs(z-cz)<=d/2;let height=0;const add=(cx,cz,w,d,h)=>{if(inBox(cx,cz,w,d))height=Math.max(height,h)};for(const zone of ['cafe','tour','cook']){const o=centers[zone];add(o,layout.interviewDeskZ,7,1.2,.77);for(const dx of [-3,-1.5,0,1.5,3])add(o+dx,-2.4,.9,.8,.45);for(const dx of [-5,-3.85,-2.7])add(o+dx,2.4,.9,.8,.45);}add(0,-3.4,4.4,1,1.1);add(0,1.8,1.35,1.35,.5);for(const x of [-4.2,4.2])for(const z of [-2.2,-1,.2,1.4])add(x,z,.8,.9,.45);for(const [x,z] of layout.sofaSeats)add(centers.cafezone+x,z,1.5,.9,.48);for(const [x,z] of layout.benchSeats)add(centers.cafezone+x,z,1.5,.8,.45);return height;}
-function blocked(x,z,peers=[],height=0){
+function canStartDeskJump(zone,x,z,y,running){return !!running&&['cafe','tour','cook'].includes(zone)&&y>=.7&&Math.abs(x-centers[zone])<=3.5&&Math.abs(z-layout.interviewDeskZ)<=.6;}
+function blocked(x,z,peers=[],height=0,deskJump=false){
  const rect=(cx,cz,w,d)=>Math.abs(x-cx)<w/2+.25&&Math.abs(z-cz)<d/2+.25;
  for(const zone of ['cafe','tour','cook']){const o=centers[zone];
-  if(rect(o-5,0,4.7,.18)||rect(o+5,0,4.7,.18)||rect(o-7.45,-4.5,.16,9)||rect(o+7.45,-4.5,.16,9)||rect(o,-9.2,15,.18)||(height<.77&&rect(o,layout.interviewDeskZ,7,1.2))||rect(o+3,2.4,.65,.65))return true;
+  if(rect(o-5,0,4.7,.18)||rect(o+5,0,4.7,.18)||(rect(o-7.45,-4.5,.16,9)&&!(deskJump&&height>=2.8&&zone!=='cook'))||(rect(o+7.45,-4.5,.16,9)&&!(deskJump&&height>=2.8&&zone!=='cafe'))||rect(o,-9.2,15,.18)||(height<.77&&rect(o,layout.interviewDeskZ,7,1.2))||rect(o+3,2.4,.65,.65))return true;
   for(const dx of [-3,-1.5,0,1.5,3])if(height<.45&&rect(o+dx,-2.4,.9,.8))return true;
   for(const dx of [-5,-3.85,-2.7])if(height<.45&&rect(o+dx,2.4,.9,.8))return true;
  }
@@ -39,6 +40,6 @@ function routeToInterviewSeat(zone,from,peers=[]){
 }
 function wanderTarget(home,index){const angle=index*2.399;return {x:home.x+Math.cos(angle)*.65,z:home.z+Math.sin(angle)*.65};}
 function spawn(zone){return {x:centers[zone]+(zone==='cafezone'?2.4:0),z:5.3};}
-function canMove(from,to,peers=[],height=0){if(blocked(to.x,to.z,[],height))return false;return !peers.some(p=>{if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;const before=Math.hypot(from.x-p.x,from.z-p.z),after=Math.hypot(to.x-p.x,to.z-p.z);return after<.68 && !(before<.68 && after>before);});}
-const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,surfaceAt,spawn,canMove,entrancePath,interviewSeatPath,routeToInterviewSeat,shouldBlockEntrance,wanderTarget};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
+function canMove(from,to,peers=[],height=0,deskJump=false){if(blocked(to.x,to.z,[],height,deskJump))return false;return !peers.some(p=>{if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;const before=Math.hypot(from.x-p.x,from.z-p.z),after=Math.hypot(to.x-p.x,to.z-p.z);return after<.68 && !(before<.68 && after>before);});}
+const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,surfaceAt,canStartDeskJump,spawn,canMove,entrancePath,interviewSeatPath,routeToInterviewSeat,shouldBlockEntrance,wanderTarget};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
 })(typeof window==='undefined'?globalThis:window);
