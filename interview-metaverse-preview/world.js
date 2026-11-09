@@ -20,8 +20,9 @@ function blocked(x,z,peers=[]){
 }
 function entrancePath(zone,from){const x=centers[zone];return [{x:from.x,z:3.35},{x,z:3.35},{x,z:.8,action:'entrance'}];}
 function interviewSeatPath(zone){return [{x:centers[zone],z:-1.45,action:'seat'}];}
+function wanderTarget(home,index){const angle=index*2.399;return {x:home.x+Math.cos(angle)*.65,z:home.z+Math.sin(angle)*.65};}
 function spawn(zone){return {x:centers[zone]+(zone==='cafezone'?2.4:0),z:5.3};}
 function canMove(from,to,peers=[]){if(blocked(to.x,to.z,[]))return false;return !peers.some(p=>{if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;const before=Math.hypot(from.x-p.x,from.z-p.z),after=Math.hypot(to.x-p.x,to.z-p.z);return after<.68 && !(before<.68 && after>before);});}
-const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,spawn,canMove,entrancePath,interviewSeatPath};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
+const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,spawn,canMove,entrancePath,interviewSeatPath,wanderTarget};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
 })(typeof window==='undefined'?globalThis:window);
 
