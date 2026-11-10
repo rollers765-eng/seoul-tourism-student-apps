@@ -11,6 +11,7 @@ function surfaceAt(x,z){const inBox=(cx,cz,w,d)=>Math.abs(x-cx)<=w/2&&Math.abs(z
 function canStartDeskJump(zone,x,z,y,running){return !!running&&['cafe','tour','cook'].includes(zone)&&y>=.7&&Math.abs(x-centers[zone])<=3.5&&Math.abs(z-layout.interviewDeskZ)<=.6;}
 function blocked(x,z,peers=[],height=0,deskJump=false,ignoreChair=null){
  const rect=(cx,cz,w,d)=>Math.abs(x-cx)<w/2+.25&&Math.abs(z-cz)<d/2+.25;
+ if(x< -51&&z>8.2)return true;
  for(const zone of ['cafe','tour','cook']){const o=centers[zone];
   if(rect(o-5,0,4.7,.18)||rect(o+5,0,4.7,.18)||(rect(o-7.45,-4.5,.16,9)&&!(deskJump&&height>=2.8&&zone!=='cook'))||(rect(o+7.45,-4.5,.16,9)&&!(deskJump&&height>=2.8&&zone!=='cafe'))||rect(o,-9.2,15,.18)||(height<.77&&rect(o,layout.interviewDeskZ,7,1.2))||rect(o+3,2.4,.65,.65))return true;
   for(const dx of [-3,-1.5,0,1.5,3])if(height<.45&&!(ignoreChair&&ignoreChair.zone===zone&&ignoreChair.x===dx&&ignoreChair.z===-2.4)&&rect(o+dx,-2.4,.9,.8))return true;
