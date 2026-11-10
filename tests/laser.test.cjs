@@ -1,3 +1,3 @@
 const test=require('node:test'),assert=require('node:assert/strict'),L=require('../interview-metaverse-preview/laser.js');
-test('제한 시간 안에 활성 표적을 맞히면 점수가 오르고 종료된다',()=>{let finish=0;const g=L.create({duration:30000,onFinish:()=>finish++});g.start(1000);assert.equal(g.hit(0,1100),true);assert.equal(g.score,1);assert.equal(g.hit(0,1200),false);assert.equal(g.hit(1,1300),true);g.update(31000);assert.equal(finish,1);assert.equal(g.hit(2,32000),false);});
-test('새 게임은 점수와 표적을 초기화한다',()=>{const g=L.create({});g.start(0);g.hit(0,1);g.start(5);assert.equal(g.score,0);assert.equal(g.target,0)});
+test('사격대 근처에서만 조작하고 한 발마다 지정된 결과가 나온다',()=>{for(const [n,value] of [[0,10],[.26,9],[.51,8],[.76,0]]){const s=L.shoot({x:0,z:3.8},()=>n);assert.equal(s.value,value);assert.equal(s.lane,1);}assert.equal(L.shoot({x:0,z:6},()=>0),null);});
+test('사로별 발사 위치를 구분한다',()=>{assert.equal(L.shoot({x:-3,z:3.8},()=>0).lane,0);assert.equal(L.shoot({x:3,z:3.8},()=>0).lane,2)});
