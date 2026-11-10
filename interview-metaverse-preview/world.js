@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const centers={lobby:0,cafe:-15,tour:-30,cook:-45,cafezone:15};
+const centers={lobby:0,cafe:-15,tour:-30,cook:-45,cafezone:15,futsal:-60};
 const layout={interviewDeskZ:-7.2,interviewSeatZ:-2.4,benchSeats:[[-2.8,-3.4],[2.8,-3.4],[-2.8,1.4],[2.8,1.4]],sofaSeats:[[-5,-4],[0,5],[5,-4],[-5,3.8],[5,3.8]]};
 function zoneAt(x){let best='lobby',d=Infinity;for(const [key,c] of Object.entries(centers)){const n=Math.abs(x-c);if(n<d){best=key;d=n;}}return best;}
 function nearestSeat(zone,x,z){let seats=[];if(['cafe','tour','cook'].includes(zone)){seats=[...[-5,-3.85,-2.7].map(x=>({type:'waiting',x,z:2.4})),...[-3,-1.5,0,1.5,3].map(x=>({type:'interview',x,z:-2.4}))];}else if(zone==='cafezone'){seats=[...layout.sofaSeats.map(([x,z])=>({type:'rest',x,z,rotation:z>3&&x<0?-.5:z>3&&x>0?.8:0})),...layout.benchSeats.map(([x,z])=>({type:'rest',x,z,rotation:Math.atan2(-x,-(z+1))}))];}else if(zone==='lobby'){seats=[-4.2,4.2].flatMap(x=>[-2.2,-1,.2,1.4].map(z=>({type:'rest',x,z,facing:x<0?'east':'west'})));}

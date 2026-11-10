@@ -1,0 +1,5 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const F=require('../interview-metaverse-preview/futsal.js');
+test('공 세 개를 밀어 골대에 넣으면 점수가 한 번 증가하고 공이 돌아온다',()=>{let goals=0;const g=F.create({onGoal:()=>goals++});assert.equal(g.balls.length,3);const ball=g.balls[0];ball.x=0;ball.z=-5.7;ball.vz=-4;g.update(.2,{x:7,z:0},0);assert.equal(g.score,1);assert.equal(goals,1);assert.ok(Math.abs(ball.z)<3);g.update(.1,{x:7,z:0},10);assert.equal(g.score,1)});
+test('선수가 공에 다가가 움직이면 공이 밀리고 경계 밖으로 벗어나지 않는다',()=>{const g=F.create({});const b=g.balls[0];b.x=0;b.z=0;g.update(.1,{x:-.3,z:0,dx:1,dz:0},0);assert.ok(b.x>0);for(let i=0;i<100;i++)g.update(.1,{x:8,z:0},i);assert.ok(Math.abs(b.x)<=6.8)});
+test('풋살장에 머문 2분 뒤 한 번만 안내하고 퇴장 후 다시 시작한다',()=>{let notices=0;const g=F.create({onReminder:()=>notices++});g.visit(true,0);g.visit(true,119999);assert.equal(notices,0);g.visit(true,120000);g.visit(true,200000);assert.equal(notices,1);g.visit(false,200001);g.visit(true,210000);g.visit(true,330000);assert.equal(notices,2)});

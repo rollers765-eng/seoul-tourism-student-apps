@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const rooms=new Set(['lobby','cafe','tour','cook','cafezone']);
+const rooms=new Set(['lobby','cafe','tour','cook','cafezone','futsal']);
 function sanitizePeer(p){if(!p||!rooms.has(p.room)||!Number.isFinite(p.x)||!Number.isFinite(p.z)||Math.abs(p.x)>12.1||p.z< -9.1||p.z>7)return null;const result={room:p.room,x:Math.round(p.x*100)/100,z:Math.round(p.z*100)/100};if(typeof p.sitting==='boolean')result.sitting=p.sitting;if(Number.isFinite(p.y)&&p.y>=0&&p.y<=4)result.y=Math.round(p.y*100)/100;return result;}
 function sanitizeReaction(text){return ['응원해요!','함께 힘내요!','반가워요!','사랑합니다!'].includes(text)?text:null;}
 function startPresence(options){
