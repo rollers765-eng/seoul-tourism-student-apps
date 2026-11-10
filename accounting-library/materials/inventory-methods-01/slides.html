@@ -706,8 +706,8 @@
     }
   </style>
 <style>
-.library-glass-nav{position:relative;z-index:110;display:flex;align-items:center;gap:.25rem;flex-wrap:wrap;padding:.35rem .65rem;background:rgba(255,253,249,.82);border-bottom:1px solid rgba(132,91,63,.25);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:600 .78rem/1.3 system-ui,sans-serif;color:#533a30}
-.library-glass-nav a,.library-glass-nav button{display:inline-flex;align-items:center;min-height:34px;color:#4b352c;text-decoration:none;background:rgba(255,255,255,.66);border:1px solid rgba(108,80,63,.24);border-radius:10px;padding:5px 8px;font:inherit;cursor:pointer}
+.library-glass-nav{position:sticky;top:0;z-index:110;display:flex;align-items:center;gap:.25rem;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;height:46px;padding:6px .65rem;background:rgba(255,253,249,.82);border-bottom:1px solid rgba(132,91,63,.25);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:600 .78rem/1.3 system-ui,sans-serif;color:#533a30}
+.app-header{top:46px!important}.library-glass-nav a,.library-glass-nav button{flex-shrink:0;display:inline-flex;align-items:center;min-height:34px;color:#4b352c;text-decoration:none;background:rgba(255,255,255,.66);border:1px solid rgba(108,80,63,.24);border-radius:10px;padding:5px 8px;font:inherit;cursor:pointer}
 .library-glass-nav a:focus-visible,.library-glass-nav button:focus-visible{outline:3px solid #bd6200;outline-offset:2px}.library-glass-nav .library-close{margin-left:auto;background:rgba(255,240,220,.85)}.library-glass-nav span{color:#796455}@media(max-width:600px){.library-glass-nav{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;font-size:.72rem}.library-glass-nav .library-close{position:sticky;right:0;flex-shrink:0}}
 </style></head>
 <body>
