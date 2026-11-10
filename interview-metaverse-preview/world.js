@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const centers={lobby:0,cafe:-15,tour:-30,cook:-45,cafezone:15,futsal:-60,laser:-74.3};
+const centers={lobby:0,cafe:-15,tour:-30,cook:-45,cafezone:15,futsal:-64,laser:-78.3};
 const layout={interviewDeskZ:-7.2,interviewSeatZ:-2.4,benchSeats:[[-2.8,-3.4],[2.8,-3.4],[-2.8,1.4],[2.8,1.4]],sofaSeats:[[-5,-4],[0,5],[5,-4],[-5,3.8],[5,3.8]]};
 function zoneAt(x){let best='lobby',d=Infinity;for(const [key,c] of Object.entries(centers)){const n=Math.abs(x-c);if(n<d){best=key;d=n;}}return best;}
 function nearestSeat(zone,x,z){let seats=[];if(['cafe','tour','cook'].includes(zone)){seats=[...[-5,-3.85,-2.7].map(x=>({type:'waiting',x,z:2.4})),...[-3,-1.5,0,1.5,3].map(x=>({type:'interview',x,z:-2.4}))];}else if(zone==='cafezone'){seats=[...layout.sofaSeats.map(([x,z])=>({type:'rest',x,z,rotation:Math.PI})),...layout.benchSeats.map(([x,z])=>({type:'rest',x,z,rotation:Math.atan2(-x,-(z+1))}))];}else if(zone==='lobby'){seats=[...[-4.2,4.2].flatMap(x=>[-2.2,-1,.2,1.4].map(z=>({type:'rest',x,z,facing:x<0?'east':'west'}))),...Array.from({length:3},(_,i)=>({type:'rest',x:Math.cos(i*Math.PI*2/3)*1.7,z:1.8+Math.sin(i*Math.PI*2/3)*1.5}))];}
@@ -18,6 +18,8 @@ function blocked(x,z,peers=[],height=0,deskJump=false,ignoreChair=null){
  }
  for(const o of [centers.lobby,centers.cafezone])if(rect(o,-6.8,15,.18))return true;
  if((height<1.1&&rect(0,-3.4,4.4,1))||(height<.5&&rect(0,1.8,1.35,1.35))||rect(15,-1,1,1))return true;
+ const lx=centers.laser;if(rect(lx,-5.5,14,.18)||rect(lx-7,1.5,.18,14))return true;
+ for(const dx of [-3,0,3]){if(rect(lx+dx,2.6,2.4,1))return true;for(const edge of [-1.2,1.2])if(rect(lx+dx+edge,1.4,.12,3))return true;}
  if(x<centers.futsal+7&&x>centers.futsal-7&&z< -4.3)return true;
  if(Math.abs(x-(centers.futsal-7))<.32&&Math.abs(z-2)>1.3&&z> -4.7&&z<8.7)return true;
  if(height<.43)for(let i=0;i<3;i++){const a=i*Math.PI*2/3;if(rect(Math.cos(a)*1.7,1.8+Math.sin(a)*1.5,.86,.86))return true;}

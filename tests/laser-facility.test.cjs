@@ -1,0 +1,4 @@
+const test=require('node:test'),assert=require('node:assert/strict'),W=require('../interview-metaverse-preview/world.js'),L=require('../interview-metaverse-preview/laser.js');
+test('면접교실과 풋살장 사이에 걸을 수 있는 공간이 있고 두 공간의 입구는 연결된다',()=>{const right=W.centers.futsal+7.3,left=W.centers.cook-7.5;assert.ok(left-right>=3.5);for(let x=right+.4;x<left-.4;x+=.3)assert.equal(W.blocked(x,4,[],.65),false);});
+test('사격실 벽과 사격대를 통과할 수 없지만 사격대 앞에서 발사할 수 있다',()=>{const o=W.centers.laser;for(const p of [{x:o,z:-5.5},{x:o-7,z:0},{x:o,z:2.6},{x:o+1.2,z:1.4}])assert.equal(W.blocked(p.x,p.z,[],.65),true);assert.equal(W.blocked(o,3.8,[],.65),false);assert.ok(L.shoot({x:0,z:3.8},()=>0));});
+test('풋살장과 사격실은 문으로 연결된다',()=>{const fx=W.centers.futsal,lx=W.centers.laser;assert.ok(Math.abs(lx+7-(fx-7.3))<.1);for(let x=fx-6.2;x>fx-8;x-=.1)assert.equal(W.blocked(x,2,[],.65),false);});
