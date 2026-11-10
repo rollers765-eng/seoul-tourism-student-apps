@@ -1,0 +1,5 @@
+const test=require('node:test'),assert=require('node:assert/strict'),C=require('../interview-metaverse-preview/controls.js');
+function fake(){const handlers={};return {handlers,addEventListener(name,fn){handlers[name]=fn}}}
+test('조이스틱 터치가 유지되는 동안 다른 손가락의 점프 터치가 바로 실행된다',()=>{const button=fake();let jumps=0,prevented=false;C.bindImmediateAction(button,()=>jumps++,{pointerEvents:true,now:()=>100});button.handlers.pointerdown({pointerType:'touch',preventDefault(){prevented=true}});assert.equal(jumps,1);assert(prevented);button.handlers.click({detail:1});assert.equal(jumps,1,'터치 뒤 클릭은 중복 실행하지 않는다');button.handlers.click({detail:0});assert.equal(jumps,2,'키보드 조작은 유지한다')});
+test('포인터 이벤트가 없는 모바일에서는 터치로 즉시 실행된다',()=>{const b=fake();let n=0;C.bindImmediateAction(b,()=>n++,{pointerEvents:false,now:()=>100});b.handlers.touchstart({preventDefault(){}});assert.equal(n,1)});
+test('앉기 직전부터 누르던 방향은 자동 이동을 취소하지 않고 손을 뗀 뒤 새 입력만 허용한다',()=>{const latch=C.createMovementLatch();latch.capture(1,0);assert.equal(latch.block(1,0),true);assert.equal(latch.block(.5,.5),true);assert.equal(latch.block(0,0),false);assert.equal(latch.block(0,1),false);});

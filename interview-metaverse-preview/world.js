@@ -9,12 +9,12 @@ function stepToward(from,to,speed){const dx=to.x-from.x,dz=to.z-from.z,d=Math.hy
 function gait(time,amount,run){if(!amount)return {left:0,right:0};const a=Math.sin(time*(run?.016:.011))*(run?.75:.43)*amount;return {left:a,right:-a};}
 function surfaceAt(x,z){const inBox=(cx,cz,w,d)=>Math.abs(x-cx)<=w/2&&Math.abs(z-cz)<=d/2;let height=0;const add=(cx,cz,w,d,h)=>{if(inBox(cx,cz,w,d))height=Math.max(height,h)};for(const zone of ['cafe','tour','cook']){const o=centers[zone];add(o,layout.interviewDeskZ,7,1.2,.77);for(const dx of [-3,-1.5,0,1.5,3])add(o+dx,-2.4,.9,.8,.45);for(const dx of [-5,-3.85,-2.7])add(o+dx,2.4,.9,.8,.45);}add(0,-3.4,4.4,1,1.1);add(0,1.8,1.35,1.35,.5);for(const x of [-4.2,4.2])for(const z of [-2.2,-1,.2,1.4])add(x,z,.8,.9,.45);for(const [x,z] of layout.sofaSeats)add(centers.cafezone+x,z,1.5,.9,.48);for(const [x,z] of layout.benchSeats)add(centers.cafezone+x,z,1.5,.8,.45);return height;}
 function canStartDeskJump(zone,x,z,y,running){return !!running&&['cafe','tour','cook'].includes(zone)&&y>=.7&&Math.abs(x-centers[zone])<=3.5&&Math.abs(z-layout.interviewDeskZ)<=.6;}
-function blocked(x,z,peers=[],height=0,deskJump=false){
+function blocked(x,z,peers=[],height=0,deskJump=false,ignoreChair=null){
  const rect=(cx,cz,w,d)=>Math.abs(x-cx)<w/2+.25&&Math.abs(z-cz)<d/2+.25;
  for(const zone of ['cafe','tour','cook']){const o=centers[zone];
   if(rect(o-5,0,4.7,.18)||rect(o+5,0,4.7,.18)||(rect(o-7.45,-4.5,.16,9)&&!(deskJump&&height>=2.8&&zone!=='cook'))||(rect(o+7.45,-4.5,.16,9)&&!(deskJump&&height>=2.8&&zone!=='cafe'))||rect(o,-9.2,15,.18)||(height<.77&&rect(o,layout.interviewDeskZ,7,1.2))||rect(o+3,2.4,.65,.65))return true;
-  for(const dx of [-3,-1.5,0,1.5,3])if(height<.45&&rect(o+dx,-2.4,.9,.8))return true;
-  for(const dx of [-5,-3.85,-2.7])if(height<.45&&rect(o+dx,2.4,.9,.8))return true;
+  for(const dx of [-3,-1.5,0,1.5,3])if(height<.45&&!(ignoreChair&&ignoreChair.zone===zone&&ignoreChair.x===dx&&ignoreChair.z===-2.4)&&rect(o+dx,-2.4,.9,.8))return true;
+  for(const dx of [-5,-3.85,-2.7])if(height<.45&&!(ignoreChair&&ignoreChair.zone===zone&&ignoreChair.x===dx&&ignoreChair.z===2.4)&&rect(o+dx,2.4,.9,.8))return true;
  }
  for(const o of [centers.lobby,centers.cafezone])if(rect(o,-6.8,15,.18))return true;
  if((height<1.1&&rect(0,-3.4,4.4,1))||(height<.5&&rect(0,1.8,1.35,1.35))||rect(15,-1,1,1))return true;
@@ -29,7 +29,7 @@ function routeToInterviewSeat(zone,from,peers=[]){
  const gx=x=>Math.round((x-origin)/step),gz=z=>Math.round(z/step),pos=(x,z)=>({x:origin+x*step,z:z*step}),key=(x,z)=>x+','+z;
  const safePeers=peers.filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.z)&&Math.hypot(from.x-p.x,from.z-p.z)>=.68);
  function clearLine(a,b){const n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/.05));let prev=a;for(let i=1;i<=n;i++){const next={x:a.x+(b.x-a.x)*i/n,z:a.z+(b.z-a.z)*i/n};if(!canMove(prev,next,safePeers))return false;prev=next;}return true;}
- const starts=[];for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){const x=gx(from.x)+dx,z=gz(from.z)+dz,p=pos(x,z);if(!blocked(p.x,p.z,safePeers)&&clearLine(from,p))starts.push({x,z,d:Math.hypot(p.x-from.x,p.z-from.z)});}starts.sort((a,b)=>a.d-b.d);if(!starts.length)return null;
+ const starts=[];for(let dx=-5;dx<=5;dx++)for(let dz=-5;dz<=5;dz++){const x=gx(from.x)+dx,z=gz(from.z)+dz,p=pos(x,z);if(!blocked(p.x,p.z,safePeers)&&clearLine(from,p))starts.push({x,z,d:Math.hypot(p.x-from.x,p.z-from.z)});}starts.sort((a,b)=>a.d-b.d);if(!starts.length)return null;
  const seats=[-3,-1.5,0,1.5,3].map(x=>({x,z:layout.interviewSeatZ})).sort((a,b)=>Math.hypot(origin+a.x-from.x,a.z-from.z)-Math.hypot(origin+b.x-from.x,b.z-from.z));
  for(const seat of seats){const target={x:origin+seat.x,z:seat.z+.95};if(blocked(target.x,target.z,safePeers)||safePeers.some(p=>Math.hypot(p.x-(origin+seat.x),p.z-seat.z)<1))continue;const goal={x:gx(target.x),z:gz(target.z)},goalPos=pos(goal.x,goal.z);if(blocked(goalPos.x,goalPos.z,safePeers)||!clearLine(goalPos,target))continue;
  const start=starts[0],startKey=key(start.x,start.z),open=[{x:start.x,z:start.z,g:0,f:Math.abs(start.x-goal.x)+Math.abs(start.z-goal.z)}],scores=new Map([[startKey,0]]),parents=new Map();let found=null;
@@ -40,6 +40,6 @@ function routeToInterviewSeat(zone,from,peers=[]){
 }
 function wanderTarget(home,index){const angle=index*2.399;return {x:home.x+Math.cos(angle)*.65,z:home.z+Math.sin(angle)*.65};}
 function spawn(zone){return {x:centers[zone]+(zone==='cafezone'?2.4:0),z:5.3};}
-function canMove(from,to,peers=[],height=0,deskJump=false){if(blocked(to.x,to.z,[],height,deskJump))return false;return !peers.some(p=>{if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;const before=Math.hypot(from.x-p.x,from.z-p.z),after=Math.hypot(to.x-p.x,to.z-p.z);return after<.68 && !(before<.68 && after>before);});}
+function canMove(from,to,peers=[],height=0,deskJump=false){if(blocked(to.x,to.z,[],height,deskJump)){let escape=false;for(const zone of ['cafe','tour','cook']){const origin=centers[zone];for(const [xs,z] of [[[-3,-1.5,0,1.5,3],-2.4],[[-5,-3.85,-2.7],2.4]])for(const x of xs){const cx=origin+x;if(Math.abs(from.x-cx)<.7&&Math.abs(from.z-z)<.65&&Math.hypot(to.x-cx,to.z-z)>Math.hypot(from.x-cx,from.z-z)+1e-7&&!blocked(to.x,to.z,[],height,deskJump,{zone,x,z}))escape=true;}}if(!escape)return false;}return !peers.some(p=>{if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;const before=Math.hypot(from.x-p.x,from.z-p.z),after=Math.hypot(to.x-p.x,to.z-p.z);return after<.68 && !(before<.68 && after>before);});}
 const api={centers,layout,zoneAt,nearestSeat,stepToward,gait,blocked,surfaceAt,canStartDeskJump,spawn,canMove,entrancePath,interviewSeatPath,routeToInterviewSeat,shouldBlockEntrance,wanderTarget};if(typeof module!=='undefined')module.exports=api;root.InterviewWorld=api;
 })(typeof window==='undefined'?globalThis:window);
