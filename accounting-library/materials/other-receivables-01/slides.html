@@ -553,8 +553,16 @@
     gap: 10px;
   }
 </style>
-</head>
+<style id="accounting-library-navigation">
+.school-path-bar{position:fixed;top:0;left:0;right:0;height:48px;z-index:9999;display:flex;align-items:center;gap:4px;padding:5px 8px;background:rgba(255,253,249,.88);border-bottom:1px solid rgba(132,91,63,.25);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:600 12px/1.3 system-ui,sans-serif;color:#533a30;box-sizing:border-box;overflow-x:auto;white-space:nowrap}
+.school-path-bar a,.school-path-bar button{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-height:34px;padding:5px 8px;border:1px solid rgba(108,80,63,.24);border-radius:10px;background:rgba(255,255,255,.78);color:#4b352c;text-decoration:none;font:inherit;cursor:pointer;box-sizing:border-box}
+.school-path-bar .school-return{margin-left:auto;background:rgba(255,240,220,.95)}.school-path-bar a:focus-visible,.school-path-bar button:focus-visible{outline:3px solid #bd6200;outline-offset:2px}
+body{box-sizing:border-box!important;padding-top:54px!important}
+@supports(height:100dvh){body{min-height:100dvh}}
+@media(max-width:700px){.school-path-bar{font-size:11px}.school-path-bar .school-return{position:sticky;right:0}}
+</style><style>body{overflow-y:auto!important}</style></head>
 <body>
+<nav class="school-path-bar" aria-label="자료실 이동 경로"><a href="../../../">서울관광고 학생용 웹앱 모음</a><span aria-hidden="true">›</span><a href="../../../business-finance/">경영·금융 교과교실</a><span aria-hidden="true">›</span><a href="../../">회계원리 자료실</a><span aria-hidden="true">›</span><a href="../../?unit=%EA%B8%B0%ED%83%80%20%EC%B1%84%EA%B6%8C&account=%EB%8B%A8%EA%B8%B0%EB%8C%80%EC%97%AC%EA%B8%88%C2%B7%EB%AF%B8%EC%88%98%EA%B8%88%C2%B7%EC%84%A0%EA%B8%89%EA%B8%88%C2%B7%EA%B0%80%EC%A7%80%EA%B8%89%EA%B8%88#materials">기타 채권</a><button class="school-return" type="button" onclick="window.close();setTimeout(function(){window.location.href='../../?unit=%EA%B8%B0%ED%83%80%20%EC%B1%84%EA%B6%8C&account=%EB%8B%A8%EA%B8%B0%EB%8C%80%EC%97%AC%EA%B8%88%C2%B7%EB%AF%B8%EC%88%98%EA%B8%88%C2%B7%EC%84%A0%EA%B8%89%EA%B8%88%C2%B7%EA%B0%80%EC%A7%80%EA%B8%89%EA%B8%88#materials'},150)">✕ 슬라이드 닫고 자료실로</button></nav>
 
 <!-- 공통 SVG 캐릭터 심볼 정의 (치이카와 감성 마스코트 & 픽토그램) -->
 <svg width="0" height="0" style="position:absolute; visibility:hidden;" aria-hidden="true">
