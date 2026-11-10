@@ -34,3 +34,5 @@ nav[aria-label="생활과 휴식"]{z-index:2;max-width:calc(100% - 24px);gap:3px
 .cafe-game{position:fixed;top:120px;left:50%;transform:translateX(-50%);z-index:2;max-width:70%;padding:8px 13px;border-radius:20px;background:#fff8dfeb;color:#755b27;box-shadow:0 3px 12px #273b3025;font-size:12px;font-weight:700;text-align:center;pointer-events:none}@media(max-width:600px){.cafe-game{top:calc(max(10px,env(safe-area-inset-top)) + 130px);max-width:75%;font-size:10px;padding:6px 9px}}@media(max-height:500px) and (orientation:landscape){.cafe-game{top:58px;font-size:10px}}
 
 #jump,#run{touch-action:none;-webkit-user-select:none;user-select:none}
+
+.laser-targets{display:flex;gap:10px;margin:18px 0}.laser-targets button{flex:1;border-radius:16px;background:#eee8df;padding:20px 6px;font-size:42px;opacity:.35}.laser-targets button.active{opacity:1;background:#ffe4a3;box-shadow:0 0 18px #ffc865;transform:scale(1.05)}
