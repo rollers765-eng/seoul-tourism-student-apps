@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서울관광고 카페경영과 1학년 회계원리 - 상품 매매의 기장법과 매출원가</title>
+  <style>
+    :root {
+      --bg-cream: #FFFDF9;
+      --bg-warm: #F7F1E5;
+      --bg-card: #FFFFFF;
+      --brown-dark: #3E2723;
+      --brown-main: #5D4037;
+      --brown-light: #8D6E63;
+      --border-warm: #E0D4C3;
+      
+      /* 일관된 회계 및 거래 색상 토큰 */
+      --buy-main: #1565C0;
+      --buy-bg: #E3F2FD;
+      --buy-border: #90CAF9;
+      
+      --sell-main: #C62828;
+      --sell-bg: #FFEBEE;
+      --sell-border: #EF9A9A;
+      
+      --cost-main: #E65100;
+      --cost-bg: #FFF3E0;
+      --cost-border: #FFCC80;
+      
+      --profit-main: #2E7D32;
+      --profit-bg: #E8F5E9;
+      --profit-border: #A5D6A7;
+      
+      --adj-main: #6A1B9A;
+      --adj-bg: #F3E5F5;
+      --adj-border: #CE93D8;
+
+      --accent-gold: #FFB300;
+      --shadow-sm: 0 2px 6px rgba(62, 39, 35, 0.08);
+      --shadow-md: 0 6px 16px rgba(62, 39, 35, 0.12);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--brown-dark);
+      line-height: 1.6;
+      word-break: keep-all;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 상단 헤더 및 네비게이션 */
+    .app-header {
+      background-color: var(--brown-dark);
+      color: #FFFFFF;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+
+    .header-top {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .school-badge {
+      background-color: var(--accent-gold);
+      color: var(--brown-dark);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .lesson-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header {
+      background-color: rgba(255,255,255,0.15);
+      color: #FFFFFF;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-header:hover, .btn-header:focus-visible {
+      background-color: rgba(255,255,255,0.28);
+      outline: none;
+    }
+
+    /* 목차 바 (바로 이동) */
+    .toc-bar {
+      background-color: var(--bg-warm);
+      border-bottom: 2px solid var(--border-warm);
+      padding: 8px 16px;
+    }
+
+    .toc-list {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .toc-btn {
+      background-color: #FFFFFF;
+      color: var(--brown-main);
+      border: 1px solid var(--border-warm);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 40px;
+      flex-shrink: 0;
+    }
+
+    .toc-btn.active {
+      background-color: var(--brown-main);
+      color: #FFFFFF;
+      border-color: var(--brown-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* 교사용 안내 모달/패널 */
+    .teacher-guide {
+      max-width: 1280px;
+      margin: 12px auto 0;
+      padding: 0 20px;
+      display: none;
+    }
+
+    .teacher-guide.show {
+      display: block;
+    }
+
+    .teacher-box {
+      background-color: #FFF8E1;
+      border: 2px solid #FFD54F;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      color: var(--brown-dark);
+      font-size: 0.95rem;
+    }
+
+    /* 반복 사고 순서 배너 */
+    .thinking-banner {
+      max-width: 1280px;
+      margin: 14px auto 0;
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    .thinking-steps {
+      background-color: #FFFFFF;
+      border: 2px solid var(--border-warm);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-chip {
+      background-color: var(--bg-warm);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: var(--brown-dark);
+    }
+
+    .step-arrow {
+      color: var(--cost-main);
+      font-weight: 900;
+    }
+
+    /* 메인 장면 컨테이너 */
+    .main-container {
+      max-width: 1280px;
+      width: 100%;
+      margin: 16px auto 32px;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .scene {
+      display: none;
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-warm);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .scene.active {
+      display: block;
+    }
+
+    .scene-header {
+      border-bottom: 2px solid var(--bg-warm);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .scene-badge {
+      display: inline-block;
+      background-color: var(--cost-bg);
+      color: var(--cost-main);
+      border: 1px solid var(--cost-border);
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+    }
+
+    .scene-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--brown-dark);
+      line-height: 1.3;
+    }
+
+    /* 공통 컴포넌트: 캐릭터 말풍선 */
+    .dialogue-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background-color: var(--bg-warm);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-warm);
+    }
+
+    .avatar-wrap {
+      flex-shrink: 0;
+      width: 68px;
+      height: 68px;
+      background-color: #FFFFFF;
+      border-radius: 50%;
+      border: 2px solid var(--brown-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .speech-content {
+      flex: 1;
+    }
+
+    .speaker-name {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--cost-main);
+      margin-bottom: 4px;
+    }
+
+    .speech-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--brown-dark);
+    }
+
+    /* 공통 버튼 스타일 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      min-height: 48px;
+      font-size: 1rem;
+      font-weight: 800;
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background-color: var(--cost-main);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background-color: #BF360C;
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-warm);
+      color: var(--brown-dark);
+      border-color: var(--border-warm);
+    }
+
+    .btn-secondary:hover {
+      background-color: #EAE0C8;
+    }
+
+    .btn-toggle {
+      background-color: #FFF8E1;
+      color: var(--brown-dark);
+      border: 2px solid var(--accent-gold);
+    }
+
+    .btn-toggle.revealed {
+      background-color: var(--brown-main);
+      color: #FFFFFF;
+      border-color: var(--brown-dark);
+    }
+
+    /* 토글 정답 영역 */
+    .reveal-panel {
+      display: none;
+      margin-top: 16px;
+      padding: 20px;
+      border-radius: var(--radius-md);
+      background-color: #FFFDF7;
+      border: 2px dashed var(--accent-gold);
+    }
+
+    .reveal-panel.show {
+      display: block;
+    }
+
+    /* 그리드 유틸리티 */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background-color: #FFFFFF;
+      border: 2px solid var(--border-warm);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* 분개 표시 테이블 (차변/대변 같은 줄 유지 + 모바일 가로 스크롤) */
+    .journal-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      background-color: #FFFFFF;
+      border: 2px solid var(--brown-main);
+      border-radius: var(--radius-sm);
+      margin-top: 10px;
+    }
+
+    .journal-row {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr);
+      min-width: 500px;
+    }
+
+    .journal-side {
+      padding: 12px 16px;
+    }
+
+    .journal-side.debit {
+      border-right: 2px solid var(--brown-main);
+      background-color: #FAFAFA;
+    }
+
+    .journal-side.credit {
+      background-color: #FFFFFF;
+    }
+
+    .journal-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      white-space: nowrap;
+      gap: 12px;
+    }
+
+    .acct-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+
+    .acct-buy { background-color: var(--buy-bg); color: var(--buy-main); border: 1px solid var(--buy-border); }
+    .acct-sell { background-color: var(--sell-bg); color: var(--sell-main); border: 1px solid var(--sell-border); }
+    .acct-cost { background-color: var(--cost-bg); color: var(--cost-main); border: 1px solid var(--cost-border); }
+    .acct-profit { background-color: var(--profit-bg); color: var(--profit-main); border: 1px solid var(--profit-border); }
+    .acct-adj { background-color: var(--adj-bg); color: var(--adj-main); border: 1px solid var(--adj-border); }
+
+    /* 장면 2: 용어 학습 인터랙티브 다이어그램 */
+    .perspective-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .persp-indicator {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .persp-buy {
+      background-color: var(--buy-bg);
+      color: var(--buy-main);
+      border: 2px solid var(--buy-border);
+    }
+
+    .persp-sell {
+      background-color: var(--sell-bg);
+      color: var(--sell-main);
+      border: 2px solid var(--sell-border);
+    }
+
+    .term-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .term-card-btn {
+      background-color: #FFFFFF;
+      border: 2px solid var(--border-warm);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 92px;
+    }
+
+    .term-card-btn.active {
+      border-width: 3px;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .term-card-btn.buy-type.active {
+      border-color: var(--buy-main);
+      background-color: #F5FAFF;
+    }
+
+    .term-card-btn.sell-type.active {
+      border-color: var(--sell-main);
+      background-color: #FFF8F8;
+    }
+
+    .stage-diagram {
+      background-color: var(--bg-warm);
+      border: 2px solid var(--border-warm);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .flow-nodes {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-entity {
+      background-color: #FFFFFF;
+      border: 2px solid var(--brown-main);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      min-width: 150px;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .flow-action-center {
+      flex: 1;
+      min-width: 220px;
+      background-color: #FFFFFF;
+      border: 2px dashed var(--brown-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+    }
+
+    /* 장면 3: 붕어빵 트레이 */
+    .bungeo-tray {
+      background-color: #ECEFF1;
+      border: 4px solid #90A4AE;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      min-height: 150px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .bungeo-item {
+      width: 82px;
+      padding: 8px 6px;
+      border-radius: var(--radius-sm);
+      background-color: #FFFFFF;
+      border: 2px solid var(--border-warm);
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .bungeo-item.yesterday {
+      border-color: var(--buy-main);
+      background-color: var(--buy-bg);
+    }
+
+    .bungeo-item.today {
+      border-color: var(--cost-main);
+      background-color: var(--cost-bg);
+    }
+
+    .bungeo-item.sold {
+      border-color: var(--profit-main);
+      background-color: var(--profit-bg);
+    }
+
+    .bungeo-item.remain {
+      border-color: var(--adj-main);
+      background-color: var(--adj-bg);
+      transform: scale(1.06);
+    }
+
+    /* 하단 장면 이동 푸터 */
+    .app-footer {
+      background-color: #FFFFFF;
+      border-top: 2px solid var(--border-warm);
+      padding: 14px 20px;
+      position: sticky;
+      bottom: 0;
+      z-index: 90;
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .scene-counter {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--brown-main);
+    }
+
+    /* 퀴즈 입력 스타일 */
+    .quiz-option-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .quiz-opt-btn {
+      padding: 10px 16px;
+      min-height: 46px;
+      background-color: #FFFFFF;
+      border: 2px solid var(--border-warm);
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.98rem;
+      cursor: pointer;
+    }
+
+    .quiz-opt-btn.selected {
+      background-color: var(--buy-bg);
+      border-color: var(--buy-main);
+      color: var(--buy-main);
+    }
+
+    .quiz-input {
+      padding: 10px 14px;
+      min-height: 46px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: 2px solid var(--brown-light);
+      border-radius: var(--radius-sm);
+      width: 180px;
+      max-width: 100%;
+    }
+
+    /* 반응형 미디어 쿼리 (스마트폰/태블릿 대응) */
+    @media (max-width: 900px) {
+      .grid-2, .grid-3, .grid-4, .term-selector-grid {
+        grid-template-columns: 1fr;
+      }
+      .scene {
+        padding: 18px;
+      }
+      .scene-title {
+        font-size: 1.35rem;
+      }
+      .dialogue-box {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .perspective-tabs {
+        flex-direction: column;
+      }
+    }
+
+    /* 기기의 '움직임 줄이기' 설정 존중 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 헤더 -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand-group">
+        <span class="school-badge">서울관광고 카페경영과 1학년</span>
+        <h1 class="lesson-title">상품 매매의 기장법과 매출원가</h1>
+      </div>
+      <div class="header-controls">
+        <button type="button" class="btn-header" onclick="toggleTeacherGuide()" aria-expanded="false" id="teacherGuideBtn">
+          <span>📋 교사용 수업 안내</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 목차 바로 이동 바 -->
+  <nav class="toc-bar" aria-label="수업 장면 목차">
+    <div class="toc-list" id="tocList">
+      <button type="button" class="toc-btn active" onclick="goToScene(1)">1. 재고자산과 상품</button>
+      <button type="button" class="toc-btn" onclick="goToScene(2)">2. 환출·환입·에누리·할인</button>
+      <button type="button" class="toc-btn" onclick="goToScene(3)">3. 붕어빵 수량 흐름</button>
+      <button type="button" class="toc-btn" onclick="goToScene(4)">4. 원가와 매출총이익</button>
+      <button type="button" class="toc-btn" onclick="goToScene(5)">5. 4대 필수 계산식</button>
+      <button type="button" class="toc-btn" onclick="goToScene(6)">6. 3가지 기장법 비교</button>
+      <button type="button" class="toc-btn" onclick="goToScene(7)">7. 기초 다지기 01</button>
+      <button type="button" class="toc-btn" onclick="goToScene(8)">8. 기초 다지기 02</button>
+      <button type="button" class="toc-btn" onclick="goToScene(9)">9. 스스로 확인 5문제</button>
+    </div>
+  </nav>
+
+  <!-- 교사용 수업 범위 안내 패널 -->
+  <section class="teacher-guide" id="teacherGuidePanel">
+    <div class="teacher-box">
+      <strong>💡 [교사용 안내] 수업 범위 및 활용 팁 (교과서 112~117쪽, 119쪽 연계)</strong>
+      <ul style="margin-top:8px; padding-left:20px;">
+        <li>이 자료는 <strong>분기법·총기법·3분법의 매입·매출 거래 분개</strong>와 <strong>매출원가·매출총이익 계산 공식 도출</strong>에 집중합니다.</li>
+        <li>상품 계정의 그림은 공식의 의미를 이해하기 위한 시각화로만 활용하며, 손익 계정 대체분개·상세 결산 절차·학생의 직접 원장 전기는 다루지 않습니다.</li>
+        <li><strong>교과서 119쪽 기초 다지기 01, 02</strong>는 원래 계정 전기와 대체분개를 요구하지만, 본 수업 자료에서는 1학년 학습 목표에 맞추어 <strong>주요 매입·매출 거래 분개만 선별</strong>하여 제시합니다.</li>
+        <li>키보드 좌우 화살표(<code>←</code>, <code>→</code>) 또는 상단 목차 버튼으로 원하는 장면을 즉시 띄워 굿노트 판서와 함께 활용하세요.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 반복 사고 순서 배너 -->
+  <div class="thinking-banner">
+    <div class="thinking-steps" aria-label="분개할 때 반복할 사고 순서">
+      <span style="color:var(--cost-main);">🔍 분개 4단계 사고 순서:</span>
+      <span class="step-chip">① 무슨 거래인가?</span>
+      <span class="step-arrow">→</span>
+      <span class="step-chip">② 어떤 기장법인가?</span>
+      <span class="step-arrow">→</span>
+      <span class="step-chip">③ 어떤 계정과목을 쓰는가?</span>
+      <span class="step-arrow">→</span>
+      <span class="step-chip">④ 차변·대변에 얼마를 적는가?</span>
+    </div>
+  </div>
+
+  <!-- 메인 수업 장면 영역 -->
+  <main class="main-container">
+
+    <!-- ==========================================
+         [장면 1] 도입: 재고자산과 상품
+         ========================================== -->
+    <section class="scene active" id="scene-1">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 1 · 도입 (교과서 112쪽)</span>
+          <h2 class="scene-title">재고자산과 상품: 같은 텀블러도 용도에 따라 다르다고요?</h2>
+        </div>
+      </div>
+
+      <div class="dialogue-box">
+        <div class="avatar-wrap" aria-hidden="true">
+          <svg width="54" height="54" viewBox="0 0 64 64">
+            <circle cx="32" cy="24" r="14" fill="#FFCCBC"/>
+            <path d="M18 22 C18 10, 46 10, 46 22" fill="#4E342E"/>
+            <circle cx="27" cy="24" r="2" fill="#3E2723"/>
+            <circle cx="37" cy="24" r="2" fill="#3E2723"/>
+            <path d="M28 30 Q32 34 36 30" stroke="#3E2723" stroke-width="2" fill="none"/>
+            <path d="M14 58 C14 42, 50 42, 50 58" fill="#8D6E63"/>
+            <rect x="24" y="44" width="16" height="14" fill="#FFF8E1" rx="2"/>
+          </svg>
+        </div>
+        <div class="speech-content">
+          <div class="speaker-name">서울관광고 카페경영과 1학년 김바리 학생</div>
+          <p class="speech-text">“우리 카페 매장에서 손님에게 <strong>판매하려고 진열한 텀블러</strong>와, 카페 직원이 주방에서 <strong>업무용으로 사용하는 텀블러</strong>는 회계에서 똑같이 분류할까요?”</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 20px;">
+        <div class="card" style="background-color: var(--buy-bg); border-color: var(--buy-border);">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+              <rect x="18" y="14" width="28" height="40" rx="6" fill="#1E88E5"/>
+              <rect x="16" y="10" width="32" height="6" rx="3" fill="#0D47A1"/>
+              <rect x="22" y="24" width="20" height="12" rx="2" fill="#FFFFFF"/>
+            </svg>
+            <div>
+              <span class="acct-badge acct-buy">경우 A · 판매 목적</span>
+              <h3 style="font-size:1.25rem; margin-top:4px;">손님에게 팔려고 사 온 텀블러</h3>
+              <p style="font-size:0.95rem; color:var(--brown-main);">가격표가 붙어 진열대에 놓여 있어요.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="background-color: var(--bg-warm);">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+              <rect x="18" y="14" width="28" height="40" rx="6" fill="#8D6E63"/>
+              <rect x="16" y="10" width="32" height="6" rx="3" fill="#4E342E"/>
+              <circle cx="32" cy="34" r="7" fill="#FFF8E1"/>
+            </svg>
+            <div>
+              <span class="acct-badge" style="background:#E0E0E0;">경우 B · 사용 목적</span>
+              <h3 style="font-size:1.25rem; margin-top:4px;">카페 직원이 매장에서 쓰는 텀블러</h3>
+              <p style="font-size:0.95rem; color:var(--brown-main);">판매하지 않고 카페 운영을 위해 사용해요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-toggle" onclick="toggleReveal('scene1-ans', this)">
+        <span>💡 정답과 회계상 분류 확인하기</span>
+      </button>
+
+      <div class="reveal-panel" id="scene1-ans">
+        <h3 style="font-size:1.25rem; color:var(--cost-main); margin-bottom:12px;">
+          정답: 용도가 다르므로 회계상 분류도 다릅니다!
+        </h3>
+        <p style="margin-bottom:16px; font-weight:700;">
+          같은 물건이라도 기업에서 <strong>무엇을 위해 보유하는지(보유 목적)</strong>에 따라 계정과목이 달라집니다. 판매를 목적으로 보유·생산하는 자산을 <strong>재고자산</strong>이라고 합니다.
+        </p>
+
+        <div class="grid-4">
+          <div class="card" style="border-color:var(--buy-main); background:#F5FAFF;">
+            <span class="acct-badge acct-buy">상품 (Merchandise)</span>
+            <h4 style="font-size:1.1rem; margin:8px 0 4px;">판매하려고 구입한 물건</h4>
+            <p style="font-size:0.9rem; color:var(--brown-main);">예: 카페에서 사 와서 손님에게 그대로 파는 완제품 텀블러·병음료</p>
+          </div>
+          <div class="card">
+            <span class="acct-badge acct-profit">제품 (Finished Goods)</span>
+            <h4 style="font-size:1.1rem; margin:8px 0 4px;">직접 만들어 파는 완성품</h4>
+            <p style="font-size:0.9rem; color:var(--brown-main);">예: 베이커리 공장에서 직접 구워 완성한 포장 케이크</p>
+          </div>
+          <div class="card">
+            <span class="acct-badge acct-cost">재공품 (Work in Process)</span>
+            <h4 style="font-size:1.1rem; margin:8px 0 4px;">생산 중인 미완성품</h4>
+            <p style="font-size:0.9rem; color:var(--brown-main);">예: 아직 오븐에서 굽고 있거나 숙성 중인 반죽 상태의 물건</p>
+          </div>
+          <div class="card">
+            <span class="acct-badge acct-adj">원재료 (Raw Materials)</span>
+            <h4 style="font-size:1.1rem; margin:8px 0 4px;">제품을 만들 때 쓰는 재료</h4>
+            <p style="font-size:0.9rem; color:var(--brown-main);">예: 케이크를 만들기 위해 사 둔 밀가루, 설탕, 생크림</p>
+          </div>
+        </div>
+        <p style="margin-top:14px; font-size:0.92rem; color:var(--brown-main);">
+          ※ 참고: 카페 직원이 매장에서 업무용으로 쓰는 텀블러나 비품은 판매 목적이 아니므로 재고자산(상품)이 아니라 <strong>비품</strong>이나 <strong>소모품</strong> 등으로 처리합니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 2] 새로운 용어: 환출·환입·에누리·할인
+         ========================================== -->
+    <section class="scene" id="scene-2">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 2 · 핵심 용어 6가지 (교과서 112, 114쪽)</span>
+          <h2 class="scene-title">환출·환입·에누리·할인: 거래 흐름으로 구분하기</h2>
+        </div>
+      </div>
+
+      <p style="margin-bottom:14px; font-weight:700;">
+        여섯 용어를 무조건 외우지 말고, <strong>① 물건을 돌려보냄 → ② 물건은 그대로 두고 가격만 조정 → ③ 외상대금을 빨리 갚거나 받아서 할인</strong> 순서로 눌러 보세요!
+      </p>
+
+      <div class="perspective-tabs">
+        <div class="persp-indicator persp-buy">
+          🔵 매입 입장 (물건을 산 우리 회사 기준): 매입환출 · 매입에누리 · 매입할인
+        </div>
+        <div class="persp-indicator persp-sell">
+          🔴 매출 입장 (물건을 판 우리 회사 기준): 매출환입 · 매출에누리 · 매출할인
+        </div>
+      </div>
+
+      <!-- 6개 용어 선택 버튼 (단계별 짝배치) -->
+      <div class="term-selector-grid" role="tablist" aria-label="6가지 용어 선택">
+        <button type="button" class="term-card-btn buy-type active" onclick="selectTerm(0)" id="termBtn-0">
+          <span class="acct-badge acct-buy">1단계: 물건을 돌려보냄 (매입 입장)</span>
+          <strong style="font-size:1.15rem;">① 매입환출</strong>
+          <span style="font-size:0.88rem; color:var(--brown-main);">사 온 상품을 공급업체에 반품</span>
+        </button>
+        <button type="button" class="term-card-btn buy-type" onclick="selectTerm(2)" id="termBtn-2">
+          <span class="acct-badge acct-buy">2단계: 물건 유지·값 조정 (매입 입장)</span>
+          <strong style="font-size:1.15rem;">③ 매입에누리</strong>
+          <span style="font-size:0.88rem; color:var(--brown-main);">파손·불량으로 매입 대금 일부 감액</span>
+        </button>
+        <button type="button" class="term-card-btn buy-type" onclick="selectTerm(4)" id="termBtn-4">
+          <span class="acct-badge acct-buy">3단계: 조기 결제 할인 (매입 입장)</span>
+          <strong style="font-size:1.15rem;">⑤ 매입할인</strong>
+          <span style="font-size:0.88rem; color:var(--brown-main);">외상대금을 약정 기간 내 조기 지급</span>
+        </button>
+
+        <button type="button" class="term-card-btn sell-type" onclick="selectTerm(1)" id="termBtn-1">
+          <span class="acct-badge acct-sell">1단계: 물건이 돌아옴 (매출 입장)</span>
+          <strong style="font-size:1.15rem;">② 매출환입</strong>
+          <span style="font-size:0.88rem; color:var(--brown-main);">판매한 상품이 고객에게서 반품됨</span>
+        </button>
+        <button type="button" class="term-card-btn sell-type" onclick="selectTerm(3)" id="termBtn-3">
+          <span class="acct-badge acct-sell">2단계: 물건 유지·값 조정 (매출 입장)</span>
+          <strong style="font-size:1.15rem;">④ 매출에누리</strong>
+          <span style="font-size:0.88rem; color:var(--brown-main);">파손·불량으로 판매 대금 일부 감액</span>
+        </button>
+        <button type="button" class="term-card-btn sell-type" onclick="selectTerm(5)" id="termBtn-5">
+          <span class="acct-badge acct-sell">3단계: 조기 회수 할인 (매출 입장)</span>
+          <strong style="font-size:1.15rem;">⑥ 매출할인</strong>
+          <span style="font-size:0.88rem; color:var(--brown-main);">외상대금을 약정 기간 내 조기 회수</span>
+        </button>
+      </div>
+
+      <!-- 선택된 용어 상세 도식 및 미니 퀴즈 -->
+      <div class="stage-diagram" id="termDetailStage">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 3] 붕어빵 이야기: 몇 개를 팔았을까?
+         ========================================== -->
+    <section class="scene" id="scene-3">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 3 · 수량 흐름 이해하기 (교과서 113쪽 판서 연계)</span>
+          <h2 class="scene-title">붕어빵 이야기 ①: 오늘 붕어빵을 몇 개 팔았을까요?</h2>
+        </div>
+      </div>
+
+      <div class="dialogue-box">
+        <div class="avatar-wrap" aria-hidden="true">
+          <svg width="54" height="54" viewBox="0 0 64 64">
+            <ellipse cx="32" cy="34" rx="22" ry="15" fill="#FFB74D" stroke="#E65100" stroke-width="2.5"/>
+            <polygon points="50,34 60,24 60,44" fill="#FFB74D" stroke="#E65100" stroke-width="2.5"/>
+            <circle cx="22" cy="30" r="2.5" fill="#3E2723"/>
+          </svg>
+        </div>
+        <div class="speech-content">
+          <div class="speaker-name">친숙한 붕어빵 가게 이야기</div>
+          <p class="speech-text">“어제 팔다 남은 붕어빵이 <strong>2개</strong>, 오늘 새로 준비한 붕어빵이 <strong>8개</strong>예요. 오늘 장사를 마치고 트레이를 보니 <strong>1개</strong>가 남았어요. 오늘 몇 개를 팔았을까요?”</p>
+        </div>
+      </div>
+
+      <!-- 단계별 클릭 버튼 -->
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+        <button type="button" class="btn btn-secondary" onclick="setBungeoStep(1)" id="bStepBtn-1">1단계: 어제 남은 2개</button>
+        <button type="button" class="btn btn-secondary" onclick="setBungeoStep(2)" id="bStepBtn-2">2단계: 오늘 준비한 8개 합류</button>
+        <button type="button" class="btn btn-secondary" onclick="setBungeoStep(3)" id="bStepBtn-3">3단계: 팔 수 있는 총 10개</button>
+        <button type="button" class="btn btn-secondary" onclick="setBungeoStep(4)" id="bStepBtn-4">4단계: 장사 후 남은 1개</button>
+        <button type="button" class="btn btn-secondary" onclick="setBungeoStep(5)" id="bStepBtn-5">5단계: 오늘 판매한 9개 확인</button>
+      </div>
+
+      <div class="card" style="background-color:#FFFDF9;">
+        <div id="bungeoStepTitle" style="font-size:1.15rem; font-weight:800; color:var(--cost-main); margin-bottom:8px;">
+          단계 버튼을 차례대로 눌러 붕어빵 트레이의 변화를 확인해 보세요!
+        </div>
+        <div class="bungeo-tray" id="bungeoTray">
+          <!-- JS로 붕어빵 아이콘 렌더링 -->
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button type="button" class="btn btn-toggle" onclick="toggleReveal('scene3-ans', this)">
+          <span>🎯 생각한 답과 회계 용어 연결 보기 (정답 보기)</span>
+        </button>
+
+        <div class="reveal-panel" id="scene3-ans">
+          <h3 style="font-size:1.3rem; color:var(--profit-main); margin-bottom:10px;">
+            정답: 2개 + 8개 - 1개 = 9개 판매!
+          </h3>
+          
+          <div class="card" style="background-color:#FFF8E1; border-color:var(--accent-gold); margin-bottom:16px;">
+            <strong>⚠️ 회계적 연결에서 꼭 구분할 점!</strong>
+            <p style="margin-top:6px;">
+              방금 이야기에서 붕어빵을 매장에서 직접 구웠다면 회계상 엄밀히는 <strong>‘제품’</strong>입니다.<br>
+              <strong style="color:var(--buy-main); font-size:1.05rem;">“이제 같은 수량을 완제품 상태의 판매용 붕어빵(상품)으로 사 왔다고 가정해 볼까요?”</strong>
+            </p>
+          </div>
+
+          <div class="grid-4">
+            <div class="card" style="background:var(--buy-bg); border-color:var(--buy-border);">
+              <span class="acct-badge acct-buy">처음 남아 있던 2개</span>
+              <h4 style="font-size:1.15rem; margin-top:6px;">기초 상품 수량</h4>
+              <p style="font-size:0.88rem;">장사 시작할 때 이미 있던 상품</p>
+            </div>
+            <div class="card" style="background:var(--cost-bg); border-color:var(--cost-border);">
+              <span class="acct-badge acct-cost">오늘 사 온 8개</span>
+              <h4 style="font-size:1.15rem; margin-top:6px;">당기 매입 상품 수량</h4>
+              <p style="font-size:0.88rem;">이번 기간에 새로 사 온 상품</p>
+            </div>
+            <div class="card" style="background:var(--adj-bg); border-color:var(--adj-border);">
+              <span class="acct-badge acct-adj">마지막에 남은 1개</span>
+              <h4 style="font-size:1.15rem; margin-top:6px;">기말 상품 수량</h4>
+              <p style="font-size:0.88rem;">장사를 마치고 남아 있는 재고</p>
+            </div>
+            <div class="card" style="background:var(--profit-bg); border-color:var(--profit-border);">
+              <span class="acct-badge acct-profit">팔린 9개</span>
+              <h4 style="font-size:1.15rem; margin-top:6px;">판매 수량</h4>
+              <p style="font-size:0.88rem;">기초(2) + 매입(8) - 기말(1) = 9개</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 4] 붕어빵 이야기: 원가와 이익은 얼마일까?
+         ========================================== -->
+    <section class="scene" id="scene-4">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 4 · 수량에서 금액(원가·이익)으로</span>
+          <h2 class="scene-title">붕어빵 이야기 ②: 팔린 9개의 원가와 매출총이익은 얼마일까?</h2>
+        </div>
+      </div>
+
+      <div class="card" style="background-color:var(--bg-warm); margin-bottom:20px;">
+        <h3 style="font-size:1.1rem; margin-bottom:8px;">📌 계산 조건을 먼저 확인해요</h3>
+        <ul style="padding-left:20px; font-weight:700;">
+          <li>붕어빵의 기초 상품과 당기 매입 상품은 모두 <strong>개당 매입원가 100원</strong>입니다.</li>
+          <li>수량: <strong>기초 2개, 당기 매입 8개, 기말 재고 1개</strong> (즉, 판매한 수량은 <strong>9개</strong>)</li>
+          <li>오늘 9개를 팔고 손님에게 받은 <strong>전체 매출액(총 판매금액)은 3,500원</strong>입니다. (판매금액은 원가와 다릅니다!)</li>
+          <li>이 예제에는 매입·매출 환출입, 에누리, 할인이 없습니다.</li>
+        </ul>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <h3 style="font-size:1.15rem; margin-bottom:12px;">1단계: 재고와 매입 금액 계산하기</h3>
+          <p style="margin-bottom:12px;">개당 원가 100원을 곱하면 금액이 얼마가 될까요?</p>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('scene4-step1', this)">
+            <span>🔍 기초·매입·기말 금액 확인</span>
+          </button>
+          <div class="reveal-panel" id="scene4-step1">
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:1.05rem; font-weight:800;">
+              <li>🔵 기초 상품 재고액: 2개 × 100원 = <span style="color:var(--buy-main);">200원</span></li>
+              <li>🟠 당기 순매입액: 8개 × 100원 = <span style="color:var(--cost-main);">800원</span></li>
+              <li>🟣 기말 상품 재고액: 1개 × 100원 = <span style="color:var(--adj-main);">100원</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:1.15rem; margin-bottom:12px;">2단계: 생각 질문!</h3>
+          <p style="font-weight:700; color:var(--brown-dark); margin-bottom:12px;">
+            “총 10개(1,000원어치)를 준비했는데, 왜 오늘 팔린 상품의 <strong>매출원가는 1,000원이 아니고 900원</strong>일까요?”
+          </p>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('scene4-why', this)">
+            <span>💡 이유 확인하기</span>
+          </button>
+          <div class="reveal-panel" id="scene4-why">
+            <p style="font-weight:800; color:var(--cost-main); font-size:1.05rem;">
+              1개(100원)가 팔리지 않고 아직 기말 재고로 남아 있기 때문입니다!
+            </p>
+            <p style="margin-top:6px; font-size:0.95rem;">
+              회계에서 <strong>매출원가</strong>는 준비한 전체 상품이 아니라 <strong>‘실제로 판매된 상품(9개)의 원가’</strong>만 뜻합니다. 남은 1개(100원)는 다음 날 팔 수 있는 자산(기말 상품 재고액)으로 남습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--profit-main);">
+        <h3 style="font-size:1.2rem; margin-bottom:10px;">3단계: 매출원가와 매출총이익 구하기</h3>
+        <button type="button" class="btn btn-toggle" onclick="toggleReveal('scene4-final', this)">
+          <span>📊 매출원가 · 순매출액 · 매출총이익 결과 보기</span>
+        </button>
+        <div class="reveal-panel" id="scene4-final">
+          <div class="grid-3">
+            <div class="card" style="background:var(--cost-bg); border-color:var(--cost-border);">
+              <span class="acct-badge acct-cost">팔린 9개의 원가</span>
+              <h4 style="font-size:1.1rem; margin:6px 0;">매출원가 = 900원</h4>
+              <p style="font-weight:700;">200원(기초) + 800원(매입) - 100원(기말) = 900원</p>
+            </div>
+            <div class="card" style="background:var(--sell-bg); border-color:var(--sell-border);">
+              <span class="acct-badge acct-sell">오늘 번 전체 매출액</span>
+              <h4 style="font-size:1.1rem; margin:6px 0;">순매출액 = 3,500원</h4>
+              <p style="font-weight:700;">9개를 판매하고 받은 전체 판매금액</p>
+            </div>
+            <div class="card" style="background:var(--profit-bg); border-color:var(--profit-border);">
+              <span class="acct-badge acct-profit">매출에서 원가를 뺀 이익</span>
+              <h4 style="font-size:1.1rem; margin:6px 0;">매출총이익 = 2,600원</h4>
+              <p style="font-weight:700;">3,500원(순매출액) - 900원(매출원가) = 2,600원</p>
+            </div>
+          </div>
+          <p style="margin-top:12px; font-size:0.92rem; color:var(--brown-main); font-weight:700;">
+            ※ 주의: 오늘 판매하고 받은 <strong>3,500원은 전체 매출액</strong>이며, 여기서 매출원가(900원)를 뺀 <strong>2,600원은 판매관리비(가게 월세, 전기요금 등)를 차감하기 전의 ‘매출총이익’</strong>입니다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 5] 네 가지 필수 계산식: 그림에서 공식으로
+         ========================================== -->
+    <section class="scene" id="scene-5">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 5 · 그림에서 공식으로 도출 (교과서 113~114쪽)</span>
+          <h2 class="scene-title">네 가지 필수 계산식과 단계별 숫자 연결 연습</h2>
+        </div>
+      </div>
+
+      <p style="margin-bottom:16px; font-weight:700;">
+        네 공식을 한꺼번에 외우지 말고, 각 거래의 흐름 그림을 보며 <strong>① 순매입액 → ② 순매출액 → ③ 매출원가 → ④ 매출총이익</strong> 순서로 열어 보세요. (단위: 원, 보충 예제)
+      </p>
+
+      <!-- 공식 1: 당기 순매입액 -->
+      <div class="card" style="margin-bottom:16px; border-left: 6px solid var(--buy-main);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <span class="acct-badge acct-buy">공식 ① 매입 조정 흐름</span>
+            <h3 style="font-size:1.25rem; margin-top:4px;">당기 순매입액은 어떻게 구할까요?</h3>
+          </div>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('f1-box', this)">
+            <span>공식 ① 도출 및 계산 보기</span>
+          </button>
+        </div>
+        <p style="margin-top:8px; color:var(--brown-main); font-weight:700;">
+          질문: 상품 500,000원을 매입하면서 인수 운임(매입 제비용) 20,000원이 들었고, 이후 반품(환출) 30,000원, 에누리 10,000원, 조기 결제 할인 5,000원을 받았다면 실제 순수하게 매입한 원가는 얼마일까요?
+        </p>
+        <div class="reveal-panel" id="f1-box">
+          <div style="background:#F5FAFF; padding:14px; border-radius:8px; border:1px solid var(--buy-border); margin-bottom:12px;">
+            <strong style="font-size:1.1rem; color:var(--buy-main);">
+              [식] 당기 순매입액 = 당기 총매입액 + 매입 제비용 - (매입환출 + 매입에누리 + 매입할인)
+            </strong>
+            <p style="font-size:0.9rem; margin-top:6px; color:var(--brown-dark);">
+              ※ 주의: 매입시 발생한 운임·수수료 등 <strong>매입 제비용은 매입원가에 가산</strong>합니다. 단, 문제에서 제시된 ‘당기 총매입액’에 이미 매입 제비용이 포함되어 있다면 중복해서 더하지 않습니다! (아래 보충 예제는 총매입액에 매입 제비용이 포함되어 있지 않은 경우입니다.)
+            </p>
+          </div>
+          <div style="font-size:1.05rem; font-weight:800;">
+            📊 보충 예제 계산: 500,000(총매입액) + 20,000(매입 제비용) - 30,000(환출) - 10,000(에누리) - 5,000(할인) = <span style="color:var(--buy-main); font-size:1.2rem;">475,000원</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 공식 2: 당기 순매출액 -->
+      <div class="card" style="margin-bottom:16px; border-left: 6px solid var(--sell-main);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <span class="acct-badge acct-sell">공식 ② 매출 조정 흐름</span>
+            <h3 style="font-size:1.25rem; margin-top:4px;">당기 순매출액은 어떻게 구할까요?</h3>
+          </div>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('f2-box', this)">
+            <span>공식 ② 도출 및 계산 보기</span>
+          </button>
+        </div>
+        <p style="margin-top:8px; color:var(--brown-main); font-weight:700;">
+          질문: 상품을 총 900,000원어치 팔았는데, 고객에게서 반품(환입) 40,000원이 들어오고, 에누리 20,000원, 조기 회수 할인 10,000원을 해 주었다면 순수한 매출액은 얼마일까요?
+        </p>
+        <div class="reveal-panel" id="f2-box">
+          <div style="background:#FFF8F8; padding:14px; border-radius:8px; border:1px solid var(--sell-border); margin-bottom:12px;">
+            <strong style="font-size:1.1rem; color:var(--sell-main);">
+              [식] 당기 순매출액 = 당기 총매출액 - (매출환입 + 매출에누리 + 매출할인)
+            </strong>
+            <p style="font-size:0.9rem; margin-top:6px;">
+              뜻: 전체 매출액에서 반품되거나 깎아 준 금액을 빼서 실제로 확정된 순수 매출 수익을 구합니다.
+            </p>
+          </div>
+          <div style="font-size:1.05rem; font-weight:800;">
+            📊 보충 예제 계산: 900,000(총매출액) - 40,000(환입) - 20,000(에누리) - 10,000(할인) = <span style="color:var(--sell-main); font-size:1.2rem;">830,000원</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 공식 3: 매출원가 (상품 수량·원가 흐름 도식 포함) -->
+      <div class="card" style="margin-bottom:16px; border-left: 6px solid var(--cost-main);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <span class="acct-badge acct-cost">공식 ③ 상품 원가 흐름 박스</span>
+            <h3 style="font-size:1.25rem; margin-top:4px;">매출원가는 상품 흐름 그림에서 어떻게 나올까요?</h3>
+          </div>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('f3-box', this)">
+            <span>공식 ③ 도출 및 계산 보기</span>
+          </button>
+        </div>
+        <p style="margin-top:8px; color:var(--brown-main); font-weight:700;">
+          질문: 기초 상품 재고액이 100,000원이고, 공식 ①에서 구한 당기 순매입액이 475,000원입니다. 기말에 남은 상품 재고액이 75,000원이라면 이번 기간에 팔린 상품의 원가(매출원가)는 얼마일까요?
+        </p>
+        <div class="reveal-panel" id="f3-box">
+          <!-- 상품 원가 흐름 시각화 블록 (분기법 원가 기준 시각화) -->
+          <div class="grid-2" style="margin-bottom:14px; align-items:stretch;">
+            <div style="border:2px solid var(--buy-main); border-radius:8px; overflow:hidden;">
+              <div style="background:var(--buy-main); color:#fff; padding:6px 12px; font-weight:800;">들어온 상품 원가 합계 (575,000원)</div>
+              <div style="padding:12px; background:#E3F2FD; border-bottom:1px dashed var(--buy-main); font-weight:800;">
+                기초 상품 재고액: 100,000원
+              </div>
+              <div style="padding:18px 12px; background:#FFF3E0; font-weight:800;">
+                + 당기 순매입액: 475,000원 <span style="font-size:0.85rem; color:var(--cost-main);">(공식 ①에서 연결!)</span>
+              </div>
+            </div>
+            <div style="border:2px solid var(--cost-main); border-radius:8px; overflow:hidden;">
+              <div style="background:var(--cost-main); color:#fff; padding:6px 12px; font-weight:800;">팔린 원가와 남은 원가 합계 (575,000원)</div>
+              <div style="padding:18px 12px; background:#FFE0B2; border-bottom:1px dashed var(--cost-main); font-weight:800; color:var(--cost-main);">
+                👉 매출원가 (팔린 것): 500,000원
+              </div>
+              <div style="padding:12px; background:#F3E5F5; font-weight:800;">
+                기말 상품 재고액 (남은 것): 75,000원
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--cost-bg); padding:14px; border-radius:8px; border:1px solid var(--cost-border); margin-bottom:12px;">
+            <strong style="font-size:1.1rem; color:var(--cost-main);">
+              [식] 매출원가 = 기초 상품 재고액 + 당기 순매입액 - 기말 상품 재고액
+            </strong>
+            <p style="font-size:0.88rem; margin-top:6px;">
+              ※ 안내: 위 그림은 원가 흐름(기초+순매입=매출원가+기말)을 이해하기 위한 도식입니다. (총기법의 상품 계정 대변에는 매출액이 기록되므로 방법별 장부 기입 방식과 혼동하지 마세요.)
+            </p>
+          </div>
+          <div style="font-size:1.05rem; font-weight:800;">
+            📊 보충 예제 계산: 100,000(기초) + 475,000(당기 순매입액) - 75,000(기말) = <span style="color:var(--cost-main); font-size:1.2rem;">500,000원</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 공식 4: 매출총이익 -->
+      <div class="card" style="border-left: 6px solid var(--profit-main);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <span class="acct-badge acct-profit">공식 ④ 수익과 원가의 비교</span>
+            <h3 style="font-size:1.25rem; margin-top:4px;">매출총이익은 어떻게 구할까요?</h3>
+          </div>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('f4-box', this)">
+            <span>공식 ④ 도출 및 계산 보기</span>
+          </button>
+        </div>
+        <p style="margin-top:8px; color:var(--brown-main); font-weight:700;">
+          질문: 공식 ②에서 구한 당기 순매출액(830,000원)과 공식 ③에서 구한 매출원가(500,000원)를 비교하면 얼마의 이익이 남았을까요?
+        </p>
+        <div class="reveal-panel" id="f4-box">
+          <div style="background:var(--profit-bg); padding:14px; border-radius:8px; border:1px solid var(--profit-border); margin-bottom:12px;">
+            <strong style="font-size:1.1rem; color:var(--profit-main);">
+              [식] 매출총이익 = 당기 순매출액 - 매출원가
+            </strong>
+          </div>
+          <div style="font-size:1.05rem; font-weight:800;">
+            📊 보충 예제 계산: 830,000(당기 순매출액) - 500,000(매출원가) = <span style="color:var(--profit-main); font-size:1.2rem;">330,000원</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 6] 같은 거래로 분기법·총기법·3분법 비교
+         ========================================== -->
+    <section class="scene" id="scene-6">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 6 · 3가지 기장법 한눈에 비교 (보충 예제)</span>
+          <h2 class="scene-title">같은 매입·매출 거래를 분기법·총기법·3분법으로 분개하면?</h2>
+        </div>
+      </div>
+
+      <div class="card" style="background-color:var(--bg-warm); margin-bottom:20px;">
+        <span class="acct-badge" style="background:#FFF8E1; border:1px solid var(--accent-gold);">📌 교과서에 없는 이해용 보충 예제</span>
+        <p style="font-size:1.15rem; font-weight:800; margin-top:8px;">
+          [거래] 상품 <span style="color:var(--buy-main);">100,000원</span>을 외상으로 매입하고, 그중 <span style="color:var(--cost-main);">원가가 60,000원</span>인 상품을 <span style="color:var(--sell-main);">80,000원</span>에 외상으로 판매하였다.
+        </p>
+      </div>
+
+      <!-- 방법별 탭 선택 -->
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+        <button type="button" class="btn btn-primary" id="methodTab-1" onclick="selectMethodTab(1)">① 분기법 (순수 상품 계정)</button>
+        <button type="button" class="btn btn-secondary" id="methodTab-2" onclick="selectMethodTab(2)">② 총기법 (혼합 상품 계정)</button>
+        <button type="button" class="btn btn-secondary" id="methodTab-3" onclick="selectMethodTab(3)">③ 3분법 (상품 계정 분할)</button>
+        <button type="button" class="btn btn-secondary" id="methodTab-all" onclick="selectMethodTab(0)">📊 3가지 방법 한눈에 비교</button>
+      </div>
+
+      <div id="methodComparisonContent">
+        <!-- JS로 탭별 내용 렌더링 -->
+      </div>
+
+      <div class="card" style="margin-top:20px; background-color:#FFF8E1; border-color:var(--accent-gold);">
+        <h3 style="font-size:1.1rem; margin-bottom:8px;">⭐ 세 가지 기장법 비교의 핵심 포인트!</h3>
+        <ul style="padding-left:20px; font-weight:700;">
+          <li>같은 외상 판매이므로 차변의 <strong>외상매출금은 세 방법 모두 80,000원</strong>으로 똑같습니다.</li>
+          <li><strong>분기법</strong>은 판매할 때마다 대변에 <strong>상품(원가 60,000원)과 상품매출이익(20,000원)을 나누어</strong> 기록합니다.</li>
+          <li><strong>총기법</strong>은 판매할 때 이익을 나누지 않고 대변의 <strong>상품 계정에 판매금액(80,000원)을 그대로</strong> 기록합니다.</li>
+          <li><strong>3분법</strong>은 상품 계정 대신 매입할 때 차변에 <strong>매입(비용)</strong>, 판매할 때 대변에 <strong>매출(수익, 80,000원)</strong> 계정을 사용합니다.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 7] 교과서 119쪽 기초 다지기 01
+         ========================================== -->
+    <section class="scene" id="scene-7">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 7 · 교과서 119쪽 기초 다지기 01</span>
+          <h2 class="scene-title">실전 분개 연습 ①: 분기법과 총기법으로 분개하기</h2>
+        </div>
+      </div>
+
+      <p style="margin-bottom:16px; font-size:0.95rem; color:var(--brown-main); font-weight:700;">
+        ※ 교과서 119쪽 기초 다지기 01번의 매입·매출 분개 문제입니다. (교과서 문제의 손익 대체 및 원장 전기는 이번 수업에서 생략합니다. 기초 상품 재고액: 4월 1일 30,000원)
+      </p>
+
+      <!-- 4월 12일 거래 -->
+      <div class="card" style="margin-bottom:20px;">
+        <span class="acct-badge acct-buy">4월 12일 매입 거래</span>
+        <h3 style="font-size:1.2rem; margin:8px 0;">
+          “안성 상사에서 갑상품 100개(@3,000원)를 수표를 발행하여 매입하다.”
+        </h3>
+        <p style="font-size:0.95rem; color:var(--brown-main); margin-bottom:12px;">
+          🔍 사고 힌트: 100개 × 3,000원 = 300,000원! <strong>우리 회사(당점)가 수표를 발행하여 지급</strong>하면 어떤 예금 계정에서 돈이 빠져나갈까요?
+        </p>
+
+        <button type="button" class="btn btn-toggle" onclick="toggleReveal('p1-apr12', this)">
+          <span>✍️ 4월 12일 분개 정답 확인하기</span>
+        </button>
+
+        <div class="reveal-panel" id="p1-apr12">
+          <p style="font-weight:800; color:var(--buy-main); margin-bottom:8px;">
+            ✔ 매입 분개는 분기법과 총기법이 동일합니다! 당점 발행 수표 지급은 대변에 ‘당좌예금’으로 처리합니다.
+          </p>
+          <div class="journal-scroll-wrap">
+            <div class="journal-row">
+              <div class="journal-side debit">
+                <div class="journal-line">
+                  <span>(차) <span class="acct-badge acct-buy">상품</span></span>
+                  <span>300,000</span>
+                </div>
+              </div>
+              <div class="journal-side credit">
+                <div class="journal-line">
+                  <span>(대) 당좌예금</span>
+                  <span>300,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4월 13일 거래 -->
+      <div class="card" style="margin-bottom:20px;">
+        <span class="acct-badge acct-sell">4월 13일 매출 거래</span>
+        <h3 style="font-size:1.2rem; margin:8px 0;">
+          “충주 상사에 갑상품 80개(원가 @3,000원, 판매가 @3,200원)를 동점 발행 당좌수표를 받고 매출하다.”
+        </h3>
+        <p style="font-size:0.95rem; color:var(--brown-main); margin-bottom:12px;">
+          🔍 사고 힌트: 거래처(동점, 충주 상사)가 발행한 당좌수표를 받으면 우리 입장에서는 무엇으로 처리할까요? 원가와 판매금액을 먼저 계산해 보세요!
+        </p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('p1-apr13-calc', this)">
+            <span>🧮 1단계: 원가·판매금액·이익 계산 보기</span>
+          </button>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('p1-apr13-journal', this)">
+            <span>✍️ 2단계: 분기법·총기법 분개 정답 보기</span>
+          </button>
+        </div>
+
+        <div class="reveal-panel" id="p1-apr13-calc">
+          <ul style="list-style:none; font-weight:800; font-size:1.05rem; display:flex; flex-direction:column; gap:6px;">
+            <li>• 매출원가 = 80개 × 3,000원 = <span style="color:var(--cost-main);">240,000원</span></li>
+            <li>• 판매금액(매출액) = 80개 × 3,200원 = <span style="color:var(--sell-main);">256,000원</span></li>
+            <li>• 상품매출이익 = 256,000원 - 240,000원 = <span style="color:var(--profit-main);">16,000원</span></li>
+            <li>• 결제 수단: <strong>거래처(동점) 발행 당좌수표를 받으면 차변에 ‘현금’</strong>으로 처리합니다!</li>
+          </ul>
+        </div>
+
+        <div class="reveal-panel" id="p1-apr13-journal">
+          <div style="margin-bottom:16px;">
+            <strong style="font-size:1.05rem; color:var(--cost-main);">① 분기법 매출 분개 (원가와 이익 분리)</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit">
+                  <div class="journal-line">
+                    <span>(차) 현금</span>
+                    <span>256,000</span>
+                  </div>
+                </div>
+                <div class="journal-side credit">
+                  <div class="journal-line">
+                    <span>(대) <span class="acct-badge acct-cost">상품</span></span>
+                    <span>240,000</span>
+                  </div>
+                  <div class="journal-line">
+                    <span>(대) <span class="acct-badge acct-profit">상품매출이익</span></span>
+                    <span>16,000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <strong style="font-size:1.05rem; color:var(--sell-main);">② 총기법 매출 분개 (판매금액 전체를 상품 계정에 기록)</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit">
+                  <div class="journal-line">
+                    <span>(차) 현금</span>
+                    <span>256,000</span>
+                  </div>
+                </div>
+                <div class="journal-side credit">
+                  <div class="journal-line">
+                    <span>(대) <span class="acct-badge acct-sell">상품</span></span>
+                    <span>256,000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; padding:12px; background:var(--bg-warm); border-radius:8px; font-weight:800;">
+            🔗 재고 흐름 확인: 기초 재고(30,000원) + 당기 매입(300,000원) - 매출원가(240,000원) = <strong>기말 상품 재고액 90,000원</strong> (교과서 제시 월말 재고액과 정확히 일치!)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 8] 교과서 119쪽 기초 다지기 02
+         ========================================== -->
+    <section class="scene" id="scene-8">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 8 · 교과서 119쪽 기초 다지기 02</span>
+          <h2 class="scene-title">실전 분개 연습 ②: 3분법과 매입·매출 운임 처리하기</h2>
+        </div>
+      </div>
+
+      <p style="margin-bottom:16px; font-size:0.95rem; color:var(--brown-main); font-weight:700;">
+        ※ 교과서 119쪽 기초 다지기 02번 중 핵심인 10월 4일 매입 거래와 10월 17일 매출 거래를 <strong>3분법</strong>으로 분개합니다. (전기와 결산 대체분개는 생략합니다.)
+      </p>
+
+      <div class="card" style="background:#FFF8E1; border-color:var(--accent-gold); margin-bottom:20px;">
+        <h3 style="font-size:1.1rem; color:var(--brown-dark);">🚛 운임(택배비·운반비) 회계 처리 핵심 비교 (교과서 112쪽 회계 TIP)</h3>
+        <div class="grid-2" style="margin-top:10px;">
+          <div style="background:#FFFFFF; padding:12px; border-radius:8px; border:1px solid var(--buy-border);">
+            <strong style="color:var(--buy-main);">🔵 상품을 사 올 때 (매입 시 인수 운임)</strong>
+            <p style="font-size:0.95rem; font-weight:700; margin-top:4px;">별도의 비용 계정을 쓰지 않고 <strong>매입원가(상품 또는 매입 계정)에 포함</strong>하여 더합니다!</p>
+          </div>
+          <div style="background:#FFFFFF; padding:12px; border-radius:8px; border:1px solid var(--sell-border);">
+            <strong style="color:var(--sell-main);">🔴 상품을 팔 때 (매출 시 발송 운임)</strong>
+            <p style="font-size:0.95rem; font-weight:700; margin-top:4px;">매출액에서 빼지 않고 차변에 <strong>‘운반비’(비용) 계정으로 따로 처리</strong>합니다!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10월 4일 거래 -->
+      <div class="card" style="margin-bottom:20px;">
+        <span class="acct-badge acct-buy">10월 4일 · 3분법 매입 + 인수 운임</span>
+        <h3 style="font-size:1.2rem; margin:8px 0;">
+          “서산 상사에서 을상품 700,000원을 외상으로 매입하고, 인수 운임 5,000원을 현금으로 지급하다.”
+        </h3>
+        <button type="button" class="btn btn-toggle" onclick="toggleReveal('p2-oct4', this)">
+          <span>✍️ 10월 4일 분개 정답 확인하기</span>
+        </button>
+
+        <div class="reveal-panel" id="p2-oct4">
+          <p style="font-weight:800; color:var(--buy-main); margin-bottom:8px;">
+            ✔ 3분법이므로 차변에 ‘매입’ 계정을 사용하고, 인수 운임 5,000원은 매입원가에 합산하여 705,000원으로 기록합니다!
+          </p>
+          <div class="journal-scroll-wrap">
+            <div class="journal-row">
+              <div class="journal-side debit">
+                <div class="journal-line">
+                  <span>(차) <span class="acct-badge acct-buy">매입</span></span>
+                  <span>705,000</span>
+                </div>
+              </div>
+              <div class="journal-side credit">
+                <div class="journal-line">
+                  <span>(대) 외상매입금</span>
+                  <span>700,000</span>
+                </div>
+                <div class="journal-line">
+                  <span>(대) 현금</span>
+                  <span>5,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10월 17일 거래 -->
+      <div class="card">
+        <span class="acct-badge acct-sell">10월 17일 · 3분법 매출 + 발송 운임</span>
+        <h3 style="font-size:1.2rem; margin:8px 0;">
+          “예천 상사에 을상품 900,000원을 외상으로 매출하고, 발송 운임 10,000원을 현금으로 지급하다.”
+        </h3>
+        <button type="button" class="btn btn-toggle" onclick="toggleReveal('p2-oct17', this)">
+          <span>✍️ 10월 17일 분개 정답 확인하기</span>
+        </button>
+
+        <div class="reveal-panel" id="p2-oct17">
+          <p style="font-weight:800; color:var(--sell-main); margin-bottom:8px;">
+            ✔ 3분법이므로 대변에 ‘매출’ 900,000원을 기록하고, 매출 시 발생한 발송 운임 10,000원은 차변에 ‘운반비’로 처리합니다! (차변 합계 910,000원 = 대변 합계 910,000원)
+          </p>
+          <div class="journal-scroll-wrap">
+            <div class="journal-row">
+              <div class="journal-side debit">
+                <div class="journal-line">
+                  <span>(차) 외상매출금</span>
+                  <span>900,000</span>
+                </div>
+                <div class="journal-line">
+                  <span>(차) <span class="acct-badge acct-cost">운반비</span></span>
+                  <span>10,000</span>
+                </div>
+              </div>
+              <div class="journal-side credit">
+                <div class="journal-line">
+                  <span>(대) <span class="acct-badge acct-sell">매출</span></span>
+                  <span>900,000</span>
+                </div>
+                <div class="journal-line">
+                  <span>(대) 현금</span>
+                  <span>10,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         [장면 9] 스스로 확인하는 5문제
+         ========================================== -->
+    <section class="scene" id="scene-9">
+      <div class="scene-header">
+        <div>
+          <span class="scene-badge">장면 9 · 자기주도 마무리 확인</span>
+          <h2 class="scene-title">스스로 확인하는 5문제: 오늘 배운 내용을 점검해 볼까요?</h2>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="resetAllQuizzes()">
+          <span>🔄 전체 다시 풀기</span>
+        </button>
+      </div>
+
+      <p style="margin-bottom:20px; font-weight:700; color:var(--brown-main);">
+        각 문제를 스스로 풀어 본 뒤 <strong>[채점하기]</strong> 버튼을 눌러 정답과 이유를 확인하세요. (숫자 입력 시 쉼표(,)는 넣어도 되고 빼도 됩니다.)
+      </p>
+
+      <!-- 문제 1 -->
+      <div class="card" style="margin-bottom:16px;" id="qCard-1">
+        <h3 style="font-size:1.15rem;">문제 1. 우리 회사가 구입한 상품이 파손되어 공급업체에 돌려보냈다. 알맞은 회계 용어는?</h3>
+        <div class="quiz-option-list" id="q1-options">
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(1, '매입환출', this)">① 매입환출</button>
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(1, '매출환입', this)">② 매출환입</button>
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(1, '매입에누리', this)">③ 매입에누리</button>
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(1, '매출에누리', this)">④ 매출에누리</button>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="checkQuiz(1)">채점하기</button>
+          <button type="button" class="btn btn-secondary" onclick="resetSingleQuiz(1)">다시 풀기</button>
+        </div>
+        <div class="reveal-panel" id="qFeedback-1"></div>
+      </div>
+
+      <!-- 문제 2 -->
+      <div class="card" style="margin-bottom:16px;" id="qCard-2">
+        <h3 style="font-size:1.15rem;">문제 2. 외상 매입 대금을 약정 기간 안에 조기 지급하여 지급할 금액의 일부를 할인받았다. 알맞은 용어는?</h3>
+        <div class="quiz-option-list" id="q2-options">
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(2, '매입에누리', this)">① 매입에누리</button>
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(2, '매입할인', this)">② 매입할인</button>
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(2, '매출할인', this)">③ 매출할인</button>
+          <button type="button" class="quiz-opt-btn" onclick="selectQuizOpt(2, '매입환출', this)">④ 매입환출</button>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="checkQuiz(2)">채점하기</button>
+          <button type="button" class="btn btn-secondary" onclick="resetSingleQuiz(2)">다시 풀기</button>
+        </div>
+        <div class="reveal-panel" id="qFeedback-2"></div>
+      </div>
+
+      <!-- 문제 3 -->
+      <div class="card" style="margin-bottom:16px;" id="qCard-3">
+        <h3 style="font-size:1.15rem;">문제 3. 기초 상품 재고액 200원, 당기 순매입액 800원, 기말 상품 재고액 100원일 때 매출원가는 얼마인가?</h3>
+        <div style="margin-top:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <label for="q3-input" style="font-weight:700;">매출원가:</label>
+          <input type="text" id="q3-input" class="quiz-input" placeholder="숫자 입력 (예: 900)" inputmode="numeric">
+          <span style="font-weight:800;">원</span>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="checkQuiz(3)">채점하기</button>
+          <button type="button" class="btn btn-secondary" onclick="resetSingleQuiz(3)">다시 풀기</button>
+        </div>
+        <div class="reveal-panel" id="qFeedback-3"></div>
+      </div>
+
+      <!-- 문제 4 -->
+      <div class="card" style="margin-bottom:16px;" id="qCard-4">
+        <h3 style="font-size:1.15rem;">문제 4. 원가 60,000원인 상품을 80,000원에 외상 판매할 때, <u>분기법</u>에서 대변의 상품과 상품매출이익은 각각 얼마인가?</h3>
+        <div style="margin-top:12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <div>
+            <label for="q4-input1" style="font-weight:700;">(대) 상품:</label>
+            <input type="text" id="q4-input1" class="quiz-input" placeholder="예: 60,000" inputmode="numeric">
+            <span style="font-weight:800;">원</span>
+          </div>
+          <div>
+            <label for="q4-input2" style="font-weight:700;">(대) 상품매출이익:</label>
+            <input type="text" id="q4-input2" class="quiz-input" placeholder="예: 20,000" inputmode="numeric">
+            <span style="font-weight:800;">원</span>
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="checkQuiz(4)">채점하기</button>
+          <button type="button" class="btn btn-secondary" onclick="resetSingleQuiz(4)">다시 풀기</button>
+        </div>
+        <div class="reveal-panel" id="qFeedback-4"></div>
+      </div>
+
+      <!-- 문제 5 -->
+      <div class="card" id="qCard-5">
+        <h3 style="font-size:1.15rem;">문제 5. 당기 순매출액이 700,000원이고 매출원가가 400,000원일 때 매출총이익은 얼마인가?</h3>
+        <div style="margin-top:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <label for="q5-input" style="font-weight:700;">매출총이익:</label>
+          <input type="text" id="q5-input" class="quiz-input" placeholder="예: 300,000" inputmode="numeric">
+          <span style="font-weight:800;">원</span>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="checkQuiz(5)">채점하기</button>
+          <button type="button" class="btn btn-secondary" onclick="resetSingleQuiz(5)">다시 풀기</button>
+        </div>
+        <div class="reveal-panel" id="qFeedback-5"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 하단 이전/다음 장면 네비게이션 -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <button type="button" class="btn btn-secondary" id="prevSceneBtn" onclick="changeScene(-1)">
+        ◀ 이전 장면
+      </button>
+      <div class="scene-counter" id="sceneCounterText" aria-live="polite">
+        장면 1 / 9
+      </div>
+      <button type="button" class="btn btn-primary" id="nextSceneBtn" onclick="changeScene(1)">
+        다음 장면 ▶
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================
+       1. 장면(Scene) 전환 및 키보드 네비게이션
+       ========================================== */
+    let currentScene = 1;
+    const totalScenes = 9;
+
+    function goToScene(sceneNum) {
+      if (sceneNum < 1 || sceneNum > totalScenes) return;
+      currentScene = sceneNum;
+
+      for (let i = 1; i <= totalScenes; i++) {
+        const el = document.getElementById('scene-' + i);
+        if (el) {
+          el.classList.toggle('active', i === currentScene);
+        }
+      }
+
+      const tocBtns = document.querySelectorAll('.toc-btn');
+      tocBtns.forEach((btn, idx) => {
+        btn.classList.toggle('active', (idx + 1) === currentScene);
+      });
+
+      document.getElementById('sceneCounterText').textContent = `장면 ${currentScene} / ${totalScenes}`;
+      document.getElementById('prevSceneBtn').disabled = (currentScene === 1);
+      document.getElementById('nextSceneBtn').disabled = (currentScene === totalScenes);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changeScene(delta) {
+      goToScene(currentScene + delta);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      // 입력창에 포커스되어 있을 때는 화살표 키로 장면이 넘어가지 않도록 보호
+      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea') return;
+
+      if (e.key === 'ArrowRight') {
+        changeScene(1);
+      } else if (e.key === 'ArrowLeft') {
+        changeScene(-1);
+      }
+    });
+
+    function toggleTeacherGuide() {
+      const panel = document.getElementById('teacherGuidePanel');
+      const btn = document.getElementById('teacherGuideBtn');
+      const isShown = panel.classList.toggle('show');
+      btn.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+    }
+
+    function toggleReveal(panelId, btnEl) {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      const isShown = panel.classList.toggle('show');
+      if (btnEl) {
+        btnEl.classList.toggle('revealed', isShown);
+      }
+    }
+
+    /* ==========================================
+       2. 장면 2: 6가지 핵심 용어 데이터 및 렌더링
+       ========================================== */
+    const termsData = [
+      {
+        title: "① 매입환출 (Purchase Returns)",
+        perspective: "🔵 매입 입장 (물건을 산 우리 회사)",
+        badgeClass: "acct-buy",
+        definition: "우리 회사가 사 온 상품을 파손·불량 등의 이유로 거래처(공급업체)에 돌려보내는 것",
+        leftNode: "🏢 우리 회사 (카페)",
+        centerAction: "📦 사 온 상품을 실제로 돌려보냄 ➔",
+        rightNode: "🏭 공급업체 (거래처)",
+        visualNote: "실제 상품 상자가 우리 회사에서 공급업체로 반품되어 이동합니다. (총매입액에서 차감)",
+        example: "카페에서 판매용 원두 10봉지를 사 왔는데, 2봉지가 다른 품종으로 잘못 배송되어 공급업체로 반품했어요.",
+        quizQ: "미니 확인 질문: 사 온 상품에 하자가 있어 상품을 공급업체에 돌려보냈어요. 매입환출일까요, 매입에누리일까요?",
+        quizA: "정답: 매입환출! (상품을 실제로 돌려보냈기 때문에 매입환출입니다.)"
+      },
+      {
+        title: "② 매출환입 (Sales Returns)",
+        perspective: "🔴 매출 입장 (물건을 판 우리 회사)",
+        badgeClass: "acct-sell",
+        definition: "우리 회사가 판매한 상품이 파손·품종 상이 등으로 고객에게서 다시 돌아오는 것",
+        leftNode: "🧑 고객 (구매자)",
+        centerAction: "📦 판 상품이 다시 돌아옴 ➔",
+        rightNode: "🏢 우리 회사 (카페)",
+        visualNote: "고객에게 팔았던 실제 상품이 우리 회사로 되돌아옵니다. (총매출액에서 차감)",
+        example: "손님에게 판매한 머그컵 세트가 견본과 다르다며 손님이 매장으로 반품해 왔어요.",
+        quizQ: "미니 확인 질문: 우리가 판 상품을 고객이 반품하여 돌아왔어요. 매입환출일까요, 매출환입일까요?",
+        quizA: "정답: 매출환입! (판매한 우리 회사 입장에서 상품이 다시 들어왔으므로 매출환입입니다.)"
+      },
+      {
+        title: "③ 매입에누리 (Purchase Allowances)",
+        perspective: "🔵 매입 입장 (물건을 산 우리 회사)",
+        badgeClass: "acct-buy",
+        definition: "사 온 상품의 파손·품질 불량 등으로 상품은 반환하지 않고 매입 대금의 일부를 깎는 것",
+        leftNode: "🔍 파손·하자 확인",
+        centerAction: "📦 상품은 그대로 유지 + 🏷️ 매입 가격표 감액",
+        rightNode: "📉 매입 대금 감소",
+        visualNote: "상품은 돌려보내지 않고 우리 회사가 그대로 보유한 채, 줄 돈(매입 대금)만 깎습니다.",
+        example: "사 온 텀블러 상자 겉면에 작은 흠집이 있어서 반품하지 않고 그냥 쓰기로 하되, 대금에서 10,000원을 깎았어요.",
+        quizQ: "미니 확인 질문: 사 온 상품에 작은 흠집이 있었지만 반품하지 않고 값만 깎았어요. 매입환출일까요, 매입에누리일까요?",
+        quizA: "정답: 매입에누리! (물건은 돌려보내지 않고 매입 가격만 조정했으므로 매입에누리입니다.)"
+      },
+      {
+        title: "④ 매출에누리 (Sales Allowances)",
+        perspective: "🔴 매출 입장 (물건을 판 우리 회사)",
+        badgeClass: "acct-sell",
+        definition: "판매한 상품의 파손·품질 불량 등으로 반품받지 않고 고객이 지급할 판매 대금의 일부를 깎아 주는 것",
+        leftNode: "🔍 하자 확인",
+        centerAction: "📦 고객이 상품 보유 + 🏷️ 판매 가격표 감액",
+        rightNode: "📉 매출 대금 감소",
+        visualNote: "고객이 상품을 반품하지 않고 그대로 가지되, 우리가 받을 판매 대금의 일부를 깎아 줍니다.",
+        example: "손님에게 판 선물용 쿠키 박스가 살짝 찌그러져 있어서 반품받지 않고 판매 대금 5,000원을 깎아 주었어요.",
+        quizQ: "미니 확인 질문: 판매한 상품에 하자가 있어 반품받지 않고 판매 대금만 깎아 주었어요. 매출에누리일까요, 매출할인일까요?",
+        quizA: "정답: 매출에누리! (파손·품질 불량 등 하자로 인해 값을 깎아 준 것은 매출에누리입니다.)"
+      },
+      {
+        title: "⑤ 매입할인 (Purchase Discounts)",
+        perspective: "🔵 매입 입장 (물건을 산 우리 회사)",
+        badgeClass: "acct-buy",
+        definition: "약정된 할인 조건에 따라 외상 매입 대금을 조기에 지급하여 지급할 금액의 일부를 할인받는 것",
+        leftNode: "📝 외상 매입",
+        centerAction: "🗓️ 약정 기간 내 조기 지급!",
+        rightNode: "💰 지급할 외상값 감소",
+        visualNote: "상품 불량이 아니라, 외상값을 약속한 날짜보다 일찍 갚아서 매입 대금을 할인받는 것입니다.",
+        example: "원두 대금 100,000원을 한 달 뒤에 주기로 외상 매입했는데, 10일 안에 빨리 갚으면 2%를 깎아 준다는 조건에 따라 조기 지급하고 2,000원을 할인받았어요.",
+        quizQ: "미니 확인 질문: 외상 매입 대금을 약정 기일 전에 일찍 갚아서 일부 금액을 깎아 받았어요. 매입에누리일까요, 매입할인일까요?",
+        quizA: "정답: 매입할인! (약정 조건에 따라 외상대금을 조기에 지급하여 할인받은 것은 매입할인입니다.)"
+      },
+      {
+        title: "⑥ 매출할인 (Sales Discounts)",
+        perspective: "🔴 매출 입장 (물건을 판 우리 회사)",
+        badgeClass: "acct-sell",
+        definition: "약정된 할인 조건에 따라 외상 매출 대금을 조기에 회수하여 고객에게 대금의 일부를 할인해 주는 것",
+        leftNode: "📝 외상 매출",
+        centerAction: "🗓️ 약정 기간 내 조기 회수!",
+        rightNode: "💰 받을 외상값 일부 할인",
+        visualNote: "고객이 외상값을 약속한 할인 기간 안에 일찍 갚아 주어, 받을 금액의 일부를 깎아 주는 것입니다.",
+        example: "거래처에 더치커피를 외상으로 팔았는데, 거래처가 약정 기간 안에 외상값을 일찍 보내와서 대금의 일부를 할인해 주었어요.",
+        quizQ: "미니 확인 질문: 외상으로 판 상품 대금을 거래처가 약정 기간 내에 조기 결제하여 대금 일부를 할인해 주었어요. 무엇일까요?",
+        quizA: "정답: 매출할인! (외상 매출 대금을 조기에 회수하면서 약정 조건에 따라 할인해 준 금액입니다.)"
+      }
+    ];
+
+    function selectTerm(idx) {
+      for (let i = 0; i < 6; i++) {
+        const btn = document.getElementById('termBtn-' + i);
+        if (btn) btn.classList.toggle('active', i === idx);
+      }
+
+      const d = termsData[idx];
+      const stage = document.getElementById('termDetailStage');
+      stage.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <span class="acct-badge ${d.badgeClass}" style="font-size:0.95rem;">${d.perspective}</span>
+          <span style="font-size:0.9rem; font-weight:700; color:var(--brown-main);">※ 주의: 단순히 '할인'이라는 말만 보고 단정하지 말고, 하자 때문인지(에누리) 조기 결제 때문인지(할인) 꼭 확인하세요!</span>
+        </div>
+        <h3 style="font-size:1.4rem; color:var(--brown-dark); margin-bottom:8px;">${d.title}</h3>
+        <p style="font-size:1.1rem; font-weight:800; color:var(--cost-main); margin-bottom:16px;">뜻: ${d.definition}</p>
+
+        <div class="flow-nodes">
+          <div class="flow-entity">${d.leftNode}</div>
+          <div class="flow-action-center">
+            <div style="font-size:1.1rem; font-weight:800; color:var(--brown-dark);">${d.centerAction}</div>
+            <div style="font-size:0.88rem; color:var(--brown-main); margin-top:4px;">${d.visualNote}</div>
+          </div>
+          <div class="flow-entity">${d.rightNode}</div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px;">
+          <strong>☕ 카페 예시 상황:</strong>
+          <p style="margin-top:4px; font-weight:700;">${d.example}</p>
+        </div>
+
+        <div class="card" style="background:#FFFDF7; border-color:var(--accent-gold);">
+          <p style="font-weight:800; margin-bottom:10px;">❓ ${d.quizQ}</p>
+          <button type="button" class="btn btn-toggle" onclick="toggleReveal('termMiniAns', this)">
+            <span>정답과 이유 확인하기</span>
+          </button>
+          <div class="reveal-panel" id="termMiniAns">
+            <p style="font-weight:800; color:var(--profit-main);">${d.quizA}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ==========================================
+       3. 장면 3: 붕어빵 수량 인터랙티브 트레이
+       ========================================== */
+    function getBungeoSvg() {
+      return `<svg width="46" height="32" viewBox="0 0 64 44" aria-hidden="true">
+        <ellipse cx="28" cy="22" rx="20" ry="13" fill="#FFB74D" stroke="#E65100" stroke-width="2.5"/>
+        <polygon points="45,22 58,12 58,32" fill="#FFB74D" stroke="#E65100" stroke-width="2.5"/>
+        <circle cx="19" cy="18" r="2.2" fill="#3E2723"/>
+      </svg>`;
+    }
+
+    function setBungeoStep(step) {
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById('bStepBtn-' + i);
+        if (btn) {
+          btn.className = (i === step) ? 'btn btn-primary' : 'btn btn-secondary';
+        }
+      }
+
+      const titleEl = document.getElementById('bungeoStepTitle');
+      const trayEl = document.getElementById('bungeoTray');
+      let itemsHtml = '';
+
+      if (step === 1) {
+        titleEl.textContent = "1단계: 어제 팔다 남은 붕어빵 2개가 트레이에 있어요. (기초 수량 2개)";
+        for (let i = 1; i <= 2; i++) {
+          itemsHtml += `<div class="bungeo-item yesterday">${getBungeoSvg()}<div>어제 남은 #${i}</div></div>`;
+        }
+      } else if (step === 2) {
+        titleEl.textContent = "2단계: 오늘 새로 준비한 붕어빵 8개가 트레이에 합류했어요! (+8개)";
+        for (let i = 1; i <= 2; i++) {
+          itemsHtml += `<div class="bungeo-item yesterday">${getBungeoSvg()}<div>어제 남은 #${i}</div></div>`;
+        }
+        for (let i = 1; i <= 8; i++) {
+          itemsHtml += `<div class="bungeo-item today">${getBungeoSvg()}<div>오늘 준비 #${i}</div></div>`;
+        }
+      } else if (step === 3) {
+        titleEl.textContent = "3단계: 오늘 손님에게 판매할 수 있는 붕어빵은 총 10개입니다! (2 + 8 = 10개)";
+        for (let i = 1; i <= 10; i++) {
+          const typeClass = i <= 2 ? 'yesterday' : 'today';
+          itemsHtml += `<div class="bungeo-item ${typeClass}">${getBungeoSvg()}<div>전체 #${i}</div></div>`;
+        }
+      } else if (step === 4) {
+        titleEl.textContent = "4단계: 오늘 장사를 마치고 보니 트레이에 1개가 남았어요! (기말 재고 1개)";
+        for (let i = 1; i <= 9; i++) {
+          itemsHtml += `<div class="bungeo-item" style="opacity:0.45;">${getBungeoSvg()}<div>팔려 나감</div></div>`;
+        }
+        itemsHtml += `<div class="bungeo-item remain">${getBungeoSvg()}<div>남은 1개(기말)</div></div>`;
+      } else if (step === 5) {
+        titleEl.textContent = "5단계: 총 10개 중 1개가 남았으니 오늘 판매한 붕어빵은 9개입니다! (2 + 8 - 1 = 9개)";
+        for (let i = 1; i <= 9; i++) {
+          itemsHtml += `<div class="bungeo-item sold">${getBungeoSvg()}<div>판매 완료 #${i}</div></div>`;
+        }
+        itemsHtml += `<div class="bungeo-item remain">${getBungeoSvg()}<div>남은 1개(기말)</div></div>`;
+      }
+
+      trayEl.innerHTML = itemsHtml;
+    }
+
+    /* ==========================================
+       4. 장면 6: 분기법·총기법·3분법 비교 탭
+       ========================================== */
+    function selectMethodTab(tabIdx) {
+      const ids = ['methodTab-all', 'methodTab-1', 'methodTab-2', 'methodTab-3'];
+      ids.forEach((id, i) => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = (i === tabIdx) ? 'btn btn-primary' : 'btn btn-secondary';
+      });
+
+      const container = document.getElementById('methodComparisonContent');
+
+      const block1 = `
+        <div class="card" style="margin-bottom:16px; border-top:4px solid var(--cost-main);">
+          <h3 style="font-size:1.25rem; color:var(--cost-main); margin-bottom:8px;">① 분기법 (순수 상품 계정)</h3>
+          <p style="font-weight:700; margin-bottom:12px;">
+            • <strong>어떤 계정인가?</strong> ‘상품’ 계정과 ‘상품매출이익’ 계정을 사용합니다.<br>
+            • <strong>어떤 금액을 기록하나?</strong> 상품을 매입할 때와 매출할 때 모두 <strong>상품 계정에는 ‘원가’</strong>만 적고, 판매 가격과 원가의 차이는 <strong>‘상품매출이익’</strong>에 나누어 적습니다.
+          </p>
+          <div style="margin-bottom:12px;">
+            <strong>[매입 분개] 상품 100,000원 외상 매입</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit"><div class="journal-line"><span>(차) <span class="acct-badge acct-buy">상품</span></span><span>100,000</span></div></div>
+                <div class="journal-side credit"><div class="journal-line"><span>(대) 외상매입금</span><span>100,000</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <strong>[매출 분개] 원가 60,000원 상품을 80,000원에 외상 판매</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit"><div class="journal-line"><span>(차) 외상매출금</span><span>80,000</span></div></div>
+                <div class="journal-side credit">
+                  <div class="journal-line"><span>(대) <span class="acct-badge acct-cost">상품 (원가)</span></span><span>60,000</span></div>
+                  <div class="journal-line"><span>(대) <span class="acct-badge acct-profit">상품매출이익</span></span><span>20,000</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const block2 = `
+        <div class="card" style="margin-bottom:16px; border-top:4px solid var(--buy-main);">
+          <h3 style="font-size:1.25rem; color:var(--buy-main); margin-bottom:8px;">② 총기법 (혼합 상품 계정)</h3>
+          <p style="font-weight:700; margin-bottom:12px;">
+            • <strong>어떤 계정인가?</strong> 단일 ‘상품’ 계정을 사용합니다.<br>
+            • <strong>어떤 금액을 기록하나?</strong> 매입할 때는 차변에 원가(100,000원)를 적지만, 판매할 때는 원가와 이익을 나누지 않고 대변의 <strong>상품 계정에 ‘판매금액(80,000원)’을 그대로</strong> 기록합니다.
+          </p>
+          <div style="margin-bottom:12px;">
+            <strong>[매입 분개] 상품 100,000원 외상 매입 (분기법과 동일)</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit"><div class="journal-line"><span>(차) <span class="acct-badge acct-buy">상품</span></span><span>100,000</span></div></div>
+                <div class="journal-side credit"><div class="journal-line"><span>(대) 외상매입금</span><span>100,000</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <strong>[매출 분개] 원가 60,000원 상품을 80,000원에 외상 판매</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit"><div class="journal-line"><span>(차) 외상매출금</span><span>80,000</span></div></div>
+                <div class="journal-side credit">
+                  <div class="journal-line"><span>(대) <span class="acct-badge acct-sell">상품 (판매금액)</span></span><span>80,000</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const block3 = `
+        <div class="card" style="margin-bottom:16px; border-top:4px solid var(--profit-main);">
+          <h3 style="font-size:1.25rem; color:var(--profit-main); margin-bottom:8px;">③ 3분법 (상품 계정의 분할)</h3>
+          <p style="font-weight:700; margin-bottom:12px;">
+            • <strong>어떤 계정인가?</strong> 상품 계정을 <strong>이월상품(자산) · 매입(비용) · 매출(수익)</strong> 3가지로 나누어 처리합니다.<br>
+            • <strong>어떤 금액을 기록하나?</strong> 사 올 때는 차변에 <strong>‘매입’ 계정(원가 100,000원)</strong>, 팔 때는 대변에 <strong>‘매출’ 계정(판매금액 80,000원)</strong>을 기록합니다.
+          </p>
+          <div style="margin-bottom:12px;">
+            <strong>[매입 분개] 상품 100,000원 외상 매입</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit"><div class="journal-line"><span>(차) <span class="acct-badge acct-buy">매입</span></span><span>100,000</span></div></div>
+                <div class="journal-side credit"><div class="journal-line"><span>(대) 외상매입금</span><span>100,000</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <strong>[매출 분개] 원가 60,000원 상품을 80,000원에 외상 판매</strong>
+            <div class="journal-scroll-wrap">
+              <div class="journal-row">
+                <div class="journal-side debit"><div class="journal-line"><span>(차) 외상매출금</span><span>80,000</span></div></div>
+                <div class="journal-side credit">
+                  <div class="journal-line"><span>(대) <span class="acct-badge acct-sell">매출 (판매금액)</span></span><span>80,000</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (tabIdx === 1) container.innerHTML = block1;
+      else if (tabIdx === 2) container.innerHTML = block2;
+      else if (tabIdx === 3) container.innerHTML = block3;
+      else container.innerHTML = block1 + block2 + block3;
+    }
+
+    /* ==========================================
+       5. 장면 9: 스스로 확인하는 5문제 채점 로직
+       ========================================== */
+    const userSelections = { 1: '', 2: '' };
+
+    function selectQuizOpt(qNum, val, btnEl) {
+      userSelections[qNum] = val;
+      const parent = document.getElementById(`q${qNum}-options`);
+      const btns = parent.querySelectorAll('.quiz-opt-btn');
+      btns.forEach(b => b.classList.remove('selected'));
+      btnEl.classList.add('selected');
+    }
+
+    function normalizeNumberInput(str) {
+      if (!str) return '';
+      return str.replace(/,/g, '').replace(/원/g, '').trim();
+    }
+
+    function checkQuiz(qNum) {
+      const fb = document.getElementById('qFeedback-' + qNum);
+      fb.classList.add('show');
+
+      if (qNum === 1) {
+        if (!userSelections[1]) {
+          fb.innerHTML = `<p style="font-weight:800; color:var(--cost-main);">보기를 먼저 선택해 주세요!</p>`;
+          return;
+        }
+        const isCorrect = (userSelections[1] === '매입환출');
+        fb.innerHTML = `
+          <p style="font-size:1.1rem; font-weight:800; color:${isCorrect ? 'var(--profit-main)' : 'var(--sell-main)'};">
+            ${isCorrect ? '⭕ 정답입니다!' : '❌ 아쉬워요! 다시 확인해 볼까요?'} (정답: 매입환출)
+          </p>
+          <p style="margin-top:6px; font-weight:700;">해설: 매입한 상품이 우리 회사에서 공급업체로 실제 돌아가는 것이므로 <strong>매입환출</strong>입니다.</p>
+        `;
+      } else if (qNum === 2) {
+        if (!userSelections[2]) {
+          fb.innerHTML = `<p style="font-weight:800; color:var(--cost-main);">보기를 먼저 선택해 주세요!</p>`;
+          return;
+        }
+        const isCorrect = (userSelections[2] === '매입할인');
+        fb.innerHTML = `
+          <p style="font-size:1.1rem; font-weight:800; color:${isCorrect ? 'var(--profit-main)' : 'var(--sell-main)'};">
+            ${isCorrect ? '⭕ 정답입니다!' : '❌ 아쉬워요! 다시 확인해 볼까요?'} (정답: 매입할인)
+          </p>
+          <p style="margin-top:6px; font-weight:700;">해설: 외상 매입 대금을 약정된 조건에 따라 일찍 지급하여 할인받은 금액이므로 <strong>매입할인</strong>입니다.</p>
+        `;
+      } else if (qNum === 3) {
+        const val = normalizeNumberInput(document.getElementById('q3-input').value);
+        if (!val) {
+          fb.innerHTML = `<p style="font-weight:800; color:var(--cost-main);">숫자를 입력해 주세요!</p>`;
+          return;
+        }
+        const isCorrect = (val === '900');
+        fb.innerHTML = `
+          <p style="font-size:1.1rem; font-weight:800; color:${isCorrect ? 'var(--profit-main)' : 'var(--sell-main)'};">
+            ${isCorrect ? '⭕ 정답입니다!' : '❌ 아쉬워요! 다시 확인해 볼까요?'} (정답: 900원)
+          </p>
+          <p style="margin-top:6px; font-weight:700;">해설: 매출원가 = 기초 상품(200원) + 당기 순매입액(800원) - 기말 상품(100원) = <strong>900원</strong>입니다.</p>
+        `;
+      } else if (qNum === 4) {
+        const v1 = normalizeNumberInput(document.getElementById('q4-input1').value);
+        const v2 = normalizeNumberInput(document.getElementById('q4-input2').value);
+        if (!v1 || !v2) {
+          fb.innerHTML = `<p style="font-weight:800; color:var(--cost-main);">상품 금액과 상품매출이익 금액을 모두 입력해 주세요!</p>`;
+          return;
+        }
+        const isCorrect = (v1 === '60000' && v2 === '20000');
+        fb.innerHTML = `
+          <p style="font-size:1.1rem; font-weight:800; color:${isCorrect ? 'var(--profit-main)' : 'var(--sell-main)'};">
+            ${isCorrect ? '⭕ 정답입니다!' : '❌ 아쉬워요! 다시 확인해 볼까요?'} (정답: 상품 60,000원, 상품매출이익 20,000원)
+          </p>
+          <p style="margin-top:6px; font-weight:700;">해설: 분기법은 판매 시 대변에 <strong>원가(상품 60,000원)</strong>와 <strong>이익(상품매출이익 20,000원)</strong>을 나누어 기록합니다.</p>
+        `;
+      } else if (qNum === 5) {
+        const val = normalizeNumberInput(document.getElementById('q5-input').value);
+        if (!val) {
+          fb.innerHTML = `<p style="font-weight:800; color:var(--cost-main);">숫자를 입력해 주세요!</p>`;
+          return;
+        }
+        const isCorrect = (val === '300000');
+        fb.innerHTML = `
+          <p style="font-size:1.1rem; font-weight:800; color:${isCorrect ? 'var(--profit-main)' : 'var(--sell-main)'};">
+            ${isCorrect ? '⭕ 정답입니다!' : '❌ 아쉬워요! 다시 확인해 볼까요?'} (정답: 300,000원)
+          </p>
+          <p style="margin-top:6px; font-weight:700;">해설: 매출총이익 = 당기 순매출액(700,000원) - 매출원가(400,000원) = <strong>300,000원</strong>입니다.</p>
+        `;
+      }
+    }
+
+    function resetSingleQuiz(qNum) {
+      const fb = document.getElementById('qFeedback-' + qNum);
+      fb.classList.remove('show');
+      fb.innerHTML = '';
+
+      if (qNum === 1 || qNum === 2) {
+        userSelections[qNum] = '';
+        const parent = document.getElementById(`q${qNum}-options`);
+        parent.querySelectorAll('.quiz-opt-btn').forEach(b => b.classList.remove('selected'));
+      } else if (qNum === 3) {
+        document.getElementById('q3-input').value = '';
+      } else if (qNum === 4) {
+        document.getElementById('q4-input1').value = '';
+        document.getElementById('q4-input2').value = '';
+      } else if (qNum === 5) {
+        document.getElementById('q5-input').value = '';
+      }
+    }
+
+    function resetAllQuizzes() {
+      for (let i = 1; i <= 5; i++) {
+        resetSingleQuiz(i);
+      }
+    }
+
+    /* 초기 화면 세팅 */
+    window.addEventListener('DOMContentLoaded', function() {
+      selectTerm(0);
+      setBungeoStep(1);
+      selectMethodTab(1);
+      goToScene(1);
+    });
+  </script>
+</body>
+</html>
