@@ -12,7 +12,7 @@
  current.subscribe(async s=>{if(channel!==current)return;if(s==='SUBSCRIBED'){ready=true;let p=window.villageLocalPosition?.()||{x:0,z:6};await current.track({name:nickname,x:p.x,z:p.z});if(channel!==current)return;sendPosition();if(heartbeat)clearInterval(heartbeat);heartbeat=setInterval(sendPosition,650)}else if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(s)){ready=false;status('👥 연결 중...')}});
  }catch{status('👥 연결 실패')}};
  window.leaveVillage=goodbye;
- function doGreet(){if(window.villagePause)return;window.villageLocalGreet?.();if(channel&&ready)channel.send({type:'broadcast',event:'greet',payload:{id}});try{let u=new SpeechSynthesisUtterance('사랑합니다');u.lang='ko-KR';u.pitch=1.25;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}catch{}}
+ function doGreet(){if(window.villagePause)return;window.villageLocalGreet?.();if(channel&&ready)channel.send({type:'broadcast',event:'greet',payload:{id}});window.villageVoice?.play('greet')}
  greet.addEventListener('pointerdown',e=>{e.preventDefault();doGreet()});greet.addEventListener('click',e=>{if(e.detail===0)doGreet()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(channel)goodbye()}else if(nickname&&document.querySelector('#welcome').hidden)window.joinVillage(nickname)});
  window.addEventListener('pagehide',goodbye);
