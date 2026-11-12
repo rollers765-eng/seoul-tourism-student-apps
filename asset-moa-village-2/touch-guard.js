@@ -1,6 +1,6 @@
 (function(){
  'use strict';
- const controls='#joystick, #journalAction, #jumpAction, .move-access button';
+ const controls='#joystick, #journalAction, #jumpAction, #greetAction, .move-access button';
  const active=()=>document.querySelector('#welcome').hidden&&document.querySelector('#modal').hidden;
  const onControl=target=>!!(target&&target.closest&&target.closest(controls));
  const touchesControl=e=>Array.from(e.touches||[]).some(t=>onControl(t.target));
