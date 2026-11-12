@@ -1,6 +1,6 @@
 (function(){
  'use strict';
- const paths={greet:'greeting-supertonic3.wav',journal:'journal-supertonic3.wav'},raw={},decoded={};let context=null,resumeTask=Promise.resolve(),lastNotice=0;
+ const paths={greet:'greeting-child-v2.wav',journal:'journal-child-v2.wav'},raw={},decoded={};let context=null,resumeTask=Promise.resolve(),lastNotice=0;
  for(const [key,path] of Object.entries(paths))raw[key]=fetch(path).then(r=>{if(!r.ok)throw Error('audio download');return r.arrayBuffer()}).catch(()=>null);
  // 입장하거나 버튼을 누르는 바로 그 순간에 오디오를 활성화한다.
  function unlock(){try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return null;context=context||new AudioCtx();resumeTask=context.state!=='running'?context.resume():Promise.resolve();resumeTask.catch(()=>{});return context}catch{return null}}
