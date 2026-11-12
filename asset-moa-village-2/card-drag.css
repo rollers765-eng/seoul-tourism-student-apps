@@ -1,0 +1,2 @@
+.card-token.drag-source{opacity:.35}.card-token.drag-ghost{position:fixed;z-index:1000;left:0;top:0;transform:translate(-50%,-50%) rotate(-3deg);pointer-events:none;touch-action:none;opacity:.96;box-shadow:0 12px 24px #163c3570;border:2px solid #fff;color:#244f42}.drag-over{outline:3px solid #58b793!important;outline-offset:2px;background:#d7f4df!important}
+
