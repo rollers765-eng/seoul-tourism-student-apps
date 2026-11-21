@@ -369,8 +369,8 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
         '<div class="mbti-block"><h3>🏢 직장에서의 모습</h3><dl class="mbti-dl">' +
           t.work.map(function (row) { return '<div><dt>' + escapeHtml(row[0]) + '</dt><dd>' + escapeHtml(row[1]) + '</dd></div>'; }).join('') + '</dl></div>' +
         '<div class="mbti-block"><h3>🤝 직장 상사 케미 지도</h3>' +
-          '<div class="boss-row"><span class="boss-name">😇 환상의 상사<br>' + escapeHtml(t.goodBoss[0]) + '</span><span>' + escapeHtml(t.goodBoss[1]) + '</span></div>' +
-          '<div class="boss-row"><span class="boss-name">😈 각오할 상사<br>' + escapeHtml(t.badBoss[0]) + '</span><span>' + escapeHtml(t.badBoss[1]) + '</span></div></div>' +
+          '<div class="boss-row"><span class="boss-name">😇 환상의 상사<br> ' + escapeHtml(t.goodBoss[0]) + '</span><span>' + escapeHtml(t.goodBoss[1]) + '</span></div>' +
+          '<div class="boss-row"><span class="boss-name">😈 각오할 상사<br> ' + escapeHtml(t.badBoss[0]) + '</span><span>' + escapeHtml(t.badBoss[1]) + '</span></div></div>' +
         '<div class="mbti-block"><h3>💡 이런 점을 연습하면 좋아요</h3><p class="mbti-advice">' + escapeHtml(t.lesson) + '</p></div>' +
         '<div class="mbti-block"><h3>추천 직업 5선</h3>' + tagList(t.jobs) + '</div>' +
         '<div class="mbti-block"><h3>대표 유명인 & 캐릭터</h3><p style="font-size:13px;color:#5c5145;margin:0;line-height:1.7">' + escapeHtml(t.celebs) + '</p></div>' +
@@ -589,9 +589,9 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     if (mbtiType) {
       var dimMatch = mbtiType.dims.filter(function (d) { return data.topDims.indexOf(d) !== -1; });
       var matchLine = dimMatch.length
-        ? '적성에서 가장 높은 ‘' + dimMatch.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’가 MBTI가 가리키는 방향과 겹쳐요.'
-        : '적성에서 나온 방향과 MBTI가 가리키는 ‘' + mbtiType.dims.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’가 조금 달라요. 두 결과를 함께 보면 나를 더 넓게 볼 수 있어요.';
-      mbtiCard = '<div class="rcard lead"><h3>MBTI 분석 · ' + escapeHtml(state.mbti) + '</h3>' +
+        ? '적성에서 가장 높은 ‘' + dimMatch.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’ 방향이 MBTI와 겹쳐요.'
+        : '적성에서 나온 방향과 MBTI가 가리키는 ‘' + mbtiType.dims.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’ 방향이 조금 달라요. 두 결과를 함께 보면 나를 더 넓게 볼 수 있어요.';
+      mbtiCard = '<div class="rcard lead"><h3>MBTI 분석</h3>' +
         '<p class="mbti-code" style="font-size:24px">' + escapeHtml(state.mbti) + '</p>' +
         '<p class="mbti-name" style="margin-top:2px">' + escapeHtml(mbtiType.name) + '</p>' +
         '<p class="mbti-role" style="margin-top:4px">' + escapeHtml(mbtiType.role) + '</p>' +
