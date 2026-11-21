@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#faf9f6">
-<meta name="description" content="서울관광고등학교 학생을 위한 진로 탐색 도구. 적성·흥미·가치관을 단계별로 정리하고 직업과 전공 키워드, 나의 진로 한 줄을 만들어 저장합니다.">
+<meta name="description" content="서울관광고등학교 학생을 위한 진로 탐색 도구. MBTI 유형 해석과 적성·흥미·가치관을 단계별로 정리하고 직업과 전공 키워드, 나의 진로 한 줄을 만들어 저장합니다.">
 <title>진로 탐색 | 서울관광고등학교</title>
 <link rel="stylesheet" href="../accounting-library/style.css">
 <style>
@@ -23,7 +23,7 @@
 .steps li.done{border-bottom-color:#e0c9ad}
 .steps li.done span{background:var(--cream);color:#84451f}
 .progress{height:6px;background:#f1ece3;border-radius:999px;overflow:hidden;margin:0 0 22px}
-.progress i{display:block;height:100%;width:25%;background:var(--orange);transition:width .25s ease}
+.progress i{display:block;height:100%;width:20%;background:var(--orange);transition:width .25s ease}
 .step-panel h2{font-size:19px;margin:0 0 6px;letter-spacing:-.03em;line-height:1.4}
 .step-help{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.65}
 .apt{background:#fcfaf7;border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 10px}
@@ -63,15 +63,53 @@
 .copy-row .btn{flex:1 1 150px}
 .confirm-note{font-size:12px;color:#236145;min-height:18px;margin:10px 0 0}
 .hint-line{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.6}
+/* MBTI 단계 */
+.mbti-groups{display:grid;gap:10px}
+.mbti-group{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#fcfaf7}
+.mbti-group h3{font-size:12px;margin:0 0 9px;color:#8a6a4a;letter-spacing:.02em;font-weight:700}
+.mbti-group h3 span{font-weight:400;color:var(--muted);margin-left:4px}
+.mbti-buttons{display:flex;flex-wrap:wrap;gap:6px}
+.mbti-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:7px 12px;font-size:12px;border-radius:999px;line-height:1.35;text-align:left}
+.mbti-btn b{font-size:12px;letter-spacing:.02em;color:var(--accent)}
+.mbti-btn[aria-pressed=true] b{color:inherit}
+.mbti-detail{margin:16px 0 0}
+.mbti-card{border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;background:#fffdf8;padding:18px}
+.mbti-head{padding:0 0 12px;border-bottom:1px solid var(--line)}
+.mbti-tag{font-size:11px;color:var(--accent);font-weight:700;margin:0 0 6px;letter-spacing:.02em}
+.mbti-code{font-size:30px;font-weight:800;letter-spacing:.02em;margin:0;line-height:1.1;color:var(--ink)}
+.mbti-name{font-size:15px;font-weight:700;margin:4px 0 0}
+.mbti-role{font-size:13px;color:#6c5840;margin:6px 0 0}
+.mbti-block{margin:16px 0 0}
+.mbti-block h3{font-size:12px;color:#8a6a4a;margin:0 0 8px;letter-spacing:.02em}
+.mbti-block ul{margin:0;padding-left:17px;font-size:13px;color:#5c5145;line-height:1.7}
+.mbti-block li+li{margin-top:5px}
+.mbti-dl{margin:0;display:grid;gap:7px}
+.mbti-dl div{display:grid;grid-template-columns:92px 1fr;gap:8px}
+.mbti-dl dt{font-size:12px;font-weight:700;color:#8a6a4a;line-height:1.7}
+.mbti-dl dd{margin:0;font-size:13px;color:#5c5145;line-height:1.7}
+.boss-row{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:13px;line-height:1.7;color:#5c5145}
+.boss-row+.boss-row{margin-top:8px}
+.boss-row .boss-name{font-size:12px;font-weight:700;color:#6c5840}
+.mbti-advice{background:var(--cream);border-radius:9px;padding:11px 13px;font-size:13px;color:#84451f;line-height:1.65;margin:0}
+.mbti-school{background:#f4f7f3;border:1px solid #d9e3d5;border-radius:9px;padding:11px 13px;margin:16px 0 0}
+.mbti-school h3{font-size:12px;color:#3f6a3a;margin:0 0 6px}
+.mbti-school p{margin:0;font-size:13px;color:#41523c;line-height:1.7}
+.mbti-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+.mbti-actions .btn{min-height:42px;padding:9px 14px;font-size:13px}
+.sub-label{font-size:11px;color:#8a6a4a;font-weight:700;margin:12px 0 6px;letter-spacing:.02em}
 footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
 @media(max-width:800px){.tool{padding:18px}}
 @media(max-width:600px){
  .intro{padding:22px 0 12px}
- .steps li{font-size:11px;gap:4px;padding:6px 2px}
+ .steps li{font-size:10.5px;gap:4px;padding:6px 2px}
  .steps li span{width:20px;height:20px;font-size:10px}
  .bar{grid-template-columns:78px 1fr 40px;font-size:11px}
  .step-nav .btn{flex:1 1 100%}
  .step-nav .spacer{display:none}
+ .mbti-card{padding:14px}
+ .mbti-code{font-size:26px}
+ .mbti-dl div{grid-template-columns:1fr;gap:2px}
+ .boss-row{grid-template-columns:1fr;gap:2px}
  footer.app-footer{padding-left:20px;padding-right:20px}
 }
 </style>
@@ -88,55 +126,66 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   <section class="intro" aria-labelledby="page-title">
     <p class="eyebrow">서울관광고등학교 · 진로와 적성</p>
     <h1 id="page-title">진로 <span>탐색</span></h1>
-    <p class="intro-text">적성·흥미·가치관을 하나씩 정리하면, 나에게 맞는 직업과 전공 키워드가 보여요. 마지막에 나의 진로를 한 줄로 적어 저장할 수 있습니다.</p>
+    <p class="intro-text">MBTI 유형에서 출발해 적성·흥미·가치관을 하나씩 정리하면, 나에게 맞는 직업과 전공 키워드가 보여요. 마지막에 나의 진로를 한 줄로 적어 저장할 수 있습니다.</p>
   </section>
 
-  <p class="notice-line">입력한 내용은 이 브라우저에만 저장되고 학교 서버로 보내지 않아요. 직업·전공·자격증 키워드는 2026학년도 교육계획의 학과 교육과정을 기준으로 정리했습니다. 학과 비교는 <a href="../major-guide/">학과 선택 가이드 ↗</a>에서 이어서 할 수 있어요.</p>
+  <p class="notice-line">입력한 내용은 이 브라우저에만 저장되고 학교 서버로 보내지 않아요. MBTI 해석은 2학기 「성공적인 직업생활」 MBTI 자기탐색 해석지의 유형별 특징·직장 모습·추천 직업을 그대로 담았습니다. 직업·전공·자격증 키워드는 2026학년도 교육계획의 학과 교육과정을 기준으로 정리했습니다. 학과 비교는 <a href="../major-guide/">학과 선택 가이드 ↗</a>에서 이어서 할 수 있어요.</p>
 
   <section class="tool" aria-label="진로 탐색 도구">
     <ol class="steps" id="steps">
-      <li data-step="0"><span>1</span>적성</li>
-      <li data-step="1"><span>2</span>흥미</li>
-      <li data-step="2"><span>3</span>가치관</li>
-      <li data-step="3"><span>4</span>결과</li>
+      <li data-step="0"><span>1</span>MBTI</li>
+      <li data-step="1"><span>2</span>적성</li>
+      <li data-step="2"><span>3</span>흥미</li>
+      <li data-step="3"><span>4</span>가치관</li>
+      <li data-step="4"><span>5</span>결과</li>
     </ol>
     <div class="progress" aria-hidden="true"><i id="progress-fill"></i></div>
 
     <div class="step-panel" data-panel="0">
-      <h2>적성 — 나는 어떤 방식으로 할 때 편한가요?</h2>
-      <p class="step-help">여섯 문장을 읽고 1(전혀 아니다)부터 5(매우 그렇다)까지 중에서 골라 주세요. 정답은 없어요.</p>
-      <div id="apt-list"></div>
+      <h2>MBTI — 나는 어떤 방식으로 일할 때 편한가요?</h2>
+      <p class="step-help">MBTI 검사 결과의 4자리 유형을 고르면 성격·생활 습관·직장에서의 모습·어울리는 직업·상사 케미가 이 화면에 펼쳐져요. 검사 결과를 모르면 <b>건너뛰기</b>로 넘어가도 됩니다.</p>
+      <div class="mbti-groups" id="mbti-picker"></div>
+      <div class="mbti-detail" id="mbti-detail" aria-live="polite"></div>
       <p class="step-msg" id="msg-0" role="alert"></p>
-      <div class="step-nav"><span class="spacer"></span><button type="button" class="btn primary" data-next="1">다음 · 흥미</button></div>
+      <div class="step-nav"><button type="button" class="btn ghost" id="mbti-skip">건너뛰기</button><button type="button" class="btn primary" data-next="1">다음 · 적성</button></div>
     </div>
 
     <div class="step-panel hidden" data-panel="1">
+      <h2>적성 — 나는 어떤 방식으로 할 때 편한가요?</h2>
+      <p class="step-help">여섯 문장을 읽고 1(전혀 아니다)부터 5(매우 그렇다)까지 중에서 골라 주세요. 정답은 없어요.</p>
+      <p class="hint-line" id="apt-hint"></p>
+      <div id="apt-list"></div>
+      <p class="step-msg" id="msg-1" role="alert"></p>
+      <div class="step-nav"><button type="button" class="btn ghost" data-prev="0">← MBTI</button><button type="button" class="btn primary" data-next="2">다음 · 흥미</button></div>
+    </div>
+
+    <div class="step-panel hidden" data-panel="2">
       <h2>흥미 — 어떤 분야가 궁금한가요?</h2>
       <p class="step-help">끌리는 분야를 최대 3개까지 골라 주세요. 직업·전공·자격증 키워드가 여기서 나옵니다.</p>
       <div class="chips-wrap" id="interest-list" role="group" aria-label="흥미 분야 선택"></div>
       <p class="pick-count" id="interest-count">0 / 3 선택</p>
-      <p class="step-msg" id="msg-1" role="alert"></p>
-      <div class="step-nav"><button type="button" class="btn ghost" data-prev="0">← 이전</button><button type="button" class="btn primary" data-next="2">다음 · 가치관</button></div>
+      <p class="step-msg" id="msg-2" role="alert"></p>
+      <div class="step-nav"><button type="button" class="btn ghost" data-prev="1">← 적성</button><button type="button" class="btn primary" data-next="3">다음 · 가치관</button></div>
     </div>
 
-    <div class="step-panel hidden" data-panel="2">
+    <div class="step-panel hidden" data-panel="3">
       <h2>가치관 — 일할 때 무엇이 중요하나요?</h2>
       <p class="step-help">나에게 중요한 것을 최대 2개까지 골라 주세요. 어떤 환경에서 힘을 낼 수 있는지 알려 줍니다.</p>
       <div class="chips-wrap" id="value-list" role="group" aria-label="가치관 선택"></div>
       <p class="pick-count" id="value-count">0 / 2 선택</p>
-      <p class="step-msg" id="msg-2" role="alert"></p>
-      <div class="step-nav"><button type="button" class="btn ghost" data-prev="1">← 이전</button><button type="button" class="btn primary" data-next="3">결과 보기</button></div>
+      <p class="step-msg" id="msg-3" role="alert"></p>
+      <div class="step-nav"><button type="button" class="btn ghost" data-prev="2">← 흥미</button><button type="button" class="btn primary" data-next="4">결과 보기</button></div>
     </div>
 
-    <div class="step-panel hidden" data-panel="3">
+    <div class="step-panel hidden" data-panel="4">
       <h2>나의 진로 탐색 결과</h2>
-      <p class="step-help">적성·흥미·가치관을 모아 정리했어요. 마지막 한 줄은 직접 다듬어 보세요.</p>
+      <p class="step-help">MBTI·적성·흥미·가치관을 모아 정리했어요. 마지막 한 줄은 직접 다듬어 보세요.</p>
       <div class="result-grid" id="result"></div>
-      <div class="step-nav"><button type="button" class="btn ghost" data-prev="2">← 가치관 다시 보기</button><button type="button" class="btn ghost" id="reset">처음부터 다시 하기</button></div>
+      <div class="step-nav"><button type="button" class="btn ghost" data-prev="3">← 가치관 다시 보기</button><button type="button" class="btn ghost" id="reset">처음부터 다시 하기</button></div>
     </div>
   </section>
 </main>
-<footer class="app-footer"><span>서울관광고등학교 · 진로 탐색</span><span>적성 · 흥미 · 가치관 · 진로 한 줄</span></footer>
+<footer class="app-footer"><span>서울관광고등학교 · 진로 탐색</span><span>MBTI · 적성 · 흥미 · 가치관 · 진로 한 줄</span></footer>
 
 <script>
 (function(){
@@ -159,6 +208,15 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     detail: { label: '정리·분석', jobs: ['사무·회계', 'MD', '예약·발권', '품질 관리'] },
     express: { label: '표현·창작', jobs: ['콘텐츠 기획', '창업가', '마케터', '강사'] }
   };
+
+  var MBTI_GROUPS = [
+    { code: 'NT', name: '분석형 (NT)', desc: '전략과 시스템의 설계자', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'] },
+    { code: 'NF', name: '외교형 (NF)', desc: '소통과 동기부여의 촉진자', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'] },
+    { code: 'SJ', name: '관리자형 (SJ)', desc: '신뢰와 원칙의 수호자', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'] },
+    { code: 'SP', name: '탐험가형 (SP)', desc: '현장 대응과 유연성의 해결사', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'] }
+  ];
+
+  var MBTI = {"INTJ":{"name":"용의주도한 전략가","short":"용의주도한 전략가","group":"NT","role":"결론과 근거로 말하고, 비효율을 걷어내는 설계자","details":["사물함과 필기노트가 본인만의 규칙(과목별·용도별 인덱스, 색상 구분)으로 철저히 정리되어 있음.","쉬는 시간에는 무의미한 잡담 대신 에어팟을 끼고 좋아하는 음악을 듣거나 다음 계획을 점검하며 에너지를 충전하는 프로 집돌이·집순이.","단톡방 알림은 대부분 무음이며, 용건 없는 대화에는 굳이 답장하지 않지만 중요한 공지나 일정은 누구보다 정확히 체크함.","모둠 활동 시 역할을 제대로 하지 않는 조원을 보면 스트레스를 받아 차라리 '내가 혼자 다 하고 말지'라며 과제를 도맡아 끝내버리기도 함.","평소 무표정으로 있을 때가 많아 주변에서 '화났어?'라는 질문을 자주 받지만, 실제로는 머릿속으로 아주 사소하거나 깊은 생각을 시뮬레이션하는 중임."],"traits":[["성격","통찰력이 뛰어나며 독립적이고, 비효율과 불합리를 참지 못하는 완벽주의 성향."],["생활 습관","하루를 시작하기 전 머릿속으로 동선과 타임라인을 계산하고 우선순위를 정해 움직임."],["의사결정","감정이나 분위기에 휩쓸리지 않고, 장기적인 데이터와 확실한 실익을 계산하여 결정."],["취미 & 힐링","전략 시뮬레이션 게임, 다큐멘터리 시청, 추리 소설, 체스·바둑, 혼자만의 산책."],["특기 & 잠재력","복잡한 문제의 큰 그림을 보고 자동화·단순화된 효율적 시스템을 구축하는 능력."]],"work":[["일하는 방식","전체 로드맵을 먼저 세우고 비효율을 제거하는 최적화 중심."],["소통 방식","결론과 핵심 근거를 먼저 제시하는 팩트 위주의 간결한 화법."],["어떤 동료인가","말수는 적지만 일의 빈틈을 찾아내 사전에 리스크를 차단하는 든든한 설계자."],["강점 상황","새로운 시스템을 구축하거나 장기 프로젝트의 전략을 기획할 때."],["어려움 상황","뚜렷한 이유 없이 비효율적인 관행을 따르라거나 감정적 호소만 강요될 때."]],"goodBoss":["ENTJ","명확한 비전과 방향을 제시하며, 사소한 잔소리(마이크로매니징) 없이 실력과 결과로만 깔끔하게 인정해 줌."],"badBoss":["ESFJ","업무 효율보다 팀 내 분위기 맞추기나 사적인 감정 교류를 강요하고, 비효율적인 관례를 따르라고 할 때 충돌 발생."],"jobs":["경영전략 컨설턴트","시스템 엔지니어·아키텍트","데이터 사이언티스트","금융 애널리스트","호텔·외식 브랜드 기획자"],"celebs":"크리스토퍼 놀란(영화감독), 마크 저커버그, 류준열, 강동원, 셜록 홈즈, 닥터 스트레인지, 배트맨.","dims":["detail","express"],"dept":"cafe","deptWhy":"매장 매출·원가·동선을 데이터로 설계하는 카페경영과 경영코스에서 강점이 살아나요.","lesson":"혼자 다 해버리기보다 과정을 공유하면 동료가 줄을 서요. 완벽한 계획이 늦는 것보다 작게라도 먼저 시작해 보세요."},"INTP":{"name":"논리적인 사색가","short":"논리적인 사색가","group":"NT","role":"원리와 논리를 파고들어 결함을 찾아내는 브레인","details":["가방과 책상이 다소 어수선해 보여도 본인은 '어디에 뭐가 있는지 다 안다'며 손을 뻗어 정확히 찾아냄.","평소 조용하다가도 자신이 관심 있는 전문 분야나 호기심을 끄는 주제가 나오면 눈이 반짝이며 백과사전처럼 설명함.","새벽에 갑자기 꽂힌 사소한 의문(예: '우주 팽창의 원리', '특정 단어의 어원')을 풀기 위해 나무위키나 유튜브를 밤새 파고드는 습관이 있음.","'선생님, 근데 왜 그래요?'라며 수업 내용의 논리적 모순이나 인과관계를 조용히 파고들어 교사를 당황하게 만들기도 함.","친구들이 고민 상담을 해오면 감정적 공감보다 문제의 본질적인 원인을 분석하고 해결책부터 제시하는 편임."],"traits":[["성격","지적 호기심이 끝이 없으며 분석적이고, 남들의 시선이나 통념보다 진실과 논리를 중시."],["생활 습관","벼락치기를 자주 하지만 짧은 시간 안에 핵심 개념을 빠르게 파악해 시험을 치름."],["의사결정","편견 없이 객관적인 인과관계와 논리적 무결성을 철저히 검증한 후 결정."],["취미 & 힐링","코딩, 전자기기 분해·조립, 퍼즐 맞추기, 철학·과학 유튜브 탐독, 마이너한 게임."],["특기 & 잠재력","복잡한 원리를 빠르게 이해하고 시스템의 치명적인 논리적 오류(버그)를 잡아내는 능력."]],"work":[["일하는 방식","원리와 인과관계를 철저히 파고들며 오류를 찾아내는 연구 중심."],["소통 방식","논리적 정확성을 중시하며, 지적 토론과 질의응답을 즐김."],["어떤 동료인가","남들이 보지 못하는 문제의 본질과 숨겨진 결함을 날카롭게 짚어내는 브레인."],["강점 상황","복잡한 데이터 분석, 기술적 결함 추적, 알고리즘 및 프로세스 검증."],["어려움 상황","엄격한 위계질서, 단순 반복 작업, 논리 없는 맹목적 복종이나 감정적 위로 요구."]],"goodBoss":["ENTP / INTJ","지적 자율성을 존중하고 논리적인 질문과 새로운 대안 제시를 열린 마음으로 환영함."],"badBoss":["ESTJ","출퇴근 시간, 보고서 줄 간격, 서류 결재 양식 등 형식과 규칙을 분 단위로 엄격히 통제할 때 숨이 턱 막힘."],"jobs":["소프트웨어 개발자","연구원","빅데이터 분석가","품질관리(QC) 전문가","신제품 기술 기획자"],"celebs":"빌 게이츠, 아인슈타인, 슈가(BTS), 기안84, 네오(매트릭스), 브루스 배너(헐크).","dims":["detail","express"],"dept":"cook","deptWhy":"레시피의 원리와 식품 품질을 파고드는 외식조리과 식품코스가 잘 맞아요.","lesson":"아이디어를 '오늘 한 문장'으로 적어 두면 실행이 붙어요. 마감과 형식도 실력의 일부로 챙겨 보세요."},"ENTJ":{"name":"대담한 통솔자","short":"대담한 통솔자","group":"NT","role":"목표를 세우고 사람을 모아 밀어붙이는 사령관","details":["모둠 과제나 체육대회 준비가 시작되면 누가 시키지 않아도 자연스럽게 단톡방을 파고 조장을 맡아 역할을 분배함.","주말에 침대에 누워 멍하니 시간을 보내면 오히려 스트레스를 받아, 헬스장을 가거나 일정을 꽉 채워 움직여야 뿌듯함을 느낌.","답답하거나 느리게 진행되는 상황을 참지 못해 '내가 직접 하고 만다'며 앞장서서 상황을 정리함.","친구들과의 약속 장소와 시간을 정할 때도 후보지를 몇 개 추려 투표를 올리는 등 총대 메는 것을 주저하지 않음.","발표 수업이 있으면 긴장하기보다는 교실 전체를 장악하며 당당하고 자신감 넘치게 스피치를 이끌어감."],"traits":[["성격","결단력과 야망이 넘치며, 명확한 목표를 향해 사람과 자원을 통솔하는 타고난 리더."],["생활 습관","스마트폰 캘린더와 할 일 목록에 시간 단위로 일정을 등록하고 체크하며 성취감을 얻음."],["의사결정","목표 달성을 위해 가장 빠르고 확실한 성과를 낼 수 있는 최선의 방안을 즉각 선택."],["취미 & 힐링","피트니스·웨이트 트레이닝, 경제·재테크 스터디, 클라이밍, 자기계발서 독서."],["특기 & 잠재력","혼란스러운 상황 속에서 우선순위를 세우고 사람들을 규합해 목표를 관철하는 지휘력."]],"work":[["일하는 방식","명확한 목표와 마감일을 설정하고 속도감 있게 밀어붙이는 드라이브 중심."],["소통 방식","단도직입적이고 자신감 넘치며 방향성을 명확히 제시하는 비즈니스 화법."],["어떤 동료인가","흔들리지 않고 앞장서서 장애물을 치워주며 팀의 성장을 견인하는 사령관."],["강점 상황","위기 극복, 대규모 프로젝트 총괄, 조직 및 사업 구조의 혁신."],["어려움 상황","결정을 미루고 우유부단하게 시간을 끄는 비효율적이고 정체된 환경."]],"goodBoss":["INTJ / ENTJ","결단력이 빠르고 스케일이 큰 프로젝트를 과감하게 맡겨주며, 능력에 걸맞은 확실한 권한과 보상을 제공함."],"badBoss":["ISFP / INFP","우유부단하게 결정을 미루거나, 피드백을 줄 때 지나치게 눈치를 보고 감정적으로 접근해 일 처리가 늦어질 때 답답함이 폭발함."],"jobs":["총괄 매니저·지점장","경영 컨설턴트","프로젝트 매니저(PM)","마케팅 총괄 디렉터","창업가·CEO"],"celebs":"스티브 잡스, 고든 램지, 유노윤호, 지코, 토니 스타크(아이언맨), 미란다 프리슬리(악마는 프라다를 입는다).","dims":["people","express"],"dept":"tour","deptWhy":"호텔·항공 현장을 총괄하는 관광서비스과 호텔코스에서 지휘력이 빛나요.","lesson":"속도를 조금 늦추고 동료의 말을 끝까지 듣는 것만으로 결과가 더 커져요. 결정을 미루는 사람에게는 이유를 물어보세요."},"ENTP":{"name":"뜨거운 논쟁을 즐기는 변론가","short":"뜨거운 논쟁가","group":"NT","role":"막힌 회의실에 새 판을 까는 아이디어 뱅크","details":["사물함 문을 열면 책과 체육복이 쏟아져 나올 것 같지만 개의치 않고 필요한 것만 쏙 빼서 씀.","수업 시간에 선생님의 설명에 기발한 반론이나 '만약에 ~하면 어떻게 돼요?' 같은 질문을 던져 반 전체를 빵 터지게 만듦.","친구들과 밸런스 게임이나 사소한 주제로 토론이 붙으면 끝까지 논리적으로 설득해 이겨야 직성이 풀리는 말싸움 강자.","아이디어는 수십 개를 번뜩이며 내놓지만 막상 뒤처리와 마무리는 마감 직전 벼락치기의 초인적인 힘으로 해결함.","새로운 유행이나 독특한 밈(meme)을 가장 빠르게 흡수해 학급 친구들에게 전파하는 트렌드세터."],"traits":[["성격","재치와 순발력이 뛰어나며, 고정관념과 권위에 유쾌하게 도전하는 자유로운 영혼."],["생활 습관","지루한 일상을 싫어해 등교 루트를 바꿔보거나 늘 새로운 자극을 찾아다님."],["의사결정","기존의 뻔한 길보다는 독창적이고 새로우며 재미있는 가능성을 바탕으로 결정."],["취미 & 힐링","보드게임, 끝없는 썰 풀기, 핫플레이스 탐방, 즉흥 여행, 팟캐스트·토론 시청."],["특기 & 잠재력","위기 상황에서도 당황하지 않고 위트 있게 받아치는 화술과 창의적인 발상의 전환."]],"work":[["일하는 방식","기존 매뉴얼에 얽매이지 않고 새로운 솔루션을 빠르게 테스트해보는 실험 중심."],["소통 방식","유머러스하고 직설적이며, 두뇌 싸움 같은 유쾌한 브레인스토밍을 선호."],["어떤 동료인가","답답하게 막힌 회의실에 신선한 충격과 활력을 불어넣는 아이디어 뱅크."],["강점 상황","신사업 기획, 마케팅 브레인스토밍, 정형화되지 않은 돌발 문제 해결."],["어려움 상황","융통성 없는 규정 준수 강요, 디테일한 서류 정리와 반복적인 루틴 작업."]],"goodBoss":["ENFP / ENTP","엉뚱하지만 기발한 아이디어를 '재밌겠는데? 한번 해봐!'라며 판을 깔아주고 도전할 기회를 줌."],"badBoss":["ISTJ","'원래 하던 방식대로 해', '튀지 말고 매뉴얼 지켜'라며 모든 창의적 시도를 절차의 벽으로 가로막을 때 좌절함."],"jobs":["광고 기획자(AE)","스타트업 창업가","콘텐츠 크리에이터","브랜딩 디렉터","이벤트 프로듀서"],"celebs":"침착맨(이말년), 덱스, 라미란, 육성재, 조커(다크나이트), 잭 스패로우(캐리비안의 해적).","dims":["express","people"],"dept":"tour","deptWhy":"축제·관광 콘텐츠를 기획하고 홍보하는 관광서비스과에서 아이디어가 통해요.","lesson":"재미있는 아이디어를 하나만 골라 끝까지 마무리하는 연습이 다음 단계를 열어 줘요."},"INFJ":{"name":"선의의 옹호자","short":"선의의 옹호자","group":"NF","role":"사람의 마음을 읽고 조용히 팀을 지탱하는 멘토","details":["겉으로는 조용히 있지만 교실 안에서 누가 누구와 서먹한지, 친구의 표정이 왜 어두운지 직관적으로 다 꿰뚫어 보고 있음.","단체 모임이나 학교 행사에 참여한 뒤에는 반드시 혼자만의 방에서 조용히 쉬어야 정신적 배터리가 충전됨.","친구들의 고민을 진지하게 경청해 주고 비밀을 끝까지 지켜주어 주변에서 가장 신뢰하는 비밀 상담소 역할을 함.","다이어리나 비밀 메모장에 자신의 가치관, 미래에 대한 상상, 그날 느낀 감정을 장문의 글로 꼼꼼하게 기록해 둠.","겉으로는 온화하고 모든 것을 맞춰주는 것 같지만, 자신만의 도덕적 기준을 반복해서 넘어서는 사람에게는 소리 없이 마음의 문을 닫음."],"traits":[["성격","통찰력과 공감력이 매우 깊으며, 확고한 신념과 이상을 품고 살아가는 조용한 멘토."],["생활 습관","사람들과의 적당한 거리를 유지하며 혼자 사색하고 생각을 정리하는 루틴을 가짐."],["의사결정","나의 도덕적 신념과 가치관에 부합하는지, 주변 사람들에게 상처가 되지 않는지 깊이 고민 후 결정."],["취미 & 힐링","미술관·전시회 관람, 감성 에세이 읽기, 글쓰기, 조용한 새벽에 플레이리스트 듣기."],["특기 & 잠재력","사람의 숨겨진 잠재력과 진심을 꿰뚫어 보고 마음을 치유하는 1:1 상담 및 코칭 능력."]],"work":[["일하는 방식","조직의 가치와 사람에게 미칠 영향을 고려하며 차분하고 계획적으로 실행."],["소통 방식","상대방을 배려하는 따뜻한 어조로 이야기하며, 다수 앞보다 깊이 있는 대화를 선호."],["어떤 동료인가","겉으로 드러나지 않게 팀원들의 멘탈을 챙겨 번아웃을 막아주는 정신적 지주."],["강점 상황","조직 문화 개선, 구성원 멘토링, 장기적인 비전 및 브랜드 철학 수립."],["어려움 상황","구성원 간의 극심한 갈등, 윤리적으로 옳지 않은 일이나 속임수를 강요받을 때."]],"goodBoss":["ENFJ","나의 노력과 진심을 알아주고 따뜻한 칭찬과 인격적인 존중으로 심리적 안정감을 채워줌."],"badBoss":["ESTP","눈앞의 단기 실적만 거칠게 압박하고, 필터링 없는 직설적인 화법으로 마음에 상처를 줄 때 멘탈이 흔들림."],"jobs":["직업상담사·진로코치","인사(HR) 담당자","브랜드 스토리텔러","심리치료사","사회복지 기획자"],"celebs":"차은우, 태연, 손석구, 마하트마 간디, 알버스 덤블도어(해리 포터), 요다(스타워즈).","dims":["people","express"],"dept":"tour","deptWhy":"손님의 마음을 읽고 오래 관계를 쌓는 호텔코스 컨시어지·고객 케어가 잘 맞아요.","lesson":"모두를 만족시키려다 지치지 않도록 '내가 맡을 수 있는 만큼'을 먼저 정해 두세요."},"INFP":{"name":"열정적인 중재자","short":"열정적인 중재자","group":"NF","role":"자기만의 감성으로 사람에게 울림을 주는 몽상가","details":["교과서 귀퉁이나 공책에 감성적인 낙서나 캐릭터가 그려져 있고, 필통과 가방에 최애 캐릭터 키링이 달려 있음.","지루한 수업 시간에는 턱을 괴고 창밖을 보며 '만약 초능력이 생긴다면?', '내가 판타지 세계의 주인공이라면?' 같은 상상의 나래를 폄.","친구가 속상했던 일을 털어놓으면 내 일처럼 가슴 아파하며 눈물을 글썽일 정도로 감정이입을 잘함.","카톡 메시지를 보낼 때 상대방이 상처받지 않을까 고민하며 썼다 지웠다를 여러 번 반복하고 이모티콘을 정성껏 고름.","평소에는 조용하고 양보를 잘하지만, 자신이 소중하게 여기는 가치관이나 취향을 무시당하면 단호하게 방어함."],"traits":[["성격","마음이 따뜻하고 낭만적이며, 자신만의 뚜렷한 개성과 예술적 감수성을 지닌 몽상가."],["생활 습관","그날그날의 기분에 따라 행동 패턴이 달라지며, 좋아하는 노래 하나를 며칠 내내 반복 재생함."],["의사결정","'내 가슴이 뛰는가', '내 양심과 진심에 부끄러움이 없는가'를 기준으로 결정."],["취미 & 힐링","인디음악 발굴, 필름 카메라로 풍경 찍기, 감성 일러스트 그리기, 시집 읽기."],["특기 & 잠재력","사람의 마음에 깊은 울림을 주는 섬세한 표현력과 독창적인 감성 스토리텔링."]],"work":[["일하는 방식","일에 대한 진정한 의미와 가치를 느낄 때 무서운 집중력과 예술적 완성도를 발휘."],["소통 방식","비판이나 지적을 매우 조심스러워하며 상대방의 마음을 헤아려주는 공감형 화법."],["어떤 동료인가","고객과 동료의 입장을 진심으로 이해하고 따뜻함을 불어넣는 힐러."],["강점 상황","감성 스토리텔링, 고객 감동 서비스 기획, 개인 맞춤형 케어."],["어려움 상황","차갑고 날 선 비판, 오직 실적과 숫자로만 사람을 평가하는 삭막한 환경."]],"goodBoss":["ENFJ / INFJ","개인의 개성과 가치관을 존중해 주며, 부드럽고 따뜻한 피드백으로 잠재력을 끌어올려 줌."],"badBoss":["ESTJ","감정이나 사정은 전혀 봐주지 않고 날 선 비판과 군대식 위계질서로 몰아붙여 자존감을 떨어뜨릴 때."],"jobs":["카피라이터·작가","공간 디자이너","스페셜티 바리스타","비영리단체(NGO) 기획자","일러스트레이터"],"celebs":"아이유, 뷔(BTS), 조이(레드벨벳), 백예린, 피터 파커(스파이더맨), 루나 러브굿(해리 포터).","dims":["express","people"],"dept":"cafe","deptWhy":"분위기와 감성으로 손님을 머물게 하는 카페경영과 음료코스에서 강점이 살아나요.","lesson":"마음에 드는 일을 작게라도 매일 해보고, 비판은 내 작업이 아니라 다음 시도를 위한 정보로 받아들이세요."},"ENFJ":{"name":"정의로운 주인공","short":"정의로운 주인공","group":"NF","role":"사람을 모으고 끌어올리는 따뜻한 캡틴","details":["모둠 활동이나 조별 과제에서 소외되거나 말수가 적은 친구에게 먼저 '너는 어떻게 생각해?'라며 의견을 물어봐 줌.","축제나 체육대회 때 반 티셔츠 맞추기, 응원 구호 정하기 등에서 가장 열정적으로 학급 분위기를 끌어올림.","친구들의 장점을 기가 막히게 찾아내서 '너 오늘 머리 진짜 잘 됐다', '너 발표 완전 멋있었어'라며 칭찬을 아끼지 않음.","약속이 없는 주말에도 친구들에게 먼저 '우리 오늘 뭐 할까?' 연락해서 모임을 만들고 함께 맛있는 것을 먹으러 감.","상대방의 사소한 거절이나 실망스러운 반응에도 '내가 혹시 서운하게 했나?' 하며 혼자 깊게 고민하기도 함."],"traits":[["성격","사교적이고 정이 많으며, 타인을 돕고 긍정적인 변화를 이끌어내는 데서 큰 행복을 느낌."],["생활 습관","단톡방에서 대화가 끊기지 않도록 리액션을 적극적으로 해주고 안부를 챙김."],["의사결정","모든 사람이 상처받지 않고 다 함께 화합하며 발전할 수 있는 방향을 선택."],["취미 & 힐링","친구들과 홈파티 및 수다, 봉사활동, 베이킹 후 친구들에게 선물하기, 보드게임 모임."],["특기 & 잠재력","사람들의 마음을 하나로 모으고 잠재력을 이끌어내는 탁월한 리더십과 스피치 능력."]],"work":[["일하는 방식","팀원 전체가 동기부여를 받고 성장할 수 있도록 지원하며 협력적으로 추진."],["소통 방식","격려와 칭찬을 바탕으로 팀의 사기를 북돋우며 명확하면서도 부드럽게 소통."],["어떤 동료인가","팀 분위기를 화기애애하게 만들고 누구도 뒤처지지 않게 이끌어주는 따뜻한 캡틴."],["강점 상황","팀 빌딩, 고객 커뮤니케이션 및 관리, 다자간 협업 프로젝트 총괄."],["어려움 상황","구성원 간의 불화와 갈등, 자신의 헌신과 선의가 이기적으로 악용당할 때."]],"goodBoss":["INFJ / INFP","팀을 위한 헌신과 열정에 깊은 신뢰와 감사를 표현하며, 서로의 성장을 돕는 진정한 파트너십을 형성함."],"badBoss":["ISTP","아무리 열정적으로 다가가도 무반응·무표정으로 일관하며, 감정적 교류 없이 사무적으로만 대할 때 외로움을 느낌."],"jobs":["호텔 총지배인·VIP 매니저","고객경험(CX) 총괄","기업 교육(HRD) 강사","사회복지 관리자","항공 승무원 사무장"],"celebs":"유재석, 송중기, 임시완, 휴 잭맨, 주디 홉스(주토피아), 캡틴 아메리카(스티브 로저스).","dims":["people","express"],"dept":"tour","deptWhy":"사람을 이끌고 환대하는 호텔·항공 서비스 현장(관광서비스과)이 어울려요.","lesson":"다른 사람을 챙기느라 내 몫을 미루지 마세요. 도움을 요청하는 것도 팀을 지키는 일이에요."},"ENFP":{"name":"재기발랄한 활동가","short":"재기발랄 활동가","group":"NF","role":"지친 팀에 활기를 불어넣는 인간 비타민","details":["가방에 형형색색의 인형 키링과 배지가 가득하며, 복도를 지나갈 때마다 아는 친구들이 많아 인사를 멈추지 않음.","집에 가만히 누워있으면 몸이 근질거려 '누구 나랑 놀 사람!'을 외치며 일단 밖으로 나가야 에너지가 충전됨.","대화를 나눌 때 '대박!', '진짜로?', '헐 대단하다!' 등 폭풍 리액션과 함께 온몸으로 감정을 표현함.","손에 스마트폰을 쥐고 있으면서 '내 폰 어디 갔지?' 하고 찾거나, 소지품을 종종 교실에 두고 다니는 허당미가 있음.","처음 만난 사람과도 10분 만에 베프처럼 친해져서 서로의 인생 이야기를 나눌 정도로 친화력이 뛰어남."],"traits":[["성격","열정적이고 낙천적이며, 사람에 대한 호기심과 긍정 에너지가 넘쳐흐르는 분위기 메이커."],["생활 습관","재미있는 일이 생기면 망설임 없이 뛰어들고, 새로운 친구를 사귀는 것을 즐김."],["의사결정","머리로 따지기보다 가슴이 뛰는 설렘과 사람들과의 즐거움을 바탕으로 직관적으로 결정."],["취미 & 힐링","숏폼 영상 제작, 원데이 클래스 체험, 페스티벌 참가, 사진 찍고 꾸미기, 즉흥 나들이."],["특기 & 잠재력","처음 보는 사람과의 어색함을 순식간에 녹여버리는 친화력과 반짝이는 기획 아이디어."]],"work":[["일하는 방식","열정과 직관으로 일의 분위기를 띄우며 다양한 사람과 네트워킹하며 진행."],["소통 방식","밝고 에너지가 넘치며 상대를 무장해제시키는 매력적인 대화법."],["어떤 동료인가","지친 팀에 활기를 불어넣고 출근길을 유쾌하게 만들어주는 인간 비타민."],["강점 상황","고객과의 빠른 라포(신뢰) 형성, 홍보·마케팅 프로모션, 신규 이벤트 기획."],["어려움 상황","혼자 고립된 자리에서 반복적인 서류 정리나 엑셀 수치 검증을 오래 해야 할 때."]],"goodBoss":["INTJ / INFJ","넘치는 아이디어를 구체적인 결과물로 다듬을 수 있도록 차분하게 길을 터주고, 든든한 바람막이가 되어줌."],"badBoss":["ISTJ","사소한 서류 오타, 규격, 반복 루틴을 하나하나 지적하며 마이크로매니징으로 숨통을 조일 때 방전됨."],"jobs":["홍보·마케팅 기획자","여행 상품 기획자(투어 플래너)","방송인·MC","카페·외식 브랜드 매니저","축제·공연 기획자"],"celebs":"이효리, 싸이, 로제(블랙핑크), 츄, 올라프(겨울왕국), 스폰지밥.","dims":["people","express"],"dept":"tour","deptWhy":"여행 상품과 축제를 기획하고 알리는 관광서비스과 일이 잘 맞아요.","lesson":"벌여 놓은 일 중 하나만 골라 마무리하는 습관이 신뢰를 만들어요. 세부 확인은 체크리스트로 도와보세요."},"ISTJ":{"name":"청렴결백한 논리주의자","short":"청렴 논리주의자","group":"SJ","role":"맡은 일을 두 번 확인할 필요 없게 만드는 실무자","details":["교과서와 유인물이 인덱스 탭과 파일철로 완벽하게 정리되어 있어 친구들이 필기 빌리러 1순위로 찾아옴.","수행평가나 과제는 마감 전날 벼락치기하지 않고, 며칠 전에 이미 계획표에 맞춰 완성해 두어야 안심함.","정해진 규칙이나 시간 약속을 어기는 사람을 보면 속으로 크게 실망하며 신뢰를 거둠.","책상 위 필통, 지우개, 교재가 항상 정해진 자리에 반듯하게 놓여 있어야 마음이 편안함.","갑작스러운 계획 변경(예: '오늘 수업 대신 영화 볼까?', '갑자기 방과 후에 여기 갈래?')을 들으면 당황스러워함."],"traits":[["성격","신중하고 책임감이 매우 강하며, 약속과 원칙을 칼같이 지키는 모범적인 현실주의자."],["생활 습관","매일 정해진 시간표와 루틴대로 움직이며, 사용한 물건은 즉시 제자리에 둠."],["의사결정","과거의 검증된 데이터, 명문화된 규칙, 확실한 선례를 바탕으로 보수적이고 안전하게 결정."],["취미 & 힐링","방 대청소 및 서랍 정리, 프라모델 조립, 스포츠 경기 데이터·기록 분석, 혼자 걷기."],["특기 & 잠재력","오탈자나 수치 오류를 한눈에 잡아내는 정밀함과 어떤 유혹에도 흔들리지 않는 성실함."]],"work":[["일하는 방식","매뉴얼과 절차를 철저히 지키며 빈틈없이 정확한 결과물을 산출."],["소통 방식","감정을 섞지 않고 사실과 근거를 명확하게 전달하는 담백한 화법."],["어떤 동료인가","일을 맡겨두면 두 번 확인할 필요가 없는 최고의 신뢰를 주는 실무자."],["강점 상황","회계 정산, 재고 관리, 품질 검수, 표준 운영 절차(SOP) 준수."],["어려움 상황","명확한 기준이나 매뉴얼 없이 '그냥 알아서 감각적으로 해봐'라고 지시받을 때."]],"goodBoss":["ESTJ","명확한 매뉴얼과 공정한 평가 기준, 예측 가능한 업무 프로세스를 제공해 마음 편하게 일하게 해줌."],"badBoss":["ENTP","계획 없이 즉흥적으로 지시를 번복하고, '일단 저지르고 수습은 네가 해'라며 체계를 흔들 때 극심한 스트레스를 받음."],"jobs":["회계사·세무 실무자","총무·행정 관리자","물류·재고 관리사","호텔 프론트 데스크 총괄","공공기관 행정관"],"celebs":"워런 버핏, 김연아, 이병헌, 차태현, 헤르미온느 그레인저(해리 포터), 닉 퓨리(어벤져스).","dims":["detail","craft"],"dept":"cafe","deptWhy":"재고·원가·정산을 빈틈없이 관리하는 카페경영과 경영코스가 잘 맞아요.","lesson":"계획이 틀어져도 괜찮다는 여유를 연습해 보세요. 새 방식도 한 번 시험해 보면 더 단단해져요."},"ISFJ":{"name":"용감한 수호자","short":"용감한 수호자","group":"SJ","role":"보이지 않는 곳에서 팀을 받쳐주는 조력자","details":["가방 안에 밴드, 물티슈, 여분의 볼펜, 거울 등이 항상 챙겨져 있어 친구들이 찾을 때마다 조용히 건네줌.","친구가 며칠 전에 스치듯 말한 '나 요즘 이 과자 좋아해'를 기억했다가 매점에서 챙겨주는 세심한 기억력의 소유자.","학급에서 아무도 치우지 않은 쓰레기나 어질러진 교탁을 보면 묵묵히 혼자 다가가 정돈해 놓음.","남에게 부탁하거나 거절하는 것을 너무 어려워해서 속으로 힘들어하면서도 부탁을 다 들어주기도 함.","학교에서는 모범생으로 성실히 생활하고, 방과 후에는 집에서 편안한 파자마를 입고 좋아하는 드라마를 보는 게 최고의 행복임."],"traits":[["성격","차분하고 헌신적이며, 주변 사람들의 필요와 감정을 세심하게 챙기는 따뜻한 돌봄이."],["생활 습관","주변을 항상 깨끗하게 유지하며, 가까운 사람들의 생일과 기념일을 꼬박꼬박 챙김."],["의사결정","타인에게 폐를 끼치지 않고, 모두가 편안하며 안정적인 방식을 선택."],["취미 & 힐링","요리·홈베이킹, 자수·뜨개질, 다이어리 스티커 꾸미기, 반려식물 가꾸기."],["특기 & 잠재력","남들이 보지 못하는 사소한 디테일을 챙겨 사람을 편안하고 감동하게 만드는 케어 능력."]],"work":[["일하는 방식","묵묵히 자기 몫을 다하며 보이지 않는 곳의 서포트 업무까지 정성껏 완수."],["소통 방식","조용하고 온화하며 상대방의 말을 경청하고 예의를 갖추어 배려."],["어떤 동료인가","궂은일도 마다하지 않고 팀의 뒤를 든든하게 받쳐주는 조용하지만 강한 조력자."],["강점 상황","VIP 고객 응대, 섬세한 서비스 지원, 조직 내 행정 및 복지 지원."],["어려움 상황","잦은 계획 변경, 무례하고 공격적인 고객이나 동료의 갑질에 노출될 때."]],"goodBoss":["ESFJ / ESTJ","보이지 않는 곳에서의 헌신과 꼼꼼한 서포트를 단번에 알아채고 공식적으로 인정과 감사를 전함."],"badBoss":["ENTP / ESTP","예고 없는 돌발 상황과 변덕스러운 업무 지시를 연발하며 안정된 근무 루틴을 깨뜨릴 때."],"jobs":["항공 승무원","호텔 고객서비스(CS) 매니저","간호사·의료행정사","초등교사","비서·의전 담당자"],"celebs":"박보영, 태양(빅뱅), 정국(BTS), 최수종, 신데렐라, 존 왓슨(셜록 홈즈).","dims":["people","detail"],"dept":"tour","deptWhy":"손님을 세심하게 챙기는 항공·호텔 서비스(관광서비스과)에서 강점이 살아나요.","lesson":"부탁을 거절하는 연습이 필요해요. '내가 할 수 있는 데까지'를 말해 두면 오히려 신뢰가 커져요."},"ESTJ":{"name":"엄격한 관리자","short":"엄격한 관리자","group":"SJ","role":"흐트러진 판을 바로잡고 목표를 끝내는 관리자","details":["모둠 과제 때 정해진 시간까지 과제를 안 내거나 단톡방에서 답장이 없는 조원에게 '오늘 몇 시까지 보내줘'라고 칼같이 직언함.","스터디 플래너에 날짜별, 시간대별 목표가 정갈하게 적혀 있으며 끝낸 항목에 취소선을 그을 때 희열을 느낌.","친구들과 놀러 갈 때 동선, 맛집, 예산, 기차 시간을 미리 표로 정리해 단톡방에 공유하는 총무 포지션.","교실 환경미화나 청소 구역 검사를 할 때 구석구석 먼지 하나 없이 완벽하게 통솔해 끝마침.","핑계나 변명을 싫어하며, '일단 정해진 건 제대로 끝내고 놀자'는 확고한 마인드를 지님."],"traits":[["성격","강한 책임감과 추진력을 바탕으로 규칙과 질서를 바로잡고 성과를 내는 리더."],["생활 습관","아침에 일어나서 이부자리 정리부터 하루 할 일 체크까지 정해진 루틴을 철저히 지킴."],["의사결정","객관적 사실, 가성비, 실현 가능성과 효율성을 엄밀히 따져 망설임 없이 결단."],["취미 & 힐링","테니스·골프·헬스, 계획적인 테마 여행, 시간 관리 스터디, 가계부·예산 정리."],["특기 & 잠재력","사람과 물자를 적재적소에 배치하고 마감 기한을 완벽히 지켜내는 탁월한 조직 관리력."]],"work":[["일하는 방식","업무의 우선순위를 명확히 정하고 표준화된 매뉴얼에 따라 체계적으로 통제."],["소통 방식","핵심을 정확하게 짚고 결론부터 말하는 직관적인 비즈니스 화법."],["어떤 동료인가","흐트러진 조직을 바로잡고 반드시 목표를 달성해 내는 믿음직한 관리자."],["강점 상황","매장 운영 총괄, 마감 일정 관리, 인력 통제 및 업무 표준화."],["어려움 상황","체계가 없고 일 처리가 주먹구구식으로 돌아가는 무질서하고 나태한 환경."]],"goodBoss":["ENTJ / ISTJ","철저한 프로의식과 성과 중심의 피드백, 군더더기 없는 업무 분장으로 일의 효율을 최고로 끌어올림."],"badBoss":["INFP","원칙 없이 기분이나 사정에 따라 지침이 오락가락하고, 마감 기한을 엄격하게 통제하지 못할 때 속이 터짐."],"jobs":["호텔 식음료(F&B) 총괄 매니저","매장 점장(Store Manager)","재무·인사 관리자","항공 지상직 슈퍼바이저","보안·안전 관리자"],"celebs":"류현진, 한채영, 데프콘, 힐러리 클린턴, 모니카 겔러(프렌즈), 우르술라(인어공주).","dims":["detail","people"],"dept":"cafe","deptWhy":"매장 운영과 인력 관리를 총괄하는 카페경영과 경영코스에서 힘을 내요.","lesson":"정답을 정해 주기 전에 동료의 의견을 한 번 더 물으면 실행이 빨라져요."},"ESFJ":{"name":"사교적인 외교관","short":"사교적 외교관","group":"SJ","role":"환대와 의전이 몸에 밴 분위기 메이커","details":["친구들의 생일을 달력에 다 적어두고 생일 전날 12시 땡 치면 축하 메시지와 기프티콘을 가장 먼저 보냄.","쉬는 시간마다 매점에서 산 젤리나 과자를 주변 친구들에게 한 움큼씩 나눠주며 수다를 떪.","학급 친구들의 새로운 헤어스타일, 바뀐 안경, 새 신발을 단번에 알아채고 '완전 잘 어울린다!'며 칭찬해 줌.","교실 안에서 소외되는 친구가 있으면 마음이 쓰여 일부러 말을 걸거나 쉬는 시간에 데리고 다님.","단톡방에서 친구들의 말에 '헐 대박!', '진짜 맛있겠다ㅠㅠ' 등 폭풍 공감과 맞장구를 담당함."],"traits":[["성격","다정다감하고 친화력이 뛰어나며, 사람들과의 조화로운 관계와 인정을 소중히 여김."],["생활 습관","주변 사람들과 끊임없이 안부를 주고받고, 모임이 있으면 솔선수범해 궂은일을 도움."],["의사결정","다수의 행복과 팀 내의 화목한 분위기를 유지할 수 있는 쪽으로 결정."],["취미 & 힐링","친구들과 맛집 투어, 인생네컷 사진 모으기, 홈파티 열기, 기념일 선물 포장하기."],["특기 & 잠재력","사람들의 어색함을 풀어주는 상냥한 미소와 완벽한 예절 및 서비스 의전 감각."]],"work":[["일하는 방식","동료 간의 조화를 중시하며 협력적인 분위기 속에서 안정적이고 꼼꼼하게 실행."],["소통 방식","리액션과 맞장구가 훌륭하며, 항상 상냥하고 예의 바른 태도가 몸에 배어 있음."],["어떤 동료인가","팀원들의 기분과 경조사를 챙기며 조직의 결속력을 다져주는 따뜻한 분위기 메이커."],["강점 상황","고객 환대(호스피탈리티), VIP 의전, 사내 복지 및 팀워크 조율."],["어려움 상황","팀원 간의 냉랭한 분위기, 자신의 친절과 헌신에 대한 인정과 감사가 전혀 없을 때."]],"goodBoss":["ISFJ / ENFJ","동료들을 챙기는 수고를 높이 평가하고, 따뜻하고 화목한 팀 분위기를 함께 조성해 줌."],"badBoss":["INTP / INTJ","아무리 웃으며 친절하게 다가가도 냉랭한 표정으로 팩트 폭격만 날리고 인간적인 교감을 단절할 때 상처받음."],"jobs":["항공 승무원","호텔 컨시어지","웨딩·연회 플래너","고객만족(CS) 강사","외식 서비스 캡틴"],"celebs":"박보검, 황광희, 혜리, 규현, 백설공주, 우디(토이 스토리).","dims":["people","detail"],"dept":"tour","deptWhy":"환대와 의전이 중심인 호텔코스·항공코스에서 빛나요.","lesson":"모두의 기분을 맞추다 내 감정을 놓치지 마세요. 인정받지 못한 노력은 스스로 기록해 두면 좋아요."},"ISTP":{"name":"만능 재주꾼","short":"만능 재주꾼","group":"SP","role":"패닉 없이 문제를 뜯어서 고치는 기술자","details":["책상 위에는 지금 당장 필요한 교재와 펜 딱 한 자루만 올려두는 극강의 미니멀리스트.","교실의 삐걱거리는 의자, 고장 난 사물함 문, 안 나오는 형광등을 도구 몇 개로 뚝딱 고쳐버림.","평소 조용히 엎드려 자며 에너지를 아끼다가 체육대회나 조리·바리스타 실습 시간만 되면 엄청난 집중력과 피지컬을 뽐냄.","카톡 메시지는 주로 'ㅇㅇ', 'ㄴㄴ', '몇 시?'처럼 필요한 용건만 초간단으로 보냄.","남들이 우왕좌왕하는 돌발 위기 상황(예: 실습 도중 기계 오작동)에서도 표정 하나 안 변하고 침착하게 수습함."],"traits":[["성격","쿨하고 과묵하며, 관찰력이 뛰어나고 실용적인 문제 해결을 선호하는 기술자."],["생활 습관","불필요한 일에 힘을 빼지 않고, 문제가 생기면 가장 효율적인 방식으로 즉각 처리."],["의사결정","감정을 철저히 배제하고 현실적인 유용성과 사실에 근거해 쿨하게 결단."],["취미 & 힐링","전자기기·오토바이 정비, 목공·가죽공예, 혼자 게임하기, 익스트림 스포츠."],["특기 & 잠재력","손재주가 뛰어나고 도구를 다루는 데 능숙하며 위기 상황에서의 탁월한 트러블슈팅."]],"work":[["일하는 방식","최소한의 에너지로 최대의 실용적 효율을 내며, 문제가 생기면 직접 뜯어보고 고침."],["소통 방식","군더더기 없이 핵심만 짧고 굵게 말하며 감정 소모가 큰 대화를 기피."],["어떤 동료인가","패닉 상황에서도 흔들리지 않고 문제를 즉각 해결해 내는 든든한 기술자."],["강점 상황","장비 고장 수리, 긴급 현장 트러블슈팅, 응급 처치."],["어려움 상황","장시간 이어지는 비효율적인 회의, 사생활에 대한 간섭, 융통성 없는 규정 강요."]],"goodBoss":["ESTP / ISTJ","불필요한 회의, 감정 소모, 회식 강요 없이 깔끔하게 할 일만 던져주고 온전히 내 방식대로 해결하게 둠."],"badBoss":["ENFJ","일상적인 감정 공유, 잦은 팀워크 미팅, '우리 하나가 되자'식의 가족 같은 분위기를 끊임없이 요구할 때 도망치고 싶어짐."],"jobs":["호텔·매장 시설 엔지니어","바텐더·믹솔로지스트","항공기 정비사","데이터·네트워크 관리자","응급구조사"],"celebs":"주우재, 한소희, 김종국, 존 윅, 제임스 본드(007), 레골라스(반지의 제왕).","dims":["craft","detail"],"dept":"cook","deptWhy":"장비와 손기술로 현장을 해결하는 외식조리과 조리코스가 잘 맞아요.","lesson":"혼자 해결한 과정을 짧게라도 공유하면 동료가 따라올 수 있어요. 회의에서는 한마디씩 먼저 꺼내 보세요."},"ISFP":{"name":"호기심 많은 예술가","short":"호기심 예술가","group":"SP","role":"감각으로 완성도를 높이는 조용한 예술가","details":["교과서 귀퉁이에 감각적인 손그림이나 타이포그래피가 자연스럽게 그려져 있음.","방과 후 종례가 끝나면 바로 집으로 직행해 침대에 누워 유튜브나 웹툰을 보는 것이 인생 최고의 힐링.","하지만 취향에 맞는 예쁜 카페, 감성 소품샵, 전시회 팝업스토어는 조용히 혼자서도 잘 찾아감.","친구들과의 대화에서 '다 좋아', '너 편한 대로 해'라며 상대방의 선택에 전적으로 맞춰주는 평화주의자.","겉으로는 매우 순하고 조용해 보이지만, 본인이 좋아하는 패션이나 음악 취향만큼은 확고한 고집이 있음."],"traits":[["성격","온화하고 겸손하며, 갈등을 싫어하고 일상의 감각적인 아름다움을 즐기는 예술가."],["생활 습관","침대 위에서 뒹굴거리며 SNS로 감성적인 사진, 인테리어 꿀팁을 스크랩함."],["의사결정","나의 내면이 편안한지, 상대방에게 부담이나 상처를 주지 않는지 고려해 조용히 결정."],["취미 & 힐링","플랜테리어, 수채화·디지털 드로잉, 향수·디퓨저 수집, 도예, 감성 음악 감상."],["특기 & 잠재력","색감과 디자인을 조화롭게 배치하는 뛰어난 미적 감각과 상대를 편안하게 만드는 태도."]],"work":[["일하는 방식","자율성이 보장된 환경에서 본인의 감각과 미적 기준을 살려 유연하게 작업."],["소통 방식","조용하고 부드러우며 상대방에게 부담을 주지 않는 편안한 배려형."],["어떤 동료인가","곁에 있는 것만으로도 마음이 편안해지고 감각적인 완성도를 높여주는 동료."],["강점 상황","디저트 플레이팅, 매장 인테리어·디스플레이(VMD) 연출, 1:1 맞춤형 서비스."],["어려움 상황","엄격한 규율과 통제, 빡빡한 마감 압박, 경쟁이 치열하고 공격적인 조직 분위기."]],"goodBoss":["ESFP / ISFJ","강압적이지 않고 편안한 환경을 만들어주며, 본인의 감각과 속도를 믿고 부드럽게 지지해 줌."],"badBoss":["ENTJ","목소리 톤부터 군대 교관처럼 강하게 밀어붙이고, 1초의 망설임도 허용하지 않는 속도전을 강요할 때 압사당하는 느낌을 받음."],"jobs":["파티시에·디저트 셰프","플로리스트","호텔 비주얼 머천다이저(VMD)","인테리어 디자이너","스페셜티 바리스타"],"celebs":"슬기(레드벨벳), 미주, 백현(EXO), 해리 포터, 오로라 공주(잠자는 숲속의 공주).","dims":["craft","express"],"dept":"cafe","deptWhy":"디저트와 매장 분위기를 감각으로 완성하는 카페경영과(베이커리·음료)가 어울려요.","lesson":"내 속도와 감각을 지키되 마감은 미리 정해 두세요. 작업물을 보여주는 연습이 기회를 불러요."},"ESTP":{"name":"모험을 즐기는 사업가","short":"모험가 사업가","group":"SP","role":"'일단 해보자'로 막힌 상황을 뚫는 돌파자","details":["교실 문을 열고 들어올 때부터 남다른 피지컬과 텐션으로 친구들에게 장난을 치며 등장함.","자리에 가만히 앉아있는 이론 수업은 쑤셔하지만, 체육 시간이나 야외 활동에서는 날아다님.","친구들과 팔씨름을 하거나 사소한 내기를 즐기며 승부욕과 승리의 짜릿함을 즐김.","시험공부는 며칠 전부터 진득하게 하기보다 전날 밤 직관과 요령으로 승부하며 의외로 점수가 잘 나옴.","옷이나 신발 등 스트릿 패션에 관심이 많고 새로운 스포츠 장비를 써보는 것을 좋아함."],"traits":[["성격","대담하고 자신감이 넘치며, 이론보다 행동으로 부딪쳐 결과를 만들어내는 실천가."],["생활 습관","고민하기보다 일단 행동으로 옮기며, 가전제품을 사면 설명서 없이 만져보며 익힘."],["의사결정","현장 상황을 직관적으로 스캔하고 가장 즉각적인 효과를 내는 방향으로 과감히 결정."],["취미 & 힐링","축구·농구 등 구기 종목, 수상 레포츠·서핑, 오토바이·드라이브, 캠핑."],["특기 & 잠재력","위기 상황을 유쾌하게 넘기는 임기응변, 탁월한 순발력과 현장 장악력."]],"work":[["일하는 방식","탁상공론보다 현장에서 직접 발로 뛰며 상황에 맞춰 임기응변으로 대응."],["소통 방식","유머러스하고 직설적이며 상황을 빠르게 반전시키는 순발력 넘치는 화법."],["어떤 동료인가","'일단 해보자!'며 망설이는 팀원들을 이끌고 막힌 상황을 뚫어주는 돌파자."],["강점 상황","악성 컴플레인 고객 즉각 응대, 세일즈 현장, 돌발 비상 상황 처리."],["어려움 상황","장시간의 서류 작성, 끝없는 이론 교육, 행동이 제약되는 엄격한 통제."]],"goodBoss":["ENTJ / ESTP","화끈한 인센티브, 신속한 의사결정, 현장에서 직접 결정할 수 있는 재량권을 전폭적으로 실어줌."],"badBoss":["INFJ / INFP","장기적인 이상이나 추상적인 가치관만 늘어놓으며, 현장 감각 없이 회의실에서 고민만 길어질 때 지루해 쓰러짐."],"jobs":["호텔 도어·벨 서비스 매니저","레크리에이션·이벤트 디렉터","여행 인솔자(투어 리더)","세일즈 전문가","소방관·경찰관"],"celebs":"전지현, 연정훈, 이수근, 신동엽, 토르(마블), 한 솔로(스타워즈), 뮬란.","dims":["people","craft"],"dept":"tour","deptWhy":"현장에서 즉시 대응하는 호텔 도어·벨, 투어 리더(관광서비스과)가 잘 맞아요.","lesson":"빠른 판단 뒤에 한 번만 되짚어 보는 습관이 실수를 줄여요. 서류와 기록도 무기가 돼요."},"ESFP":{"name":"자유로운 영혼의 연예인","short":"자유로운 연예인","group":"SP","role":"무대와 환대가 있는 현장을 밝히는 비타민","details":["쉬는 시간마다 복도를 런웨이처럼 누비며 옆 반 친구들까지 찾아가 인사를 건넴.","유행하는 틱톡·릴스 댄스 챌린지나 밈을 가장 먼저 따라 하고 친구들에게 보여주며 웃음을 줌.","가방 안에 손거울, 빗, 립밤, 간식이 가득 들어 있어 친구들이 매일 빌리러 옴.","예쁘고 힙한 신상 카페나 맛집을 꿰고 있어 친구들과 방과 후 약속 장소를 주도해서 잡음.","교실 안에서 재미있는 일이 벌어지면 가장 앞자리에서 구경하며 분위기를 최고조로 띄움."],"traits":[["성격","낙천적이고 흥이 넘치며, 스포트라이트를 두려워하지 않는 매력적인 분위기 메이커."],["생활 습관","사람들과 어울려 맛있는 것을 먹고 사진을 찍어 SNS에 공유하는 일상을 즐김."],["의사결정","지금 이 순간의 즐거움과 다 함께 웃을 수 있는 유쾌한 경험을 바탕으로 결정."],["취미 & 힐링","코인노래방 가기, 댄스·보컬 연습, 쇼핑 및 스타일링, 브이로그·숏폼 촬영."],["특기 & 잠재력","어색한 분위기를 단숨에 녹이고 사람들의 시선을 사로잡는 스타성과 무대 매너."]],"work":[["일하는 방식","유쾌한 분위기 속에서 사람들과 협력하며 현장의 활력을 극대화."],["소통 방식","밝고 매력적이며 사람의 경계심을 해제시키는 친화력 넘치는 대화."],["어떤 동료인가","고객에게 잊지 못할 즐거움을 선물하고 지친 팀의 텐션을 끌어올리는 비타민."],["강점 상황","오프닝 이벤트, VIP 고객 환대, 라이브 쇼케이스, 현장 프로모션."],["어려움 상황","혼자 고립된 근무 환경, 엄격하고 삭막한 분위기, 반복적인 서류 정리."]],"goodBoss":["ENFP / ESFJ","끼와 에너지를 마음껏 뽐낼 수 있는 판을 깔아주고, 사소한 성과에도 폭풍 칭찬과 환호를 보내줌."],"badBoss":["INTJ","웃음기 하나 없는 표정으로 논리적 결함과 디테일한 수치 오류만 차갑게 지적할 때 의기소침해짐."],"jobs":["호텔 엔터테인먼트 매니저","항공 승무원","쇼호스트·라이브 커머서","테마파크 캐스트·공연 기획자","외식 매장 서비스 캡틴"],"celebs":"비(정지훈), 하하, 이선빈, 강혜원, 안나(겨울왕국), 조이(인사이드 아웃).","dims":["people","express"],"dept":"tour","deptWhy":"무대와 환대가 있는 호텔 엔터테인먼트·승무원(관광서비스과)이 어울려요.","lesson":"즐거운 현장에서도 체크리스트 하나를 챙기면 실수가 줄어요. 숫자와 기록을 무서워하지 마세요."}};
 
   var INTERESTS = [
     { id: 'coffee', label: '커피·음료', emoji: '☕', dept: 'cafe', course: '음료코스',
@@ -207,7 +265,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   var DEPT_NAMES = { cafe: '카페경영과', tour: '관광서비스과', cook: '외식조리과' };
   var DEPT_COURSES = { cafe: '경영코스 · 음료코스', tour: '항공코스 · 호텔코스', cook: '식품코스 · 조리코스' };
 
-  var state = { ratings: {}, interests: [], values: [], oneLine: '', step: 0, updated: null };
+  var state = { mbti: '', ratings: {}, interests: [], values: [], oneLine: '', step: 0, updated: null };
   var saveTimer = null;
 
   function escapeHtml(text) {
@@ -225,12 +283,20 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     return '<div class="tags">' + items.map(function (t) { return '<span class="tag">' + escapeHtml(t) + '</span>'; }).join('') + '</div>';
   }
 
+  function mbtiGroupName(code) {
+    for (var i = 0; i < MBTI_GROUPS.length; i++) {
+      if (MBTI_GROUPS[i].types.indexOf(code) !== -1) { return MBTI_GROUPS[i].name + ' · ' + MBTI_GROUPS[i].desc; }
+    }
+    return '';
+  }
+
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
       if (!raw) { return; }
       var saved = JSON.parse(raw);
       if (!saved || typeof saved !== 'object') { return; }
+      if (typeof saved.mbti === 'string' && MBTI[saved.mbti]) { state.mbti = saved.mbti; }
       if (saved.ratings && typeof saved.ratings === 'object') {
         APT.forEach(function (item) {
           var v = Number(saved.ratings[item.id]);
@@ -245,7 +311,12 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
       }
       if (typeof saved.oneLine === 'string') { state.oneLine = saved.oneLine; }
       var step = Number(saved.step);
-      if (step >= 0 && step <= 2) { state.step = step; }
+      if (typeof saved.mbti === 'string') {
+        if (step >= 0 && step <= 4) { state.step = step; }
+      } else if (step >= 0 && step <= 3) {
+        /* MBTI 단계가 없던 이전 저장: 적성(0)…결과(3)를 한 칸 뒤로 옮깁니다. */
+        state.step = step + 1;
+      }
       if (saved.updated) { state.updated = saved.updated; }
     } catch (e) { /* 저장된 내용을 읽을 수 없으면 새로 시작합니다. */ }
   }
@@ -258,6 +329,65 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   function saveSoon() {
     if (saveTimer) { clearTimeout(saveTimer); }
     saveTimer = setTimeout(save, 500);
+  }
+
+  function renderMbti() {
+    var picker = document.getElementById('mbti-picker');
+    if (picker) {
+      picker.innerHTML = MBTI_GROUPS.map(function (g) {
+        var buttons = g.types.map(function (code) {
+          var item = MBTI[code];
+          return '<button type="button" class="choice mbti-btn" data-mbti="' + code + '" aria-pressed="' + (state.mbti === code) + '">' +
+            '<b>' + code + '</b> ' + escapeHtml(item.short) + '</button>';
+        }).join('');
+        return '<section class="mbti-group"><h3>' + escapeHtml(g.name) + ' <span>' + escapeHtml(g.desc) + '</span></h3>' +
+          '<div class="mbti-buttons" role="group" aria-label="' + escapeHtml(g.name) + ' 유형">' + buttons + '</div></section>';
+      }).join('');
+    }
+
+    var host = document.getElementById('mbti-detail');
+    if (!host) { return; }
+    var t = state.mbti ? MBTI[state.mbti] : null;
+    if (!t) {
+      host.innerHTML = '<p class="hint-line">유형을 고르면 이곳에 해석지 내용이 펼쳐져요. 검사 결과를 모르면 ‘건너뛰기’로 넘어가도 괜찮아요.</p>';
+      return;
+    }
+
+    var dimLabels = t.dims.map(function (d) { return DIMS[d].label; }).join(', ');
+    host.innerHTML =
+      '<article class="mbti-card">' +
+        '<div class="mbti-head">' +
+          '<p class="mbti-tag">' + escapeHtml(mbtiGroupName(state.mbti)) + '</p>' +
+          '<p class="mbti-code">' + escapeHtml(state.mbti) + '</p>' +
+          '<p class="mbti-name">' + escapeHtml(t.name) + '</p>' +
+          '<p class="mbti-role">' + escapeHtml(t.role) + '</p>' +
+        '</div>' +
+        '<div class="mbti-block"><h3>🎒 학교 및 일상 속 디테일</h3><ul>' +
+          t.details.map(function (d) { return '<li>' + escapeHtml(d) + '</li>'; }).join('') + '</ul></div>' +
+        '<div class="mbti-block"><h3>🌱 성격 및 라이프스타일</h3><dl class="mbti-dl">' +
+          t.traits.map(function (row) { return '<div><dt>' + escapeHtml(row[0]) + '</dt><dd>' + escapeHtml(row[1]) + '</dd></div>'; }).join('') + '</dl></div>' +
+        '<div class="mbti-block"><h3>🏢 직장에서의 모습</h3><dl class="mbti-dl">' +
+          t.work.map(function (row) { return '<div><dt>' + escapeHtml(row[0]) + '</dt><dd>' + escapeHtml(row[1]) + '</dd></div>'; }).join('') + '</dl></div>' +
+        '<div class="mbti-block"><h3>🤝 직장 상사 케미 지도</h3>' +
+          '<div class="boss-row"><span class="boss-name">😇 환상의 상사<br>' + escapeHtml(t.goodBoss[0]) + '</span><span>' + escapeHtml(t.goodBoss[1]) + '</span></div>' +
+          '<div class="boss-row"><span class="boss-name">😈 각오할 상사<br>' + escapeHtml(t.badBoss[0]) + '</span><span>' + escapeHtml(t.badBoss[1]) + '</span></div></div>' +
+        '<div class="mbti-block"><h3>💡 이런 점을 연습하면 좋아요</h3><p class="mbti-advice">' + escapeHtml(t.lesson) + '</p></div>' +
+        '<div class="mbti-block"><h3>추천 직업 5선</h3>' + tagList(t.jobs) + '</div>' +
+        '<div class="mbti-block"><h3>대표 유명인 & 캐릭터</h3><p style="font-size:13px;color:#5c5145;margin:0;line-height:1.7">' + escapeHtml(t.celebs) + '</p></div>' +
+        '<div class="mbti-school"><h3>🏫 우리 학교 3개 학과로 이어 보면</h3><p>' + escapeHtml(DEPT_NAMES[t.dept]) + ' — ' + escapeHtml(t.deptWhy) + '</p>' +
+          '<p class="hint-line" style="margin-top:6px">적성 검사에서 겹쳐 나오기 쉬운 신호: ' + escapeHtml(dimLabels) + '</p></div>' +
+        '<div class="mbti-actions"><button type="button" class="btn ghost" data-mbti-clear="1">유형 선택 해제</button></div>' +
+      '</article>';
+    renderAptHint();
+  }
+
+  function renderAptHint() {
+    var el = document.getElementById('apt-hint');
+    if (!el) { return; }
+    var t = state.mbti ? MBTI[state.mbti] : null;
+    if (!t) { el.textContent = ''; return; }
+    el.innerHTML = 'MBTI(' + escapeHtml(state.mbti) + ' ' + escapeHtml(t.name) + ')는 ‘' +
+      t.dims.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’ 쪽에서 힘을 낸다고 해요. 아래 문장은 수업·실습에서의 실제 경험에 비추어 답해 주세요.';
   }
 
   function renderApt() {
@@ -319,9 +449,10 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
       items[j].classList.toggle('done', n < step);
     }
     var fill = document.getElementById('progress-fill');
-    if (fill) { fill.style.width = Math.round((step + 1) / 4 * 100) + '%'; }
+    if (fill) { fill.style.width = Math.round((step + 1) / 5 * 100) + '%'; }
     state.step = step;
-    if (step === 3) { renderResult(); }
+    if (step === 4) { renderResult(); }
+    if (step === 1) { renderAptHint(); }
     var panel = document.querySelector('.step-panel[data-panel="' + step + '"]');
     if (panel && step > 0) {
       var top = panel.getBoundingClientRect().top + window.pageYOffset - 16;
@@ -398,6 +529,13 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   function summaryText(data) {
     var lines = [];
     lines.push('서울관광고 진로 탐색 요약');
+    if (state.mbti && MBTI[state.mbti]) {
+      var t = MBTI[state.mbti];
+      lines.push('· MBTI: ' + state.mbti + ' ' + t.name + ' — ' + t.role);
+      lines.push('  · 직장에서의 강점: ' + t.work[3][1]);
+      lines.push('  · 어울리는 직업: ' + t.jobs.join(', '));
+      lines.push('  · 연습할 점: ' + t.lesson);
+    }
     lines.push('· 적성: ' + Object.keys(data.pct).map(function (d) { return DIMS[d].label + ' ' + data.pct[d] + '%'; }).join(', '));
     lines.push('· 흥미 분야: ' + state.interests.map(function (id) { var it = findById(INTERESTS, id); return it ? it.label : ''; }).filter(Boolean).join(', '));
     lines.push('· 가치관: ' + state.values.map(function (id) { var v = findById(VALUES, id); return v ? v.label : ''; }).filter(Boolean).join(', '));
@@ -412,6 +550,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     var host = document.getElementById('result');
     if (!host) { return; }
     var data = buildResultData();
+    var mbtiType = state.mbti ? MBTI[state.mbti] : null;
 
     var bars = ['people', 'craft', 'detail', 'express'].map(function (dim) {
       return '<div class="bar"><span>' + DIMS[dim].label + '</span>' +
@@ -434,20 +573,47 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
         (pickedCourse ? ' 고른 흥미에는 <b>' + escapeHtml(pickedCourse) + '</b>가 가까워요.' : '') + '</p>';
     }
 
-    var deptHtml = '<p>고른 흥미가 가장 가까운 학과는 <b>' + escapeHtml(DEPT_NAMES[topDept] || '') + '</b>예요.</p>' + courseHint +
-      '<a class="btn ghost" href="../major-guide/" style="margin-top:12px">학과 선택 가이드에서 비교하기 ↗</a>';
+    var deptHtml = '<p>고른 흥미가 가장 가까운 학과는 <b>' + escapeHtml(DEPT_NAMES[topDept] || '') + '</b>예요.</p>' + courseHint;
+    if (mbtiType) {
+      var sameDept = topDept === mbtiType.dept;
+      deptHtml += '<p style="margin-top:10px">MBTI(' + escapeHtml(state.mbti) + ')로 보면 <b>' + escapeHtml(DEPT_NAMES[mbtiType.dept]) + '</b> — ' +
+        escapeHtml(mbtiType.deptWhy) + (sameDept ? ' 흥미로 고른 학과와 같은 방향이에요.' : ' 흥미로 고른 학과와 다르니 두 학과를 함께 비교해 보세요.') + '</p>';
+    }
+    deptHtml += '<a class="btn ghost" href="../major-guide/" style="margin-top:12px">학과 선택 가이드에서 비교하기 ↗</a>';
 
     var envText = valueItems.length
       ? valueItems.map(function (v) { return v.env; }).join(' 그리고 ') + '에서 힘을 발휘해요.'
       : '';
 
+    var mbtiCard = '';
+    if (mbtiType) {
+      var dimMatch = mbtiType.dims.filter(function (d) { return data.topDims.indexOf(d) !== -1; });
+      var matchLine = dimMatch.length
+        ? '적성에서 가장 높은 ‘' + dimMatch.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’가 MBTI가 가리키는 방향과 겹쳐요.'
+        : '적성에서 나온 방향과 MBTI가 가리키는 ‘' + mbtiType.dims.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’가 조금 달라요. 두 결과를 함께 보면 나를 더 넓게 볼 수 있어요.';
+      mbtiCard = '<div class="rcard lead"><h3>MBTI 분석 · ' + escapeHtml(state.mbti) + '</h3>' +
+        '<p class="mbti-code" style="font-size:24px">' + escapeHtml(state.mbti) + '</p>' +
+        '<p class="mbti-name" style="margin-top:2px">' + escapeHtml(mbtiType.name) + '</p>' +
+        '<p class="mbti-role" style="margin-top:4px">' + escapeHtml(mbtiType.role) + '</p>' +
+        '<p style="margin-top:10px"><b>직장에서의 강점</b> · ' + escapeHtml(mbtiType.work[3][1]) + '</p>' +
+        '<p style="margin-top:6px"><b>어려움을 느끼는 상황</b> · ' + escapeHtml(mbtiType.work[4][1]) + '</p>' +
+        '<p style="margin-top:6px"><b>환상의 상사</b> ' + escapeHtml(mbtiType.goodBoss[0]) + ' · ' + escapeHtml(mbtiType.goodBoss[1]) + '</p>' +
+        '<p style="margin-top:6px"><b>각오할 상사</b> ' + escapeHtml(mbtiType.badBoss[0]) + ' · ' + escapeHtml(mbtiType.badBoss[1]) + '</p>' +
+        '<p class="mbti-advice" style="margin-top:12px">💡 ' + escapeHtml(mbtiType.lesson) + '</p>' +
+        '<p class="hint-line">' + escapeHtml(matchLine) + '</p></div>';
+    }
+
+    var jobCard = '<div class="rcard"><h3>직업 키워드</h3>' + (data.jobs.length ? tagList(data.jobs) : '<p>흥미 분야를 고르면 직업 키워드가 나와요.</p>') +
+      (mbtiType ? '<p class="sub-label">MBTI(' + escapeHtml(state.mbti) + ')가 꼽은 직업</p>' + tagList(mbtiType.jobs) : '') + '</div>';
+
     host.innerHTML =
-      '<div class="rcard lead"><h3>적성 프로필</h3><div class="bars">' + bars + '</div>' +
+      mbtiCard +
+      '<div class="rcard"><h3>적성 프로필</h3><div class="bars">' + bars + '</div>' +
         '<p class="hint-line">가장 높은 두 가지는 ‘' + data.topDims.map(function (d) { return DIMS[d].label; }).join('’, ‘') + '’이에요.</p></div>' +
       '<div class="rcard"><h3>관심 분야</h3>' + (interestLabels.length ? tagList(interestLabels) : '<p>고른 분야가 없어요.</p>') + '</div>' +
       '<div class="rcard"><h3>가치관</h3>' + (valueItems.length ? tagList(valueItems.map(function (v) { return v.label; })) : '') +
         (envText ? '<p style="margin-top:10px">' + escapeHtml(envText) + '</p>' : '') + '</div>' +
-      '<div class="rcard"><h3>직업 키워드</h3>' + (data.jobs.length ? tagList(data.jobs) : '<p>흥미 분야를 고르면 직업 키워드가 나와요.</p>') + '</div>' +
+      jobCard +
       '<div class="rcard"><h3>전공 키워드</h3>' + (data.majors.length ? tagList(data.majors) : '<p>흥미 분야를 고르면 전공 키워드가 나와요.</p>') + '</div>' +
       '<div class="rcard"><h3>관심 자격증</h3>' + (data.certs.length ? tagList(data.certs) : '<p>흥미 분야를 고르면 학교에서 준비하는 자격증이 나와요.</p>') + '</div>' +
       '<div class="rcard"><h3>어울리는 학과</h3>' + (data.deptTop.length ? deptHtml : '<p>흥미 분야를 고르면 어울리는 학과를 알려 드려요.</p>') + '</div>' +
@@ -455,7 +621,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
         '<textarea class="oneline" id="oneline" maxlength="200" placeholder="예: 사람을 반갑게 맞이하는 호텔리어가 되어, 호텔 식음료 서비스를 기획하고 싶다."></textarea>' +
         '<div class="copy-row"><button type="button" class="btn primary" id="save-line">한 줄 저장하기</button><button type="button" class="btn ghost" id="copy-summary">요약 복사하기</button></div>' +
         '<p class="confirm-note" id="line-note" role="status" aria-live="polite"></p>' +
-        '<p class="hint-line">복사한 요약은 수행평가·상담 자료에 붙여 넣어 쓸 수 있어요.</p></div>';
+        '<p class="hint-line">복사한 요약에는 MBTI 분석도 함께 담겨 수행평가·상담 자료에 붙여 넣어 쓸 수 있어요.</p></div>';
 
     var line = document.getElementById('oneline');
     if (line) {
@@ -513,22 +679,51 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
 
   function validateStep(step) {
     if (step === 0) {
-      var missing = APT.filter(function (item) { return !state.ratings[item.id]; }).length;
-      if (missing > 0) { setMsg(0, '아직 답하지 않은 문장이 ' + missing + '개 있어요. 모두 골라 주세요.'); return false; }
-      setMsg(0, '');
+      /* MBTI는 선택 사항입니다. 고르지 않아도 다음으로 넘어갈 수 있어요. */
       return true;
     }
     if (step === 1) {
-      if (state.interests.length === 0) { setMsg(1, '끌리는 분야를 하나 이상 골라 주세요.'); return false; }
+      var missing = APT.filter(function (item) { return !state.ratings[item.id]; }).length;
+      if (missing > 0) { setMsg(1, '아직 답하지 않은 문장이 ' + missing + '개 있어요. 모두 골라 주세요.'); return false; }
       setMsg(1, '');
       return true;
     }
     if (step === 2) {
-      if (state.values.length === 0) { setMsg(2, '중요한 가치를 하나 이상 골라 주세요.'); return false; }
+      if (state.interests.length === 0) { setMsg(2, '끌리는 분야를 하나 이상 골라 주세요.'); return false; }
       setMsg(2, '');
       return true;
     }
+    if (step === 3) {
+      if (state.values.length === 0) { setMsg(3, '중요한 가치를 하나 이상 골라 주세요.'); return false; }
+      setMsg(3, '');
+      return true;
+    }
     return true;
+  }
+
+  function onMbtiClick(event) {
+    var btn = event.target.closest('[data-mbti]');
+    if (!btn) { return; }
+    var code = btn.getAttribute('data-mbti');
+    if (!MBTI[code]) { return; }
+    var firstPick = !state.mbti;
+    state.mbti = code;
+    setMsg(0, '');
+    renderMbti();
+    save();
+    if (firstPick) {
+      var detail = document.getElementById('mbti-detail');
+      if (detail) {
+        var top = detail.getBoundingClientRect().top + window.pageYOffset - 12;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    }
+  }
+
+  function clearMbti() {
+    state.mbti = '';
+    renderMbti();
+    save();
   }
 
   function onAptClick(event) {
@@ -541,7 +736,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     for (var i = 0; i < siblings.length; i++) {
       siblings[i].setAttribute('aria-pressed', Number(siblings[i].getAttribute('data-value')) === value ? 'true' : 'false');
     }
-    setMsg(0, '');
+    setMsg(1, '');
     save();
   }
 
@@ -555,12 +750,12 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
       btn.setAttribute('aria-pressed', 'false');
     } else {
       if (state.interests.length >= 3) {
-        setMsg(1, '흥미 분야는 최대 3개까지 고를 수 있어요. 하나를 해제하고 골라 주세요.');
+        setMsg(2, '흥미 분야는 최대 3개까지 고를 수 있어요. 하나를 해제하고 골라 주세요.');
         return;
       }
       state.interests.push(id);
       btn.setAttribute('aria-pressed', 'true');
-      setMsg(1, '');
+      setMsg(2, '');
     }
     updatePickCounts();
     save();
@@ -576,12 +771,12 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
       btn.setAttribute('aria-pressed', 'false');
     } else {
       if (state.values.length >= 2) {
-        setMsg(2, '가치관은 최대 2개까지 고를 수 있어요. 하나를 해제하고 골라 주세요.');
+        setMsg(3, '가치관은 최대 2개까지 고를 수 있어요. 하나를 해제하고 골라 주세요.');
         return;
       }
       state.values.push(id);
       btn.setAttribute('aria-pressed', 'true');
-      setMsg(2, '');
+      setMsg(3, '');
     }
     updatePickCounts();
     save();
@@ -592,8 +787,8 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     if (nextBtn) {
       var from = Number(nextBtn.getAttribute('data-next')) - 1;
       if (!validateStep(from)) { return; }
-      save();
       showStep(Number(nextBtn.getAttribute('data-next')));
+      save();
       return;
     }
     var prevBtn = event.target.closest('[data-prev]');
@@ -603,8 +798,9 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   function resetAll() {
     var ok = window.confirm('저장한 답변과 진로 한 줄을 모두 지우고 처음부터 시작할까요? 지운 내용은 되돌릴 수 없어요.');
     if (!ok) { return; }
-    state = { ratings: {}, interests: [], values: [], oneLine: '', step: 0, updated: null };
+    state = { mbti: '', ratings: {}, interests: [], values: [], oneLine: '', step: 0, updated: null };
     try { localStorage.removeItem(KEY); } catch (e) { /* 저장소를 지울 수 없어도 화면은 초기화합니다. */ }
+    renderMbti();
     renderApt();
     renderInterests();
     renderValues();
@@ -612,15 +808,20 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   }
 
   load();
+  renderMbti();
   renderApt();
   renderInterests();
   renderValues();
+  renderAptHint();
 
   var fullAnswers = APT.every(function (item) { return state.ratings[item.id]; });
   var complete = fullAnswers && state.interests.length > 0 && state.values.length > 0;
-  showStep(complete ? 3 : state.step);
+  showStep(complete ? 4 : state.step);
 
   document.addEventListener('click', function (event) {
+    if (event.target.closest('[data-mbti]')) { onMbtiClick(event); return; }
+    if (event.target.closest('[data-mbti-clear]')) { clearMbti(); return; }
+    if (event.target.closest('#mbti-skip')) { showStep(1); save(); return; }
     if (event.target.closest('[data-apt]')) { onAptClick(event); return; }
     if (event.target.closest('[data-interest]')) { onInterestClick(event); return; }
     if (event.target.closest('[data-value-pick]')) { onValueClick(event); return; }
