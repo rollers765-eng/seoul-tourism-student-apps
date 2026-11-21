@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#faf9f6">
+<meta name="description" content="서울관광고등학교 카페경영과·관광서비스과·외식조리과의 교과·자격증·진로를 비교하고, 관심 분야와 성향 체크로 나에게 맞는 학과를 찾는 웹앱입니다.">
+<title>학과 선택 가이드 | 서울관광고등학교</title>
+<link rel="stylesheet" href="../accounting-library/style.css">
+<style>
+.app-main{max-width:1000px}
+.intro{padding:30px 0 16px}
+.intro h1{font-size:clamp(30px,5vw,38px)}
+.intro-text{max-width:640px}
+.notice-line{font-size:12px;color:var(--muted);line-height:1.65;margin:0 0 28px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:9px}
+.notice-line a{color:var(--accent);text-underline-offset:3px;font-weight:700}
+.block{margin:0 0 38px}
+.section-head h2{font-size:21px;letter-spacing:-.04em;margin:0 0 4px}
+.section-head p{font-size:13px;color:var(--muted);margin:0 0 14px}
+.section-head .count{font-size:11px;color:var(--accent);font-weight:700}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.tabs [role=tab]{flex:1 1 180px;min-height:54px;padding:10px 14px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;line-height:1.4}
+.tabs [role=tab][aria-selected=true]{border-color:var(--accent);background:var(--cream);color:#84451f;box-shadow:inset 0 0 0 1px var(--accent)}
+.panel{background:#fff;border:1px solid var(--line);border-top:3px solid var(--orange);border-radius:12px;padding:22px}
+.panel h3{font-size:21px;margin:0 0 6px;letter-spacing:-.04em}
+.panel-tag{display:inline-block;font-size:11px;font-weight:700;color:#96501e;background:var(--cream);border-radius:20px;padding:3px 10px;margin:0 0 10px}
+.panel-summary{font-size:14px;color:#5c5145;margin:0 0 18px;line-height:1.7}
+.mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mini{background:#fcfaf7;border:1px solid var(--line);border-radius:9px;padding:14px}
+.mini h4{margin:0 0 9px;font-size:12px;color:#8a6a4a;letter-spacing:.02em}
+.mini-line{font-size:13px;margin:14px 0 0;color:#5c5145;line-height:1.7}
+.mini-line b{display:inline-block;color:var(--accent);margin-right:6px;font-size:12px}
+.panel .btn{margin-top:18px}
+.cmp-wrap{margin-top:16px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.cmp-wrap summary{cursor:pointer;padding:14px 16px;min-height:48px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;list-style:none}
+.cmp-wrap summary::-webkit-details-marker{display:none}
+.cmp-wrap summary:before{content:'▸';color:var(--accent);font-size:11px}
+.cmp-wrap[open] summary:before{content:'▾'}
+.cmp-scroll{padding:0 16px 16px;overflow-x:auto}
+.cmp-hint{display:none;font-size:11px;color:var(--muted);margin:0 0 8px}
+.cmp{min-width:660px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cmp-row{display:grid;grid-template-columns:112px repeat(3,minmax(0,1fr))}
+.cmp-row+.cmp-row{border-top:1px solid var(--line)}
+.cmp-row>div{padding:12px;font-size:12px;line-height:1.65}
+.cmp-row>div:first-child{background:#f6f2ea;font-weight:700;color:#6c5840}
+.cmp-head>div{background:#f3efe7;font-weight:700;color:#6c5840}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;border:1px solid #dacbb9;border-radius:8px;background:#fff;color:var(--ink);font-size:14px;font-weight:700;text-decoration:none;cursor:pointer}
+.btn:hover{background:#fff9ef}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#8d471c}
+.btn.ghost{background:var(--cream);border-color:#e3cdb2;color:#84451f}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.chips-wrap .choice{display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:8px 14px;font-size:13px;border-radius:999px}
+.q{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 10px}
+.q-text{font-size:14px;font-weight:700;letter-spacing:-.02em;margin:0 0 11px;line-height:1.55}
+.q-text span{color:var(--accent);margin-right:6px}
+.q-options{display:flex;flex-wrap:wrap;gap:8px}
+.q-options .choice{flex:1 1 190px;justify-content:flex-start;text-align:left;min-height:50px;padding:10px 14px;font-size:13px;line-height:1.5;border-radius:8px}
+.result-card{background:#fff;border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;padding:22px}
+.result-label{font-size:12px;font-weight:700;color:var(--accent);margin:0 0 6px}
+.result-name{font-size:26px;margin:0 0 8px;letter-spacing:-.04em}
+.result-name small{font-size:14px;font-weight:400;color:var(--muted);margin-left:8px}
+.result-desc{font-size:13px;color:#5c5145;margin:0 0 18px;line-height:1.7}
+.bars{display:grid;gap:9px;margin:0 0 18px}
+.bar{display:grid;grid-template-columns:96px 1fr 46px;align-items:center;gap:10px;font-size:12px}
+.bar-track{height:10px;background:#f1ece3;border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;background:var(--orange);border-radius:999px}
+.bar.top .bar-fill{background:var(--accent)}
+.bar b{text-align:right;color:#6c5840}
+.reasons{margin:0;padding-left:18px;font-size:13px;line-height:1.75;color:#4f463c}
+.reasons li::marker{color:var(--accent)}
+.result-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.empty-note{font-size:13px;color:var(--muted);margin:0;padding:18px;background:#fff;border:1px dashed var(--line);border-radius:10px;text-align:center}
+.memo-grid{display:grid;gap:12px}
+.memo{display:block;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+.memo span{display:block;font-size:13px;font-weight:700;margin:0 0 8px}
+.memo textarea{width:100%;min-height:92px;padding:12px;border:1px solid var(--line);border-radius:8px;font-size:13px;line-height:1.65;resize:vertical;background:#fdfcfa;color:var(--ink);font-family:inherit}
+.memo textarea:focus{outline:3px solid #2269a2;outline-offset:2px}
+.save-note{font-size:12px;color:#236145;min-height:20px;margin:10px 0 0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-top:1px solid var(--line);padding-top:18px;margin-top:4px}
+.actions p{font-size:11px;color:var(--muted);margin:0;line-height:1.6;flex:1 1 260px}
+footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
+@media(max-width:800px){
+ .mini-grid{grid-template-columns:1fr}
+ .panel{padding:18px}
+ .result-card{padding:18px}
+}
+@media(max-width:700px){.cmp-hint{display:block}}
+@media(max-width:600px){
+ .intro{padding:22px 0 12px}
+ .tabs [role=tab]{flex:1 1 100%;min-height:50px}
+ .bar{grid-template-columns:82px 1fr 42px;font-size:11px}
+ .result-name{font-size:23px}
+ .q{padding:14px}
+ .q-options .choice{flex:1 1 100%}
+ footer.app-footer{padding-left:20px;padding-right:20px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="school-header"><div class="header-inner">
+  <a href="../" aria-label="서울관광고등학교 웹앱 모음"><img class="signature" src="../accounting-library/assets/school-signature.png" width="979" height="264" alt="서울관광고등학교 Seoul Tourism High School"></a>
+  <a class="hub-link" href="../">웹앱 모음 ↗</a>
+</div></header>
+<main class="app-main" id="main">
+  <nav class="site-path" aria-label="현재 위치"><a href="../">웹앱 모음</a><span aria-hidden="true">›</span><span aria-current="page">학과 선택 가이드</span></nav>
+
+  <section class="intro" aria-labelledby="page-title">
+    <p class="eyebrow">서울관광고등학교 · 진로와 학과</p>
+    <h1 id="page-title">학과 선택 <span>가이드</span></h1>
+    <p class="intro-text">카페경영·관광서비스·외식조리, 세 학과의 수업과 자격증·진로를 비교하고 나에게 맞는 선택을 찾아보세요.</p>
+  </section>
+
+  <p class="notice-line">입력한 내용은 이 브라우저에만 저장되고 학교 서버로 보내지 않아요. 진로까지 정리하려면 <a href="../career-explore/">진로 탐색 ↗</a>을 함께 사용해 보세요.</p>
+
+  <section class="block" aria-labelledby="compare-title">
+    <div class="section-head"><h2 id="compare-title">세 학과 한눈에 보기</h2><p>학과를 눌러 주요 교과와 자격증, 졸업 후 진로를 확인하세요.</p></div>
+    <div class="tabs" role="tablist" aria-label="학과 선택">
+      <button role="tab" id="tab-cafe" aria-controls="dept-panel" aria-selected="true" data-dept="cafe">☕ 카페경영과</button>
+      <button role="tab" id="tab-tour" aria-controls="dept-panel" aria-selected="false" data-dept="tour">🧳 관광서비스과</button>
+      <button role="tab" id="tab-cook" aria-controls="dept-panel" aria-selected="false" data-dept="cook">🍳 외식조리과</button>
+    </div>
+    <div class="panel" id="dept-panel" role="tabpanel" aria-labelledby="tab-cafe" tabindex="0"></div>
+    <details class="cmp-wrap">
+      <summary>표로 한 번에 비교하기</summary>
+      <div class="cmp-scroll">
+        <p class="cmp-hint">표를 옆으로 넘겨서 비교할 수 있어요 →</p>
+        <div class="cmp" id="cmp"></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" aria-labelledby="check-title">
+    <div class="section-head">
+      <h2 id="check-title">나에게 맞는 학과 체크</h2>
+      <p>관심 분야를 고르고 6개 질문에 답하면 어울리는 학과를 알려드려요. <span class="count" id="answered-count"></span></p>
+    </div>
+    <div id="interests" class="chips-wrap" role="group" aria-label="관심 분야 선택"></div>
+    <div id="questions"></div>
+  </section>
+
+  <section class="block" aria-labelledby="result-title">
+    <div class="section-head"><h2 id="result-title">나의 결과</h2><p>관심 분야와 답변을 바탕으로 계산한 결과예요. 선택을 바꾸면 바로 다시 계산됩니다.</p></div>
+    <div id="result" aria-live="polite"></div>
+  </section>
+
+  <section class="block" aria-labelledby="memo-title">
+    <div class="section-head"><h2 id="memo-title">학과 메모</h2><p>상담이나 체험 후 느낀 점을 학과별로 적어 두세요. 입력하는 대로 저장됩니다.</p></div>
+    <div class="memo-grid" id="memo-grid"></div>
+    <p class="save-note" id="save-status" role="status" aria-live="polite"></p>
+  </section>
+
+  <div class="actions">
+    <button type="button" class="btn ghost" id="reset">체크 결과와 메모 모두 지우기</button>
+    <p>학과 정보는 서울관광고등학교 홈페이지 학과소개와 공개 자료를 바탕으로 정리했어요. 교육과정과 자격증은 학년도에 따라 달라질 수 있으니 진학 상담 때 한 번 더 확인해 주세요.</p>
+  </div>
+</main>
+<footer class="app-footer"><span>서울관광고등학교 · 학과 선택 가이드</span><span>학과 비교 · 성향 체크 · 메모</span></footer>
+
+<script>
+(function(){
+  'use strict';
+
+  var KEY = 'sths.majorGuide.v1';
+
+  var DEPTS = [
+    {
+      id: 'cafe', name: '카페경영과', emoji: '☕', tag: '커피 · 베이커리 · 창업',
+      summary: '커피와 음료, 베이커리 실습에 서비스 경영을 더해 카페와 식음료 현장을 이끄는 실무 인재를 기릅니다.',
+      subjects: ['식음료기초','바리스타','디저트제과실무','제과제빵','양식조리','카페경영관리','회계원리','창업일반','기초조리'],
+      certs: ['바리스타','제과기능사','제빵기능사','양식조리기능사','조주기능사','쇼콜라티에','창업마스터','ITQ','컴퓨터활용능력'],
+      careers: ['호텔 베이커리','프랜차이즈 베이커리','호텔 식음료 부서','카페·식음료 전문점','디저트 생산업체','카페 창업'],
+      fit: '음료와 디저트를 직접 만들고, 손님 응대와 매장 운영까지 함께 살펴보고 싶은 학생'
+    },
+    {
+      id: 'tour', name: '관광서비스과', emoji: '🧳', tag: '호텔 · 항공 · 여행',
+      summary: '호텔·여행사·항공사에서 필요한 서비스 역량과 현장 감각을 실습으로 익히는 글로벌 관광 인재의 학과입니다.',
+      subjects: ['관광영어','관광서비스','여행서비스실무','호텔객실서비스실무','호텔식음료서비스실무','항공객실서비스실무','카지노서비스실무','관광콘텐츠개발','바리스타','바텐더'],
+      certs: ['SMAT(서비스경영자격)','국내여행안내사','TOPAS(항공예약발권)','호텔서비스사','바리스타','조주기능사','컴퓨터활용능력'],
+      careers: ['호텔리어','항공 객실승무원','여행업 종사원','크루즈 승무원','항공사 예약·발권'],
+      fit: '사람을 맞이하고 안내하는 일이 즐겁고, 호텔·항공·여행 현장을 꿈꾸는 학생'
+    },
+    {
+      id: 'cook', name: '외식조리과', emoji: '🍳', tag: '한식 · 양식 · 제과제빵',
+      summary: '한식·양식·중식·일식과 제과제빵을 두루 익혀 조리 자격과 현장 실무를 함께 갖추는 학과입니다.',
+      subjects: ['식품과 영양','한식조리','양식조리','일식조리','제과제빵','디저트조리','김치반찬가공','바텐더','바리스타'],
+      certs: ['한식조리기능사','양식조리기능사','중식조리기능사','일식조리기능사','제과기능사','제빵기능사','바리스타','쇼콜라티에','식품조각지도사','식품위생사'],
+      careers: ['호텔·외식업체 조리사','레스토랑 셰프','급식 조리','푸드스타일리스트','메뉴 개발'],
+      fit: '재료를 다루고 완성된 요리를 접시에 담는 과정이 즐거운 학생'
+    }
+  ];
+
+  var INTERESTS = [
+    { id: 'coffee', label: '커피·음료', emoji: '☕', w: { cafe: 3, tour: 0, cook: 0 } },
+    { id: 'bakery', label: '베이커리·디저트', emoji: '🥐', w: { cafe: 3, tour: 0, cook: 1 } },
+    { id: 'dish', label: '요리·조리', emoji: '🍳', w: { cafe: 1, tour: 0, cook: 3 } },
+    { id: 'hotel', label: '호텔·서비스', emoji: '🛎️', w: { cafe: 0, tour: 3, cook: 0 } },
+    { id: 'travel', label: '여행·항공', emoji: '✈️', w: { cafe: 0, tour: 3, cook: 0 } },
+    { id: 'biz', label: '경영·창업', emoji: '📈', w: { cafe: 2, tour: 1, cook: 0 } },
+    { id: 'talk', label: '사람 맞이·안내', emoji: '🎤', w: { cafe: 1, tour: 2, cook: 0 } },
+    { id: 'plating', label: '플레이팅·푸드스타일', emoji: '🍽️', w: { cafe: 1, tour: 0, cook: 2 } },
+    { id: 'office', label: '사무·데이터', emoji: '💻', w: { cafe: 2, tour: 1, cook: 0 } }
+  ];
+
+  var QUESTIONS = [
+    { id: 'q1', short: '자유시간', text: '3시간의 자유시간이 생겼어요. 가장 끌리는 것은?', options: [
+      { dept: 'cook', label: '주방에서 새 레시피로 요리를 만들어 본다' },
+      { dept: 'cafe', label: '카페에서 음료와 디저트를 비교해 본다' },
+      { dept: 'tour', label: '친구와 다음 여행 계획을 짠다' }
+    ]},
+    { id: 'q2', short: '모둠 활동', text: '모둠 활동에서 맡고 싶은 역할은?', options: [
+      { dept: 'cook', label: '직접 만들고 완성하는 역할' },
+      { dept: 'cafe', label: '준비물·예산·일정을 정리하는 역할' },
+      { dept: 'tour', label: '발표하고 진행을 이끄는 역할' }
+    ]},
+    { id: 'q3', short: '뿌듯한 순간', text: '가장 뿌듯한 순간은?', options: [
+      { dept: 'cook', label: '완성한 요리가 접시에 예쁘게 담겼을 때' },
+      { dept: 'cafe', label: '내가 만든 음료를 손님이 맛있게 마실 때' },
+      { dept: 'tour', label: '낯선 곳에서 새 사람과 이야기를 나눴을 때' }
+    ]},
+    { id: 'q4', short: '자격증', text: '자격증 하나를 고른다면?', options: [
+      { dept: 'cook', label: '한식조리기능사' },
+      { dept: 'cafe', label: '제과기능사' },
+      { dept: 'tour', label: 'SMAT(서비스경영자격)' }
+    ]},
+    { id: 'q5', short: '10년 뒤', text: '10년 뒤 나의 모습에 가까운 것은?', options: [
+      { dept: 'cook', label: '호텔 주방에서 나만의 메뉴를 만드는 셰프' },
+      { dept: 'cafe', label: '동네에서 사랑받는 카페를 운영하는 사장님' },
+      { dept: 'tour', label: '세계를 누비는 승무원·호텔리어' }
+    ]},
+    { id: 'q6', short: '배우는 방식', text: '새로운 것을 배울 때 편한 방식은?', options: [
+      { dept: 'cook', label: '보고 따라 하며 손으로 익힌다' },
+      { dept: 'cafe', label: '재료와 원리를 비교하며 정리한다' },
+      { dept: 'tour', label: '역할을 나눠 사람들과 함께 해 본다' }
+    ]}
+  ];
+
+  var state = { interests: [], answers: {}, memo: { cafe: '', tour: '', cook: '' }, updated: null };
+  var saveTimer = null;
+
+  function deptById(id) {
+    for (var i = 0; i < DEPTS.length; i++) { if (DEPTS[i].id === id) { return DEPTS[i]; } }
+    return null;
+  }
+
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  function tagList(items) {
+    return '<div class="tags">' + items.map(function (t) { return '<span class="tag">' + escapeHtml(t) + '</span>'; }).join('') + '</div>';
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) { return; }
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object') { return; }
+      if (Array.isArray(saved.interests)) { state.interests = saved.interests.filter(function (id) { return INTERESTS.some(function (it) { return it.id === id; }); }); }
+      if (saved.answers && typeof saved.answers === 'object') {
+        Object.keys(saved.answers).forEach(function (qid) {
+          var q = null;
+          for (var i = 0; i < QUESTIONS.length; i++) { if (QUESTIONS[i].id === qid) { q = QUESTIONS[i]; } }
+          if (q && q.options.some(function (o) { return o.dept === saved.answers[qid]; })) { state.answers[qid] = saved.answers[qid]; }
+        });
+      }
+      if (saved.memo && typeof saved.memo === 'object') {
+        DEPTS.forEach(function (d) { if (typeof saved.memo[d.id] === 'string') { state.memo[d.id] = saved.memo[d.id]; } });
+      }
+      if (saved.updated) { state.updated = saved.updated; }
+    } catch (e) { /* 저장된 내용을 읽을 수 없으면 새로 시작합니다. */ }
+  }
+
+  function save() {
+    state.updated = new Date().toISOString();
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      setStatus('이 브라우저에 저장했어요 · ' + formatTime(state.updated));
+    } catch (e) {
+      setStatus('이 브라우저에서는 저장이 막혀 있어요. 시크릿 모드나 저장 공간 부족을 확인해 주세요.');
+    }
+  }
+
+  function saveSoon() {
+    if (saveTimer) { clearTimeout(saveTimer); }
+    saveTimer = setTimeout(save, 500);
+  }
+
+  function formatTime(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) { return ''; }
+    var hh = String(d.getHours()).padStart(2, '0');
+    var mm = String(d.getMinutes()).padStart(2, '0');
+    return hh + ':' + mm;
+  }
+
+  function setStatus(text) {
+    var el = document.getElementById('save-status');
+    if (el) { el.textContent = text; }
+  }
+
+  function renderPanel(id) {
+    var d = deptById(id);
+    var panel = document.getElementById('dept-panel');
+    if (!d || !panel) { return; }
+    panel.setAttribute('aria-labelledby', 'tab-' + d.id);
+    panel.innerHTML =
+      '<span class="panel-tag">' + escapeHtml(d.tag) + '</span>' +
+      '<h3>' + d.emoji + ' ' + escapeHtml(d.name) + '</h3>' +
+      '<p class="panel-summary">' + escapeHtml(d.summary) + '</p>' +
+      '<div class="mini-grid">' +
+        '<div class="mini"><h4>주요 교과 · 실습</h4>' + tagList(d.subjects) + '</div>' +
+        '<div class="mini"><h4>자격증</h4>' + tagList(d.certs) + '</div>' +
+        '<div class="mini"><h4>졸업 후 진로</h4>' + tagList(d.careers) + '</div>' +
+      '</div>' +
+      '<p class="mini-line"><b>이런 학생에게</b>' + escapeHtml(d.fit) + '</p>' +
+      '<button type="button" class="btn ghost" data-jump-memo="' + d.id + '">' + escapeHtml(d.name) + ' 메모 쓰기 →</button>';
+  }
+
+  function renderCompare() {
+    var rows = [
+      { label: '한 줄 소개', key: 'summary' },
+      { label: '주요 교과', key: 'subjects' },
+      { label: '자격증', key: 'certs' },
+      { label: '졸업 후 진로', key: 'careers' }
+    ];
+    var html = '<div class="cmp-row cmp-head"><div>구분</div>' +
+      DEPTS.map(function (d) { return '<div>' + d.emoji + ' ' + escapeHtml(d.name) + '</div>'; }).join('') + '</div>';
+    rows.forEach(function (row) {
+      html += '<div class="cmp-row"><div>' + escapeHtml(row.label) + '</div>' +
+        DEPTS.map(function (d) {
+          var value = d[row.key];
+          if (Array.isArray(value)) { value = value.slice(0, 9).join(' · '); }
+          return '<div>' + escapeHtml(value) + '</div>';
+        }).join('') + '</div>';
+    });
+    var target = document.getElementById('cmp');
+    if (target) { target.innerHTML = html; }
+  }
+
+  function renderInterests() {
+    var wrap = document.getElementById('interests');
+    if (!wrap) { return; }
+    wrap.innerHTML = INTERESTS.map(function (it) {
+      var on = state.interests.indexOf(it.id) !== -1;
+      return '<button type="button" class="choice" data-interest="' + it.id + '" aria-pressed="' + on + '">' +
+        '<span aria-hidden="true">' + it.emoji + '</span>' + escapeHtml(it.label) + '</button>';
+    }).join('');
+  }
+
+  function renderQuestions() {
+    var wrap = document.getElementById('questions');
+    if (!wrap) { return; }
+    wrap.innerHTML = QUESTIONS.map(function (q, idx) {
+      var chosen = state.answers[q.id];
+      return '<div class="q"><p class="q-text" id="' + q.id + '-text"><span>Q' + (idx + 1) + '.</span>' + escapeHtml(q.text) + '</p>' +
+        '<div class="q-options" role="group" aria-labelledby="' + q.id + '-text">' +
+        q.options.map(function (o) {
+          return '<button type="button" class="choice" data-question="' + q.id + '" data-dept="' + o.dept + '" aria-pressed="' + (chosen === o.dept) + '">' + escapeHtml(o.label) + '</button>';
+        }).join('') + '</div></div>';
+    }).join('');
+  }
+
+  function computeScores() {
+    var score = { cafe: 0, tour: 0, cook: 0 };
+    state.interests.forEach(function (id) {
+      for (var i = 0; i < INTERESTS.length; i++) {
+        if (INTERESTS[i].id === id) {
+          var w = INTERESTS[i].w;
+          score.cafe += w.cafe; score.tour += w.tour; score.cook += w.cook;
+        }
+      }
+    });
+    Object.keys(state.answers).forEach(function (qid) {
+      var dept = state.answers[qid];
+      if (score[dept] !== undefined) { score[dept] += 2; }
+    });
+    var total = score.cafe + score.tour + score.cook;
+    return { score: score, total: total };
+  }
+
+  function renderResult() {
+    var el = document.getElementById('result');
+    var countEl = document.getElementById('answered-count');
+    if (!el) { return; }
+
+    var answered = Object.keys(state.answers).length;
+    if (countEl) {
+      countEl.textContent = state.interests.length || answered
+        ? '관심 분야 ' + state.interests.length + '개 · 답변 ' + answered + '/' + QUESTIONS.length
+        : '';
+    }
+
+    var result = computeScores();
+    if (result.total === 0) {
+      el.innerHTML = '<p class="empty-note">관심 분야를 고르거나 질문에 답하면 결과가 여기에 나와요.</p>';
+      return;
+    }
+
+    var ordered = DEPTS.slice().sort(function (a, b) { return result.score[b.id] - result.score[a.id]; });
+    var top = ordered[0];
+    var topScore = result.score[top.id];
+    var tied = ordered.filter(function (d) { return result.score[d.id] === topScore; });
+    var percentOf = function (id) { return Math.round(result.score[id] / result.total * 100); };
+
+    var reasons = [];
+    state.interests.forEach(function (id) {
+      var it = null;
+      for (var i = 0; i < INTERESTS.length; i++) { if (INTERESTS[i].id === id) { it = INTERESTS[i]; } }
+      if (it && it.w[top.id] >= 2 && reasons.length < 3) {
+        reasons.push('‘' + it.label + '’ 분야에 관심이 있어요');
+      }
+    });
+    QUESTIONS.forEach(function (q) {
+      if (reasons.length >= 3) { return; }
+      if (state.answers[q.id] !== top.id) { return; }
+      var option = q.options.filter(function (o) { return o.dept === top.id; })[0];
+      if (option) { reasons.push('‘' + q.short + '’ 질문에서 ‘' + option.label + '’를 골랐어요'); }
+    });
+    if (reasons.length === 0) { reasons.push('고른 답변이 ' + top.name + '의 수업·진로와 가장 많이 겹쳤어요'); }
+
+    var bars = ordered.map(function (d) {
+      var pct = percentOf(d.id);
+      return '<div class="bar' + (d.id === top.id ? ' top' : '') + '">' +
+        '<span>' + d.emoji + ' ' + escapeHtml(d.name) + '</span>' +
+        '<span class="bar-track" role="img" aria-label="' + escapeHtml(d.name) + ' ' + pct + '%"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
+        '<b>' + pct + '%</b></div>';
+    }).join('');
+
+    var tieNote = tied.length > 1
+      ? '<p class="result-desc">' + tied.map(function (d) { return d.name; }).join(' · ') + '의 점수가 같아요. 두 학과 수업을 모두 살펴보고 골라 보세요.</p>'
+      : '<p class="result-desc">' + escapeHtml(ordered[1].name) + '도 ' + percentOf(ordered[1].id) + '%로 잘 맞아요. 관심이 바뀌면 결과도 바로 달라집니다.</p>';
+
+    el.innerHTML =
+      '<div class="result-card">' +
+        '<p class="result-label">지금 나에게 가장 잘 맞는 학과</p>' +
+        '<h3 class="result-name">' + top.emoji + ' ' + escapeHtml(top.name) + '<small>' + percentOf(top.id) + '%</small></h3>' +
+        '<p class="result-desc">' + escapeHtml(top.summary) + '</p>' +
+        '<div class="bars">' + bars + '</div>' +
+        tieNote +
+        '<h4 style="font-size:13px;margin:0 0 8px;color:#8a6a4a">이런 점이 잘 맞아요</h4>' +
+        '<ul class="reasons">' + reasons.map(function (r) { return '<li>' + escapeHtml(r) + '</li>'; }).join('') + '</ul>' +
+        '<div class="result-actions">' +
+          '<button type="button" class="btn primary" data-show-dept="' + top.id + '">' + escapeHtml(top.name) + ' 자세히 보기</button>' +
+          '<a class="btn ghost" href="../career-explore/">진로 탐색으로 이어가기 ↗</a>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderMemo() {
+    var grid = document.getElementById('memo-grid');
+    if (!grid) { return; }
+    grid.innerHTML = DEPTS.map(function (d) {
+      return '<label class="memo"><span>' + d.emoji + ' ' + escapeHtml(d.name) + ' 메모</span>' +
+        '<textarea data-memo="' + d.id + '" rows="4" placeholder="예: 바리스타 실습을 직접 해 보고 싶다 / 호텔 객실 수업이 끌린다"></textarea></label>';
+    }).join('');
+    DEPTS.forEach(function (d) {
+      var field = grid.querySelector('textarea[data-memo="' + d.id + '"]');
+      if (field) { field.value = state.memo[d.id] || ''; }
+    });
+  }
+
+  function selectTab(id) {
+    var tabs = document.querySelectorAll('.tabs [role=tab]');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].setAttribute('aria-selected', tabs[i].getAttribute('data-dept') === id ? 'true' : 'false');
+    }
+    renderPanel(id);
+  }
+
+  function onInterestsClick(event) {
+    var btn = event.target.closest('[data-interest]');
+    if (!btn) { return; }
+    var id = btn.getAttribute('data-interest');
+    var idx = state.interests.indexOf(id);
+    if (idx === -1) { state.interests.push(id); } else { state.interests.splice(idx, 1); }
+    btn.setAttribute('aria-pressed', idx === -1 ? 'true' : 'false');
+    save();
+    renderResult();
+  }
+
+  function onQuestionsClick(event) {
+    var btn = event.target.closest('[data-question]');
+    if (!btn) { return; }
+    var qid = btn.getAttribute('data-question');
+    var dept = btn.getAttribute('data-dept');
+    state.answers[qid] = dept;
+    var siblings = document.querySelectorAll('[data-question="' + qid + '"]');
+    for (var i = 0; i < siblings.length; i++) {
+      siblings[i].setAttribute('aria-pressed', siblings[i].getAttribute('data-dept') === dept ? 'true' : 'false');
+    }
+    save();
+    renderResult();
+  }
+
+  function onMemoInput(event) {
+    var field = event.target.closest('textarea[data-memo]');
+    if (!field) { return; }
+    state.memo[field.getAttribute('data-memo')] = field.value;
+    saveSoon();
+  }
+
+  function onDocumentClick(event) {
+    var tab = event.target.closest('.tabs [role=tab]');
+    if (tab) { selectTab(tab.getAttribute('data-dept')); return; }
+
+    var showDept = event.target.closest('[data-show-dept]');
+    if (showDept) {
+      var id = showDept.getAttribute('data-show-dept');
+      selectTab(id);
+      var panel = document.getElementById('dept-panel');
+      if (panel) { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); panel.focus({ preventScroll: true }); }
+      return;
+    }
+
+    var jumpMemo = event.target.closest('[data-jump-memo]');
+    if (jumpMemo) {
+      var mid = jumpMemo.getAttribute('data-jump-memo');
+      var field = document.querySelector('textarea[data-memo="' + mid + '"]');
+      if (field) {
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        field.focus({ preventScroll: true });
+      }
+    }
+  }
+
+  function resetAll() {
+    var ok = window.confirm('체크 결과와 학과 메모를 모두 지울까요? 지운 내용은 되돌릴 수 없어요.');
+    if (!ok) { return; }
+    state = { interests: [], answers: {}, memo: { cafe: '', tour: '', cook: '' }, updated: null };
+    try { localStorage.removeItem(KEY); } catch (e) { /* 저장소를 지울 수 없어도 화면은 초기화합니다. */ }
+    renderInterests();
+    renderQuestions();
+    renderMemo();
+    renderResult();
+    setStatus('저장한 내용을 모두 지웠어요.');
+  }
+
+  load();
+  renderCompare();
+  renderPanel('cafe');
+  renderInterests();
+  renderQuestions();
+  renderMemo();
+  renderResult();
+
+  var interestsEl = document.getElementById('interests');
+  if (interestsEl) { interestsEl.addEventListener('click', onInterestsClick); }
+  var questionsEl = document.getElementById('questions');
+  if (questionsEl) { questionsEl.addEventListener('click', onQuestionsClick); }
+  var memoGrid = document.getElementById('memo-grid');
+  if (memoGrid) { memoGrid.addEventListener('input', onMemoInput); }
+  document.addEventListener('click', onDocumentClick);
+  var resetBtn = document.getElementById('reset');
+  if (resetBtn) { resetBtn.addEventListener('click', resetAll); }
+})();
+</script>
+</body>
+</html>
