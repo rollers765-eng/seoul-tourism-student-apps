@@ -345,7 +345,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
     }).join('');
     panel.innerHTML =
       '<span class="panel-tag">' + escapeHtml(d.tag) + '</span>' +
-      '<h3>' + d.emoji + ' ' + escapeHtml(d.name) + ' <small>' + escapeHtml(d.classes) + '</small></h3>' +
+      '<h3>' + d.emoji + ' ' + escapeHtml(d.name) + ' <small>· ' + escapeHtml(d.classes) + '</small></h3>' +
       '<p class="panel-summary">' + escapeHtml(d.summary) + '</p>' +
       '<div class="mini-grid">' +
         '<div class="mini"><h4>전문 교과</h4>' + tagList(d.subjects) + '</div>' +
@@ -353,7 +353,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
         '<div class="mini"><h4>졸업 후 진로</h4>' + tagList(d.careers) + '</div>' +
       '</div>' +
       '<div class="courses-box">' +
-        '<h4>3학년 코스 <span>두 코스 중 하나를 골라 더 깊이 배웁니다</span></h4>' +
+        '<h4>3학년 코스 <span>· 두 코스 중 하나를 골라 더 깊이 배웁니다</span></h4>' +
         '<div class="course-grid">' + courses + '</div>' +
       '</div>' +
       '<p class="mini-line"><b>인력 양성 유형</b>' + escapeHtml(d.trainees) + '</p>' +
