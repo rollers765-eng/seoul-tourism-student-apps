@@ -25,6 +25,13 @@
 .panel h3{font-size:21px;margin:0 0 6px;letter-spacing:-.04em}
 .panel-tag{display:inline-block;font-size:11px;font-weight:700;color:#96501e;background:var(--cream);border-radius:20px;padding:3px 10px;margin:0 0 10px}
 .panel-summary{font-size:14px;color:#5c5145;margin:0 0 18px;line-height:1.7}
+.panel h3 small{font-size:12px;font-weight:600;color:var(--muted);margin-left:8px;vertical-align:middle}
+.courses-box{margin:16px 0 0;background:#fcfaf7;border:1px solid var(--line);border-radius:10px;padding:14px}
+.courses-box>h4{margin:0 0 10px;font-size:12px;color:#8a6a4a;letter-spacing:.02em}
+.courses-box>h4 span{font-weight:400;color:var(--muted);margin-left:6px}
+.course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.course{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+.course h4{margin:0 0 8px;font-size:12px;color:var(--accent);font-weight:700}
 .mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .mini{background:#fcfaf7;border:1px solid var(--line);border-radius:9px;padding:14px}
 .mini h4{margin:0 0 9px;font-size:12px;color:#8a6a4a;letter-spacing:.02em}
@@ -38,7 +45,7 @@
 .cmp-wrap[open] summary:before{content:'▾'}
 .cmp-scroll{padding:0 16px 16px;overflow-x:auto}
 .cmp-hint{display:none;font-size:11px;color:var(--muted);margin:0 0 8px}
-.cmp{min-width:660px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cmp{min-width:720px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .cmp-row{display:grid;grid-template-columns:112px repeat(3,minmax(0,1fr))}
 .cmp-row+.cmp-row{border-top:1px solid var(--line)}
 .cmp-row>div{padding:12px;font-size:12px;line-height:1.65}
@@ -82,6 +89,7 @@
 footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
 @media(max-width:800px){
  .mini-grid{grid-template-columns:1fr}
+ .course-grid{grid-template-columns:1fr}
  .panel{padding:18px}
  .result-card{padding:18px}
 }
@@ -109,7 +117,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
   <section class="intro" aria-labelledby="page-title">
     <p class="eyebrow">서울관광고등학교 · 진로와 학과</p>
     <h1 id="page-title">학과 선택 <span>가이드</span></h1>
-    <p class="intro-text">카페경영·관광서비스·외식조리, 세 학과의 수업과 자격증·진로를 비교하고 나에게 맞는 선택을 찾아보세요.</p>
+    <p class="intro-text">카페경영·관광서비스·외식조리, 세 학과의 2026학년도 교육과정과 자격증·진로를 비교하고 나에게 맞는 선택을 찾아보세요.</p>
   </section>
 
   <p class="notice-line">입력한 내용은 이 브라우저에만 저장되고 학교 서버로 보내지 않아요. 진로까지 정리하려면 <a href="../career-explore/">진로 탐색 ↗</a>을 함께 사용해 보세요.</p>
@@ -153,7 +161,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
 
   <div class="actions">
     <button type="button" class="btn ghost" id="reset">체크 결과와 메모 모두 지우기</button>
-    <p>학과 정보는 서울관광고등학교 홈페이지 학과소개와 공개 자료를 바탕으로 정리했어요. 교육과정과 자격증은 학년도에 따라 달라질 수 있으니 진학 상담 때 한 번 더 확인해 주세요.</p>
+    <p>2026학년도 교육계획 편제표와 학교 홈페이지 학과소개를 바탕으로 정리했어요. 선택 과목과 코스는 학년도·학생 선택에 따라 달라질 수 있으니 진학 상담 때 한 번 더 확인해 주세요.</p>
   </div>
 </main>
 <footer class="app-footer"><span>서울관광고등학교 · 학과 선택 가이드</span><span>학과 비교 · 성향 체크 · 메모</span></footer>
@@ -166,29 +174,50 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
 
   var DEPTS = [
     {
-      id: 'cafe', name: '카페경영과', emoji: '☕', tag: '커피 · 베이커리 · 창업',
+      id: 'cafe', name: '카페경영과', emoji: '☕', tag: '커피 · 베이커리 · 창업', classes: '학년별 2학급',
       summary: '커피와 음료, 베이커리 실습에 서비스 경영을 더해 카페와 식음료 현장을 이끄는 실무 인재를 기릅니다.',
-      subjects: ['식음료기초','바리스타','디저트제과실무','제과제빵','양식조리','카페경영관리','회계원리','창업일반','기초조리'],
-      certs: ['바리스타','제과기능사','제빵기능사','양식조리기능사','조주기능사','쇼콜라티에','창업마스터','ITQ','컴퓨터활용능력'],
-      careers: ['호텔 베이커리','프랜차이즈 베이커리','호텔 식음료 부서','카페·식음료 전문점','디저트 생산업체','카페 창업'],
+      trainees: '바리스타, 제빵원 및 제과원, 경영 지원 사무원',
+      subjects: ['성공적인 직업 생활','상업 경제','회계 원리','창업 일반','카페 경영 관리','마케팅과 광고','인공지능 일반','디저트 제과 실무','디자인 일반','사무 행정','제과','제빵','바리스타'],
+      courses: [
+        { name: '경영코스', subjects: ['기업 자원 통합 관리·회계 정보 처리 시스템', '회계 실무', '매장 판매'] },
+        { name: '음료코스', subjects: ['바텐더', '호텔 식음료 서비스 실무'] }
+      ],
+      certs: ['바리스타','제과기능사','제빵기능사','양식조리기능사','조주기능사','쇼콜라티에','식품조각지도사','컴퓨터활용능력','ITQ','워드프로세서'],
+      careers: ['호텔 베이커리','프랜차이즈 베이커리','카페·식음료 전문점','디저트 생산업체','경영 지원 사무원','카페 창업'],
+      rooms: ['바리스타실습실 2실','제과제빵실습실 2실','호텔식음료서비스실습실 2실','회계실무실습실','사무행정실습실'],
+      programs: '교내 사회적협동조합 학교가게 운영, 청소년 비즈쿨(창업동아리·비즈마켓데이), 바리스타 전공실무 기반 지역연계 프로젝트',
       fit: '음료와 디저트를 직접 만들고, 손님 응대와 매장 운영까지 함께 살펴보고 싶은 학생',
       memoPlaceholder: '예: 바리스타·제과 실습을 직접 해 보고 싶다 / 카페 창업까지 생각해 봤다'
     },
     {
-      id: 'tour', name: '관광서비스과', emoji: '🧳', tag: '호텔 · 항공 · 여행',
+      id: 'tour', name: '관광서비스과', emoji: '🧳', tag: '호텔 · 항공 · 여행', classes: '학년별 2학급',
       summary: '호텔·여행사·항공사에서 필요한 서비스 역량과 현장 감각을 실습으로 익히는 글로벌 관광 인재의 학과입니다.',
-      subjects: ['관광영어','관광서비스','여행서비스실무','호텔객실서비스실무','호텔식음료서비스실무','항공객실서비스실무','카지노서비스실무','관광콘텐츠개발','바리스타','바텐더'],
-      certs: ['SMAT(서비스경영자격)','국내여행안내사','TOPAS(항공예약발권)','호텔서비스사','바리스타','조주기능사','컴퓨터활용능력'],
-      careers: ['호텔리어','항공 객실승무원','여행업 종사원','크루즈 승무원','항공사 예약·발권'],
+      trainees: '숙박·외식 접객원, 여행 사무원, 국내외 여행 안내원, 카지노 딜러',
+      subjects: ['성공적인 직업 생활','관광 일반','관광 문화와 자원','관광 서비스','관광 콘텐츠 개발','관광 영어','창업 일반','인공지능 일반','디자인 일반','바리스타','소믈리에 서비스','카지노 서비스 실무','호텔 식음료 서비스 실무','사무 행정'],
+      courses: [
+        { name: '항공코스', subjects: ['항공객실서비스', '국외 여행 서비스 실무'] },
+        { name: '호텔코스', subjects: ['호텔 객실 서비스 실무', '국내 여행 서비스 실무'] }
+      ],
+      certs: ['호텔서비스사','국내여행안내사','관광통역안내사','토파스항공예약(TOPAS)','S.M.A.T','카지노서비스운영사','바리스타','조주기능사','컴퓨터활용능력'],
+      careers: ['호텔리어(객실·식음료)','항공 객실승무원','여행 사무원·국내외 여행 안내원','크루즈 승무원','카지노 딜러','항공사 예약·발권'],
+      rooms: ['관광서비스실습실','여행서비스실습실','항공서비스실습실','카지노실습실','호텔식음료서비스실습실'],
+      programs: '지역연계 진로·전공체험(항공승무원·카지노딜러 실습), 서울 특성화고 글로벌현장학습, K-Move 해외취업 프로그램',
       fit: '사람을 맞이하고 안내하는 일이 즐겁고, 호텔·항공·여행 현장을 꿈꾸는 학생',
       memoPlaceholder: '예: 호텔 객실 서비스 수업이 끌린다 / 승무원 준비반이 있는지 궁금하다'
     },
     {
-      id: 'cook', name: '외식조리과', emoji: '🍳', tag: '한식 · 양식 · 제과제빵',
+      id: 'cook', name: '외식조리과', emoji: '🍳', tag: '한식 · 양식 · 제과제빵', classes: '학년별 4학급',
       summary: '한식·양식·중식·일식과 제과제빵을 두루 익혀 조리 자격과 현장 실무를 함께 갖추는 학과입니다.',
-      subjects: ['식품과 영양','한식조리','양식조리','일식조리','제과제빵','디저트조리','김치반찬가공','바텐더','바리스타'],
-      certs: ['한식조리기능사','양식조리기능사','중식조리기능사','일식조리기능사','제과기능사','제빵기능사','바리스타','쇼콜라티에','식품조각지도사','식품위생사'],
-      careers: ['호텔·외식업체 조리사','레스토랑 셰프','급식 조리','푸드스타일리스트','메뉴 개발'],
+      trainees: '한식·양식·중식·일식 조리사 및 주방장',
+      subjects: ['성공적인 직업 생활','기초 조리','디저트 조리','한식 조리','일식 조리','양식 조리','제과','제빵','바리스타','바텐더','디자인 일반','사무 행정'],
+      courses: [
+        { name: '식품코스', subjects: ['식품과 영양', '식품 위생'] },
+        { name: '조리코스', subjects: ['중식 조리', '김치·반찬 가공'] }
+      ],
+      certs: ['한식조리기능사','양식조리기능사','중식조리기능사','일식조리기능사','복어조리기능사','제과기능사','제빵기능사','식품조각지도사','쇼콜라티에','바리스타','조주기능사'],
+      careers: ['호텔·외식업체 조리사','호텔 주방·주방장','레스토랑 셰프','급식 조리','푸드스타일리스트','메뉴 개발'],
+      rooms: ['한국조리실습실 2실','서양조리실습실','중식조리실습실','일식조리실습실','제과제빵실습실 2실'],
+      programs: '호텔조리 전문가 양성 과정(1~3학년), 조리 분야 전문가 특강·체험 프로그램, 상업경진대회',
       fit: '재료를 다루고 완성된 요리를 접시에 담는 과정이 즐거운 학생',
       memoPlaceholder: '예: 한식조리기능사를 먼저 따고 싶다 / 단체 급식 쪽도 알아보고 싶다'
     }
@@ -225,7 +254,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
     { id: 'q4', short: '자격증', text: '자격증 하나를 고른다면?', options: [
       { dept: 'cook', label: '한식조리기능사' },
       { dept: 'cafe', label: '제과기능사' },
-      { dept: 'tour', label: 'SMAT(서비스경영자격)' }
+      { dept: 'tour', label: 'S.M.A.T(서비스경영자격)' }
     ]},
     { id: 'q5', short: '10년 뒤', text: '10년 뒤 나의 모습에 가까운 것은?', options: [
       { dept: 'cook', label: '호텔 주방에서 나만의 메뉴를 만드는 셰프' },
@@ -311,23 +340,34 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
     var panel = document.getElementById('dept-panel');
     if (!d || !panel) { return; }
     panel.setAttribute('aria-labelledby', 'tab-' + d.id);
+    var courses = d.courses.map(function (c) {
+      return '<div class="course"><h4>' + escapeHtml(c.name) + '</h4>' + tagList(c.subjects) + '</div>';
+    }).join('');
     panel.innerHTML =
       '<span class="panel-tag">' + escapeHtml(d.tag) + '</span>' +
-      '<h3>' + d.emoji + ' ' + escapeHtml(d.name) + '</h3>' +
+      '<h3>' + d.emoji + ' ' + escapeHtml(d.name) + ' <small>' + escapeHtml(d.classes) + '</small></h3>' +
       '<p class="panel-summary">' + escapeHtml(d.summary) + '</p>' +
       '<div class="mini-grid">' +
-        '<div class="mini"><h4>주요 교과 · 실습</h4>' + tagList(d.subjects) + '</div>' +
+        '<div class="mini"><h4>전문 교과</h4>' + tagList(d.subjects) + '</div>' +
         '<div class="mini"><h4>자격증</h4>' + tagList(d.certs) + '</div>' +
         '<div class="mini"><h4>졸업 후 진로</h4>' + tagList(d.careers) + '</div>' +
       '</div>' +
+      '<div class="courses-box">' +
+        '<h4>3학년 코스 <span>두 코스 중 하나를 골라 더 깊이 배웁니다</span></h4>' +
+        '<div class="course-grid">' + courses + '</div>' +
+      '</div>' +
+      '<p class="mini-line"><b>인력 양성 유형</b>' + escapeHtml(d.trainees) + '</p>' +
+      '<p class="mini-line"><b>실습실</b>' + escapeHtml(d.rooms.join(' · ')) + '</p>' +
+      '<p class="mini-line"><b>학과 프로그램</b>' + escapeHtml(d.programs) + '</p>' +
       '<p class="mini-line"><b>이런 학생에게</b>' + escapeHtml(d.fit) + '</p>' +
       '<button type="button" class="btn ghost" data-jump-memo="' + d.id + '">' + escapeHtml(d.name) + ' 메모 쓰기 →</button>';
   }
 
   function renderCompare() {
     var rows = [
-      { label: '한 줄 소개', key: 'summary' },
-      { label: '주요 교과', key: 'subjects' },
+      { label: '인력 양성 유형', key: 'trainees' },
+      { label: '전문 교과', key: 'subjects' },
+      { label: '3학년 코스', key: 'courses' },
       { label: '자격증', key: 'certs' },
       { label: '졸업 후 진로', key: 'careers' }
     ];
@@ -337,7 +377,11 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
       html += '<div class="cmp-row"><div>' + escapeHtml(row.label) + '</div>' +
         DEPTS.map(function (d) {
           var value = d[row.key];
-          if (Array.isArray(value)) { value = value.slice(0, 9).join(' · '); }
+          if (row.key === 'courses') {
+            value = value.map(function (c) { return c.name; }).join(' / ');
+          } else if (Array.isArray(value)) {
+            value = value.slice(0, 10).join(' · ');
+          }
           return '<div>' + escapeHtml(value) + '</div>';
         }).join('') + '</div>';
     });

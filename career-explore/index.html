@@ -91,7 +91,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     <p class="intro-text">적성·흥미·가치관을 하나씩 정리하면, 나에게 맞는 직업과 전공 키워드가 보여요. 마지막에 나의 진로를 한 줄로 적어 저장할 수 있습니다.</p>
   </section>
 
-  <p class="notice-line">입력한 내용은 이 브라우저에만 저장되고 학교 서버로 보내지 않아요. 저장한 내용은 언제든 아래 초기화 버튼으로 지울 수 있습니다. 학과 비교는 <a href="../major-guide/">학과 선택 가이드 ↗</a>에서 이어서 할 수 있어요.</p>
+  <p class="notice-line">입력한 내용은 이 브라우저에만 저장되고 학교 서버로 보내지 않아요. 직업·전공·자격증 키워드는 2026학년도 교육계획의 학과 교육과정을 기준으로 정리했습니다. 학과 비교는 <a href="../major-guide/">학과 선택 가이드 ↗</a>에서 이어서 할 수 있어요.</p>
 
   <section class="tool" aria-label="진로 탐색 도구">
     <ol class="steps" id="steps">
@@ -112,7 +112,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
 
     <div class="step-panel hidden" data-panel="1">
       <h2>흥미 — 어떤 분야가 궁금한가요?</h2>
-      <p class="step-help">끌리는 분야를 최대 3개까지 골라 주세요. 직업과 전공 키워드가 여기서 나옵니다.</p>
+      <p class="step-help">끌리는 분야를 최대 3개까지 골라 주세요. 직업·전공·자격증 키워드가 여기서 나옵니다.</p>
       <div class="chips-wrap" id="interest-list" role="group" aria-label="흥미 분야 선택"></div>
       <p class="pick-count" id="interest-count">0 / 3 선택</p>
       <p class="step-msg" id="msg-1" role="alert"></p>
@@ -161,29 +161,37 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   };
 
   var INTERESTS = [
-    { id: 'coffee', label: '커피·음료', emoji: '☕', dept: 'cafe',
-      jobs: ['바리스타', '로스터', '카페 매니저', '음료 개발', '카페 창업'],
+    { id: 'coffee', label: '커피·음료', emoji: '☕', dept: 'cafe', course: '음료코스',
+      jobs: ['바리스타', '음료·메뉴 개발', '카페 매니저', '카페 창업'],
+      certs: ['바리스타', '조주기능사'],
       majors: ['식음료조리', '외식경영', '호텔경영'] },
-    { id: 'bakery', label: '베이커리·디저트', emoji: '🥐', dept: 'cafe',
-      jobs: ['제과제빵사', '디저트 개발', '쇼콜라티에', '호텔 베이커리'],
+    { id: 'bakery', label: '베이커리·디저트', emoji: '🥐', dept: 'cafe', course: '',
+      jobs: ['제과원·제빵원', '디저트 개발', '쇼콜라티에', '호텔 베이커리'],
+      certs: ['제과기능사', '제빵기능사', '쇼콜라티에', '식품조각지도사'],
       majors: ['제과제빵학', '식품공학', '외식조리학'] },
-    { id: 'dish', label: '요리·조리', emoji: '🍳', dept: 'cook',
-      jobs: ['한식·양식 조리사', '레스토랑 셰프', '급식 조리', '메뉴 개발'],
+    { id: 'dish', label: '요리·조리', emoji: '🍳', dept: 'cook', course: '조리코스',
+      jobs: ['한식·양식·중식·일식 조리사', '호텔 주방장', '레스토랑 셰프', '급식 조리', '메뉴 개발'],
+      certs: ['조리기능사(한식·양식·중식·일식)', '제과기능사', '식품조각지도사'],
       majors: ['외식조리학', '식품영양학', '조리과학'] },
-    { id: 'hotel', label: '호텔·서비스', emoji: '🛎️', dept: 'tour',
-      jobs: ['호텔리어(프런트·객실)', '식음료 서비스 매니저', '컨시어지'],
+    { id: 'hotel', label: '호텔·서비스', emoji: '🛎️', dept: 'tour', course: '호텔코스',
+      jobs: ['호텔리어(객실·식음료)', '숙박·외식 접객원', '카지노 딜러', '컨시어지'],
+      certs: ['호텔서비스사', 'S.M.A.T', '조주기능사'],
       majors: ['호텔경영학', '관광경영학', '서비스경영학'] },
-    { id: 'travel', label: '여행·항공', emoji: '✈️', dept: 'tour',
-      jobs: ['객실승무원', '여행 플래너', '항공 예약·발권', '크루즈 승무원'],
+    { id: 'travel', label: '여행·항공', emoji: '✈️', dept: 'tour', course: '항공코스',
+      jobs: ['항공 객실승무원', '여행 사무원', '국내외 여행 안내원', '항공 예약·발권', '크루즈 승무원'],
+      certs: ['국내여행안내사', '관광통역안내사', '토파스항공예약(TOPAS)'],
       majors: ['항공서비스학', '관광경영학', '여행항공학'] },
-    { id: 'biz', label: '경영·마케팅', emoji: '📈', dept: 'cafe',
-      jobs: ['매장 매니저', '창업가', 'MD', '브랜드 마케터'],
+    { id: 'biz', label: '경영·마케팅', emoji: '📈', dept: 'cafe', course: '경영코스',
+      jobs: ['매장 판매·경영 지원 사무원', '창업가', 'MD', '브랜드 마케터'],
+      certs: ['전산회계', 'FAT 회계관리', '컴퓨터활용능력'],
       majors: ['경영학', '마케팅학', '세무회계학'] },
-    { id: 'content', label: '관광 콘텐츠·미디어', emoji: '📱', dept: 'tour',
+    { id: 'content', label: '관광 콘텐츠·미디어', emoji: '📱', dept: 'tour', course: '',
       jobs: ['관광 콘텐츠 기획', 'SNS 마케터', '영상 크리에이터', '여행 작가'],
+      certs: ['컴퓨터활용능력', 'ITQ'],
       majors: ['관광콘텐츠학', '미디어커뮤니케이션', '문화관광학'] },
-    { id: 'teach', label: '가르치고 돕기', emoji: '🤝', dept: '',
+    { id: 'teach', label: '가르치고 돕기', emoji: '🤝', dept: '', course: '',
       jobs: ['직업교육 강사', '진로 코치', '서비스 교육 담당', '바리스타 강사'],
+      certs: [],
       majors: ['교육학', '평생교육', '상담학'] }
   ];
 
@@ -197,6 +205,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
   ];
 
   var DEPT_NAMES = { cafe: '카페경영과', tour: '관광서비스과', cook: '외식조리과' };
+  var DEPT_COURSES = { cafe: '경영코스 · 음료코스', tour: '항공코스 · 호텔코스', cook: '식품코스 · 조리코스' };
 
   var state = { ratings: {}, interests: [], values: [], oneLine: '', step: 0, updated: null };
   var saveTimer = null;
@@ -366,6 +375,15 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
       });
     });
 
+    var certs = [];
+    state.interests.forEach(function (id) {
+      var it = findById(INTERESTS, id);
+      if (!it) { return; }
+      it.certs.forEach(function (c) {
+        if (certs.indexOf(c) === -1 && certs.length < 5) { certs.push(c); }
+      });
+    });
+
     var deptCount = { cafe: 0, tour: 0, cook: 0 };
     state.interests.forEach(function (id) {
       var it = findById(INTERESTS, id);
@@ -374,7 +392,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     var deptTop = Object.keys(deptCount).filter(function (k) { return deptCount[k] > 0; })
       .sort(function (a, b) { return deptCount[b] - deptCount[a]; });
 
-    return { pct: pct, topDims: topDims, jobs: jobs, majors: majors, deptTop: deptTop, deptCount: deptCount };
+    return { pct: pct, topDims: topDims, jobs: jobs, majors: majors, certs: certs, deptTop: deptTop, deptCount: deptCount };
   }
 
   function summaryText(data) {
@@ -385,6 +403,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     lines.push('· 가치관: ' + state.values.map(function (id) { var v = findById(VALUES, id); return v ? v.label : ''; }).filter(Boolean).join(', '));
     if (data.jobs.length) { lines.push('· 직업 키워드: ' + data.jobs.join(', ')); }
     if (data.majors.length) { lines.push('· 전공 키워드: ' + data.majors.join(', ')); }
+    if (data.certs.length) { lines.push('· 관심 자격증: ' + data.certs.join(', ')); }
     if (state.oneLine.trim()) { lines.push('· 나의 진로 한 줄: ' + state.oneLine.trim()); }
     return lines.join('\n');
   }
@@ -403,7 +422,19 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
     var interestLabels = state.interests.map(function (id) { var it = findById(INTERESTS, id); return it ? it.emoji + ' ' + it.label : ''; }).filter(Boolean);
     var valueItems = state.values.map(function (id) { var v = findById(VALUES, id); return v ? v : null; }).filter(Boolean);
 
-    var deptHtml = '<p>고른 흥미가 가장 가까운 학과는 <b>' + escapeHtml(DEPT_NAMES[data.deptTop[0]] || '') + '</b>예요.</p>' +
+    var topDept = data.deptTop[0];
+    var courseHint = '';
+    if (topDept) {
+      var pickedCourse = '';
+      state.interests.forEach(function (id) {
+        var it = findById(INTERESTS, id);
+        if (!pickedCourse && it && it.dept === topDept && it.course) { pickedCourse = it.course; }
+      });
+      courseHint = '<p style="margin-top:10px">3학년 코스는 ' + escapeHtml(DEPT_COURSES[topDept]) + ' 중에서 고릅니다.' +
+        (pickedCourse ? ' 고른 흥미에는 <b>' + escapeHtml(pickedCourse) + '</b>가 가까워요.' : '') + '</p>';
+    }
+
+    var deptHtml = '<p>고른 흥미가 가장 가까운 학과는 <b>' + escapeHtml(DEPT_NAMES[topDept] || '') + '</b>예요.</p>' + courseHint +
       '<a class="btn ghost" href="../major-guide/" style="margin-top:12px">학과 선택 가이드에서 비교하기 ↗</a>';
 
     var envText = valueItems.length
@@ -418,6 +449,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
         (envText ? '<p style="margin-top:10px">' + escapeHtml(envText) + '</p>' : '') + '</div>' +
       '<div class="rcard"><h3>직업 키워드</h3>' + (data.jobs.length ? tagList(data.jobs) : '<p>흥미 분야를 고르면 직업 키워드가 나와요.</p>') + '</div>' +
       '<div class="rcard"><h3>전공 키워드</h3>' + (data.majors.length ? tagList(data.majors) : '<p>흥미 분야를 고르면 전공 키워드가 나와요.</p>') + '</div>' +
+      '<div class="rcard"><h3>관심 자격증</h3>' + (data.certs.length ? tagList(data.certs) : '<p>흥미 분야를 고르면 학교에서 준비하는 자격증이 나와요.</p>') + '</div>' +
       '<div class="rcard"><h3>어울리는 학과</h3>' + (data.deptTop.length ? deptHtml : '<p>흥미 분야를 고르면 어울리는 학과를 알려 드려요.</p>') + '</div>' +
       '<div class="rcard"><label class="oneline-label" for="oneline">나의 진로 한 줄 정리</label>' +
         '<textarea class="oneline" id="oneline" maxlength="200" placeholder="예: 사람을 반갑게 맞이하는 호텔리어가 되어, 호텔 식음료 서비스를 기획하고 싶다."></textarea>' +
