@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="../accounting-library/style.css">
 <style>
 .app-main{max-width:1000px}
-.intro{padding:30px 0 16px}
+.intro{display:block;padding:30px 0 16px}
 .intro h1{font-size:clamp(30px,5vw,38px)}
 .intro-text{max-width:640px}
 .notice-line{font-size:12px;color:var(--muted);line-height:1.65;margin:0 0 28px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:9px}
@@ -64,7 +64,7 @@
 .bars{display:grid;gap:9px;margin:0 0 18px}
 .bar{display:grid;grid-template-columns:96px 1fr 46px;align-items:center;gap:10px;font-size:12px}
 .bar-track{height:10px;background:#f1ece3;border-radius:999px;overflow:hidden}
-.bar-fill{height:100%;background:var(--orange);border-radius:999px}
+.bar-fill{display:block;height:100%;background:var(--orange);border-radius:999px}
 .bar.top .bar-fill{background:var(--accent)}
 .bar b{text-align:right;color:#6c5840}
 .reasons{margin:0;padding-left:18px;font-size:13px;line-height:1.75;color:#4f463c}
@@ -171,7 +171,8 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
       subjects: ['식음료기초','바리스타','디저트제과실무','제과제빵','양식조리','카페경영관리','회계원리','창업일반','기초조리'],
       certs: ['바리스타','제과기능사','제빵기능사','양식조리기능사','조주기능사','쇼콜라티에','창업마스터','ITQ','컴퓨터활용능력'],
       careers: ['호텔 베이커리','프랜차이즈 베이커리','호텔 식음료 부서','카페·식음료 전문점','디저트 생산업체','카페 창업'],
-      fit: '음료와 디저트를 직접 만들고, 손님 응대와 매장 운영까지 함께 살펴보고 싶은 학생'
+      fit: '음료와 디저트를 직접 만들고, 손님 응대와 매장 운영까지 함께 살펴보고 싶은 학생',
+      memoPlaceholder: '예: 바리스타·제과 실습을 직접 해 보고 싶다 / 카페 창업까지 생각해 봤다'
     },
     {
       id: 'tour', name: '관광서비스과', emoji: '🧳', tag: '호텔 · 항공 · 여행',
@@ -179,7 +180,8 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
       subjects: ['관광영어','관광서비스','여행서비스실무','호텔객실서비스실무','호텔식음료서비스실무','항공객실서비스실무','카지노서비스실무','관광콘텐츠개발','바리스타','바텐더'],
       certs: ['SMAT(서비스경영자격)','국내여행안내사','TOPAS(항공예약발권)','호텔서비스사','바리스타','조주기능사','컴퓨터활용능력'],
       careers: ['호텔리어','항공 객실승무원','여행업 종사원','크루즈 승무원','항공사 예약·발권'],
-      fit: '사람을 맞이하고 안내하는 일이 즐겁고, 호텔·항공·여행 현장을 꿈꾸는 학생'
+      fit: '사람을 맞이하고 안내하는 일이 즐겁고, 호텔·항공·여행 현장을 꿈꾸는 학생',
+      memoPlaceholder: '예: 호텔 객실 서비스 수업이 끌린다 / 승무원 준비반이 있는지 궁금하다'
     },
     {
       id: 'cook', name: '외식조리과', emoji: '🍳', tag: '한식 · 양식 · 제과제빵',
@@ -187,7 +189,8 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
       subjects: ['식품과 영양','한식조리','양식조리','일식조리','제과제빵','디저트조리','김치반찬가공','바텐더','바리스타'],
       certs: ['한식조리기능사','양식조리기능사','중식조리기능사','일식조리기능사','제과기능사','제빵기능사','바리스타','쇼콜라티에','식품조각지도사','식품위생사'],
       careers: ['호텔·외식업체 조리사','레스토랑 셰프','급식 조리','푸드스타일리스트','메뉴 개발'],
-      fit: '재료를 다루고 완성된 요리를 접시에 담는 과정이 즐거운 학생'
+      fit: '재료를 다루고 완성된 요리를 접시에 담는 과정이 즐거운 학생',
+      memoPlaceholder: '예: 한식조리기능사를 먼저 따고 싶다 / 단체 급식 쪽도 알아보고 싶다'
     }
   ];
 
@@ -357,7 +360,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
     if (!wrap) { return; }
     wrap.innerHTML = QUESTIONS.map(function (q, idx) {
       var chosen = state.answers[q.id];
-      return '<div class="q"><p class="q-text" id="' + q.id + '-text"><span>Q' + (idx + 1) + '.</span>' + escapeHtml(q.text) + '</p>' +
+      return '<div class="q"><p class="q-text" id="' + q.id + '-text"><span>Q' + (idx + 1) + '.</span> ' + escapeHtml(q.text) + '</p>' +
         '<div class="q-options" role="group" aria-labelledby="' + q.id + '-text">' +
         q.options.map(function (o) {
           return '<button type="button" class="choice" data-question="' + q.id + '" data-dept="' + o.dept + '" aria-pressed="' + (chosen === o.dept) + '">' + escapeHtml(o.label) + '</button>';
@@ -431,14 +434,20 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
         '<b>' + pct + '%</b></div>';
     }).join('');
 
-    var tieNote = tied.length > 1
-      ? '<p class="result-desc">' + tied.map(function (d) { return d.name; }).join(' · ') + '의 점수가 같아요. 두 학과 수업을 모두 살펴보고 골라 보세요.</p>'
-      : '<p class="result-desc">' + escapeHtml(ordered[1].name) + '도 ' + percentOf(ordered[1].id) + '%로 잘 맞아요. 관심이 바뀌면 결과도 바로 달라집니다.</p>';
+    var second = ordered[1];
+    var tieNote;
+    if (tied.length > 1) {
+      tieNote = '<p class="result-desc">' + tied.map(function (d) { return d.name; }).join(' · ') + '의 점수가 같아요. 두 학과 수업을 모두 살펴보고 골라 보세요.</p>';
+    } else if (percentOf(second.id) > 0) {
+      tieNote = '<p class="result-desc">' + escapeHtml(second.name) + '도 ' + percentOf(second.id) + '%로 잘 맞아요. 관심이 바뀌면 결과도 바로 달라집니다.</p>';
+    } else {
+      tieNote = '<p class="result-desc">아직 답한 내용이 ' + escapeHtml(top.name) + ' 쪽으로 모였어요. 다른 학과가 궁금하면 위의 학과 비교에서 수업을 살펴보세요.</p>';
+    }
 
     el.innerHTML =
       '<div class="result-card">' +
         '<p class="result-label">지금 나에게 가장 잘 맞는 학과</p>' +
-        '<h3 class="result-name">' + top.emoji + ' ' + escapeHtml(top.name) + '<small>' + percentOf(top.id) + '%</small></h3>' +
+        '<h3 class="result-name">' + top.emoji + ' ' + escapeHtml(top.name) + ' <small>' + percentOf(top.id) + '%</small></h3>' +
         '<p class="result-desc">' + escapeHtml(top.summary) + '</p>' +
         '<div class="bars">' + bars + '</div>' +
         tieNote +
@@ -456,7 +465,7 @@ footer.app-footer{max-width:1000px;padding-left:28px;padding-right:28px}
     if (!grid) { return; }
     grid.innerHTML = DEPTS.map(function (d) {
       return '<label class="memo"><span>' + d.emoji + ' ' + escapeHtml(d.name) + ' 메모</span>' +
-        '<textarea data-memo="' + d.id + '" rows="4" placeholder="예: 바리스타 실습을 직접 해 보고 싶다 / 호텔 객실 수업이 끌린다"></textarea></label>';
+        '<textarea data-memo="' + d.id + '" rows="4" placeholder="' + escapeHtml(d.memoPlaceholder) + '"></textarea></label>';
     }).join('');
     DEPTS.forEach(function (d) {
       var field = grid.querySelector('textarea[data-memo="' + d.id + '"]');
