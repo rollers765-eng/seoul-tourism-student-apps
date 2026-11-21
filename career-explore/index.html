@@ -268,7 +268,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
       var buttons = [1, 2, 3, 4, 5].map(function (v) {
         return '<button type="button" class="choice" data-apt="' + item.id + '" data-value="' + v + '" aria-pressed="' + (current === v) + '">' + v + '</button>';
       }).join('');
-      return '<div class="apt"><p class="apt-text" id="' + item.id + '-text"><span>' + (idx + 1) + '.</span>' + escapeHtml(item.text) + '</p>' +
+      return '<div class="apt"><p class="apt-text" id="' + item.id + '-text"><span>' + (idx + 1) + '.</span> ' + escapeHtml(item.text) + '</p>' +
         '<div class="rate" role="group" aria-labelledby="' + item.id + '-text">' + buttons + '</div>' +
         '<div class="rate-scale"><span>전혀 아니다</span><span>매우 그렇다</span></div></div>';
     }).join('');
