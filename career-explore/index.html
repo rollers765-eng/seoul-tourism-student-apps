@@ -621,7 +621,7 @@ footer.app-footer{max-width:900px;padding-left:28px;padding-right:28px}
         '<textarea class="oneline" id="oneline" maxlength="200" placeholder="예: 사람을 반갑게 맞이하는 호텔리어가 되어, 호텔 식음료 서비스를 기획하고 싶다."></textarea>' +
         '<div class="copy-row"><button type="button" class="btn primary" id="save-line">한 줄 저장하기</button><button type="button" class="btn ghost" id="copy-summary">요약 복사하기</button></div>' +
         '<p class="confirm-note" id="line-note" role="status" aria-live="polite"></p>' +
-        '<p class="hint-line">복사한 요약에는 MBTI 분석도 함께 담겨 수행평가·상담 자료에 붙여 넣어 쓸 수 있어요.</p></div>';
+        '<p class="hint-line">' + (mbtiType ? '복사한 요약에는 MBTI 분석도 함께 담겨' : '복사한 요약은') + ' 수행평가·상담 자료에 붙여 넣어 쓸 수 있어요.</p></div>';
 
     var line = document.getElementById('oneline');
     if (line) {
