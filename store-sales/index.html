@@ -84,7 +84,7 @@ a{color:inherit}
 /* ---------- nav ---------- */
 .navbar{position:sticky;top:0;z-index:30;background:rgba(251,245,233,.94);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);padding:8px 0}
-.nav-scroll{display:flex;gap:7px;overflow-x:auto;padding:2px 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav-scroll{display:flex;gap:7px;overflow-x:auto;padding:2px 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:1092px;margin:0 auto}
 .nav-scroll::-webkit-scrollbar{display:none}
 .nav-scroll a{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 12px;border-radius:999px;
   border:1px solid var(--line-2);background:#fffdf8;color:var(--ink-soft);text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
@@ -349,6 +349,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
 }
 @media (min-width:980px){
   .wrap{padding:0 26px}
+  .nav-scroll{padding:2px 26px 4px;max-width:1112px}
   .eye-list{grid-template-columns:1fr 1fr 1fr}
   .eye-item:nth-last-child(2){border-bottom:1px dashed var(--line)}
 }
@@ -594,19 +595,19 @@ footer .fnote{margin:8px 0 0;max-width:60em}
           </div>
           <div class="field">
             <label for="inGuests">하루 손님 수 <span>명</span></label>
-            <div class="unit"><input id="inGuests" type="number" inputmode="numeric" min="0" max="5000" step="10" value="200"><i>명</i></div>
+            <div class="unit"><input id="inGuests" type="number" inputmode="numeric" min="0" max="5000" step="10" value="120"><i>명</i></div>
           </div>
           <div class="field">
             <label for="inSpend">객단가 <span>원</span></label>
-            <div class="unit"><input id="inSpend" type="number" inputmode="numeric" min="0" max="200000" step="500" value="8000"><i>원</i></div>
+            <div class="unit"><input id="inSpend" type="number" inputmode="numeric" min="0" max="200000" step="500" value="6500"><i>원</i></div>
           </div>
           <div class="field">
             <label for="inCost">원가율 <span>%</span></label>
-            <div class="unit"><input id="inCost" type="number" inputmode="numeric" min="0" max="100" step="1" value="50"><i>%</i></div>
+            <div class="unit"><input id="inCost" type="number" inputmode="numeric" min="0" max="100" step="1" value="35"><i>%</i></div>
           </div>
           <div class="field">
             <label for="inFixed">월 고정비 <span>만원</span></label>
-            <div class="unit"><input id="inFixed" type="number" inputmode="numeric" min="0" max="100000" step="100" value="3000"><i>만원</i></div>
+            <div class="unit"><input id="inFixed" type="number" inputmode="numeric" min="0" max="100000" step="100" value="1500"><i>만원</i></div>
           </div>
           <p class="hint">고정비에는 임대료·인건비·관리비처럼 매출과 상관없이 나가는 돈을 넣습니다. 한 달은 30일로 계산합니다.</p>
         </div>
@@ -721,7 +722,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
           <div class="db">
             <div class="field">
               <label for="dDate">받는 날</label>
-              <input id="dDate" type="date">
+              <input id="dDate" type="text" inputmode="numeric" maxlength="10" placeholder="2026-11-25" autocomplete="off">
             </div>
             <div class="field">
               <label for="dTime">시간대</label>
@@ -1198,7 +1199,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
 
   /* ---------- 04 numbers ---------- */
   var PRESETS = {
-    buffet:{g:200, s:8000, c:50, f:9000},
+    buffet:{g:300, s:22000, c:50, f:9000},
     cafe:{g:120, s:6500, c:35, f:1500},
     dessert:{g:80, s:12000, c:30, f:1200}
   };
@@ -1321,11 +1322,11 @@ footer .fnote{margin:8px 0 0;max-width:60em}
 
   /* ---------- 06 packing ---------- */
   var SEQ = [
-    {id:'cut', t:'포장지를 책 크기에 맞게 자른다'},
-    {id:'place', t:'책을 포장지 가운데에 놓는다'},
-    {id:'fold', t:'양쪽 날개를 접어 각을 세운다'},
-    {id:'tape', t:'테이프로 고정한다'},
-    {id:'ribbon', t:'리본을 묶어 마무리한다'}
+    {id:'cut', t:'포장지를 책 크기에 맞게 자른다', n:'포장지 재단하기'},
+    {id:'place', t:'책을 포장지 가운데에 놓는다', n:'책을 가운데에 놓기'},
+    {id:'fold', t:'양쪽 날개를 접어 각을 세운다', n:'양쪽 날개 접어 각 세우기'},
+    {id:'tape', t:'테이프로 고정한다', n:'테이프로 고정하기'},
+    {id:'ribbon', t:'리본을 묶어 마무리한다', n:'리본 묶어 마무리하기'}
   ];
   var order = [0,1,2,3,4];
   // deterministic shuffle so first card is not always the answer
@@ -1352,13 +1353,13 @@ footer .fnote{margin:8px 0 0;max-width:60em}
         seqHint.innerHTML = '<b style="color:var(--mint)">포장 완성!</b> 이제 5분 타이머로 실제 속도를 재 보세요. 각을 세우고 리본을 묶는 데 대부분의 시간이 쓰입니다.';
         timerStart && timerStart.focus();
       } else {
-        seqHint.textContent = '좋아요. 다음은 ' + SEQ[seqDone].t + '입니다.';
+        seqHint.textContent = '좋아요. 다음은 ‘' + SEQ[seqDone].n + '’입니다.';
       }
     } else {
       btn.classList.remove('wrong');
       void btn.offsetWidth;
       btn.classList.add('wrong');
-      seqHint.innerHTML = '<b style="color:var(--cherry)">순서가 달라요.</b> 지금 필요한 일은 “' + SEQ[seqDone].t + '”입니다.';
+      seqHint.innerHTML = '<b style="color:var(--cherry)">순서가 달라요.</b> 지금 필요한 일은 ‘' + SEQ[seqDone].n + '’입니다.';
       setTimeout(function(){ btn.classList.remove('wrong'); }, 400);
     }
   }
@@ -1400,8 +1401,13 @@ footer .fnote{margin:8px 0 0;max-width:60em}
     var product = dProduct.options[dProduct.selectedIndex].text;
     var name = dName.value.trim(), phone = dPhone.value.trim(), addr = dAddr.value.trim(), memo = dMemo.value.trim();
     var date = dDate.value, time = dTime.value, method = dMethod.value;
-    if (!name || !phone || !addr || !date) {
-      dErr.textContent = '받는 사람, 연락처, 주소, 받는 날은 꼭 적어 주세요. 배송 사고는 대부분 이 네 칸이 비어서 생깁니다.';
+    if (!name || !phone || !addr) {
+      dErr.textContent = '받는 사람, 연락처, 주소는 꼭 적어 주세요. 배송 사고는 대부분 이 칸들이 비어서 생깁니다.';
+      dErr.style.display = 'block';
+      return;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      dErr.textContent = '받는 날을 2026-11-25 형식으로 적어 주세요. (숫자만 입력하면 자동으로 맞춰집니다)';
       dErr.style.display = 'block';
       return;
     }
@@ -1427,6 +1433,12 @@ footer .fnote{margin:8px 0 0;max-width:60em}
     orderEl.classList.add('show');
     orderEl.scrollIntoView({ block:'nearest', behavior:'smooth' });
   }
+  dDate.addEventListener('input', function(){
+    var d = dDate.value.replace(/[^0-9]/g, '').slice(0, 8), out = d;
+    if (d.length > 4) out = d.slice(0, 4) + '-' + d.slice(4);
+    if (d.length > 6) out = d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6);
+    dDate.value = out;
+  });
   $('dMake').addEventListener('click', makeOrder);
   $('dClear').addEventListener('click', function(){
     [dName, dPhone, dAddr, dMemo].forEach(function(el){ el.value = ''; });
