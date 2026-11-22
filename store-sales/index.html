@@ -358,6 +358,12 @@ footer .fnote{margin:8px 0 0;max-width:60em}
   .eye-item{grid-column:span 2}
   .eye-item:nth-child(4),.eye-item:nth-child(5){grid-column:span 3}
 }
+@media (max-width:759px){
+  .strip-rule{display:none}
+  .strip-row{display:grid;gap:3px}
+  .rail{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .rail span{justify-content:flex-start}
+}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
