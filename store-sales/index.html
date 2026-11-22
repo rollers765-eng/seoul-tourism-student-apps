@@ -818,8 +818,8 @@ footer .fnote{margin:8px 0 0;max-width:60em}
     <h2>한 문장 정리</h2>
     <p>오늘 수업을 한 문장으로 남겨 보세요. 문장은 저장되지 않고, 이 화면에서만 완성됩니다.</p>
     <div class="sentence">
-      <div class="out" id="sentenceOut">“매장관리자는 단순히 많이 파는 것보다 ______을/를 관리하는 사람이다.”</div>
-      <input id="sentenceIn" type="text" placeholder="빈칸에 들어갈 말 (예: 남는 구조)" aria-label="한 문장 정리에 들어갈 말">
+      <div class="out" id="sentenceOut">“매장관리자가 가장 먼저 관리해야 할 것은 ______이다.”</div>
+      <input id="sentenceIn" type="text" placeholder="빈칸에 들어갈 말 (예: 원가율과 재방문)" aria-label="한 문장 정리에 들어갈 말">
     </div>
   </section>
 
@@ -1498,9 +1498,9 @@ footer .fnote{margin:8px 0 0;max-width:60em}
   sIn.addEventListener('input', function(){
     var v = sIn.value.trim();
     if (!v) {
-      sOut.textContent = '“매장관리자는 단순히 많이 파는 것보다 ______을/를 관리하는 사람이다.”';
+      sOut.textContent = '“매장관리자가 가장 먼저 관리해야 할 것은 ______이다.”';
     } else {
-      sOut.textContent = '“매장관리자는 단순히 많이 파는 것보다 ' + v + '을/를 관리하는 사람이다.”';
+      sOut.textContent = '“매장관리자가 가장 먼저 관리해야 할 것은 ' + v + '이다.”';
     }
   });
 })();
