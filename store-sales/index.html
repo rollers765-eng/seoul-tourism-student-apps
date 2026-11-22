@@ -3,296 +3,1494 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#a55725">
-<meta name="description" content="서울관광고등학교 매장판매 자료실. 매장 입지와 상권, 고객 응대, 진열, 포장·재고, POS 정산, 고객 불만 관리를 단원별 핵심 정리와 용어 카드, 자가 점검 퀴즈로 복습합니다.">
+<meta name="theme-color" content="#1b1410">
+<title>매장판매 스테이션 | 경영·금융 교과교실 | 서울관광고등학교</title>
+<meta name="description" content="서울관광고등학교 매장판매 수업 스테이션. 매장 판매 마무리(결제·포장·배송·환송)와 고객 요구 관리를 사례로 익히는 실습형 자료 — 고객과 매장관리자의 두 눈, 불만 응대 6단계, 매장 숫자 진단, 입지 판단, 5분 포장, 배송 주문서, 보고서 완성 조건.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="서울관광고등학교">
-<meta property="og:title" content="매장판매 자료실 | 경영·금융 교과교실">
-<meta property="og:description" content="서울관광고등학교 매장판매 자료실. 매장 입지와 상권, 고객 응대, 진열, 포장·재고, POS 정산, 고객 불만 관리를 단원별 핵심 정리와 용어 카드, 자가 점검 퀴즈로 복습합니다.">
+<meta property="og:title" content="매장판매 스테이션 | 경영·금융 교과교실">
+<meta property="og:description" content="계산대 앞에서 손님은 매장을 한 번 더 평가합니다. 사례로 배우고, 판단을 연습하는 매장판매 수업 자료.">
 <meta property="og:url" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/store-sales/">
-<title>매장판매 자료실 | 경영·금융 교과교실 | 서울관광고등학교</title>
-<link rel="stylesheet" href="../accounting-library/style.css">
 <style>
-.lib-main{max-width:1000px}
-.intro{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:26px 0 20px}
-.intro>div{flex:1 1 auto;min-width:0}
-.intro .eyebrow{margin-bottom:7px}
-.intro h1{font-size:clamp(28px,5vw,38px)}
-.intro-text{max-width:600px;font-size:13px;line-height:1.75;margin:10px 0 0}
-.intro .characters{flex:0 0 auto;width:min(38%,400px);margin:0}
-.stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 18px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-.stat b{display:block;font-size:19px;color:var(--accent);letter-spacing:-.03em;line-height:1.3}
-.stat span{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
-.notice-line{font-size:12px;color:var(--muted);line-height:1.75;margin:0 0 26px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:9px}
-.notice-line b{color:#84451f}
-.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:0 0 11px}
-.section-head h2{font-size:21px;letter-spacing:-.04em;margin:0}
-.section-head p{font-size:12px;color:var(--muted);margin:0;text-align:right;line-height:1.5}
-.unit-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
-.unit-tabs::-webkit-scrollbar{display:none}
-.unit-tabs button{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;min-height:46px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer}
-.unit-tabs button .n{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#f3efe7;color:var(--accent);font-size:11px;font-weight:700}
-.unit-tabs button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
-.unit-tabs button[aria-selected=true] .n{background:rgba(255,255,255,.22);color:#fff}
-.unit-panel{background:#fff;border:1px solid var(--line);border-top:3px solid var(--orange);border-radius:12px;padding:22px;scroll-margin-top:12px}
-.unit-head{display:flex;align-items:flex-start;gap:11px;margin:0 0 11px}
-.unit-no{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--cream);color:#84451f;font-size:13px;font-weight:800;margin-top:1px}
-.unit-head h2{font-size:21px;letter-spacing:-.04em;margin:0;line-height:1.35}
-.unit-goal{font-size:13px;color:#5c5145;line-height:1.75;background:#fcfaf7;border-left:3px solid var(--orange);padding:10px 13px;border-radius:0 8px 8px 0;margin:0}
-.unit-goal b{color:#84451f;font-size:11.5px;letter-spacing:.03em;margin-right:6px}
-.block-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;font-weight:800;letter-spacing:.03em;color:#8a6a4a;margin:26px 0 10px}
-.block-title .hint{font-weight:500;color:var(--muted);letter-spacing:0;font-size:11px}
-.concepts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.concept{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fcfaf7}
-.concept h3{margin:0 0 8px;font-size:14px;letter-spacing:-.02em;line-height:1.45}
-.concept ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.72;color:#4f463c}
-.concept li+li{margin-top:3px}
-.concept li::marker{color:var(--orange)}
-.concept .calc{display:block;margin-top:7px;padding:7px 9px;background:#fff;border:1px dashed #e3d3bd;border-radius:6px;font-size:12px;color:#7a4a22;line-height:1.6}
-.case{background:var(--cream);border:1px solid #f0dcc0;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.78;color:#5c4630}
-.case b{color:#84451f}
-.case p{margin:0}
-.case p+p{margin-top:8px}
-.terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-details.term{border:1px solid var(--line);border-radius:8px;background:#fff}
-details.term summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:46px;padding:10px 13px;font-size:13px;font-weight:700;cursor:pointer;list-style:none;touch-action:manipulation}
-details.term summary::-webkit-details-marker{display:none}
-details.term .pm::after{content:'+';color:var(--accent);font-weight:700;font-size:15px;line-height:1}
-details.term[open] .pm::after{content:'\2212'}
-details.term summary:focus-visible{outline:3px solid #2269a2;outline-offset:-1px}
-details.term p{margin:0;padding:0 13px 13px;font-size:12.5px;line-height:1.72;color:#5c5145}
-.quiz-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;background:#fcfaf7;border:1px solid var(--line);border-radius:9px}
-.quiz-score{font-size:12px;font-weight:800;color:#84451f;white-space:nowrap}
-.quiz-track{flex:1 1 90px;min-width:80px;height:7px;border-radius:999px;background:#efe8dc;overflow:hidden}
-.quiz-track i{display:block;height:100%;width:0;background:var(--orange);transition:width .25s}
-.quiz-best{font-size:11px;color:var(--muted);white-space:nowrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:9px 15px;border:1px solid #dacbb9;border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}
-.btn:hover{background:#fff9ef}
-.btn.small{padding:6px 11px;min-height:34px;font-size:11.5px}
-.q-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.q{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fff}
-.q-text{margin:0 0 10px;font-size:13.5px;font-weight:700;line-height:1.6;letter-spacing:-.02em}
-.q-tag{display:inline-block;font-size:10px;font-weight:800;color:#96501e;background:var(--cream);border-radius:4px;padding:2px 6px;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
-.q-options{display:grid;gap:7px}
-.q-options.ox{grid-template-columns:repeat(2,minmax(0,1fr))}
-.q-opt{display:flex;align-items:flex-start;gap:8px;width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;line-height:1.5;text-align:left;cursor:pointer}
-.q-options.ox .q-opt{justify-content:center;font-weight:700;font-size:15px}
-.q-opt:hover:not(:disabled){background:#fff9ef}
-.q-opt:disabled{cursor:default;opacity:1}
-.q-opt .k{flex:0 0 auto;font-weight:800;color:var(--muted);font-size:11px;padding-top:2px}
-.q-options.ox .q-opt .k{display:none}
-.q-opt.correct{border-color:#2f7d52;background:#eaf6ee;color:#1c5637;font-weight:700}
-.q-opt.wrong{border-color:#b5482f;background:#fdeee9;color:#8c3520}
-.q-opt.correct .k,.q-opt.wrong .k{color:inherit}
-.q-explain{margin:10px 0 0;font-size:12.5px;line-height:1.72;color:#4f463c;background:#fcfaf7;border-left:3px solid var(--orange);border-radius:0 7px 7px 0;padding:9px 12px}
-.q-explain b{color:#84451f}
-.quiz-result{margin:12px 0 0;padding:12px 14px;border-radius:9px;background:var(--cream);border:1px solid #f0dcc0;font-size:13px;font-weight:700;color:#84451f;line-height:1.6}
-.pager{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);margin-top:20px;padding-top:16px}
-.pager .count{font-size:12px;color:var(--muted)}
-.pager button[disabled]{opacity:.35;cursor:default}
-footer.lib-footer{max-width:1000px;padding-left:28px;padding-right:28px}
+:root{
+  --ink:#1b1410;
+  --ink-soft:#4a3f35;
+  --muted:#7c6f61;
+  --paper:#fbf5e9;
+  --paper-2:#f4ead8;
+  --card:#fffdf8;
+  --line:#e6d9c4;
+  --line-2:#d8c7ab;
+  --espresso:#241a13;
+  --mint:#0e9b74;
+  --mint-soft:#dff4ec;
+  --amber:#e8a13a;
+  --amber-soft:#fdf0d8;
+  --cherry:#c34a33;
+  --cherry-soft:#fbe6e1;
+  --radius:16px;
+  --shadow:0 10px 26px -18px rgba(36,26,19,.55);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:
+    radial-gradient(120% 60% at 12% -10%,rgba(232,161,58,.20),transparent 62%),
+    radial-gradient(100% 50% at 92% 4%,rgba(14,155,116,.14),transparent 60%),
+    linear-gradient(180deg,#fdf8ee 0%,var(--paper) 42%,#f8f1e3 100%);
+  color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65;
+  letter-spacing:-.01em;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid #0b6fb8;outline-offset:2px;border-radius:8px}
+.wrap{width:100%;max-width:1060px;margin:0 auto;padding:0 16px}
 
-@media(min-width:760px){
- .unit-tabs{flex-wrap:wrap;overflow:visible}
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(90% 120% at 85% -20%,rgba(14,155,116,.34),transparent 60%),
+  radial-gradient(70% 90% at 0% 120%,rgba(232,161,58,.24),transparent 60%),
+  linear-gradient(160deg,#241a13,#150f0b 70%);
+  color:#f8f1e3;padding:22px 0 0}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 6px);
+  opacity:.5}
+.hero-in{position:relative;z-index:1;display:grid;gap:14px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#cbbaa4}
+.topline a{color:#cbbaa4;text-decoration:none;border-bottom:1px solid rgba(203,186,164,.4);padding-bottom:1px}
+.hero-main{display:grid;gap:16px;grid-template-columns:1fr}
+.hero h1{margin:0;font-size:clamp(30px,8.4vw,54px);line-height:1.04;letter-spacing:-.045em;font-weight:800}
+.hero h1 em{font-style:normal;color:#8fe3c7}
+.hero p.lead{margin:10px 0 0;max-width:34em;color:#e2d5c4;font-size:13.5px;line-height:1.75}
+.hero-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(248,241,227,.22);background:rgba(248,241,227,.07);
+  color:#f0e6d7;border-radius:999px;padding:6px 11px;font-size:11.5px;font-weight:700;letter-spacing:0}
+.sign{position:relative;justify-self:start;align-self:end;margin:2px 0 6px}
+.sign-body{display:flex;flex-direction:column;gap:2px;padding:12px 20px;border-radius:12px;border:2px solid rgba(143,227,199,.65);
+  background:linear-gradient(180deg,rgba(143,227,199,.16),rgba(143,227,199,.04));
+  box-shadow:0 0 22px rgba(143,227,199,.28),inset 0 0 18px rgba(143,227,199,.12);transform:rotate(-2.5deg)}
+.sign-body b{font-family:var(--mono);font-size:26px;letter-spacing:.22em;color:#a9f0d7;line-height:1;text-shadow:0 0 14px rgba(143,227,199,.7)}
+.sign-body span{font-size:9.5px;letter-spacing:.18em;color:#88c9b4}
+.hero-strip{position:relative;z-index:1;margin-top:18px;background:var(--card);color:var(--ink);
+  border-radius:14px 14px 0 0;padding:12px 14px 14px;box-shadow:0 -10px 30px -20px #000}
+.hero-strip::before{content:"";display:block;height:8px;margin:-12px -14px 10px;
+  background-image:radial-gradient(circle at 6px 8px,transparent 5px,#fbf5e9 5.5px);background-size:12px 12px;background-position:0 -4px}
+.strip-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+.strip-row b{color:var(--ink);font-weight:700}
+.strip-rule{flex:1 1 40px;min-width:30px;border-bottom:1px dashed var(--line-2);transform:translateY(-3px)}
+
+/* ---------- nav ---------- */
+.navbar{position:sticky;top:0;z-index:30;background:rgba(251,245,233,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:8px 0}
+.nav-scroll{display:flex;gap:7px;overflow-x:auto;padding:2px 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav-scroll::-webkit-scrollbar{display:none}
+.nav-scroll a{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 12px;border-radius:999px;
+  border:1px solid var(--line-2);background:#fffdf8;color:var(--ink-soft);text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
+.nav-scroll a i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--mint);font-weight:700}
+.nav-scroll a[aria-current="true"]{background:var(--espresso);border-color:var(--espresso);color:#fff8ec}
+.nav-scroll a[aria-current="true"] i{color:#8fe3c7}
+
+/* ---------- sections ---------- */
+main{padding:24px 0 10px}
+section.block{padding:26px 0 8px;scroll-margin-top:64px}
+.sec-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px}
+.sec-no{flex:0 0 auto;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--espresso);
+  font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--espresso);background:#fffdf8}
+.sec-head h2{margin:0;font-size:clamp(20px,5.2vw,27px);letter-spacing:-.04em;line-height:1.3;font-weight:800}
+.sec-head p{margin:4px 0 0;font-size:12.5px;color:var(--muted);line-height:1.7;max-width:44em}
+.sec-body{margin-top:14px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:16px}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.7}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------- 01 flow ---------- */
+.flow-grid{display:grid;gap:12px}
+.rail{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.rail span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--ink-soft);
+  background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:5px 9px}
+.rail span b{font-family:var(--mono);color:var(--mint);font-size:10.5px}
+.track{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+.track-top{display:flex;align-items:center;gap:10px;padding:13px 15px;background:linear-gradient(180deg,#fffdf8,#fbf3e4);border-bottom:1px solid var(--line)}
+.track-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:#fff;background:var(--espresso);border-radius:5px;padding:3px 7px;font-weight:700}
+.track-tag.b{background:var(--mint)}
+.track-top h3{margin:0;font-size:15.5px;letter-spacing:-.03em;line-height:1.4}
+.track-top p{margin:2px 0 0;font-size:11.5px;color:var(--muted)}
+.steps{list-style:none;margin:0;padding:0}
+.steps>li{border-bottom:1px dashed var(--line)}
+.steps>li:last-child{border-bottom:0}
+.steps details summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 15px;min-height:52px}
+.steps summary::-webkit-details-marker{display:none}
+.step-n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--paper-2);
+  font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--ink-soft)}
+.steps summary b{font-size:13.5px;letter-spacing:-.02em}
+.steps summary span.s{font-size:11.5px;color:var(--muted);margin-left:auto;text-align:right}
+.steps details[open] summary{background:#fffaf0}
+.step-body{padding:0 15px 14px 51px;display:grid;gap:8px}
+.step-body p{margin:0;font-size:12.5px;line-height:1.72;color:var(--ink-soft)}
+.step-body p b{color:var(--espresso)}
+.step-body .q{border-left:3px solid var(--amber);background:#fffaf0;padding:8px 11px;border-radius:0 8px 8px 0;font-size:12.5px}
+.step-body .q b{display:block;font-size:10.5px;letter-spacing:.08em;color:#9a6a1f;margin-bottom:2px}
+.chip-mini{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--mint);
+  background:var(--mint-soft);border-radius:6px;padding:3px 7px;margin-right:4px}
+
+/* ---------- 02 two eyes ---------- */
+.eyes{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+.eye-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:9px;background:var(--paper-2);border-bottom:1px solid var(--line)}
+.eye-switch button{min-height:44px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--ink-soft);
+  font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.eye-switch button[aria-pressed="true"]{background:#fffdf8;border-color:var(--line-2);color:var(--ink);box-shadow:0 2px 6px -4px rgba(36,26,19,.6)}
+.eye-switch button span{font-size:15px}
+.eye-list{display:grid}
+.eye-item{display:grid;gap:4px;padding:13px 15px;border-bottom:1px dashed var(--line)}
+.eye-item:last-child{border-bottom:0}
+.eye-item h3{margin:0;font-size:12.5px;letter-spacing:-.02em;color:var(--muted);font-weight:800}
+.eye-item p{margin:0;font-size:14px;line-height:1.65;letter-spacing:-.02em;min-height:2.9em}
+.eye-item p .before{color:var(--muted);font-size:11.5px;font-weight:700;margin-right:6px}
+.eye-note{margin:0;padding:12px 15px;background:var(--espresso);color:#f6ecdc;font-size:12.5px;line-height:1.7}
+.eye-note b{color:#8fe3c7}
+
+/* ---------- 03 complaint ---------- */
+.case-chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.case-chips::-webkit-scrollbar{display:none}
+.case-chips button{flex:0 0 auto;min-height:42px;padding:8px 13px;border-radius:999px;border:1px solid var(--line-2);
+  background:#fffdf8;color:var(--ink-soft);font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.case-chips button[aria-pressed="true"]{background:var(--espresso);border-color:var(--espresso);color:#fff8ec}
+.scene{margin:0;padding:13px 15px;border-radius:12px;background:linear-gradient(180deg,#fff8ea,#fdf1dd);
+  border:1px solid #f0dcbb;font-size:13px;line-height:1.75;color:#5b4630}
+.scene b{display:block;font-size:10.5px;letter-spacing:.1em;color:#9a6a1f;margin-bottom:3px}
+.steprail{display:flex;align-items:center;gap:4px;margin:14px 0 12px}
+.steprail .dot{flex:1 1 0;display:grid;place-items:center;gap:3px}
+.steprail .dot i{display:block;width:100%;height:6px;border-radius:99px;background:#eadfcc}
+.steprail .dot b{font-size:9.5px;font-weight:700;color:#b0a290;letter-spacing:-.02em;white-space:nowrap}
+.steprail .dot.done i{background:var(--mint)}
+.steprail .dot.done b{color:var(--mint)}
+.steprail .dot.now i{background:var(--amber)}
+.steprail .dot.now b{color:#9a6a1f}
+.qbox{padding:15px;border-radius:13px;border:1px solid var(--line);background:#fffdf8}
+.qbox .k{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+  color:#fff;background:var(--espresso);border-radius:5px;padding:3px 7px;font-weight:700}
+.qbox h3{margin:9px 0 12px;font-size:15px;line-height:1.55;letter-spacing:-.03em}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;min-height:48px;padding:11px 13px;border-radius:11px;
+  border:1px solid var(--line-2);background:#fff;color:var(--ink);font:inherit;font-size:13px;line-height:1.6;cursor:pointer;transition:transform .12s,border-color .12s}
+.opt:hover{border-color:var(--mint);transform:translateY(-1px)}
+.opt .num{flex:0 0 auto;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--paper-2);
+  font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink-soft);margin-top:1px}
+.opt[data-state="best"]{border-color:var(--mint);background:#f1fbf7}
+.opt[data-state="soso"]{border-color:var(--amber);background:#fffaf0}
+.opt[data-state="bad"]{border-color:var(--cherry);background:#fdf1ee}
+.opt[disabled]{cursor:default;opacity:1}
+.fb{margin-top:11px;padding:11px 13px;border-radius:10px;font-size:12.5px;line-height:1.7;display:none}
+.fb.show{display:block}
+.fb b{display:block;font-size:11px;letter-spacing:.06em;margin-bottom:2px}
+.fb.best{background:var(--mint-soft);color:#0a5f49}.fb.best b{color:#0a7a5c}
+.fb.soso{background:var(--amber-soft);color:#7a5413}.fb.soso b{color:#9a6a1f}
+.fb.bad{background:var(--cherry-soft);color:#8a2e1d}.fb.bad b{color:#a33524}
+.nextrow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;padding:10px 16px;border-radius:11px;
+  border:1px solid var(--espresso);background:var(--espresso);color:#fff8ec;font:inherit;font-size:13px;font-weight:800;cursor:pointer;text-decoration:none}
+.btn.ghost{background:#fffdf8;color:var(--ink);border-color:var(--line-2)}
+.btn.mint{background:var(--mint);border-color:var(--mint)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:38px;padding:7px 12px;font-size:12px}
+.ledger{display:none;margin-top:14px;background:#fffdf8;border:1px solid var(--line-2);border-radius:12px;padding:15px}
+.ledger.show{display:block}
+.ledger h3{margin:0 0 3px;font-size:14px;letter-spacing:-.02em}
+.ledger .sub{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.ledger dl{margin:12px 0 0;display:grid;gap:0}
+.ledger .row{display:grid;grid-template-columns:74px 1fr;gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
+.ledger dt{font-size:11px;font-weight:800;color:var(--muted)}
+.ledger dd{margin:0;font-size:12.5px;line-height:1.65}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:800}
+.badge.g{background:var(--mint-soft);color:#0a6b50}
+.badge.y{background:var(--amber-soft);color:#8a5f18}
+.badge.r{background:var(--cherry-soft);color:#96301f}
+
+/* ---------- 04 numbers ---------- */
+.calc{display:grid;gap:14px}
+.calc-in{display:grid;gap:10px}
+.field{display:grid;gap:5px}
+.field label{font-size:11.5px;font-weight:800;color:var(--ink-soft);display:flex;justify-content:space-between;gap:8px}
+.field label span{font-family:var(--mono);font-weight:700;color:var(--muted);font-size:10.5px}
+.field .unit{position:relative;display:flex;align-items:center}
+.field input{width:100%;min-height:48px;padding:10px 44px 10px 12px;border-radius:10px;border:1px solid var(--line-2);
+  background:#fffdf8;font:inherit;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.field .unit>i{position:absolute;right:12px;font-style:normal;font-size:11.5px;color:var(--muted);font-weight:700}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.presets button{min-height:36px;padding:6px 11px;border-radius:8px;border:1px dashed var(--line-2);background:#fffdf8;
+  font:inherit;font-size:11.5px;font-weight:700;color:var(--ink-soft);cursor:pointer}
+.presets button:hover{border-color:var(--mint);color:var(--mint)}
+.readout{background:var(--espresso);color:#f7eddd;border-radius:14px;padding:15px;display:grid;gap:10px}
+.readout .line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px dashed rgba(247,237,221,.22);font-size:12.5px}
+.readout .line:last-of-type{border-bottom:0;padding-bottom:0}
+.readout .line b{font-family:var(--mono);font-size:15px;letter-spacing:-.02em;color:#fff}
+.readout .line b.neg{color:#ff9d85}
+.readout .line b.pos{color:#8fe3c7}
+.readout .big{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(247,237,221,.28)}
+.readout .big span{font-size:11.5px;color:#cbbaa4;font-weight:700}
+.readout .big b{font-family:var(--mono);font-size:23px;letter-spacing:-.03em}
+.meter{display:grid;gap:5px;margin-top:2px}
+.meter .bar{height:9px;border-radius:99px;background:rgba(247,237,221,.16);overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8fe3c7,#e8a13a);transition:width .3s}
+.verdict{font-size:12px;line-height:1.7;border-radius:10px;padding:10px 12px;background:rgba(247,237,221,.08)}
+.verdict b{color:#fff}
+
+/* ---------- 05 location ---------- */
+.loc-sit{margin:0;padding:13px 15px;border-radius:12px;background:#fff8ea;border:1px solid #f0dcbb;font-size:13px;line-height:1.75}
+.loc-sit b{display:block;font-size:10.5px;letter-spacing:.1em;color:#9a6a1f;margin-bottom:3px}
+.loc-opts{display:grid;gap:8px;margin-top:11px}
+.loc-dots{display:flex;gap:5px;margin:12px 0 0}
+.loc-dots i{width:22px;height:5px;border-radius:99px;background:#eadfcc}
+.loc-dots i.on{background:var(--mint)}
+.loc-dots i.miss{background:var(--cherry)}
+
+/* ---------- 06 packing ---------- */
+.pack-grid{display:grid;gap:12px}
+.seq{display:grid;gap:8px}
+.seq button{display:flex;align-items:center;gap:10px;min-height:52px;padding:11px 13px;border-radius:11px;border:1px solid var(--line-2);
+  background:#fffdf8;font:inherit;font-size:13px;font-weight:700;color:var(--ink);text-align:left;cursor:pointer;transition:transform .12s}
+.seq button .n{flex:0 0 auto;display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:var(--paper-2);
+  font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+.seq button.done{background:var(--mint-soft);border-color:rgba(14,155,116,.5);color:#0a6b50}
+.seq button.done .n{background:var(--mint);color:#fff}
+.seq button.wrong{animation:shake .32s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pack-side{display:grid;gap:10px}
+.timer{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:13px;background:var(--espresso);color:#f7eddd}
+.timer .t{font-family:var(--mono);font-size:30px;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.timer .t.over{color:#ff9d85}
+.timer .lbl{font-size:10.5px;letter-spacing:.1em;color:#cbbaa4}
+.timer .btns{margin-left:auto;display:flex;gap:6px}
+.timer button{min-height:38px;padding:7px 12px;border-radius:9px;border:1px solid rgba(247,237,221,.32);background:rgba(247,237,221,.1);
+  color:#f7eddd;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.rubric{display:grid;gap:7px}
+.rubric li{display:flex;gap:9px;font-size:12.5px;line-height:1.6;color:var(--ink-soft)}
+.rubric li b{color:var(--ink)}
+.tick{flex:0 0 auto;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--mint-soft);color:var(--mint);font-size:11px;font-weight:800;margin-top:1px}
+
+/* ---------- 07 delivery ---------- */
+.form-grid{display:grid;gap:10px}
+.form-grid .field input,.form-grid .field select,.form-grid .field textarea{width:100%;min-height:46px;padding:10px 12px;border-radius:10px;
+  border:1px solid var(--line-2);background:#fffdf8;font:inherit;font-size:14px;color:var(--ink)}
+.form-grid textarea{min-height:74px;resize:vertical;line-height:1.6}
+.form-grid .db{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+.form-note{font-size:11px;color:var(--muted);line-height:1.6}
+.order{display:none;margin-top:14px;background:#fff;border:1px solid var(--line-2);border-radius:12px;padding:0;overflow:hidden}
+.order.show{display:block}
+.order-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;background:var(--espresso);color:#f7eddd}
+.order-top b{font-size:12.5px;letter-spacing:-.01em}
+.order-top span{font-family:var(--mono);font-size:10.5px;color:#cbbaa4}
+.order dl{margin:0;padding:12px 14px}
+.order .row{display:grid;grid-template-columns:82px 1fr;gap:9px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.order .row:last-child{border-bottom:0}
+.order dt{font-size:11px;font-weight:800;color:var(--muted)}
+.order dd{margin:0;line-height:1.6}
+.order .flags{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 12px}
+.flag{font-size:10.5px;font-weight:800;border-radius:5px;padding:3px 7px;background:var(--amber-soft);color:#8a5f18}
+.flag.red{background:var(--cherry-soft);color:#96301f}
+.order .say{margin:0 14px 14px;padding:11px 12px;border-radius:9px;background:#f7fbf9;border:1px solid #cfe9df;font-size:12px;line-height:1.75;color:#235c4b;white-space:pre-wrap}
+
+/* ---------- 08 report ---------- */
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1 1 0;min-height:46px;padding:8px 10px;border-radius:11px;border:1px solid var(--line-2);background:#fffdf8;
+  font:inherit;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--espresso);border-color:var(--espresso);color:#fff8ec}
+.check{display:grid;gap:8px}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:11px;border:1px solid var(--line);
+  background:#fffdf8;cursor:pointer;font-size:12.5px;line-height:1.65}
+.check input{appearance:none;flex:0 0 auto;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line-2);background:#fff;margin:1px 0 0;cursor:pointer;position:relative}
+.check input:checked{background:var(--mint);border-color:var(--mint)}
+.check input:checked::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+.check label:has(input:checked){background:#f1fbf7;border-color:rgba(14,155,116,.45)}
+.check label b{display:block;font-size:12.5px;letter-spacing:-.02em}
+.check label span{display:block;font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:1px}
+.progress{display:flex;align-items:center;gap:9px;margin:12px 0 4px;font-size:11.5px;font-weight:800;color:var(--ink-soft)}
+.progress .bar{flex:1 1 auto;height:8px;border-radius:99px;background:#eadfcc;overflow:hidden}
+.progress .bar i{display:block;height:100%;width:0;background:var(--mint);transition:width .25s}
+.tpl{display:grid;gap:6px;margin-top:12px}
+.tpl div{font-size:12.5px;line-height:1.8;color:var(--ink-soft);border-bottom:1px dashed var(--line);padding:7px 0}
+.tpl b{color:var(--espresso)}
+.tpl .fill{display:inline-block;min-width:90px;border-bottom:1px solid var(--line-2)}
+.deduction{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.deduction li{display:flex;gap:8px;font-size:12px;color:var(--ink-soft);line-height:1.6}
+.deduction li::before{content:"×";flex:0 0 auto;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;
+  background:var(--cherry-soft);color:var(--cherry);font-size:11px;font-weight:800;margin-top:1px}
+
+/* ---------- closing / footer ---------- */
+.closing{margin:26px 0 0;background:linear-gradient(150deg,#fffaf0,#f7ecd8);border:1px solid var(--line);border-radius:18px;padding:18px}
+.closing h2{margin:0 0 6px;font-size:18px;letter-spacing:-.04em}
+.closing p{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.75}
+.closing .sentence{margin-top:12px;display:grid;gap:8px}
+.closing input{width:100%;min-height:46px;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:#fff;font:inherit;font-size:14px}
+.closing .out{margin-top:2px;font-size:13px;line-height:1.8;color:var(--espresso);background:#fff;border:1px dashed var(--line-2);border-radius:10px;padding:10px 12px;min-height:52px}
+footer{margin-top:26px;padding:20px 0 34px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;line-height:1.8}
+footer .frow{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between}
+footer a{color:var(--ink-soft);font-weight:700;text-decoration:none;border-bottom:1px solid var(--line-2)}
+footer .fnote{margin:8px 0 0;max-width:60em}
+
+/* ---------- desktop ---------- */
+@media (min-width:760px){
+  .hero{padding-top:26px}
+  .hero-in{grid-template-columns:1fr auto;align-items:end;gap:26px}
+  .hero-strip{margin-top:24px}
+  .flow-grid{grid-template-columns:1fr 1fr;gap:14px}
+  .calc{grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .pack-grid{grid-template-columns:1.1fr .9fr;gap:14px}
+  .form-grid .db{grid-template-columns:1fr 1fr}
+  .section-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .eye-list{grid-template-columns:1fr 1fr}
+  .eye-item:nth-last-child(2){border-bottom:0}
+  .eye-note{grid-column:1/-1}
+  .steps>li{border-right:0}
 }
-@media(max-width:800px){
- .concepts,.terms{grid-template-columns:1fr}
- .unit-panel{padding:18px}
- .section-head{display:block}
- .section-head p{text-align:left;margin-top:4px}
+@media (min-width:980px){
+  .wrap{padding:0 26px}
+  .eye-list{grid-template-columns:1fr 1fr 1fr}
+  .eye-item:nth-last-child(2){border-bottom:1px dashed var(--line)}
 }
-@media(max-width:600px){
- .intro{display:block;padding:22px 0 14px}
- .intro .characters{width:100%;max-width:420px;margin:16px 0 0}
- .stat-row{gap:7px}
- .stat{padding:10px 11px}
- .stat b{font-size:16.5px}
- .stat span{font-size:10px}
- .unit-head h2{font-size:19px}
- .unit-tabs button{font-size:12px;padding:8px 12px}
- .concept{padding:12px}
- .q{padding:12px}
- .quiz-top{gap:8px}
- .quiz-score{font-size:11.5px}
- .pager .count{font-size:11px}
- footer.lib-footer{padding-left:20px;padding-right:20px}
- .track-switch{grid-template-columns:1fr}
- .track-btn{min-height:0}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
-@media(prefers-reduced-motion:reduce){.quiz-track i{transition:none}}
 </style>
 </head>
 <body>
-<a class="skip" href="#units">단원별 자료로 건너뛰기</a>
-<header class="school-header"><div class="header-inner"><a href="../" aria-label="서울관광고등학교 학생용 웹앱 모음"><img class="signature" src="../accounting-library/assets/school-signature.png" width="979" height="264" alt="서울관광고등학교 Seoul Tourism High School"></a><a class="hub-link" href="../business-finance/">교과교실 ↗</a></div></header>
-<main class="lib-main">
-<nav class="site-path" aria-label="현재 위치"><a href="../">웹앱 모음</a><span aria-hidden="true">›</span><a href="../business-finance/">경영·금융 교과교실</a><span aria-hidden="true">›</span><span aria-current="page">매장판매 자료실</span></nav>
-<section class="intro" aria-labelledby="page-title">
-<div><p class="eyebrow">경영·금융 교과교실 · 매장판매</p><h1 id="page-title">매장판매 <span>자료실</span></h1><p class="intro-text">손님을 맞고, 팔고, 정리하고, 문제를 푸는 일의 순서를 단원별로 정리했습니다. 핵심 개념 → 현장 사례 → 용어 카드 → 자가 점검 순서로 10분이면 한 단원을 훑을 수 있어요.</p></div>
-<img class="characters" src="../accounting-library/assets/school-characters.png" width="2048" height="592" alt="교복과 다양한 전공 직업 복장을 입은 학교 캐릭터들">
-</section>
-<div class="stat-row"><div class="stat"><b>7단원</b><span>매장의 기본부터 불만 관리까지</span></div>
-<div class="stat"><b>35개</b><span>눌러서 보는 용어 카드</span></div>
-<div class="stat"><b>35문항</b><span>O/X·객관식 자가 점검</span></div></div>
-<p class="notice-line"><b>읽는 순서</b> 단원을 고르면 핵심 개념 → 현장 사례 → 용어 카드 → 자가 점검 순서로 이어집니다. 수업에서 다룬 현장실습 사례는 학생용으로 익명 각색했고, 퀴즈 기록은 이 브라우저에만 저장됩니다.</p><section id="units" aria-labelledby="units-title"><div class="section-head"><h2 id="units-title">단원별 자료</h2><p>단원 7개 · 용어 카드 35개 · 자가 점검 35문항</p></div><div class="unit-tabs" role="tablist" aria-label="단원 선택"><button type="button" role="tab" id="tab-ss1" aria-controls="panel-ss1" aria-selected="true" tabindex="0"><span class="n" aria-hidden="true">1</span>매장과 관리자 시각</button><button type="button" role="tab" id="tab-ss2" aria-controls="panel-ss2" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">2</span>입지와 상권</button><button type="button" role="tab" id="tab-ss3" aria-controls="panel-ss3" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">3</span>고객 응대</button><button type="button" role="tab" id="tab-ss4" aria-controls="panel-ss4" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">4</span>진열과 판매 촉진</button><button type="button" role="tab" id="tab-ss5" aria-controls="panel-ss5" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">5</span>포장·배송·재고</button><button type="button" role="tab" id="tab-ss6" aria-controls="panel-ss6" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">6</span>POS 정산·시재</button><button type="button" role="tab" id="tab-ss7" aria-controls="panel-ss7" aria-selected="false" tabindex="-1"><span class="n" aria-hidden="true">7</span>고객 불만 관리</button></div><div class="unit-panel" id="panel-ss1" role="tabpanel" aria-labelledby="tab-ss1" tabindex="0"><div class="unit-head"><span class="unit-no" aria-hidden="true">1</span><h2>매장과 매장관리자의 시각</h2></div><p class="unit-goal"><b>이 단원의 목표</b>매장이 하는 일과 판매원·매장관리자의 역할을 구분하고, 매출과 수익 구조를 숫자로 설명할 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>매장은 유통의 마지막 접점</h3><ul><li>상품이 생산자에서 소비자에게 닿는 마지막 자리</li><li>상담·결제·수령이 한 공간에서 한 번에 이루어짐</li><li>이곳에서의 경험이 브랜드 이미지를 만든다</li></ul></div><div class="concept"><h3>매장의 네 가지 기능</h3><ul><li>상품 제공: 고객이 원하는 구색을 갖춤</li><li>정보 제공: 상품 설명·비교·추천</li><li>서비스 제공: 포장·배송·교환 안내</li><li>체험 제공: 시식·시음·공간 경험</li></ul></div><div class="concept"><h3>판매원과 매장관리자</h3><ul><li>판매원: 응대·결제·진열·재고 확인</li><li>매장관리자: 판매 + 인력·발주·정산·고객 관리</li><li>관리자는 '오늘 많이 팔았나'보다 '남는 구조인가'를 본다</li></ul></div><div class="concept"><h3>같은 장면, 다른 시각</h3><ul><li>고객: 무한리필·넓은 매장·무료 음료가 모두 장점</li><li>관리자: 원재료비·폐기·인건비·임대료가 늘어나는 지점</li><li>좋은 결정은 두 관점을 함께 놓고 내린다</li></ul></div><div class="concept"><h3>성공요인과 위기요인</h3><ul><li>성공요인: 가성비·입소문·접근성·차별화</li><li>위기요인: 높은 원가율·낮은 회전율·경쟁 심화</li><li>요인을 나눠 보면 먼저 고칠 곳이 보인다</li></ul></div><div class="concept"><h3>매출의 구조</h3><ul><li>매출 = 고객 수 × 객단가</li><li>순이익 = 매출 − 원가 − 고정비</li><li>매출이 커도 원가율과 고정비가 높으면 남는 돈이 줄어든다</li></ul><span class="calc">예: 하루 손님 200명 × 객단가 8,000원 = 매출 160만 원</span></div><div class="concept"><h3>관리자가 매일 보는 숫자</h3><ul><li>매출·객단가·고객 수</li><li>원재료 사용량·폐기량·재고</li><li>인건비·임대료 같은 고정비, 회전율</li></ul></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>월 매출 2억 원인 무한리필 식당도 원재료비가 50%를 넘고, 넓은 매장의 임대료와 인건비, 낮은 회전율이 겹치면 남는 돈이 거의 없습니다.</p><p>손님이 많이 오는 것과 돈이 남는 것은 다른 문제입니다. <b>매출 → 원가 → 고정비 → 순이익</b> 순서로 확인하는 습관이 매장관리자의 기본입니다.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>객단가<span class="pm" aria-hidden="true"></span></summary><p>손님 한 명이 한 번 방문에 결제한 평균 금액. 매출 ÷ 고객 수로 구한다.</p></details><details class="term"><summary>원가율<span class="pm" aria-hidden="true"></span></summary><p>매출에서 원재료·상품 매입 등 원가가 차지하는 비율.</p></details><details class="term"><summary>고정비<span class="pm" aria-hidden="true"></span></summary><p>매출이 늘고 줄어도 계속 나가는 비용. 임대료·인건비·관리비·구독료 등.</p></details><details class="term"><summary>회전율<span class="pm" aria-hidden="true"></span></summary><p>일정 시간 동안 테이블이나 좌석이 몇 번 새로 이용되는지를 나타내는 정도.</p></details><details class="term"><summary>순이익<span class="pm" aria-hidden="true"></span></summary><p>매출에서 모든 비용을 빼고 실제로 남는 돈.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss1"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="0"><p class="q-text"><span class="q-tag">객관식</span>매출을 구하는 식으로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>고객 수 × 객단가</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>객단가 ÷ 고객 수</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>원가 − 고정비</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>순이익 + 원가율</span></button></div><p class="q-explain" hidden><b>해설</b> 매출은 손님 수와 한 명당 결제 금액의 곱이다. 둘 중 하나를 올리는 것이 매출을 키우는 방법이다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>매출이 높은 매장은 순이익도 반드시 높다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 원가율과 고정비가 높으면 매출이 커도 남는 돈이 적다. 무한리필 매장 사례가 대표적이다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>월 매출 2억 원, 원가율 50%인 매장의 원가는?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>5,000만 원</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>1억 원</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>1억 5,000만 원</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>2억 원</span></button></div><p class="q-explain" hidden><b>해설</b> 2억 원 × 50% = 1억 원. 여기서 인건비·임대료 같은 고정비를 빼야 순이익이 나온다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>회전율이 낮다는 말의 뜻으로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>손님이 적게 와서 좌석이 비어 있다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>같은 시간 동안 좌석이 적게 재사용된다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>상품을 많이 팔았다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>재고가 빨리 돈다</span></button></div><p class="q-explain" hidden><b>해설</b> 회전율은 좌석·테이블이 얼마나 자주 새 손님에게 넘어가는지를 뜻한다. 낮으면 같은 매출을 올리기 어렵다.</p></li><li class="q" data-answer="3"><p class="q-text"><span class="q-tag">객관식</span>매장관리자가 매일 확인할 항목으로 가장 거리가 먼 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>매출과 객단가</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>폐기량과 재고</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>인건비와 회전율</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>경쟁사 주가</span></button></div><p class="q-explain" hidden><b>해설</b> 매일의 판단은 내 매장 숫자에서 나온다. 매출·원가·재고·인건비·회전율이 기본 점검 항목이다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">1 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div><div class="unit-panel" id="panel-ss2" role="tabpanel" aria-labelledby="tab-ss2" tabindex="0" hidden><div class="unit-head"><span class="unit-no" aria-hidden="true">2</span><h2>매장 입지와 상권</h2></div><p class="unit-goal"><b>이 단원의 목표</b>고객의 구매 목적과 동선에 따라 매장 위치와 층수가 달라지는 이유를 설명할 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>입지는 구매 목적에서 출발</h3><ul><li>누가, 무엇을 사러, 어떤 동선으로 오는가</li><li>목적 구매: 찾아가는 손님 (다이소, 설빙)</li><li>충동 구매: 지나가다 들어오는 손님 (올리브영, 베이커리)</li></ul></div><div class="concept"><h3>층수와 공간의 선택</h3><ul><li>1층: 유동 인구·시인성·횡단보도 앞 대기 수요</li><li>2층: 같은 임대료로 넓은 면적, 대형 간판, 오래 머무는 업종</li><li>임대료와 면적, 업종의 체류 시간을 함께 계산</li></ul></div><div class="concept"><h3>기생 전략과 집적 이익</h3><ul><li>경쟁 브랜드 옆에 들어가 그 손님 흐름을 나눠 받는 전략</li><li>유사 업종이 모이면 상권 전체의 유동 인구가 늘어남</li><li>싸움의 대상이 아니라 상권을 함께 키우는 관계</li></ul></div><div class="concept"><h3>1층과 2층, 무엇을 얻고 무엇을 내주나</h3><ul><li>1층: 시인성·접근성·충동 구매 / 대신 높은 임대료</li><li>2층: 넓은 면적·낮은 임대료·큰 간판 / 대신 찾아오는 수요</li><li>스타벅스는 머무는 카페, 메가커피는 테이크아웃 — 같은 커피도 자리가 다르다</li></ul></div><div class="concept"><h3>브랜드 페르소나</h3><ul><li>우리 매장이 상정하는 이상적인 고객상</li><li>라이프스타일과 구매 상황을 정하면 입지·가격·메뉴가 정해짐</li><li>예: 이동 중 빠르게 식사하는 직장인 → 역세권·사거리</li></ul></div><div class="concept"><h3>우리 주변 입지 분석 (실습)</h3><ul><li>시간대별 유동 인구와 동선</li><li>경쟁 매장·대체 상품, 주차·대중교통 접근성</li><li>임대료 대비 예상 매출, 눈에 띄는 정도(시인성)</li></ul></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>같은 상권에서도 자리가 다릅니다. 화장품 매장은 지나가다 보이는 <b>1층 횡단보도 앞</b>, 빙수 매장은 검색해 찾아가는 목적 구매라 <b>2층의 넓은 자리</b>, 패스트푸드는 이동 중 결제가 빠른 <b>사거리·역세권</b>에 자리 잡습니다.</p><p>브랜드 이름을 외우는 것이 아니라 <b>왜 그 자리여야 했는지</b>를 설명할 수 있어야 합니다.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>상권<span class="pm" aria-hidden="true"></span></summary><p>매장이 손님을 끌어오는 일정한 지역 범위. 배후 인구와 동선으로 파악한다.</p></details><details class="term"><summary>유동 인구<span class="pm" aria-hidden="true"></span></summary><p>특정 시간에 그 지역을 지나가는 사람의 수.</p></details><details class="term"><summary>목적 구매<span class="pm" aria-hidden="true"></span></summary><p>사려는 것을 정하고 매장을 찾아가는 구매.</p></details><details class="term"><summary>충동 구매<span class="pm" aria-hidden="true"></span></summary><p>지나가다 진열과 분위기에 이끌려 하게 되는 구매.</p></details><details class="term"><summary>기생 전략<span class="pm" aria-hidden="true"></span></summary><p>경쟁 브랜드나 인기 매장 옆에 입점해 그 손님 흐름을 함께 받는 전략.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss2"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>화장품 매장이 1층 횡단보도 앞을 선호하는 이유로 가장 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>임대료가 싸서</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>신호를 기다리는 사람의 시선과 동선을 잡을 수 있어서</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>주차가 편해서</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>층고가 높아서</span></button></div><p class="q-explain" hidden><b>해설</b> 지나가다 보면 들어오는 충동 구매 업종은 시인성과 유동 인구가 중요하다. 신호 대기 시간이 그 자리를 만든다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>빙수 전문점은 반드시 1층에 있어야 매출이 오른다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 빙수는 검색 후 찾아가는 목적 구매 성향이 강해 2층도 괜찮다. 같은 임대료로 넓은 면적과 간판을 얻을 수 있다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>집적 이익에 대한 설명으로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>경쟁 매장이 많으면 무조건 손해다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>비슷한 업종이 모이면 상권 전체의 유동 인구가 늘어난다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>임대료가 자동으로 내려간다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>본사가 지원금을 준다</span></button></div><p class="q-explain" hidden><b>해설</b> 같은 업종이 모이면 소비자는 비교하러 그 지역을 찾는다. 상권 전체가 커지는 효과가 있다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>브랜드 페르소나를 정하는 것이 입지에 도움이 되는 이유는?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>광고비를 아낄 수 있어서</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>고객의 구매 상황과 동선이 정해져 입지 기준이 생기기 때문</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>직원을 덜 뽑아도 되기 때문</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>메뉴를 줄일 수 있기 때문</span></button></div><p class="q-explain" hidden><b>해설</b> 누가·왜·언제 오는지가 정해지면 어디에 있어야 하는지가 따라온다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>입지를 정할 때는 임대료만 가장 싼 곳을 고르면 된다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 임대료, 예상 매출, 동선, 경쟁, 시인성을 함께 본다. 싼 자리가 손님이 없는 자리일 수 있다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">2 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div><div class="unit-panel" id="panel-ss3" role="tabpanel" aria-labelledby="tab-ss3" tabindex="0" hidden><div class="unit-head"><span class="unit-no" aria-hidden="true">3</span><h2>고객 응대와 접객</h2></div><p class="unit-goal"><b>이 단원의 목표</b>접객의 흐름에 따라 필요를 파악하고, 상황에 맞는 말과 행동을 고를 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>접객의 다섯 단계</h3><ul><li>맞이: 눈맞춤과 인사</li><li>탐색: 질문으로 필요 파악</li><li>제안: 추천과 옵션 확인</li><li>마무리: 감사 인사와 안내</li><li>사후: 불만 예방과 다음 방문</li></ul></div><div class="concept"><h3>첫 10초가 만드는 인상</h3><ul><li>표정·자세·목소리 톤이 먼저 전달된다</li><li>같은 인사도 눈을 맞추면 다르게 들린다</li><li>바쁠수록 짧고 분명하게</li></ul></div><div class="concept"><h3>질문은 열린 것 → 닫힌 것</h3><ul><li>열린 질문: 어떤 맛을 좋아하세요?</li><li>닫힌 질문: 라지로 드릴까요?</li><li>먼저 넓게 묻고, 마지막에 좁혀 확인</li></ul></div><div class="concept"><h3>고객 유형별 응대</h3><ul><li>목적형: 빠른 계산과 짧은 안내</li><li>탐색형: 비교와 추천, 설명</li><li>가족·단체: 좌석과 주문 나누기</li><li>외국인·고령 고객: 천천히, 큰 글씨, 손가락 안내</li></ul></div><div class="concept"><h3>말투 바꾸기</h3><ul><li>모르겠는데요 → 확인해서 알려드릴게요</li><li>안 됩니다 → 이렇게는 가능합니다</li><li>부정어보다 대안을 먼저</li></ul></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>주문이 몰려 “잠시만요”만 반복하면 손님은 얼마나 기다려야 하는지 모릅니다. <b>“앞에 세 팀, 약 10분 걸립니다”</b>처럼 숫자로 안내하면 기다리는 동안의 불만이 크게 줄어요.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>접객<span class="pm" aria-hidden="true"></span></summary><p>손님을 맞아 인사하고 응대하는 일 전체.</p></details><details class="term"><summary>니즈<span class="pm" aria-hidden="true"></span></summary><p>손님이 말로 표현한 요구 뒤에 있는 실제 필요.</p></details><details class="term"><summary>업셀링<span class="pm" aria-hidden="true"></span></summary><p>같은 상품의 더 큰 사이즈나 상위 상품을 제안하는 것.</p></details><details class="term"><summary>크로스셀링<span class="pm" aria-hidden="true"></span></summary><p>함께 쓰면 좋은 다른 상품을 제안하는 것.</p></details><details class="term"><summary>서비스 리커버리<span class="pm" aria-hidden="true"></span></summary><p>실수나 불편을 만회해 손님의 신뢰를 되찾는 응대.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss3"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>접객의 순서로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>맞이 → 제안 → 탐색 → 마무리</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>맞이 → 탐색 → 제안 → 마무리</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>탐색 → 맞이 → 마무리 → 제안</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>제안 → 맞이 → 탐색 → 마무리</span></button></div><p class="q-explain" hidden><b>해설</b> 먼저 맞이하고, 질문으로 필요를 파악한 뒤 제안하고, 마무리 인사로 끝낸다.</p></li><li class="q" data-answer="2"><p class="q-text"><span class="q-tag">객관식</span>손님의 필요를 파악하기에 가장 알맞은 질문은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>라지로 드릴까요?</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>카드로 하시겠어요?</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>어떤 맛을 좋아하세요?</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>영수증 필요하세요?</span></button></div><p class="q-explain" hidden><b>해설</b> 열린 질문으로 취향과 목적을 먼저 듣고, 마지막에 사이즈·결제 같은 닫힌 질문으로 확인한다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>“안 됩니다”라고 분명히 말하는 것이 가장 좋은 응대다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 할 수 없는 일을 분명히 하되, 가능한 대안을 함께 제시해야 손님이 다음 행동을 정할 수 있다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>외국인 손님 응대로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>빠르게 말해 빨리 끝낸다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>천천히 또박또박 말하고 메뉴판을 가리켜 확인한다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>영어를 모르면 응대하지 않는다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>직원끼리 대화를 이어간다</span></button></div><p class="q-explain" hidden><b>해설</b> 속도보다 확인이 중요하다. 숫자, 메뉴판, 손가락 안내가 오해를 줄인다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>업셀링의 예로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>커피를 주문한 손님께 케이크를 권한다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>라지 사이즈를 권한다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>계산을 빠르게 한다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>영수증을 챙겨 드린다</span></button></div><p class="q-explain" hidden><b>해설</b> 같은 상품의 더 큰 사이즈·상위 옵션이 업셀링, 다른 상품을 더하는 것은 크로스셀링이다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">3 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div><div class="unit-panel" id="panel-ss4" role="tabpanel" aria-labelledby="tab-ss4" tabindex="0" hidden><div class="unit-head"><span class="unit-no" aria-hidden="true">4</span><h2>상품 진열과 판매 촉진</h2></div><p class="unit-goal"><b>이 단원의 목표</b>진열의 목적과 유형을 알고, 매장 상황에 맞는 판매 촉진 수단을 고를 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>진열의 세 가지 목적</h3><ul><li>찾기 쉽게</li><li>사고 싶게</li><li>관리하기 쉽게</li></ul></div><div class="concept"><h3>골든존</h3><ul><li>눈높이(약 120~160cm) 구역</li><li>주력 상품·마진이 높은 상품을 둔다</li><li>어린이와 어른의 눈높이가 다름을 고려</li></ul></div><div class="concept"><h3>진열 유형</h3><ul><li>수평 진열: 넓고 안정적, 같은 종류를 옆으로</li><li>수직 진열: 색·종류를 블록으로</li><li>정면 진열: 라벨과 상품명이 보이게</li><li>파워 진열: 대량으로 쌓아 임팩트</li></ul></div><div class="concept"><h3>카페·외식 매장의 연출</h3><ul><li>쇼케이스 위치와 조명</li><li>시즌 메뉴는 POP와 함께</li><li>주문 동선과 대기 동선을 분리</li></ul></div><div class="concept"><h3>판매 촉진 수단</h3><ul><li>POP·사인, 시식·시음</li><li>세트·묶음, 한정·신상품</li><li>포토존과 SNS 인증</li></ul></div><div class="concept"><h3>진열 유지 관리</h3><ul><li>정면 정렬(페이싱), 가격표·먼지 확인</li><li>유통기한 임박 상품은 앞쪽으로</li><li>품절은 숨기지 말고 표시</li></ul></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>신상품을 맨 아래 칸에 두면 손님의 눈에 닿지 않습니다. 반대로 인기 상품을 입구에 대량으로 두면 동선이 막혀 <b>다른 상품을 볼 기회</b>가 줄어요. 진열은 말 없는 판매원입니다.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>VM<span class="pm" aria-hidden="true"></span></summary><p>비주얼 머천다이징. 상품을 보기 좋게 연출해 구매를 돕는 일.</p></details><details class="term"><summary>골든존<span class="pm" aria-hidden="true"></span></summary><p>손님이 가장 보기 편한 눈높이 진열 구역.</p></details><details class="term"><summary>페이싱<span class="pm" aria-hidden="true"></span></summary><p>상품을 앞으로 당겨 정면을 맞추는 정리.</p></details><details class="term"><summary>POP<span class="pm" aria-hidden="true"></span></summary><p>가격·특징·행사를 알리는 매장 광고물.</p></details><details class="term"><summary>플래노그램<span class="pm" aria-hidden="true"></span></summary><p>상품의 위치와 수량을 정해 둔 진열 도면.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss4"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="2"><p class="q-text"><span class="q-tag">객관식</span>골든존은 어디인가?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>바닥에서 30cm</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>허리 높이</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>눈높이(약 120~160cm)</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>천장 가까이</span></button></div><p class="q-explain" hidden><b>해설</b> 손님이 가장 자연스럽게 보는 눈높이 구역에 주력 상품을 둔다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>진열은 상품을 최대한 많이 꽂는 것이 목적이다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 찾기 쉽게, 사고 싶게, 관리하기 쉽게가 목적이다. 많이 꽂는 것은 수단일 뿐이다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>유통기한이 임박한 상품은 어떻게 하는 것이 좋은가?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>뒤쪽으로 돌린다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>앞쪽에 두고 표시·할인한다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>팔릴 때까지 그대로 둔다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>다른 상품과 섞는다</span></button></div><p class="q-explain" hidden><b>해설</b> 선입선출 원칙에 따라 앞쪽에 두고, 임박 사실과 할인을 알려 폐기를 줄인다.</p></li><li class="q" data-answer="3"><p class="q-text"><span class="q-tag">객관식</span>POP의 역할이 아닌 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>가격 안내</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>상품 특징 소개</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>신상품 알림</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>상품 원가 계산</span></button></div><p class="q-explain" hidden><b>해설</b> POP는 손님에게 정보를 주는 매장 광고물이다. 원가 계산은 매장 관리 업무다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>주문 동선과 대기 동선을 분리하는 이유는?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>직원이 쉬기 위해</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>손님이 주문과 대기를 헷갈리지 않게 하려고</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>상품을 더 쌓기 위해</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>조명을 밝히기 위해</span></button></div><p class="q-explain" hidden><b>해설</b> 동선이 엉키면 주문이 밀리고 손님은 기다리는 위치를 몰라 불만이 생긴다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">4 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div><div class="unit-panel" id="panel-ss5" role="tabpanel" aria-labelledby="tab-ss5" tabindex="0" hidden><div class="unit-head"><span class="unit-no" aria-hidden="true">5</span><h2>포장·배송과 재고 관리</h2></div><p class="unit-goal"><b>이 단원의 목표</b>포장과 배송의 기본을 지키고, 재고·유통기한을 관리하는 절차를 설명할 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>포장의 네 가지 목적</h3><ul><li>보호: 흔들림·누수·파손 방지</li><li>위생: 음료·식품의 오염 방지</li><li>정보: 메뉴·주문 내용·주의 사항</li><li>브랜드: 첫인상과 재방문</li></ul></div><div class="concept"><h3>음료 포장의 기본</h3><ul><li>뚜껑 밀폐 확인, 컵홀더로 고정</li><li>아이스·핫 구분, 비닐 밀봉</li><li>배달은 흔들림을 줄이는 순서로 담기</li></ul></div><div class="concept"><h3>배달 주문 처리</h3><ul><li>주문 내용·옵션 다시 확인</li><li>조리 순서와 픽업 시간 맞추기</li><li>누락·누수 없는지 출고 전 확인</li></ul></div><div class="concept"><h3>발주 → 입고 → 검수</h3><ul><li>발주서와 실제 수량·가격·유통기한 대조</li><li>이상이 있으면 그 자리에서 기록·반품 요청</li><li>검수 결과를 재고에 바로 반영</li></ul></div><div class="concept"><h3>재고 관리의 기본</h3><ul><li>선입선출: 먼저 들어온 것을 앞·위쪽에</li><li>유통기한 임박 상품은 표시·할인</li><li>폐기는 기록 후 정해진 방법으로</li><li>POS 재고와 실물 대조, 차이 원인 확인</li></ul></div><div class="concept"><h3>발주 기준</h3><ul><li>안전재고·리드타임·주말·행사·날씨</li><li>유통기한이 짧은 원두·우유·시럽을 우선 확인</li><li>성수기 전에는 발주 마감 시간을 달력에 표시</li></ul></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>배달 음료가 절반쯤 쏟아져 도착했다는 연락을 받았습니다. 원인은 직원 포장인지, 용기·뚜껑인지, 배달 과정인지 아직 모릅니다. <b>책임자를 정하기 전에 주문번호·포장 상태·사진을 확인</b>하고, 같은 일이 반복되면 뚜껑·컵홀더·밀봉 방법을 점검해야 합니다.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>선입선출<span class="pm" aria-hidden="true"></span></summary><p>먼저 들어온 재고를 먼저 판매하는 방식. 유통기한 관리의 기본.</p></details><details class="term"><summary>안전재고<span class="pm" aria-hidden="true"></span></summary><p>수요 변동과 납품 지연에 대비해 남겨 두는 최소 재고.</p></details><details class="term"><summary>리드타임<span class="pm" aria-hidden="true"></span></summary><p>발주한 날부터 상품이 입고될 때까지 걸리는 시간.</p></details><details class="term"><summary>손실률<span class="pm" aria-hidden="true"></span></summary><p>폐기·도난·파손 등으로 잃은 양의 비율.</p></details><details class="term"><summary>재고회전율<span class="pm" aria-hidden="true"></span></summary><p>재고가 팔려 나가는 속도. 높을수록 재고가 빨리 돈다.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss5"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="0"><p class="q-text"><span class="q-tag">객관식</span>유통기한 관리의 기본 원칙은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>선입선출</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>후입선출</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>임의 폐기</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>재고 최대화</span></button></div><p class="q-explain" hidden><b>해설</b> 먼저 들어온 상품을 먼저 내보내야 오래된 상품이 쌓이지 않는다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>유통기한이 지난 상품은 눈에 띄지 않게 버리면 된다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 폐기는 정해진 절차와 기록이 필요하다. 기록이 없으면 손실 원인도 알 수 없다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>배달 음료가 새는 민원이 반복될 때 가장 먼저 점검할 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>배달기사 개인 평가</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>뚜껑 밀폐·컵홀더·밀봉 방법</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>메뉴 가격</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>매장 조명</span></button></div><p class="q-explain" hidden><b>해설</b> 책임을 단정하기 전에 포장 방식부터 확인한다. 반복되면 포장 설비와 방법을 고친다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>안전재고의 뜻으로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>가장 많이 쌓아 두는 재고</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>수요 변동과 납품 지연에 대비한 최소 재고</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>팔리지 않아 남은 재고</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>세일용 재고</span></button></div><p class="q-explain" hidden><b>해설</b> 품절을 막을 만큼만 남겨 두는 재고다. 너무 많으면 폐기와 자금 부담이 커진다.</p></li><li class="q" data-answer="3"><p class="q-text"><span class="q-tag">객관식</span>입고 검수 항목으로 보기 어려운 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>수량</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>가격</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>유통기한</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>고객 만족도</span></button></div><p class="q-explain" hidden><b>해설</b> 검수는 발주서와 실제 상품을 대조하는 일이다. 고객 만족도는 판매 후에 확인한다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">5 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div><div class="unit-panel" id="panel-ss6" role="tabpanel" aria-labelledby="tab-ss6" tabindex="0" hidden><div class="unit-head"><span class="unit-no" aria-hidden="true">6</span><h2>POS 결제·정산·시재 관리</h2></div><p class="unit-goal"><b>이 단원의 목표</b>결제수단별 차이를 구분하고, 마감 정산과 시재 관리를 정확히 할 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>POS의 구성</h3><ul><li>단말기·바코드 스캐너·영수증 프린터·캐셔드로어</li><li>상품·재고·매출·회원 정보를 한 번에 관리</li><li>입력 오류는 매출과 재고에 그대로 남는다</li></ul></div><div class="concept"><h3>결제수단별 차이</h3><ul><li>현금: 즉시, 거스름돈 확인</li><li>카드: 승인 후 전표 보관, 정산은 보통 익일</li><li>간편결제: QR·NFC, 취소는 앱과 POS 양쪽 확인</li><li>상품권·포인트: 잔액 확인</li></ul></div><div class="concept"><h3>결제 전 확인</h3><ul><li>상품·수량·옵션·할인·적립</li><li>결제 후 취소는 시간이 걸리고 손님도 불편</li><li>금액을 소리 내어 한 번 더 확인</li></ul></div><div class="concept"><h3>교환·환불</h3><ul><li>영수증과 정책 확인</li><li>POS에서 취소·반품 처리, 재고 복원</li><li>카드 당일 취소는 승인취소, 이후는 카드 환불</li></ul></div><div class="concept"><h3>마감 정산과 시재</h3><ul><li>영업 전 준비금(시재) 확인</li><li>마감 시 POS 매출과 실제 현금 대조</li><li>차액은 과부족으로 기록하고 원인 확인</li></ul></div><div class="concept"><h3>계산 공식</h3><ul><li>부가세 포함가 ÷ 11 = 부가세</li><li>할인가 = 정가 × (1 − 할인율)</li><li>거스름돈 = 받은 돈 − 결제 금액</li></ul><span class="calc">12,000원 10% 할인 → 10,800원 / 20,000원 받으면 거스름돈 9,200원</span></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>마감했더니 현금이 3,000원 부족합니다. 우유를 시재에서 사고 기록하지 않은 경우가 많아요. <b>시재를 쓰면 반드시 메모</b>하고, 큰 지폐는 수시로 금고에 넣으세요. 돈은 혼자 세지 않고 두 사람이 함께 세는 것이 원칙입니다.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>POS<span class="pm" aria-hidden="true"></span></summary><p>판매 시점 정보 관리 시스템. 결제와 매출·재고를 함께 처리한다.</p></details><details class="term"><summary>시재<span class="pm" aria-hidden="true"></span></summary><p>매장에 준비해 둔 현금. 영업 전 준비금과 영업 중 현금을 포함한다.</p></details><details class="term"><summary>과부족<span class="pm" aria-hidden="true"></span></summary><p>장부상 금액과 실제 현금의 차이.</p></details><details class="term"><summary>승인취소<span class="pm" aria-hidden="true"></span></summary><p>당일 카드 결제를 없애는 처리. 이후에는 카드 환불로 처리한다.</p></details><details class="term"><summary>정산<span class="pm" aria-hidden="true"></span></summary><p>카드사·결제대행사와 매출을 맞추는 일.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss6"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="0"><p class="q-text"><span class="q-tag">객관식</span>부가세 포함 11,000원에서 부가세는?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>1,000원</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>1,100원</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>10,000원</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>2,000원</span></button></div><p class="q-explain" hidden><b>해설</b> 부가세 포함가는 공급가액의 1.1배다. 11,000 ÷ 11 = 1,000원.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>카드 결제를 취소할 때 현금으로 돌려주면 된다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 카드 결제는 당일이면 승인취소, 이후면 카드 환불로 처리해야 장부와 카드사 정산이 맞는다.</p></li><li class="q" data-answer="3"><p class="q-text"><span class="q-tag">객관식</span>시재 과부족의 원인으로 보기 어려운 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>거스름돈 착오</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>현금 결제 입력 누락</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>비품 구입 대금 미기록</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>카드 매출의 익일 입금</span></button></div><p class="q-explain" hidden><b>해설</b> 카드 매출의 입금 시점은 시재와 무관하다. 현금이 실제로 오간 기록을 확인해야 한다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>12,000원 상품을 10% 할인해 20,000원을 받았다. 거스름돈은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>8,000원</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>9,200원</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>9,800원</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>10,000원</span></button></div><p class="q-explain" hidden><b>해설</b> 12,000 × 0.9 = 10,800원. 20,000 − 10,800 = 9,200원.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>마감 정산 순서로 알맞은 것은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>현금 세기 → 매출 마감 → 대조</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>매출 마감 → 현금 세기 → 대조·기록</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>대조 → 매출 마감 → 현금 세기</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>현금 세기 → 대조 → 매출 마감</span></button></div><p class="q-explain" hidden><b>해설</b> POS 매출을 마감한 뒤 실제 현금을 세어 대조하고, 차이가 있으면 기록하고 원인을 찾는다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">6 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div><div class="unit-panel" id="panel-ss7" role="tabpanel" aria-labelledby="tab-ss7" tabindex="0" hidden><div class="unit-head"><span class="unit-no" aria-hidden="true">7</span><h2>고객 불만 관리</h2></div><p class="unit-goal"><b>이 단원의 목표</b>불만을 6단계로 처리하고, 내가 바로 할 수 있는 일과 관리자에게 확인할 일을 구분할 수 있다.</p><h3 class="block-title">핵심 개념</h3><div class="concepts"><div class="concept"><h3>불만은 정보(VOC)</h3><ul><li>한 사람의 불만 뒤에 여러 명의 침묵이 있다</li><li>같은 불만이 반복되면 직원이 아니라 시스템의 문제</li><li>접수 대장과 VOC가 개선의 출발점</li></ul></div><div class="concept"><h3>공통 처리 6단계</h3><ul><li>① 듣기: 불편한 점을 끝까지 듣고 메모</li><li>② 확인: 주문내역·영수증·상품·매뉴얼로 사실 확인</li><li>③ 판단: 매장 과실 / 고객 오해 / 기준 불일치 / 판단 불가</li><li>④ 해결: 내 권한 안에서 처리, 넘으면 관리자에게 연결</li><li>⑤ 안내: 무엇을 어떻게 처리했는지 분명히 설명</li><li>⑥ 기록·개선: 접수 대장 → 재발 방지</li></ul></div><div class="concept"><h3>사실 확인과 사과의 구분</h3><ul><li>사실 확인은 고객에게 이기기 위해서가 아니다</li><li>내가 하지 않은 잘못까지 인정할 필요는 없다</li><li>대신 불편을 겪은 상황에는 유감을 표현한다</li></ul></div><div class="concept"><h3>현장 처리와 관리자 확인</h3><ul><li>현장: 사과·설명, 정해진 범위의 교환·재제조·환불</li><li>관리자: 권한 밖 보상, 특혜 요구, 반복 클레임, 안전 문제</li><li>임의로 약속하지 않고, 확인 후 안내 시점을 알려 준다</li></ul></div><div class="concept"><h3>접수 대장에 남길 것</h3><ul><li>일시·채널·주문 정보</li><li>고객의 요구와 확인한 사실</li><li>처리 내용·안내 결과·담당자</li><li>재발 방지 아이디어</li></ul></div><div class="concept"><h3>실제 현장에서 만나는 6가지 유형</h3><ul><li>메뉴 사진과 실제 상품의 차이</li><li>따뜻한 음료 / 아이스 음료 주문 분쟁</li><li>유명세를 앞세운 특혜 요구(객실 업그레이드 등)</li><li>예약 상품 누락(케이크 등)</li><li>기간이 지난 쿠폰의 예외 요구</li><li>배달 음료 누수·누락</li></ul></div></div><h3 class="block-title">현장에서는</h3><div class="case"><p>카페에서 손님이 “따뜻한 아메리카노를 시켰는데 아이스가 나왔다”고 합니다. 주문 내역에는 아이스로 찍혀 있습니다. 여기서 “고객님이 아이스로 주문하셨어요”라고 답하면 사실이어도 손님은 자신이 틀렸다는 말로 듣습니다.</p><p><b>“주문 내역에는 아이스로 접수되어 있는데, 주문 과정에서 전달이 다르게 된 것 같습니다. 따뜻한 음료를 원하시는 게 맞으실까요? 제가 확인해 보겠습니다.”</b>처럼 사실과 해결을 함께 놓아야 합니다. 재제조 권한이 없다면 “제가 바로 결정할 수 있는 부분이 아니라 매니저에게 확인해 드리겠습니다”로 연결합니다.</p></div><h3 class="block-title">용어 카드 <span class="hint">눌러서 뜻 보기</span></h3><div class="terms"><details class="term"><summary>VOC<span class="pm" aria-hidden="true"></span></summary><p>고객의 소리. 불만·요청·칭찬을 모아 매장 개선에 쓰는 자료.</p></details><details class="term"><summary>접수 대장<span class="pm" aria-hidden="true"></span></summary><p>불만의 일시·내용·처리 결과를 기록하는 장부.</p></details><details class="term"><summary>에스컬레이션<span class="pm" aria-hidden="true"></span></summary><p>내 권한을 넘는 문제를 상급자에게 넘기는 일.</p></details><details class="term"><summary>형평성<span class="pm" aria-hidden="true"></span></summary><p>다른 손님과 같은 기준으로 대우하는 것. 특혜 요구를 판단하는 기준.</p></details><details class="term"><summary>재발 방지<span class="pm" aria-hidden="true"></span></summary><p>원인을 고쳐 같은 문제가 다시 생기지 않게 하는 일.</p></details></div><h3 class="block-title">자가 점검 <span class="hint">보기를 누르면 바로 채점돼요</span></h3><div class="quiz" data-quiz="panel-ss7"><div class="quiz-top"><span class="quiz-score">정답 0 / 5</span><span class="quiz-track" aria-hidden="true"><i></i></span><span class="quiz-best"></span><button type="button" class="btn small" data-reset>다시 풀기</button></div><ol class="q-list"><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>고객 불만 처리 6단계의 첫 단계는?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>보상 약속</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>듣기</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>관리자 호출</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>책임자 찾기</span></button></div><p class="q-explain" hidden><b>해설</b> 먼저 끝까지 듣고 무엇이 불편했는지 파악한다. 누가 잘못했는지 찾는 것부터 시작하지 않는다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">O/X</span>직원이 사실관계에서 맞았다면 그 응대도 잘한 것이다.</p><div class="q-options ox"><button type="button" class="q-opt" data-i="0"><span>O</span></button><button type="button" class="q-opt" data-i="1"><span>X</span></button></div><p class="q-explain" hidden><b>해설</b> 사실을 확인한 것과 손님이 납득하는 응대는 다르다. 맞는 말도 이기는 말투가 되면 불만이 커진다.</p></li><li class="q" data-answer="2"><p class="q-text"><span class="q-tag">객관식</span>현장 직원의 권한을 넘는 요구를 받았을 때 알맞은 행동은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>일단 들어주고 나중에 보고한다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>불가능하다고만 말한다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>확인 후 안내 시점을 알리고 관리자에게 연결한다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>다른 손님에게 물어본다</span></button></div><p class="q-explain" hidden><b>해설</b> 임의로 약속하면 이후 기준이 흔들린다. 가능 여부와 안내 시점을 말하고 관리자에게 넘긴다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>기간이 지난 쿠폰 요구가 반복될 때 근본 해결책은?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>그날 손님만 봐서 처리한다</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>쿠폰 예외 기준을 정하고 직원에게 알린다</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>쿠폰 제도를 없앤다</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>다음에 오면 처리해 준다고 한다</span></button></div><p class="q-explain" hidden><b>해설</b> 직원마다 다르게 처리하면 “기준이 없다”는 불만이 커진다. 예외 기준과 안내를 정해 같은 기준을 적용한다.</p></li><li class="q" data-answer="1"><p class="q-text"><span class="q-tag">객관식</span>고객 불만을 기록하는 가장 중요한 이유는?</p><div class="q-options"><button type="button" class="q-opt" data-i="0"><span class="k" aria-hidden="true">A</span><span>직원 평가를 위해</span></button><button type="button" class="q-opt" data-i="1"><span class="k" aria-hidden="true">B</span><span>재발을 막고 매장을 개선하기 위해</span></button><button type="button" class="q-opt" data-i="2"><span class="k" aria-hidden="true">C</span><span>손님 명단을 만들기 위해</span></button><button type="button" class="q-opt" data-i="3"><span class="k" aria-hidden="true">D</span><span>매출을 늘리기 위해</span></button></div><p class="q-explain" hidden><b>해설</b> 기록이 쌓이면 반복되는 원인이 보이고, 진열·안내·레시피·매뉴얼을 고칠 수 있다.</p></li></ol><p class="quiz-result" hidden></p></div><div class="pager"><button type="button" class="btn small" data-prev>← 이전 단원</button><span class="count">7 / 7</span><button type="button" class="btn small" data-next>다음 단원 →</button></div></div></section>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <div class="topline">
+        <span>서울관광고등학교 · 경영·금융 교과교실</span>
+        <a href="../business-finance/">자료실 전체 →</a>
+      </div>
+      <h1>매장판매<br><em>스테이션</em></h1>
+      <p class="lead">계산대 앞에서 손님은 매장을 한 번 더 평가합니다. 오늘은 그 순간을 미리 연습합니다. 사례로 보고, 물어보고, 판단하고, 한 장의 기록으로 남기는 수업.</p>
+      <div class="hero-meta">
+        <span class="pill">2차시 · 100분</span>
+        <span class="pill">카페경영과 3학년</span>
+        <span class="pill">매장 판매 마무리 → 고객 요구 관리</span>
+      </div>
+    </div>
+    <div class="sign" aria-hidden="true">
+      <div class="sign-body"><b>OPEN</b><span>영업 중 · 응대 준비 완료</span></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="hero-strip">
+      <div class="strip-row">
+        <b>오늘의 판매</b><span class="strip-rule"></span>
+        <span>결제 → 포장 → 배송 의뢰 → 고객 환송</span>
+        <span class="strip-rule"></span>
+        <span>불만 접수 → A/S → VOC</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="navbar" aria-label="구역 이동">
+  <div class="nav-scroll" id="navScroll">
+    <a href="#flow"><i>01</i>오늘의 동선</a>
+    <a href="#eyes"><i>02</i>두 개의 눈</a>
+    <a href="#complaint"><i>03</i>불만 접수</a>
+    <a href="#numbers"><i>04</i>매장 숫자</a>
+    <a href="#location"><i>05</i>입지 판단</a>
+    <a href="#packing"><i>06</i>포장 5분</a>
+    <a href="#delivery"><i>07</i>배송 주문서</a>
+    <a href="#report"><i>08</i>보고서 조건</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- 01 -->
+  <section class="block" id="flow">
+    <div class="sec-head">
+      <span class="sec-no">01</span>
+      <div>
+        <h2>오늘의 동선</h2>
+        <p>수업은 늘 같은 리듬으로 갑니다. 사례를 읽고 → 함께 물어보고 답하고 → 활동지에 쓰고 → 한 문장으로 정리합니다. 판매는 결제에서 끝나지 않고, 불만은 감정이 아니라 정보로 다룹니다.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="rail">
+        <span><b>①</b>사례 읽기</span>
+        <span><b>②</b>문답으로 확인</span>
+        <span><b>③</b>활동지에 쓰기</span>
+        <span><b>④</b>한 문장 정리</span>
+      </div>
+      <div class="flow-grid">
+
+        <article class="track">
+          <div class="track-top">
+            <span class="track-tag">MODULE A</span>
+            <div>
+              <h3>매장 판매 마무리</h3>
+              <p>“판매는 돈을 받고 끝나지 않는다”</p>
+            </div>
+          </div>
+          <ul class="steps">
+            <li>
+              <details>
+                <summary><span class="step-n">1</span><b>결제</b><span class="s">고객은 결제 순간에도 서비스를 평가한다</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>계산이 정확하면 응대도 잘한 걸까?</p>
+                  <p><b>놓치기 쉬운 것</b> 적립·영수증·결제수단을 결제가 끝난 뒤에 묻는 것. 계산은 맞았는데 기분이 상하는 지점이 여기서 생깁니다.</p>
+                  <p><b>활동</b> <span class="chip-mini">CASE 1</span> 카드로 계산은 맞았지만 기분이 상한 장면을 찾아 쓰기</p>
+                </div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary><span class="step-n">2</span><b>포장</b><span class="s">포장은 구매 경험을 완성하는 일</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>예쁘게 싸면 좋은 포장일까?</p>
+                  <p><b>좋은 포장의 조건</b> 상품을 지키는가 · 들고 가기 편한가 · 브랜드가 보이는가 · 시간 안에 끝나는가.</p>
+                  <p><b>활동</b> <span class="chip-mini">실습</span> 책 한 권을 포장지와 리본으로 5분 안에 완성하기</p>
+                </div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary><span class="step-n">3</span><b>배송 의뢰</b><span class="s">무엇을, 어디로, 언제까지</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>배송은 “보내 주세요”로 끝나는 일일까?</p>
+                  <p><b>흐름</b> 배송 희망 확인 → 방법 선택 → 주문서 작성 → 담당자에게 전달 → 수령 여부 확인. 오배송·지연·파손은 대부분 이 다섯 칸 중 하나가 비어서 생깁니다.</p>
+                  <p><b>활동</b> <span class="chip-mini">서식</span> 유리병 음료 배송 주문서 작성하기 (07번 구역)</p>
+                </div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary><span class="step-n">4</span><b>고객 환송</b><span class="s">마지막 인사가 리뷰를 만든다</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>문을 나서는 순간까지가 판매일까?</p>
+                  <p><b>확인할 것</b> 짐이 많은 손님의 동선, 잊은 물건, 다음 방문 안내. 여기서의 한마디가 재방문과 후기로 남습니다.</p>
+                </div>
+              </details>
+            </li>
+          </ul>
+        </article>
+
+        <article class="track">
+          <div class="track-top">
+            <span class="track-tag b">MODULE B</span>
+            <div>
+              <h3>고객 요구 관리</h3>
+              <p>“불만은 감정이 아니라 정보”</p>
+            </div>
+          </div>
+          <ul class="steps">
+            <li>
+              <details>
+                <summary><span class="step-n">1</span><b>불만 접수</b><span class="s">듣기 → 확인 → 판단 → 해결 → 안내 → 기록</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>고객이 틀렸음을 증명하는 것이 응대일까?</p>
+                  <p><b>공식</b> 듣기 → 확인 → 판단 → 해결 → 안내 → 기록·개선. 내가 바로 할 수 있는 일과 관리자 확인이 필요한 일을 나눠서 판단합니다.</p>
+                  <p><b>활동</b> <span class="chip-mini">훈련</span> 사례를 골라 6단계로 응대하고 접수 대장 완성하기 (03번 구역)</p>
+                </div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary><span class="step-n">2</span><b>A/S 요구</b><span class="s">수리·교환·환불의 경계</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>“환불해 주세요”에 바로 “네”라고 답해도 될까?</p>
+                  <p><b>판단 기준</b> 상품 상태, 구매 시점, 사용 흔적, 매장 규정, 내 권한. 사실을 확인한 뒤 안내하고, 권한 밖이면 관리자에게 연결합니다.</p>
+                </div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary><span class="step-n">3</span><b>고객의 소리(VOC)</b><span class="s">한 번의 불만을 매장 개선으로</span></summary>
+                <div class="step-body">
+                  <p class="q"><b>핵심 질문</b>같은 불만이 세 번 반복되면 무엇을 바꿔야 할까?</p>
+                  <p><b>기록의 쓰임</b> 접수 대장에 쌓인 요구를 시간·메뉴·직원·시간대로 묶어 보면, 응대보다 먼저 고칠 것이 보입니다.</p>
+                </div>
+              </details>
+            </li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="block" id="eyes">
+    <div class="sec-head">
+      <span class="sec-no">02</span>
+      <div>
+        <h2>두 개의 눈</h2>
+        <p>같은 장면도 손님과 매장관리자는 다르게 봅니다. 버튼을 눌러 두 시선을 겹쳐 보세요. 좋은 결정은 두 눈을 함께 뜨고 내립니다.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="eyes">
+        <div class="eye-switch" role="group" aria-label="관점 선택">
+          <button type="button" id="eyeCustomer" aria-pressed="true"><span aria-hidden="true">🙋</span>손님의 눈</button>
+          <button type="button" id="eyeManager" aria-pressed="false"><span aria-hidden="true">🧾</span>매장관리자의 눈</button>
+        </div>
+        <div class="eye-list" id="eyeList"></div>
+        <p class="eye-note" id="eyeNote"><b>손님의 눈</b>으로 보고 있습니다. 장점만 보이면 놓치는 비용이 생기고, 비용만 보이면 손님이 떠납니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="block" id="complaint">
+    <div class="sec-head">
+      <span class="sec-no">03</span>
+      <div>
+        <h2>불만 접수 6단계</h2>
+        <p>사례를 하나 고르고, 여섯 번의 판단을 내려 보세요. 마지막에 오늘의 접수 대장 한 장이 완성됩니다. 정답은 하나가 아니지만, 더 나은 순서는 있습니다.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="case-chips" id="caseChips" role="group" aria-label="사례 선택"></div>
+      <p class="scene" id="caseScene"><b>SCENE</b>사례를 선택하세요.</p>
+
+      <div class="steprail" id="stepRail" aria-hidden="true"></div>
+
+      <div class="qbox" id="qbox" hidden>
+        <span class="k" id="stepKey">STEP</span>
+        <h3 id="stepQ">질문</h3>
+        <div class="opts" id="opts"></div>
+        <div class="fb" id="fb" role="status" aria-live="polite"></div>
+        <div class="nextrow">
+          <button type="button" class="btn" id="nextStep" hidden>다음 단계 →</button>
+        </div>
+      </div>
+
+      <div class="ledger" id="ledger" aria-live="polite">
+        <h3>고객 불만 접수 대장</h3>
+        <div class="sub" id="ledgerSub"></div>
+        <dl id="ledgerBody"></dl>
+        <div class="nextrow">
+          <button type="button" class="btn mint" id="againBtn">다른 사례로 다시</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="block" id="numbers">
+    <div class="sec-head">
+      <span class="sec-no">04</span>
+      <div>
+        <h2>매장 숫자 진단</h2>
+        <p>매출이 커도 남는 돈이 적을 수 있습니다. 손님 수·객단가·원가율·고정비를 바꿔 보며 매장의 구조를 확인하세요. (모두 가정한 숫자입니다)</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="calc">
+        <div class="card pad calc-in">
+          <div class="presets" role="group" aria-label="예시 불러오기">
+            <button type="button" data-preset="buffet">무한리필 식당</button>
+            <button type="button" data-preset="cafe">동네 카페</button>
+            <button type="button" data-preset="dessert">디저트 매장</button>
+          </div>
+          <div class="field">
+            <label for="inGuests">하루 손님 수 <span>명</span></label>
+            <div class="unit"><input id="inGuests" type="number" inputmode="numeric" min="0" max="5000" step="10" value="200"><i>명</i></div>
+          </div>
+          <div class="field">
+            <label for="inSpend">객단가 <span>원</span></label>
+            <div class="unit"><input id="inSpend" type="number" inputmode="numeric" min="0" max="200000" step="500" value="8000"><i>원</i></div>
+          </div>
+          <div class="field">
+            <label for="inCost">원가율 <span>%</span></label>
+            <div class="unit"><input id="inCost" type="number" inputmode="numeric" min="0" max="100" step="1" value="50"><i>%</i></div>
+          </div>
+          <div class="field">
+            <label for="inFixed">월 고정비 <span>만원</span></label>
+            <div class="unit"><input id="inFixed" type="number" inputmode="numeric" min="0" max="100000" step="100" value="3000"><i>만원</i></div>
+          </div>
+          <p class="hint">고정비에는 임대료·인건비·관리비처럼 매출과 상관없이 나가는 돈을 넣습니다. 한 달은 30일로 계산합니다.</p>
+        </div>
+        <div class="readout" aria-live="polite">
+          <div class="big"><span>한 달 남는 돈</span><b id="outProfit">0원</b></div>
+          <div class="line"><span>하루 매출</span><b id="outDaily">0원</b></div>
+          <div class="line"><span>월 매출</span><b id="outMonthly">0원</b></div>
+          <div class="line"><span>월 원가</span><b id="outCost">0원</b></div>
+          <div class="line"><span>월 고정비</span><b id="outFixed">0원</b></div>
+          <div class="line"><span>객단가를 1,000원 올리면</span><b id="outLift">0원</b></div>
+          <div class="meter"><div class="bar"><i id="costBar"></i></div><span class="hint" id="costLabel" style="color:#cbbaa4">원가율 50%</span></div>
+          <p class="verdict" id="verdict">숫자를 바꾸면 진단이 여기에 나옵니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="block" id="location">
+    <div class="sec-head">
+      <span class="sec-no">05</span>
+      <div>
+        <h2>입지 판단</h2>
+        <p>올리브영은 1층, 설빙은 2층, 패스트푸드는 사거리. 이유를 알면 새로운 매장의 자리도 고를 수 있습니다. 네 가지 상황에서 입지를 골라 보세요.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="card pad">
+        <p class="loc-sit" id="locSit"><b>상황</b></p>
+        <div class="loc-opts" id="locOpts"></div>
+        <div class="fb" id="locFb" role="status" aria-live="polite"></div>
+        <div class="nextrow"><button type="button" class="btn" id="locNext" hidden>다음 상황 →</button></div>
+        <div class="loc-dots" id="locDots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="block" id="packing">
+    <div class="sec-head">
+      <span class="sec-no">06</span>
+      <div>
+        <h2>포장 5분</h2>
+        <p>손님이 기다리는 시간은 5분입니다. 순서를 몸에 붙여 두면 그 5분이 흔들리지 않습니다. 아래 카드를 순서대로 눌러 포장을 완성해 보세요.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="pack-grid">
+        <div class="card pad">
+          <div class="seq" id="seq" role="group" aria-label="포장 순서 맞추기"></div>
+          <p class="hint" id="seqHint" style="margin:10px 0 0">먼저 해야 할 일부터 누르세요. 틀리면 알려 드립니다.</p>
+        </div>
+        <div class="pack-side">
+          <div class="timer">
+            <div>
+              <div class="lbl">5분 타이머</div>
+              <div class="t" id="timerT">0:00</div>
+            </div>
+            <div class="btns">
+              <button type="button" id="timerStart">시작</button>
+              <button type="button" id="timerReset">초기화</button>
+            </div>
+          </div>
+          <div class="card pad">
+            <p class="hint" style="margin:0 0 8px"><b style="color:var(--ink)">평가에서 보는 네 가지</b></p>
+            <ul class="rubric" style="list-style:none;padding:0;margin:0">
+              <li><span class="tick">1</span><span><b>정확성</b> — 포장지가 상품을 정확히 감싸는가</span></li>
+              <li><span class="tick">2</span><span><b>시간 관리</b> — 5분 안에 리본까지 마무리하는가</span></li>
+              <li><span class="tick">3</span><span><b>완성도</b> — 각·주름·리본 모양이 깔끔한가</span></li>
+              <li><span class="tick">4</span><span><b>실무 태도</b> — 도구를 안전하게 쓰고 자리를 정리하는가</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="block" id="delivery">
+    <div class="sec-head">
+      <span class="sec-no">07</span>
+      <div>
+        <h2>배송 주문서</h2>
+        <p>배송 사고는 대부분 “말하지 않은 것”에서 시작됩니다. 무엇을·어디로·언제까지·어떻게 확인할지를 한 장에 담아 보세요.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="card pad">
+        <div class="form-grid">
+          <div class="field">
+            <label for="dProduct">상품</label>
+            <select id="dProduct">
+              <option value="bottle">더치커피 유리병 3병</option>
+              <option value="cake">레터링 케이크 1개</option>
+              <option value="gift">포장된 선물 세트</option>
+            </select>
+          </div>
+          <div class="db">
+            <div class="field">
+              <label for="dName">받는 사람</label>
+              <input id="dName" type="text" autocomplete="off" placeholder="예: 김하늘">
+            </div>
+            <div class="field">
+              <label for="dPhone">연락처</label>
+              <input id="dPhone" type="tel" inputmode="tel" autocomplete="off" placeholder="010-0000-0000">
+            </div>
+          </div>
+          <div class="field">
+            <label for="dAddr">주소</label>
+            <input id="dAddr" type="text" autocomplete="off" placeholder="예: 서울 서초구 서초대로 00, 3층">
+          </div>
+          <div class="db">
+            <div class="field">
+              <label for="dDate">받는 날</label>
+              <input id="dDate" type="date">
+            </div>
+            <div class="field">
+              <label for="dTime">시간대</label>
+              <select id="dTime">
+                <option>오전 (9~12시)</option>
+                <option>오후 (12~18시)</option>
+                <option>저녁 (18~21시)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="dMethod">배송 방법</label>
+            <select id="dMethod">
+              <option>택배</option>
+              <option>퀵서비스</option>
+              <option>매장 직접 배달</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="dMemo">요청 사항</label>
+            <textarea id="dMemo" placeholder="예: 경비실에 맡겨 주세요 / 계단 있음 / 파손 주의"></textarea>
+          </div>
+        </div>
+        <div class="nextrow">
+          <button type="button" class="btn" id="dMake">주문서 만들기</button>
+          <button type="button" class="btn ghost" id="dClear">비우기</button>
+        </div>
+        <p class="form-note" id="dErr" role="status" style="display:none;margin:10px 0 0;color:var(--cherry);font-weight:700">받는 사람, 연락처, 주소, 받는 날을 확인해 주세요.</p>
+        <p class="form-note" style="margin:10px 0 0">입력한 내용은 이 화면에서만 쓰이고 어디에도 저장되지 않습니다. 실제 배송 정보는 개인정보이므로 수업에서는 예시 값으로 연습하세요.</p>
+        <div class="order" id="order">
+          <div class="order-top"><b>배송 주문서</b><span id="orderNo">NO. 0000</span></div>
+          <dl id="orderBody"></dl>
+          <div class="flags" id="orderFlags"></div>
+          <p class="say" id="orderSay"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="block" id="report">
+    <div class="sec-head">
+      <span class="sec-no">08</span>
+      <div>
+        <h2>보고서 완성 조건</h2>
+        <p>보고서는 “열심히 쓴 글”이 아니라 “판단이 보이는 기록”입니다. 다섯 칸을 채우면 보고서의 뼈대가 완성됩니다.</p>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tabs" role="tablist" aria-label="보고서 종류">
+        <button type="button" role="tab" id="tabVisit" aria-selected="true" aria-controls="panelVisit">매장탐방보고서</button>
+        <button type="button" role="tab" id="tabComplaint" aria-selected="false" aria-controls="panelComplaint">불만 처리 사례 보고서</button>
+      </div>
+
+      <div id="panelVisit" role="tabpanel" aria-labelledby="tabVisit">
+        <div class="card pad">
+          <div class="check" id="checkVisit"></div>
+          <div class="progress"><span id="progVisitText">0 / 5</span><div class="bar"><i id="progVisitBar"></i></div></div>
+          <div class="tpl">
+            <div><b>매장 소개</b> 나는 <span class="fill"></span>에 있는 <span class="fill"></span>을 방문했다. 주 고객은 <span class="fill"></span>이고, 이 매장의 입지는 <span class="fill"></span> 때문이라고 판단했다.</div>
+            <div><b>손님의 눈</b> 매장에 들어서며 가장 먼저 눈에 들어온 것은 <span class="fill"></span>이었다. 기다리는 동안 <span class="fill"></span>라고 느꼈다.</div>
+            <div><b>관리자의 눈</b> 같은 장면을 매장관리자로 보면 <span class="fill"></span>이라는 비용과 <span class="fill"></span>이라는 준비가 필요해 보인다.</div>
+            <div><b>점장이라면</b> 내가 이 매장의 점장이라면 <span class="fill"></span>을 먼저 바꾸겠다. 그 이유는 <span class="fill"></span>이다.</div>
+            <div><b>기대 효과</b> 이 개선은 <span class="fill"></span>을 줄이고 <span class="fill"></span>을 높일 것으로 본다.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="panelComplaint" role="tabpanel" aria-labelledby="tabComplaint" hidden>
+        <div class="card pad">
+          <div class="check" id="checkComplaint"></div>
+          <div class="progress"><span id="progComplaintText">0 / 5</span><div class="bar"><i id="progComplaintBar"></i></div></div>
+          <div class="tpl">
+            <div><b>사례</b> <span class="fill"></span>에서 <span class="fill"></span>한 일이 있었다. (출처·업종·상황)</div>
+            <div><b>고객의 요구</b> 손님이 원한 것은 <span class="fill"></span>이었고, 그 뒤에 있던 진짜 요구는 <span class="fill"></span>이었다.</div>
+            <div><b>원인</b> 이 일이 생긴 이유는 <span class="fill"></span> 때문이다. (사람·절차·시스템 중)</div>
+            <div><b>처리</b> 나는 <span class="fill"></span>라고 말하고, <span class="fill"></span>했다. 내 권한 밖의 일은 <span class="fill"></span>에게 확인했다.</div>
+            <div><b>재발 방지</b> 같은 일이 다시 생기지 않도록 <span class="fill"></span>을 바꾸고, 그 내용을 <span class="fill"></span>에 기록하겠다.</div>
+          </div>
+          <p class="hint" style="margin:14px 0 6px"><b style="color:var(--ink)">감점이 되는 보고서</b></p>
+          <ul class="deduction">
+            <li>어디서나 있을 법한 사례만 골랐다 (출처도 시간도 없다)</li>
+            <li>원인 대신 감정을 썼다 (“너무 화가 났다”)</li>
+            <li>6단계 중 확인·판단을 건너뛰고 바로 해결부터 썼다</li>
+            <li>재발 방지가 “친절하게 하겠다”에서 끝났다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <h2>한 문장 정리</h2>
+    <p>오늘 수업을 한 문장으로 남겨 보세요. 문장은 저장되지 않고, 이 화면에서만 완성됩니다.</p>
+    <div class="sentence">
+      <div class="out" id="sentenceOut">“매장관리자는 단순히 많이 파는 것보다 ______을/를 관리하는 사람이다.”</div>
+      <input id="sentenceIn" type="text" placeholder="빈칸에 들어갈 말 (예: 남는 구조)" aria-label="한 문장 정리에 들어갈 말">
+    </div>
+  </section>
+
 </main>
-<footer class="lib-footer"><span>서울관광고등학교 · 매장판매 자료실</span><span>자습용 자료 · 퀴즈 기록은 이 브라우저에만 저장됩니다</span></footer>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <span>서울관광고등학교 · 경영·금융 교과교실 · 매장판매</span>
+      <a href="../business-finance/">교과교실로 돌아가기 →</a>
+    </div>
+    <p class="fnote">수업 사례는 현장실습에서 있었던 일을 학생용으로 각색한 것입니다. 특정 매장·브랜드를 평가하거나 비방하려는 내용이 아닙니다. 이 페이지는 어떤 개인정보도 서버에 저장하지 않습니다.</p>
+  </div>
+</footer>
+
 <script>
 (function(){
-  var KEY='sths-store-sales-v1';
-  var saved={};
-  try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){saved={};}
-  var store={best:saved.best||{}};
-  function persist(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var won = function(n){ return Math.round(n).toLocaleString('ko-KR') + '원'; };
+  var man = function(n){ return Math.round(n).toLocaleString('ko-KR') + '만 원'; };
 
-  var trackBtns=[].slice.call(document.querySelectorAll('[data-track]'));
-  var trackSections=[].slice.call(document.querySelectorAll('.track'));
-  function showTrack(id){
-    if(!trackSections.length) return;
-    trackSections.forEach(function(s){ s.hidden = s.id !== ('track-'+id); });
-    trackBtns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-track')===id)); });
+  /* ---------- nav highlight ---------- */
+  var navLinks = [].slice.call(document.querySelectorAll('#navScroll a'));
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting) {
+          navLinks.forEach(function(a){ a.removeAttribute('aria-current'); });
+          var i = sections.indexOf(en.target);
+          if (i > -1) navLinks[i].setAttribute('aria-current','true');
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    sections.forEach(function(s){ if (s) io.observe(s); });
   }
-  trackBtns.forEach(function(b){
+
+  /* ---------- 02 two eyes ---------- */
+  var EYES = [
+    {h:'무한리필 · 무료 리필', c:'부담 없이 배불리 먹을 수 있어 좋다.', m:'원재료비와 폐기량이 같이 늘어난다.'},
+    {h:'넓은 매장', c:'답답하지 않고 단체로 와도 편하다.', m:'임대료·관리비·인건비가 함께 커진다.'},
+    {h:'무료 배송', c:'배송비 부담이 없어 더 자주 시킨다.', m:'배송비와 파손·지연 응대가 매장에 남는다.'},
+    {h:'유리병에 담은 음료', c:'모양이 예쁘고 선물하기 좋다.', m:'파손 위험, 포장재, 사고 응대까지 붙는다.'},
+    {h:'늦은 밤까지 영업', c:'퇴근 후에도 들를 수 있어 고맙다.', m:'심야 인건비·전기료에 회전율은 낮다.'}
+  ];
+  var eyeList = $('eyeList'), eyeNote = $('eyeNote');
+  var eyeMode = 'c';
+  function renderEyes(){
+    eyeList.innerHTML = EYES.map(function(it){
+      return '<div class="eye-item"><h3>' + it.h + '</h3><p>' +
+        (eyeMode === 'c' ? it.c : it.m) + '</p></div>';
+    }).join('');
+    eyeNote.innerHTML = eyeMode === 'c'
+      ? '<b>손님의 눈</b>으로 보고 있습니다. 장점만 보이면 놓치는 비용이 생기고, 비용만 보이면 손님이 떠납니다.'
+      : '<b>매장관리자의 눈</b>으로 보고 있습니다. 비용만 보면 손님이 떠나고, 장점만 보면 남는 돈이 사라집니다.';
+  }
+  $('eyeCustomer').addEventListener('click', function(){
+    eyeMode = 'c'; this.setAttribute('aria-pressed','true'); $('eyeManager').setAttribute('aria-pressed','false'); renderEyes();
+  });
+  $('eyeManager').addEventListener('click', function(){
+    eyeMode = 'm'; this.setAttribute('aria-pressed','true'); $('eyeCustomer').setAttribute('aria-pressed','false'); renderEyes();
+  });
+  renderEyes();
+
+  /* ---------- 03 complaint ---------- */
+  var STEPS = ['듣기','확인','판단','해결','안내','기록'];
+  var CASES = [
+    {
+      id:'dalgona', tag:'프랜차이즈 카페 · 홀', label:'달고나 개수',
+      scene:'메뉴 사진보다 달고나가 적다며 손님이 계산대 앞에서 사진을 보여 줍니다. 목소리가 조금 커졌고, 뒤에 줄이 서 있습니다.',
+      ask:'사진과 실제 음료가 다르다며 달고나를 더 달라는 요구',
+      steps:[
+        {q:'손님이 사진을 보여 주며 항의를 시작합니다. 첫마디는?', opts:[
+          {t:'“사진과 실제가 달라 속상하셨겠어요. 어떤 점이 가장 불편하셨어요?”', s:2, fb:'먼저 감정을 받아 주면 손님은 사실을 말하기 시작합니다. 듣기는 해결이 아니라 정보 수집입니다.', led:''},
+          {t:'“저는 매뉴얼대로 만들었는데요.”', s:0, fb:'내가 틀리지 않았다는 말이 먼저 나오면, 손님은 사실 대신 감정으로 싸우게 됩니다.', led:''},
+          {t:'“잠시만요, 사진부터 다시 볼게요.”', s:1, fb:'확인은 좋지만 손님의 말을 받아 주지 않은 채 화면부터 보면 무시당했다고 느낍니다.', led:''}
+        ]},
+        {q:'무엇을 확인해야 할까요?', opts:[
+          {t:'주문 내역과 메뉴 사진을 함께 놓고, 받은 음료도 같이 봅니다.', s:2, fb:'주문·기준·결과를 한자리에서 확인하면 “내 말이 맞다”는 다툼이 “무엇이 다른가”의 확인으로 바뀝니다.', led:''},
+          {t:'“다른 손님들도 그냥 가시는데요.”', s:0, fb:'다른 손님을 근거로 쓰면 이 손님의 문제는 해결되지 않고 자존심 문제가 됩니다.', led:''},
+          {t:'사진만 확인하고 음료는 보지 않습니다.', s:1, fb:'기준만 확인하면 실제로 무엇이 나갔는지를 놓칩니다. 두 가지를 같이 봐야 합니다.', led:''}
+        ]},
+        {q:'사실을 확인했습니다. 무엇을 제안할까요?', opts:[
+          {t:'“달고나는 제가 더 올려 드릴 수 있어요. 2분 정도 걸립니다.”', s:2, fb:'내 권한 안에서 할 수 있는 일과 걸리는 시간을 함께 말하면 손님이 선택할 수 있습니다.', led:''},
+          {t:'“바로 환불해 드릴까요?”', s:1, fb:'환불은 강한 카드입니다. 먼저 작은 해결책을 제시하면 매장 손실도 줄고 손님도 만족합니다.', led:''},
+          {t:'“본사 규정상 안 됩니다.”', s:0, fb:'규정은 이유가 될 수 있지만 대안이 없으면 손님에게는 거절만 남습니다.', led:''}
+        ]},
+        {q:'해결 단계에서 실제로 할 일은?', opts:[
+          {t:'달고나를 더 올리고, 제조 과정을 짧게 설명해 드린다.', s:2, fb:'해결과 설명이 함께 가면 손님은 “다음에도 여기서 사도 되겠다”고 판단합니다.', led:'달고나 추가 제공 + 제조 기준 설명'},
+          {t:'음료를 새로 만들어 통째로 교체한다.', s:1, fb:'친절하지만 원가 손실이 큽니다. 문제가 달고나 개수라면 그만큼만 고치는 것이 정확합니다.', led:'음료 전체 재제조'},
+          {t:'그대로 전달하고 다음 손님을 받는다.', s:0, fb:'해결하지 않은 불만은 리뷰와 재방문 포기로 돌아옵니다.', led:'조치 없이 전달'}
+        ]},
+        {q:'해결한 뒤 어떻게 안내할까요?', opts:[
+          {t:'“더 넣어 드렸어요. 다음에 주문하실 때 말씀 주시면 맞춰 드릴게요.”', s:2, fb:'안내는 결과 + 다음에 달라지는 점까지 말할 때 완성됩니다.', led:'“더 넣어 드렸고, 다음 주문 때 말씀 주시면 맞춰 드립니다”'},
+          {t:'“됐죠?”', s:0, fb:'해결은 했지만 말이 결과를 지웁니다.', led:'“됐죠?”'},
+          {t:'“본사에 건의해 볼게요.”', s:1, fb:'좋은 의도지만 지금 손님의 문제 해결과는 거리가 있습니다.', led:'“본사에 건의하겠습니다”'}
+        ]},
+        {q:'마지막으로 무엇을 남길까요?', opts:[
+          {t:'접수 대장에 시간·주문·차이·조치를 적고, 사진과 실제 음료 차이를 매니저에게 보고한다.', s:2, fb:'기록은 다음 손님을 위한 준비입니다. 반복되는 불만이면 메뉴 사진이나 제조 기준을 고칠 근거가 됩니다.', led:'접수 대장 기록 + 매니저 보고'},
+          {t:'기억해 둔다.', s:0, fb:'기억은 다음 주에 사라집니다. 기록만이 VOC가 됩니다.', led:'구두로만 기억'},
+          {t:'손님에게 사과하고 끝낸다.', s:1, fb:'응대는 끝났지만 매장은 아무것도 배우지 못했습니다.', led:'사과 후 종료'}
+        ]}
+      ]
+    },
+    {
+      id:'icehot', tag:'베이커리 카페 · 홀', label:'아이스/핫 주문',
+      scene:'아이스 아메리카노 두 잔을 주문한 손님이 “따뜻한 걸 시켰다”며 다시 만들어 달라고 합니다. 주문 내역에는 아이스로 찍혀 있고, 손님 목소리가 커지자 매니저가 다가옵니다.',
+      ask:'주문과 다른 음료가 나왔다며 재제조를 요구',
+      steps:[
+        {q:'첫마디는?', opts:[
+          {t:'“불편하셨겠어요. 어떤 음료를 받으셨어요?”', s:2, fb:'사실보다 감정이 먼저 올라온 상황입니다. 받아 주고 나서 확인해야 대화가 됩니다.', led:''},
+          {t:'“주문서에는 아이스로 되어 있는데요.”', s:0, fb:'맞는 말이지만 첫마디로 쓰면 손님은 “내 말은 안 듣는다”고 느낍니다.', led:''},
+          {t:'“제가 잘못 들었을 수도 있으니 확인해 볼게요.”', s:1, fb:'겸손하지만 사실관계를 흐리면 나중에 판단이 어려워집니다.', led:''}
+        ]},
+        {q:'어떻게 확인할까요?', opts:[
+          {t:'주문 내역·영수증·현재 음료 상태를 함께 확인한다.', s:2, fb:'확인은 세 가지를 같이 볼 때 사실이 됩니다.', led:''},
+          {t:'손님 말만 듣고 바로 다시 만든다.', s:1, fb:'빠르지만 반복되면 주문 오류가 누구의 문제인지 알 수 없게 됩니다.', led:''},
+          {t:'내 기억만 믿는다.', s:0, fb:'기억은 증거가 아닙니다. 확인 없이 맞서면 매니저가 개입할 일만 커집니다.', led:''}
+        ]},
+        {q:'내 권한과 사실을 알고 있습니다. 어떻게 판단할까요?', opts:[
+          {t:'“확인해 보니 아이스로 주문되어 있어요. 그래도 불편하셨으니 한 잔은 다시 만들어 드릴게요.”', s:2, fb:'사실을 말하되 손님의 불편을 인정하고, 내 권한 안의 대안을 제시합니다.', led:''},
+          {t:'“제가 맞는데 왜 그러세요?”', s:0, fb:'이기는 대화는 남지만 손님은 잃습니다. 매장 입장에서도 손해입니다.', led:''},
+          {t:'매니저에게 바로 넘긴다.', s:1, fb:'권한 밖이라면 맞지만, 확인 가능한 일까지 넘기면 성장이 없습니다.', led:''}
+        ]},
+        {q:'해결은 어떻게?', opts:[
+          {t:'한 잔만 교체하고, 남은 한 잔과 추가 요청을 확인한다.', s:2, fb:'문제가 된 부분만 고치면 손실을 줄이면서 손님도 만족합니다.', led:'한 잔 교체 + 나머지 확인'},
+          {t:'두 잔 모두 새로 만든다.', s:1, fb:'만족은 크지만 원가 손실이 두 배가 됩니다. 이유 없이 쓰면 다음에도 같은 요구가 옵니다.', led:'두 잔 모두 교체'},
+          {t:'교체를 거부한다.', s:0, fb:'사실이 맞아도 거부만 하면 불만은 리뷰로 옮겨 갑니다.', led:'교체 거부'}
+        ]},
+        {q:'안내 문장은?', opts:[
+          {t:'“따뜻한 음료로 바꿔 드렸습니다. 다음 주문 때 한 번 더 확인하겠습니다.”', s:2, fb:'결과와 다음 행동을 함께 말하면 손님은 매장이 달라졌다고 기억합니다.', led:'“따뜻한 음료로 바꿔 드렸고, 다음 주문 때 확인하겠습니다”'},
+          {t:'“다음부터 잘 확인하세요.”', s:0, fb:'손님에게 숙제를 주는 말입니다. 응대가 아니라 훈계가 됩니다.', led:'“다음부터 잘 확인하세요”'},
+          {t:'아무 말 없이 음료만 건넨다.', s:1, fb:'해결은 했지만 말이 없으면 또 다른 불친절로 기억됩니다.', led:'말없이 전달'}
+        ]},
+        {q:'기록은?', opts:[
+          {t:'접수 대장에 주문 오류·응대 방식을 적고, 주문 확인 멘트 개선안을 제안한다.', s:2, fb:'개인의 실수를 시스템의 개선으로 바꾸는 것이 VOC입니다.', led:'대장 기록 + 주문 확인 멘트 개선 제안'},
+          {t:'매니저에게 구두로만 알린다.', s:1, fb:'빠르지만 쌓이지 않습니다. 같은 일이 반복되면 근거가 없습니다.', led:'구두 보고만'},
+          {t:'그냥 넘어간다.', s:0, fb:'다음에도 같은 장면이 반복됩니다.', led:'기록 없음'}
+        ]}
+      ]
+    },
+    {
+      id:'cake', tag:'베이커리 · 예약 픽업', label:'예약 케이크 누락',
+      scene:'예약 시간에 맞춰 온 손님 앞에 케이크가 없습니다. 예약 장부는 홀 직원이 확인하지 않았고, 냉장고에는 다른 이름의 케이크만 있습니다.',
+      ask:'예약한 케이크가 없으니 지금 받을 수 있게 해 달라는 요구',
+      steps:[
+        {q:'첫마디는?', opts:[
+          {t:'“예약 시간에 오셨는데 없어서 당황하셨겠어요. 예약 내용부터 확인하겠습니다.”', s:2, fb:'사과와 확인을 한 문장에 담으면 손님은 기다릴 이유를 얻습니다.', led:''},
+          {t:'“예약 장부에는 없는데요.”', s:0, fb:'장부만 보면 손님은 사라집니다. 실제 예약 경로(전화·메시지)도 확인해야 합니다.', led:''},
+          {t:'“잠시만 기다려 주세요.”', s:1, fb:'기다리게 하는 것은 확인 중임을 알려야 의미가 있습니다.', led:''}
+        ]},
+        {q:'확인할 것은?', opts:[
+          {t:'전화·문자·온라인 예약 기록과 결제 내역을 모두 확인한다.', s:2, fb:'예약은 여러 경로로 들어옵니다. 한 곳만 보면 “누락”이 아니라 “확인 실패”가 됩니다.', led:''},
+          {t:'장부만 다시 본다.', s:1, fb:'이미 없는 것을 다시 봐도 없습니다.', led:''},
+          {t:'“예약한 적 없으시죠?”라고 묻는다.', s:0, fb:'손님을 의심하는 말은 사실 확인이 아니라 다툼의 시작입니다.', led:''}
+        ]},
+        {q:'확인 결과 예약이 맞습니다. 어떻게 판단할까요?', opts:[
+          {t:'지금 만들 수 있는 대체 케이크와 시간을 안내하고, 원하는 쪽을 고르게 한다.', s:2, fb:'대안을 두 개 이상 주면 손님은 “선택”을 하게 되고, 불만은 협의로 바뀝니다.', led:''},
+          {t:'환불만 안내한다.', s:1, fb:'정확하지만 오늘의 기념일은 사라집니다. 대안이 있으면 먼저 제시합니다.', led:''},
+          {t:'“내일 다시 오세요.”', s:0, fb:'손님의 일정을 매장이 결정하는 말입니다.', led:''}
+        ]},
+        {q:'해결은?', opts:[
+          {t:'대체 케이크를 같은 가격으로 제공하고, 메시지 카드를 무료로 넣어 준다.', s:2, fb:'핵심 요구(오늘 챙긴다)를 지키면서 작은 보상으로 감정을 회복합니다.', led:'대체 케이크 동일 가격 제공 + 메시지 카드'},
+          {t:'다음 방문 때 할인 쿠폰을 준다.', s:1, fb:'오늘 필요한 사람에게 내일의 쿠폰은 크게 와닿지 않습니다.', led:'다음 방문 할인 쿠폰'},
+          {t:'아무것도 제공하지 않는다.', s:0, fb:'매장 실수에 대한 보상이 없으면 신뢰가 사라집니다.', led:'보상 없음'}
+        ]},
+        {q:'안내는?', opts:[
+          {t:'“오늘 챙기실 수 있게 준비했고, 예약 확인은 제가 두 번 확인하겠습니다.”', s:2, fb:'다음에 달라질 점을 말하면 손님은 재방문을 결정할 수 있습니다.', led:'“오늘 챙기실 수 있게 준비했고, 예약 확인을 두 번 하겠습니다”'},
+          {t:'“죄송합니다.”만 말한다.', s:1, fb:'사과만 있고 다음이 없으면 같은 일이 반복될 것이라 느낍니다.', led:'“죄송합니다”만'},
+          {t:'“본사 시스템 문제예요.”', s:0, fb:'책임을 바깥으로 돌리면 매장 신뢰만 떨어집니다.', led:'“시스템 문제”로 안내'}
+        ]},
+        {q:'기록은?', opts:[
+          {t:'예약 대장에 누락 사실과 조치를 적고, 예약 확인 절차(오전·픽업 전)를 제안한다.', s:2, fb:'절차를 바꾸는 기록이 진짜 재발 방지입니다.', led:'예약 대장 기록 + 확인 절차 2회 제안'},
+          {t:'직원에게 “다음부터 잘하자”고 말한다.', s:1, fb:'의지는 좋지만 절차가 없으면 잊힙니다.', led:'구두 주의'},
+          {t:'기록하지 않는다.', s:0, fb:'같은 누락이 반복될 조건이 그대로 남습니다.', led:'기록 없음'}
+        ]}
+      ]
+    },
+    {
+      id:'coupon', tag:'카페 · 계산대', label:'기간 지난 쿠폰',
+      scene:'손님이 지난주에 끝난 쿠폰을 내밀며 “이거 왜 안 되냐”고 묻습니다. 쿠폰에는 기간이 작게 인쇄되어 있고, 손님은 “안내를 못 봤다”고 말합니다.',
+      ask:'기간이 지난 쿠폰을 오늘 사용하게 해 달라는 요구',
+      steps:[
+        {q:'첫마디는?', opts:[
+          {t:'“쿠폰을 챙겨 오셨는데 사용이 안 되면 아쉬우시겠어요. 기간을 같이 확인해 볼게요.”', s:2, fb:'거절이 예정된 대화일수록 감정을 먼저 받아 줘야 설명이 들어갑니다.', led:''},
+          {t:'“기간 지났어요.”', s:0, fb:'사실이지만 말이 짧으면 무례하게 들립니다.', led:''},
+          {t:'“어디서 받으신 쿠폰인가요?”', s:1, fb:'확인은 필요하지만 먼저 손님의 아쉬움을 인정하면 대화가 부드러워집니다.', led:''}
+        ]},
+        {q:'확인할 것은?', opts:[
+          {t:'쿠폰의 기간·사용 조건과 함께, 매장에 안내가 제대로 있었는지 확인한다.', s:2, fb:'손님 잘못만 확인하면 개선할 것이 안 보입니다. 안내 방식도 함께 봅니다.', led:''},
+          {t:'쿠폰 기간만 본다.', s:1, fb:'사실은 확인되지만 매장의 안내 책임은 놓칩니다.', led:''},
+          {t:'“안내를 못 보셨으면 어쩔 수 없죠.”', s:0, fb:'손님 탓으로 끝내면 매장은 아무것도 배우지 못합니다.', led:''}
+        ]},
+        {q:'어떻게 판단할까요?', opts:[
+          {t:'원칙은 기간 준수로 안내하되, 오늘 한 번만 쓸 수 있는 대안(소액 할인·음료 사이즈 업)을 제시한다.', s:2, fb:'원칙과 배려를 동시에 지키는 판단입니다. 다만 “한 번만”이라는 경계를 분명히 합니다.', led:''},
+          {t:'바로 사용 처리한다.', s:0, fb:'한 번의 친절이 다른 손님에게는 불공정이 됩니다. 기준이 무너지면 응대가 매번 달라집니다.', led:''},
+          {t:'정중히 거절만 한다.', s:1, fb:'원칙은 지켰지만 손님의 기분은 남습니다.', led:''}
+        ]},
+        {q:'해결은?', opts:[
+          {t:'오늘만 적용되는 대안을 안내하고, 손님이 선택하면 그대로 처리한다.', s:2, fb:'작은 대안도 손님이 고르면 만족도가 달라집니다.', led:'오늘 1회 대안 제공(소액 할인 또는 사이즈 업)'},
+          {t:'새 쿠폰을 발급한다.', s:1, fb:'다음 방문을 만드는 좋은 방법이지만 재방문 조건을 확인해야 합니다.', led:'새 쿠폰 발급'},
+          {t:'아무 대안 없이 돌려보낸다.', s:0, fb:'원칙은 지켰지만 관계는 끊깁니다.', led:'대안 없음'}
+        ]},
+        {q:'안내는?', opts:[
+          {t:'“기간이 지나면 사용이 어렵지만, 오늘은 이렇게 도와드릴 수 있어요. 다음 쿠폰에는 기간을 크게 표시해 드릴게요.”', s:2, fb:'거절의 이유와 오늘의 예외, 다음의 개선을 한 번에 전달합니다.', led:'“기간이 지나 사용은 어렵지만, 오늘은 이렇게 도와드리고 다음 쿠폰은 기간을 크게 표시하겠습니다”'},
+          {t:'“다음부터 기간 확인하세요.”', s:0, fb:'훈계는 응대가 아닙니다.', led:'“다음부터 확인하세요”'},
+          {t:'“규정이라 어쩔 수 없어요.”', s:1, fb:'설명은 되지만 대안이 없습니다.', led:'“규정상 어렵습니다”'}
+        ]},
+        {q:'기록은?', opts:[
+          {t:'대장에 유형(기간 만료)을 적고, 쿠폰 안내 문구·인쇄 크기 개선을 건의한다.', s:2, fb:'같은 불만이 반복된다면 응대가 아니라 쿠폰 설계를 고쳐야 합니다.', led:'유형 기록 + 쿠폰 안내 문구 개선 건의'},
+          {t:'기록하지 않는다.', s:0, fb:'반복되는 불만을 볼 수 없습니다.', led:'기록 없음'},
+          {t:'손님에게만 다시 설명한다.', s:1, fb:'이 손님은 이해했지만 다음 손님은 같은 자리에서 멈춥니다.', led:'개별 설명만'}
+        ]}
+      ]
+    },
+    {
+      id:'hotel', tag:'호텔 · 프런트', label:'업그레이드 요구',
+      scene:'체크인 중, 유명 인플루언서라고 밝힌 손님이 “내 채널에 소개해 줄 테니 방을 올려 달라”고 요청합니다. 뒤에는 대기하는 손님이 있고, 남은 상위 객실은 한 개입니다.',
+      ask:'홍보를 조건으로 무료 객실 업그레이드를 요구',
+      steps:[
+        {q:'첫마디는?', opts:[
+          {t:'“소개해 주신다니 감사합니다. 가능한 범위를 확인해서 바로 말씀드릴게요.”', s:2, fb:'호의에는 감사를, 요청에는 확인을. 두 가지를 분리하면 협상이 가능해집니다.', led:''},
+          {t:'“그런 요청은 안 됩니다.”', s:0, fb:'즉시 거절은 이유를 말할 기회를 없앱니다.', led:''},
+          {t:'“잠시만요.”라고만 하고 자리를 비운다.', s:1, fb:'확인은 좋지만 무엇을 확인하는지 말해야 손님이 기다립니다.', led:''}
+        ]},
+        {q:'확인할 것은?', opts:[
+          {t:'남은 객실, 오늘 예약 상황, 업그레이드 가능 기준(멤버십·요금·프로모션)을 확인한다.', s:2, fb:'감정이 아니라 재고와 기준을 확인해야 공정한 판단이 됩니다.', led:''},
+          {t:'남은 객실만 확인한다.', s:1, fb:'재고만 보면 기준을 놓쳐 다른 손님과 형평성이 깨집니다.', led:''},
+          {t:'인플루언서의 채널 규모를 확인한다.', s:0, fb:'홍보 효과를 기준으로 삼으면 매장 원칙이 사람에 따라 달라집니다.', led:''}
+        ]},
+        {q:'어떻게 판단할까요?', opts:[
+          {t:'기준 안에서 가능한 대안(상위 객실 할인, 늦은 체크아웃, 조식 제공)을 제시한다.', s:2, fb:'원칙을 지키면서 호의를 표현하는 방법은 여러 가지입니다.', led:''},
+          {t:'무료로 올려 준다.', s:0, fb:'한 사람의 홍보를 위해 기준을 깨면, 그 기준은 다시는 기준이 아니게 됩니다.', led:''},
+          {t:'“규정상 안 됩니다.”로 끝낸다.', s:1, fb:'원칙은 지켰지만 호의를 표현할 기회를 버렸습니다.', led:''}
+        ]},
+        {q:'해결은?', opts:[
+          {t:'가능한 대안을 두 가지로 정리해 손님이 고르게 한다.', s:2, fb:'선택지는 손님에게 존중을, 매장에는 통제를 줍니다.', led:'가능한 대안 2가지 제시(할인·늦은 체크아웃 등)'},
+          {t:'다음 숙박에 쓸 수 있는 바우처를 준다.', s:1, fb:'재방문을 만드는 좋은 방법입니다. 다만 오늘의 요구는 해결되지 않습니다.', led:'다음 숙박 바우처'},
+          {t:'요청을 그대로 들어준다.', s:0, fb:'원칙이 사람에 따라 달라지면 뒤에 서 있는 손님도 같은 요구를 하게 됩니다.', led:'무료 업그레이드 제공'}
+        ]},
+        {q:'안내는?', opts:[
+          {t:'“오늘 가능한 선에서 이렇게 준비했습니다. 홍보는 부담 없이 해 주셔도 되고, 안 하셔도 괜찮습니다.”', s:2, fb:'조건과 호의를 분리하면 손님도 매장도 자유로워집니다.', led:'“오늘 가능한 선에서 준비했고, 홍보는 부담 갖지 않으셔도 됩니다”'},
+          {t:'“다음에 소개해 주시면 또 도와드릴게요.”', s:0, fb:'홍보를 조건처럼 들리게 만들어 손님도 불편해집니다.', led:'“다음에 소개해 주시면 도와드릴게요”'},
+          {t:'아무 설명 없이 대안만 제시한다.', s:1, fb:'대안의 이유를 모르면 손님은 “차별”로 느낄 수 있습니다.', led:'설명 없이 대안 제시'}
+        ]},
+        {q:'기록은?', opts:[
+          {t:'요청 유형과 응대 기준을 기록하고, 프런트 공통 기준으로 공유한다.', s:2, fb:'개인의 판단을 매장의 기준으로 만드는 기록입니다.', led:'요청 유형·응대 기준 기록 + 프런트 공유'},
+          {t:'슈퍼바이저에게 구두로 전한다.', s:1, fb:'알리기는 했지만 기준으로 남지 않습니다.', led:'구두 전달'},
+          {t:'그냥 넘어간다.', s:0, fb:'다음 손님에게 같은 고민이 반복됩니다.', led:'기록 없음'}
+        ]}
+      ]
+    }
+  ];
+
+  var state = {caseIdx:0, step:0, picks:[], answered:false};
+  var chips = $('caseChips'), sceneEl = $('caseScene'), rail = $('stepRail'), qbox = $('qbox');
+  var stepKey = $('stepKey'), stepQ = $('stepQ'), optsEl = $('opts'), fbEl = $('fb'), nextBtn = $('nextStep');
+  var ledger = $('ledger'), ledgerSub = $('ledgerSub'), ledgerBody = $('ledgerBody');
+
+  chips.innerHTML = CASES.map(function(c, i){
+    return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + c.label + '</button>';
+  }).join('');
+
+  function caseNow(){ return CASES[state.caseIdx]; }
+
+  function renderRail(){
+    rail.innerHTML = STEPS.map(function(s, i){
+      var cls = i < state.step ? 'done' : (i === state.step ? 'now' : '');
+      return '<span class="dot ' + cls + '"><i></i><b>' + (i + 1) + ' ' + s + '</b></span>';
+    }).join('');
+  }
+
+  function startCase(i){
+    state.caseIdx = i; state.step = 0; state.picks = []; state.answered = false;
+    [].slice.call(chips.children).forEach(function(b, k){ b.setAttribute('aria-pressed', String(k === i)); });
+    sceneEl.innerHTML = '<b>SCENE · ' + caseNow().tag + '</b>' + caseNow().scene;
+    ledger.classList.remove('show');
+    qbox.hidden = false;
+    renderRail();
+    renderStep();
+  }
+
+  function renderStep(){
+    var c = caseNow(), st = c.steps[state.step];
+    state.answered = false;
+    stepKey.textContent = (state.step + 1) + ' / 6 · ' + STEPS[state.step];
+    stepQ.textContent = st.q;
+    fbEl.className = 'fb';
+    fbEl.innerHTML = '';
+    nextBtn.hidden = true;
+    nextBtn.textContent = state.step === c.steps.length - 1 ? '접수 대장 만들기 →' : '다음 단계 →';
+    optsEl.innerHTML = st.opts.map(function(o, k){
+      return '<button type="button" class="opt" data-k="' + k + '"><span class="num">' + (k + 1) + '</span><span>' + o.t + '</span></button>';
+    }).join('');
+    [].slice.call(optsEl.children).forEach(function(btn){
+      btn.addEventListener('click', function(){ choose(parseInt(btn.getAttribute('data-k'), 10)); });
+    });
+    renderRail();
+  }
+
+  function choose(k){
+    if (state.answered) return;
+    var st = caseNow().steps[state.step];
+    var o = st.opts[k];
+    state.answered = true;
+    state.picks.push({step: STEPS[state.step], title: o.t, s: o.s, led: o.led, fb: o.fb});
+    [].slice.call(optsEl.children).forEach(function(btn, i){
+      btn.disabled = true;
+      var v = st.opts[i];
+      if (i === k) btn.setAttribute('data-state', v.s === 2 ? 'best' : (v.s === 1 ? 'soso' : 'bad'));
+      else if (v.s === 2) btn.setAttribute('data-state', 'best');
+      else if (v.s === 1) btn.setAttribute('data-state', 'soso');
+      else btn.setAttribute('data-state', 'bad');
+      btn.classList.add('mark');
+    });
+    fbEl.className = 'fb show ' + (o.s === 2 ? 'best' : (o.s === 1 ? 'soso' : 'bad'));
+    fbEl.innerHTML = '<b>' + (o.s === 2 ? '좋은 판단' : (o.s === 1 ? '괜찮지만 아쉬움' : '위험한 판단')) + '</b>' + o.fb;
+    nextBtn.hidden = false;
+  }
+
+  function score(){
+    return state.picks.reduce(function(a, p){ return a + p.s; }, 0);
+  }
+
+  nextBtn.addEventListener('click', function(){
+    var c = caseNow();
+    if (state.step < c.steps.length - 1) {
+      state.step += 1;
+      renderStep();
+      qbox.scrollIntoView({block:'nearest', behavior:'smooth'});
+      return;
+    }
+    showLedger();
+  });
+
+  function showLedger(){
+    var c = caseNow();
+    var total = score(), best = state.picks.filter(function(p){ return p.s === 2; }).length;
+    var grade, cls;
+    if (best >= 5) { grade = '매장관리자급 응대'; cls = 'g'; }
+    else if (best >= 3) { grade = '현장실습생급 응대'; cls = 'y'; }
+    else { grade = '다시 연습이 필요한 응대'; cls = 'r'; }
+    var pick = function(name){
+      var p = state.picks.filter(function(x){ return x.step === name; })[0];
+      return p ? p.led || p.title : '—';
+    };
+    var now = new Date();
+    var stamp = now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getDate()).padStart(2,'0') + ' ' +
+                String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    ledgerSub.textContent = 'NO. ' + stamp + ' · ' + c.label;
+    ledgerBody.innerHTML =
+      row('사례', c.tag + ' · ' + c.label) +
+      row('고객 요구', c.ask) +
+      row('해결', pick('해결')) +
+      row('안내', pick('안내')) +
+      row('기록·개선', pick('기록')) +
+      '<div class="row"><dt>응대 평가</dt><dd><span class="badge ' + cls + '">' + grade + '</span> <span class="hint">좋은 판단 ' + best + '/6 · 점수 ' + total + '/12</span></dd></div>';
+    ledger.classList.add('show');
+    qbox.hidden = true;
+    ledger.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }
+  function row(dt, dd){
+    return '<div class="row"><dt>' + dt + '</dt><dd>' + dd + '</dd></div>';
+  }
+
+  $('againBtn').addEventListener('click', function(){
+    state.caseIdx = (state.caseIdx + 1) % CASES.length;
+    startCase(state.caseIdx);
+    qbox.scrollIntoView({block:'nearest', behavior:'smooth'});
+  });
+
+  [].slice.call(chips.children).forEach(function(b){
+    b.addEventListener('click', function(){ startCase(parseInt(b.getAttribute('data-i'), 10)); });
+  });
+  startCase(0);
+
+  /* ---------- 04 numbers ---------- */
+  var PRESETS = {
+    buffet:{g:200, s:8000, c:50, f:9000},
+    cafe:{g:120, s:6500, c:35, f:1500},
+    dessert:{g:80, s:12000, c:30, f:1200}
+  };
+  var inG = $('inGuests'), inS = $('inSpend'), inC = $('inCost'), inF = $('inFixed');
+  function num(el, max){ var v = parseFloat(el.value); if (isNaN(v) || v < 0) v = 0; if (max && v > max) v = max; return v; }
+  function calc(){
+    var g = num(inG, 5000), s = num(inS, 200000), c = num(inC, 100), f = num(inF, 100000);
+    var daily = g * s, monthly = daily * 30;
+    var cost = monthly * c / 100;
+    var fixed = f * 10000;
+    var profit = monthly - cost - fixed;
+    $('outDaily').textContent = won(daily);
+    $('outMonthly').textContent = won(monthly);
+    $('outCost').textContent = won(cost);
+    $('outFixed').textContent = won(fixed);
+    $('outProfit').textContent = won(profit);
+    $('outProfit').className = profit < 0 ? 'neg' : 'pos';
+    $('outLift').textContent = won(g * 1000 * 30 * (1 - c / 100)) + ' 더 남음';
+    $('costBar').style.width = Math.max(0, Math.min(100, c)) + '%';
+    $('costLabel').textContent = '원가율 ' + c + '% · 매출의 ' + Math.round(c) + '%가 재료로 나갑니다';
+    var v = $('verdict');
+    if (profit < 0) {
+      v.innerHTML = '<b>지금 구조로는 한 달에 ' + won(Math.abs(profit)) + '이 모자랍니다.</b><br>손님을 늘리기 전에 원가율이나 고정비를 먼저 확인해 보세요. 객단가를 1,000원 올리면 ' + won(g * 1000 * 30 * (1 - c/100)) + '이 더 남습니다.';
+    } else if (c >= 50) {
+      v.innerHTML = '<b>남는 돈은 있지만 원가율이 ' + c + '%로 높습니다.</b><br>원재료·폐기·할인 중 어디서 새는지 확인해 보세요. 매출이 조금 줄어도 바로 적자로 바뀔 수 있는 구조입니다.';
+    } else if (profit < fixed * 0.2) {
+      v.innerHTML = '<b>고정비가 버거운 구조입니다.</b><br>한 달 남는 돈이 고정비의 20%도 되지 않습니다. 회전율이나 객단가를 함께 올려야 안정됩니다.';
+    } else {
+      v.innerHTML = '<b>구조가 버티고 있습니다.</b><br>원가율 ' + c + '%에서 남는 돈이 ' + won(profit) + '입니다. 여기서 손님을 더 늘릴지, 객단가를 올릴지 비교해 보세요.';
+    }
+  }
+  [inG, inS, inC, inF].forEach(function(el){
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  });
+  [].slice.call(document.querySelectorAll('[data-preset]')).forEach(function(b){
     b.addEventListener('click', function(){
-      showTrack(b.getAttribute('data-track'));
-      var sec=document.getElementById('track-'+b.getAttribute('data-track'));
-      if(sec){
-        var y=sec.getBoundingClientRect().top + window.pageYOffset - 12;
-        if(window.pageYOffset > y - 40) window.scrollTo({top:y,behavior:'smooth'});
-      }
+      var p = PRESETS[b.getAttribute('data-preset')];
+      inG.value = p.g; inS.value = p.s; inC.value = p.c; inF.value = p.f; calc();
     });
   });
+  calc();
 
-  function activate(tab, noScroll){
-    var list=tab.parentNode;
-    var tabs=[].slice.call(list.querySelectorAll('[role="tab"]'));
-    var id=tab.getAttribute('aria-controls');
-    var panel=document.getElementById(id);
-    if(!panel) return;
-    tabs.forEach(function(t){
-      var on=(t===tab);
-      t.setAttribute('aria-selected', String(on));
-      t.tabIndex = on?0:-1;
+  /* ---------- 05 location ---------- */
+  var LOC = [
+    {
+      sit:'친구와 오래 앉아 이야기하는 10대·20대가 주 고객인 디저트 카페. 음료보다 디저트가 중심이고, 좌석과 분위기가 중요하다.',
+      opts:[
+        {t:'1층 횡단보도 앞 소형 매장', ok:false, fb:'시인성은 좋지만 좁은 좌석과 높은 임대료가 발목을 잡습니다. 오래 머무는 손님에게는 불리합니다.'},
+        {t:'2층 넓은 매장', ok:true, fb:'목적 구매에 가깝고 체류 시간이 길어 넓은 좌석이 필요합니다. 같은 임대료로 면적을 확보하는 2층이 맞습니다.'},
+        {t:'외곽 대형 창고형 매장', ok:false, fb:'차로 방문하는 벌크 구매 업종에 맞습니다. 디저트 카페에는 과합니다.'},
+        {t:'골목 안쪽 소형 매장', ok:false, fb:'조용하지만 시인성이 낮아 “지나가다 발견”이 어렵습니다.'}
+      ]
+    },
+    {
+      sit:'등교하는 학생과 출근하는 직장인이 주 고객인 테이크아웃 커피 매장. 빠른 주문과 이동 동선이 중요하다.',
+      opts:[
+        {t:'학교 앞 또는 버스정류장 근처', ok:true, fb:'동선 위에 서 있어야 테이크아웃이 됩니다. 접근성과 속도가 핵심입니다.'},
+        {t:'2층 넓은 매장', ok:false, fb:'앉아서 머무는 카페에는 좋지만, 계단을 오르는 시간이 테이크아웃 수요를 줄입니다.'},
+        {t:'외곽 대형 매장', ok:false, fb:'차량 방문·체류형 업종에 맞습니다.'},
+        {t:'골목 안쪽 매장', ok:false, fb:'조용하지만 지나가는 손님을 잡기 어렵습니다.'}
+      ]
+    },
+    {
+      sit:'필요한 생활용품을 사러 직접 찾아오는 할인 매장. 많은 상품을 진열해야 해 넓은 공간이 필요하다.',
+      opts:[
+        {t:'1층 소형 매장', ok:false, fb:'진열 공간이 부족해 상품 구색을 맞추기 어렵습니다.'},
+        {t:'2층 또는 지하의 넓은 매장', ok:true, fb:'목적 구매 고객은 층을 가리지 않습니다. 낮은 임대료로 넓은 면적을 확보하는 것이 유리합니다.'},
+        {t:'사거리 한가운데 소형 매장', ok:false, fb:'비싼 자리에 좁게 들어가면 이 업종의 강점이 사라집니다.'},
+        {t:'테이크아웃 전용 매장', ok:false, fb:'업종 자체가 맞지 않습니다.'}
+      ]
+    },
+    {
+      sit:'이동 중 빠르게 식사를 해결하려는 손님이 주 고객인 패스트푸드 매장. 주문 속도와 접근성이 중요하다.',
+      opts:[
+        {t:'역세권 또는 사거리', ok:true, fb:'유동 인구와 동선이 만나는 자리입니다. 이동 중 빠른 식사의 조건을 갖춥니다.'},
+        {t:'조용한 주택가 안쪽', ok:false, fb:'유동 인구가 적어 회전율을 만들기 어렵습니다.'},
+        {t:'2층 구석 매장', ok:false, fb:'빠르게 들렀다 나가는 손님에게 계단은 비용입니다.'},
+        {t:'외곽 창고형 매장', ok:false, fb:'벌크 구매 업종의 자리입니다.'}
+      ]
+    }
+  ];
+  var locIdx = 0, locAnswered = false;
+  var locSit = $('locSit'), locOpts = $('locOpts'), locFb = $('locFb'), locNext = $('locNext'), locDots = $('locDots');
+  function renderLoc(){
+    var L = LOC[locIdx];
+    locAnswered = false;
+    locSit.innerHTML = '<b>상황 ' + (locIdx + 1) + '</b>' + L.sit;
+    locFb.className = 'fb';
+    locFb.innerHTML = '';
+    locNext.hidden = true;
+    locNext.textContent = locIdx === LOC.length - 1 ? '처음부터 다시 →' : '다음 상황 →';
+    locOpts.innerHTML = L.opts.map(function(o, i){
+      return '<button type="button" class="opt" data-k="' + i + '"><span class="num">' + (i + 1) + '</span><span>' + o.t + '</span></button>';
+    }).join('');
+    [].slice.call(locOpts.children).forEach(function(b){
+      b.addEventListener('click', function(){
+        if (locAnswered) return;
+        locAnswered = true;
+        var k = parseInt(b.getAttribute('data-k'), 10), o = L.opts[k];
+        [].slice.call(locOpts.children).forEach(function(btn, i){
+          btn.disabled = true;
+          btn.setAttribute('data-state', i === k ? (o.ok ? 'best' : 'bad') : (L.opts[i].ok ? 'best' : 'soso'));
+        });
+        locFb.className = 'fb show ' + (o.ok ? 'best' : 'bad');
+        locFb.innerHTML = '<b>' + (o.ok ? '맞는 판단' : '다시 생각해 보기') + '</b>' + o.fb;
+        locNext.hidden = false;
+      });
     });
-    [].slice.call(panel.parentNode.children).forEach(function(el){
-      if(el.classList && el.classList.contains('unit-panel')) el.hidden = (el!==panel);
+    locDots.innerHTML = LOC.map(function(_, i){
+      var cls = i === locIdx ? 'on' : '';
+      return '<i class="' + cls + '"></i>';
+    }).join('');
+  }
+  locNext.addEventListener('click', function(){
+    locIdx = (locIdx + 1) % LOC.length;
+    renderLoc();
+  });
+  renderLoc();
+
+  /* ---------- 06 packing ---------- */
+  var SEQ = [
+    {id:'cut', t:'포장지를 책 크기에 맞게 자른다'},
+    {id:'place', t:'책을 포장지 가운데에 놓는다'},
+    {id:'fold', t:'양쪽 날개를 접어 각을 세운다'},
+    {id:'tape', t:'테이프로 고정한다'},
+    {id:'ribbon', t:'리본을 묶어 마무리한다'}
+  ];
+  var order = [0,1,2,3,4];
+  // deterministic shuffle so first card is not always the answer
+  order = [2,0,4,1,3];
+  var seqDone = 0;
+  var seqEl = $('seq'), seqHint = $('seqHint');
+  function renderSeq(){
+    seqEl.innerHTML = order.map(function(idx){
+      var s = SEQ[idx];
+      return '<button type="button" data-id="' + s.id + '"><span class="n">' + (idx + 1) + '</span><span>' + s.t + '</span></button>';
+    }).join('');
+    [].slice.call(seqEl.children).forEach(function(b){
+      b.addEventListener('click', function(){ tapSeq(b); });
     });
-    try{ history.replaceState(null,'','#'+id); }catch(e){}
-    if(!noScroll){
-      var y=panel.getBoundingClientRect().top + window.pageYOffset - 12;
-      if(window.pageYOffset > y - 40) window.scrollTo({top:y,behavior:'smooth'});
+  }
+  function tapSeq(btn){
+    var id = btn.getAttribute('data-id');
+    var expected = SEQ[seqDone].id;
+    if (id === expected) {
+      btn.classList.add('done');
+      btn.disabled = true;
+      seqDone++;
+      if (seqDone === SEQ.length) {
+        seqHint.innerHTML = '<b style="color:var(--mint)">포장 완성!</b> 이제 5분 타이머로 실제 속도를 재 보세요. 각을 세우고 리본을 묶는 데 대부분의 시간이 쓰입니다.';
+        timerStart && timerStart.focus();
+      } else {
+        seqHint.textContent = '좋아요. 다음은 ' + SEQ[seqDone].t + '입니다.';
+      }
+    } else {
+      btn.classList.remove('wrong');
+      void btn.offsetWidth;
+      btn.classList.add('wrong');
+      seqHint.innerHTML = '<b style="color:var(--cherry)">순서가 달라요.</b> 지금 필요한 일은 “' + SEQ[seqDone].t + '”입니다.';
+      setTimeout(function(){ btn.classList.remove('wrong'); }, 400);
     }
   }
-  [].slice.call(document.querySelectorAll('[role="tablist"]')).forEach(function(list){
-    var tabs=[].slice.call(list.querySelectorAll('[role="tab"]'));
-    tabs.forEach(function(tab, idx){
-      tab.addEventListener('click', function(){ activate(tab); });
-      tab.addEventListener('keydown', function(e){
-        if(e.key!=='ArrowRight' && e.key!=='ArrowLeft') return;
-        e.preventDefault();
-        var n=(idx + (e.key==='ArrowRight'?1:-1) + tabs.length) % tabs.length;
-        tabs[n].focus();
-        activate(tabs[n], true);
-      });
-    });
-  });
+  renderSeq();
 
-  function pager(panel){
-    var list=panel.parentNode;
-    var tabs=[].slice.call(list.querySelectorAll('[role="tab"]'));
-    var i=tabs.indexOf(panel.__tab);
-    var prev=panel.querySelector('[data-prev]');
-    var next=panel.querySelector('[data-next]');
-    var count=panel.querySelector('.pager .count');
-    if(count) count.textContent=(i+1)+' / '+tabs.length;
-    if(prev){ prev.disabled=(i<=0); prev.addEventListener('click', function(){ activate(tabs[i-1]); }); }
-    if(next){ next.disabled=(i>=tabs.length-1); next.addEventListener('click', function(){ activate(tabs[i+1]); }); }
+  var timerT = $('timerT'), timerStart = $('timerStart'), timerReset = $('timerReset');
+  var tId = null, tStart = 0, tElapsed = 0;
+  function fmt(ms){
+    var s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2,'0');
   }
-  [].slice.call(document.querySelectorAll('.unit-panel')).forEach(function(panel){
-    var tab=document.querySelector('[role="tab"][aria-controls="'+panel.id+'"]');
-    panel.__tab=tab;
-    if(tab) pager(panel);
-  });
-
-  [].slice.call(document.querySelectorAll('.unit-panel')).forEach(function(panel){
-    var quiz=panel.querySelector('.quiz');
-    if(!quiz) return;
-    var key=panel.id;
-    var items=[].slice.call(quiz.querySelectorAll('.q'));
-    var total=items.length;
-    var scoreEl=quiz.querySelector('.quiz-score');
-    var bar=quiz.querySelector('.quiz-track i');
-    var bestEl=quiz.querySelector('.quiz-best');
-    var resultEl=quiz.querySelector('.quiz-result');
-    var resetBtn=quiz.querySelector('[data-reset]');
-    var correct=0, answered=0;
-    function paint(){
-      scoreEl.textContent='정답 '+correct+' / '+total;
-      bar.style.width=(answered?Math.round(answered/total*100):0)+'%';
-      var best=store.best[key];
-      bestEl.textContent=(best!=null)?('내 최고 '+best+' / '+total):'';
-      if(answered===total){
-        var msg;
-        if(correct===total) msg='모두 맞혔습니다. 이 단원은 정리됐어요!';
-        else if(correct>=Math.ceil(total*0.6)) msg=correct+'문항 정답입니다. 틀린 문항의 해설을 한 번 더 읽어 보세요.';
-        else msg=correct+'문항 정답입니다. 해설을 읽고 다시 풀어 보면 좋아요.';
-        resultEl.textContent=msg;
-        resultEl.hidden=false;
-      }else{
-        resultEl.hidden=true;
-      }
-    }
-    items.forEach(function(item){
-      var ans=Number(item.dataset.answer);
-      [].slice.call(item.querySelectorAll('.q-opt')).forEach(function(btn){
-        btn.addEventListener('click', function(){
-          if(item.dataset.done==='1') return;
-          item.dataset.done='1';
-          var pick=Number(btn.dataset.i);
-          [].slice.call(item.querySelectorAll('.q-opt')).forEach(function(b,j){
-            b.disabled=true;
-            if(j===ans) b.classList.add('correct');
-            else if(j===pick) b.classList.add('wrong');
-          });
-          item.querySelector('.q-explain').hidden=false;
-          answered++;
-          if(pick===ans) correct++;
-          if(answered===total){
-            var prev=store.best[key];
-            store.best[key]=Math.max(prev==null?0:prev, correct);
-            persist();
-          }
-          paint();
-        });
-      });
-    });
-    if(resetBtn){
-      resetBtn.addEventListener('click', function(){
-        items.forEach(function(item){
-          delete item.dataset.done;
-          item.querySelector('.q-explain').hidden=true;
-          [].slice.call(item.querySelectorAll('.q-opt')).forEach(function(b){
-            b.disabled=false;
-            b.classList.remove('correct','wrong');
-          });
-        });
-        correct=0; answered=0; paint();
-      });
+  function paint(){
+    var ms = tElapsed + (tId ? (Date.now() - tStart) : 0);
+    timerT.textContent = fmt(ms);
+    timerT.classList.toggle('over', ms > 300000);
+  }
+  timerStart.addEventListener('click', function(){
+    if (tId) {
+      clearInterval(tId); tElapsed += Date.now() - tStart; tId = null; timerStart.textContent = '이어서';
+    } else {
+      tStart = Date.now(); tId = setInterval(paint, 200); timerStart.textContent = '멈춤';
     }
     paint();
   });
+  timerReset.addEventListener('click', function(){
+    if (tId) { clearInterval(tId); tId = null; }
+    tElapsed = 0; timerStart.textContent = '시작'; paint();
+  });
+  paint();
 
-  var h=location.hash.replace('#','');
-  if(h){
-    var target=document.getElementById(h);
-    if(target && target.classList.contains('unit-panel')){
-      var tr=target.closest('.track');
-      if(tr) showTrack(tr.id.replace('track-',''));
-      var tab=document.querySelector('[role="tab"][aria-controls="'+h+'"]');
-      if(tab) activate(tab, true);
-    }
+  /* ---------- 07 delivery ---------- */
+  var dProduct = $('dProduct'), dName = $('dName'), dPhone = $('dPhone'), dAddr = $('dAddr');
+  var dDate = $('dDate'), dTime = $('dTime'), dMethod = $('dMethod'), dMemo = $('dMemo');
+  var orderEl = $('order'), orderBody = $('orderBody'), orderFlags = $('orderFlags'), orderSay = $('orderSay'), orderNo = $('orderNo'), dErr = $('dErr');
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
   }
+  function makeOrder(){
+    var product = dProduct.options[dProduct.selectedIndex].text;
+    var name = dName.value.trim(), phone = dPhone.value.trim(), addr = dAddr.value.trim(), memo = dMemo.value.trim();
+    var date = dDate.value, time = dTime.value, method = dMethod.value;
+    if (!name || !phone || !addr || !date) {
+      dErr.textContent = '받는 사람, 연락처, 주소, 받는 날은 꼭 적어 주세요. 배송 사고는 대부분 이 네 칸이 비어서 생깁니다.';
+      dErr.style.display = 'block';
+      return;
+    }
+    dErr.style.display = 'none';
+    var flags = [];
+    if (dProduct.value === 'bottle') { flags.push(['파손 주의','red'],['냉장 유지',''],['세워서 운반','']); }
+    if (dProduct.value === 'cake') { flags.push(['냉장 유지','red'],['기울임 금지',''],['픽업 시간 확인','']); }
+    if (dProduct.value === 'gift') { flags.push(['리본 변형 주의',''],['충격 주의','']); }
+    if (memo.indexOf('경비실') > -1) flags.push(['경비실 수령','']);
+    orderBody.innerHTML =
+      '<div class="row"><dt>상품</dt><dd>' + esc(product) + '</dd></div>' +
+      '<div class="row"><dt>받는 사람</dt><dd>' + esc(name) + ' · ' + esc(phone) + '</dd></div>' +
+      '<div class="row"><dt>주소</dt><dd>' + esc(addr) + '</dd></div>' +
+      '<div class="row"><dt>일시</dt><dd>' + esc(date) + ' ' + esc(time) + '</dd></div>' +
+      '<div class="row"><dt>방법</dt><dd>' + esc(method) + '</dd></div>' +
+      '<div class="row"><dt>요청</dt><dd>' + (memo ? esc(memo) : '없음') + '</dd></div>';
+    orderFlags.innerHTML = flags.map(function(f){ return '<span class="flag ' + (f[1] || '') + '">' + f[0] + '</span>'; }).join('');
+    orderSay.textContent = '“' + product + '을 ' + date + ' ' + time + '까지 ' + method + '로 보내 드립니다. ' +
+      '받는 분은 ' + name + ' 님이고, 연락처는 ' + phone + '입니다. ' +
+      (memo ? '요청 사항은 ‘' + memo + '’입니다. ' : '') +
+      '파손·지연이 생기면 바로 연락드리겠습니다.”';
+    orderNo.textContent = 'NO. ' + String(Math.floor(Math.random() * 9000) + 1000);
+    orderEl.classList.add('show');
+    orderEl.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  }
+  $('dMake').addEventListener('click', makeOrder);
+  $('dClear').addEventListener('click', function(){
+    [dName, dPhone, dAddr, dMemo].forEach(function(el){ el.value = ''; });
+    dDate.value = '';
+    orderEl.classList.remove('show');
+  });
+
+  /* ---------- 08 report ---------- */
+  var VISIT = [
+    ['방문한 매장·시간·상권', '언제, 어디에, 어떤 상권에서 보았는지가 먼저입니다. 사례의 신뢰도가 여기서 결정됩니다.'],
+    ['손님의 눈으로 본 장면 3개', '기다림, 안내, 계산, 포장처럼 실제로 눈에 보인 장면을 적습니다. 감상이 아니라 관찰입니다.'],
+    ['매장관리자의 눈으로 해석', '같은 장면을 비용·동선·재고·인력의 관점에서 다시 씁니다.'],
+    ['점장이라면 바꿀 것 1가지 + 근거', '여러 개를 나열하기보다 하나를 골라 이유를 붙입니다.'],
+    ['그 개선이 만드는 효과', '재방문, 불만 감소, 회전율처럼 숫자나 행동으로 이어지는 결과를 씁니다.']
+  ];
+  var COMPLAINT = [
+    ['실제 있었던 사례 (출처·업종)', '어디서, 어떤 업종에서, 언제 있었던 일인지 적습니다. 뻔한 사례보다 현장 경험이 좋습니다.'],
+    ['고객 요구와 근본 원인', '손님이 말한 요구와 그 뒤의 진짜 요구를 나눠 씁니다. 원인은 사람·절차·시스템으로 구분합니다.'],
+    ['접수 대장 (시간·채널·요구·조치)', '누가 언제 어떻게 접수했고 무엇을 했는지 한 줄씩 기록합니다.'],
+    ['6단계 처리와 실제 응대 문장', '듣기→확인→판단→해결→안내→기록을 순서대로, 실제로 쓴 말과 함께 적습니다.'],
+    ['재발 방지와 VOC 활용', '같은 불만이 반복되지 않도록 무엇을 바꿀지, 그 기록을 어디에 쓸지 씁니다.']
+  ];
+  function buildChecks(el, list, key){
+    el.innerHTML = list.map(function(it, i){
+      return '<label><input type="checkbox" data-key="' + key + '" data-i="' + i + '"><span><b>' + it[0] + '</b><span>' + it[1] + '</span></span></label>';
+    }).join('');
+    [].slice.call(el.querySelectorAll('input')).forEach(function(cb){
+      cb.addEventListener('change', function(){ updateProgress(key); });
+    });
+  }
+  function updateProgress(key){
+    var inputs = [].slice.call(document.querySelectorAll('input[data-key="' + key + '"]'));
+    var n = inputs.filter(function(i){ return i.checked; }).length;
+    var textEl = key === 'visit' ? $('progVisitText') : $('progComplaintText');
+    var barEl = key === 'visit' ? $('progVisitBar') : $('progComplaintBar');
+    textEl.textContent = n + ' / ' + inputs.length + (n === inputs.length ? ' · 준비 완료' : '');
+    barEl.style.width = (n / inputs.length * 100) + '%';
+  }
+  buildChecks($('checkVisit'), VISIT, 'visit');
+  buildChecks($('checkComplaint'), COMPLAINT, 'complaint');
+  updateProgress('visit'); updateProgress('complaint');
+
+  var tabVisit = $('tabVisit'), tabComplaint = $('tabComplaint');
+  var panelVisit = $('panelVisit'), panelComplaint = $('panelComplaint');
+  function selTab(which){
+    var v = which === 'visit';
+    tabVisit.setAttribute('aria-selected', String(v));
+    tabComplaint.setAttribute('aria-selected', String(!v));
+    panelVisit.hidden = !v;
+    panelComplaint.hidden = v;
+  }
+  tabVisit.addEventListener('click', function(){ selTab('visit'); });
+  tabComplaint.addEventListener('click', function(){ selTab('complaint'); });
+
+  /* ---------- closing sentence ---------- */
+  var sIn = $('sentenceIn'), sOut = $('sentenceOut');
+  sIn.addEventListener('input', function(){
+    var v = sIn.value.trim();
+    if (!v) {
+      sOut.textContent = '“매장관리자는 단순히 많이 파는 것보다 ______을/를 관리하는 사람이다.”';
+    } else {
+      sOut.textContent = '“매장관리자는 단순히 많이 파는 것보다 ' + v + '을/를 관리하는 사람이다.”';
+    }
+  });
 })();
 </script>
 </body>
