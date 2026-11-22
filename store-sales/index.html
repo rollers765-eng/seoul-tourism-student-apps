@@ -76,8 +76,7 @@ a{color:inherit}
 .sign-body span{font-size:9.5px;letter-spacing:.18em;color:#88c9b4}
 .hero-strip{position:relative;z-index:1;margin-top:18px;background:var(--card);color:var(--ink);
   border-radius:14px 14px 0 0;padding:12px 14px 14px;box-shadow:0 -10px 30px -20px #000}
-.hero-strip::before{content:"";display:block;height:8px;margin:-12px -14px 10px;
-  background-image:radial-gradient(circle at 6px 8px,transparent 5px,#fbf5e9 5.5px);background-size:12px 12px;background-position:0 -4px}
+.hero-strip::before{content:"";display:block;height:0;margin:0 0 10px;border-top:1px dashed var(--line-2)}
 .strip-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
 .strip-row b{color:var(--ink);font-weight:700}
 .strip-rule{flex:1 1 40px;min-width:30px;border-bottom:1px dashed var(--line-2);transform:translateY(-3px)}
@@ -127,14 +126,18 @@ section.block{padding:26px 0 8px;scroll-margin-top:64px}
 .steps summary::-webkit-details-marker{display:none}
 .step-n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--paper-2);
   font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--ink-soft)}
-.steps summary b{font-size:13.5px;letter-spacing:-.02em}
-.steps summary span.s{font-size:11.5px;color:var(--muted);margin-left:auto;text-align:right}
+.steps summary b{flex:0 0 auto;min-width:72px;font-size:13.5px;letter-spacing:-.02em}
+.steps summary span.s{flex:1 1 auto;font-size:11.5px;color:var(--muted);text-align:left;margin-left:4px}
+.steps summary .pm{flex:0 0 auto;margin-left:6px;color:var(--mint);font-weight:800;font-size:15px;line-height:1}
+.steps summary .pm::after{content:'+'}
+.steps details[open] summary .pm::after{content:'\2212'}
 .steps details[open] summary{background:#fffaf0}
 .step-body{padding:0 15px 14px 51px;display:grid;gap:8px}
 .step-body p{margin:0;font-size:12.5px;line-height:1.72;color:var(--ink-soft)}
 .step-body p b{color:var(--espresso)}
 .step-body .q{border-left:3px solid var(--amber);background:#fffaf0;padding:8px 11px;border-radius:0 8px 8px 0;font-size:12.5px}
 .step-body .q b{display:block;font-size:10.5px;letter-spacing:.08em;color:#9a6a1f;margin-bottom:2px}
+.track-foot{margin:0;padding:12px 15px;border-top:1px dashed var(--line);background:#faf4e8;font-size:11.5px;line-height:1.7;color:var(--muted)}
 .chip-mini{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--mint);
   background:var(--mint-soft);border-radius:6px;padding:3px 7px;margin-right:4px}
 
@@ -437,7 +440,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
           <ul class="steps">
             <li>
               <details>
-                <summary><span class="step-n">1</span><b>결제</b><span class="s">고객은 결제 순간에도 서비스를 평가한다</span></summary>
+                <summary><span class="step-n">1</span><b>결제</b><span class="s">고객은 결제 순간에도 서비스를 평가한다</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>계산이 정확하면 응대도 잘한 걸까?</p>
                   <p><b>놓치기 쉬운 것</b> 적립·영수증·결제수단을 결제가 끝난 뒤에 묻는 것. 계산은 맞았는데 기분이 상하는 지점이 여기서 생깁니다.</p>
@@ -447,7 +450,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
             </li>
             <li>
               <details>
-                <summary><span class="step-n">2</span><b>포장</b><span class="s">포장은 구매 경험을 완성하는 일</span></summary>
+                <summary><span class="step-n">2</span><b>포장</b><span class="s">포장은 구매 경험을 완성하는 일</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>예쁘게 싸면 좋은 포장일까?</p>
                   <p><b>좋은 포장의 조건</b> 상품을 지키는가 · 들고 가기 편한가 · 브랜드가 보이는가 · 시간 안에 끝나는가.</p>
@@ -457,7 +460,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
             </li>
             <li>
               <details>
-                <summary><span class="step-n">3</span><b>배송 의뢰</b><span class="s">무엇을, 어디로, 언제까지</span></summary>
+                <summary><span class="step-n">3</span><b>배송 의뢰</b><span class="s">무엇을, 어디로, 언제까지</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>배송은 “보내 주세요”로 끝나는 일일까?</p>
                   <p><b>흐름</b> 배송 희망 확인 → 방법 선택 → 주문서 작성 → 담당자에게 전달 → 수령 여부 확인. 오배송·지연·파손은 대부분 이 다섯 칸 중 하나가 비어서 생깁니다.</p>
@@ -467,7 +470,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
             </li>
             <li>
               <details>
-                <summary><span class="step-n">4</span><b>고객 환송</b><span class="s">마지막 인사가 리뷰를 만든다</span></summary>
+                <summary><span class="step-n">4</span><b>고객 환송</b><span class="s">마지막 인사가 리뷰를 만든다</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>문을 나서는 순간까지가 판매일까?</p>
                   <p><b>확인할 것</b> 짐이 많은 손님의 동선, 잊은 물건, 다음 방문 안내. 여기서의 한마디가 재방문과 후기로 남습니다.</p>
@@ -488,7 +491,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
           <ul class="steps">
             <li>
               <details>
-                <summary><span class="step-n">1</span><b>불만 접수</b><span class="s">듣기 → 확인 → 판단 → 해결 → 안내 → 기록</span></summary>
+                <summary><span class="step-n">1</span><b>불만 접수</b><span class="s">듣기 → 확인 → 판단 → 해결 → 안내 → 기록</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>고객이 틀렸음을 증명하는 것이 응대일까?</p>
                   <p><b>공식</b> 듣기 → 확인 → 판단 → 해결 → 안내 → 기록·개선. 내가 바로 할 수 있는 일과 관리자 확인이 필요한 일을 나눠서 판단합니다.</p>
@@ -498,7 +501,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
             </li>
             <li>
               <details>
-                <summary><span class="step-n">2</span><b>A/S 요구</b><span class="s">수리·교환·환불의 경계</span></summary>
+                <summary><span class="step-n">2</span><b>A/S 요구</b><span class="s">수리·교환·환불의 경계</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>“환불해 주세요”에 바로 “네”라고 답해도 될까?</p>
                   <p><b>판단 기준</b> 상품 상태, 구매 시점, 사용 흔적, 매장 규정, 내 권한. 사실을 확인한 뒤 안내하고, 권한 밖이면 관리자에게 연결합니다.</p>
@@ -507,7 +510,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
             </li>
             <li>
               <details>
-                <summary><span class="step-n">3</span><b>고객의 소리(VOC)</b><span class="s">한 번의 불만을 매장 개선으로</span></summary>
+                <summary><span class="step-n">3</span><b>고객의 소리(VOC)</b><span class="s">한 번의 불만을 매장 개선으로</span><span class="pm" aria-hidden="true"></span></summary>
                 <div class="step-body">
                   <p class="q"><b>핵심 질문</b>같은 불만이 세 번 반복되면 무엇을 바꿔야 할까?</p>
                   <p><b>기록의 쓰임</b> 접수 대장에 쌓인 요구를 시간·메뉴·직원·시간대로 묶어 보면, 응대보다 먼저 고칠 것이 보입니다.</p>
@@ -515,6 +518,7 @@ footer .fnote{margin:8px 0 0;max-width:60em}
               </details>
             </li>
           </ul>
+          <p class="track-foot">접수 → A/S → VOC는 따로 떨어진 일이 아니라 한 줄기입니다. 오늘의 접수 한 장이 내일의 매뉴얼을 바꿉니다.</p>
         </article>
 
       </div>
