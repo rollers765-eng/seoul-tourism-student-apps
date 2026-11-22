@@ -851,18 +851,23 @@ footer .fnote{margin:8px 0 0;max-width:60em}
   /* ---------- nav highlight ---------- */
   var navLinks = [].slice.call(document.querySelectorAll('#navScroll a'));
   var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if (en.isIntersecting) {
-          navLinks.forEach(function(a){ a.removeAttribute('aria-current'); });
-          var i = sections.indexOf(en.target);
-          if (i > -1) navLinks[i].setAttribute('aria-current','true');
-        }
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    sections.forEach(function(s){ if (s) io.observe(s); });
+  function syncNav(){
+    var y = window.scrollY + 150, idx = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i] && sections[i].offsetTop <= y) idx = i;
+    }
+    navLinks.forEach(function(a, k){
+      if (k === idx) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
   }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function(){ syncNav(); ticking = false; });
+  }, { passive: true });
+  syncNav();
 
   /* ---------- 02 two eyes ---------- */
   var EYES = [
