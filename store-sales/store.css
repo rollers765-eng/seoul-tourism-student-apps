@@ -656,3 +656,11 @@ body{overflow-wrap:anywhere}
 .callout.mint b,.callout.warn b,.callout.indigo b{color:inherit}
 .goalbox > b{display:block}
 .goalbox li b{font-size:inherit;letter-spacing:0;color:var(--espresso)}
+
+/* 모바일 표 가독성 */
+.tbl th,.tbl td,.assess th,.assess td{word-break:keep-all;overflow-wrap:break-word}
+@media (max-width:759px){
+  .phbar i{display:none}
+  .phbar{gap:3px 10px;padding:10px 12px}
+  .tbl{min-width:470px}
+}
