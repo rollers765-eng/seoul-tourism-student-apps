@@ -1,0 +1,3288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>카페 사장님의 자산 장부 | 투자자산과 유형자산 취득</title>
+  <style>
+    /* ==========================================================================
+       1. CSS 변수 및 디자인 토큰 (따뜻한 카페 & 라이프스타일 매거진 테마)
+       ========================================================================== */
+    :root {
+      --bg-cream: #FAF6F0;
+      --bg-paper: #FFFFFF;
+      --bg-soft: #F3ECE1;
+      --bg-card-hover: #FFFDF9;
+
+      --text-main: #2C221E;
+      --text-sub: #5E4E46;
+      --text-muted: #8C7A70;
+
+      /* 파트별 포인트 컬러 */
+      --accent-cafe: #8B5A2B;
+      --accent-invest: #1E6B52;       /* 투자자산: 딥그린 */
+      --accent-invest-bg: #EBF5F1;
+      --accent-invest-border: #A8D5C5;
+
+      --accent-tangible: #C85A17;     /* 유형자산: 웜 오렌지/테라코타 */
+      --accent-tangible-bg: #FDF1E8;
+      --accent-tangible-border: #F2C3A4;
+
+      /* 차변 / 대변 통일 색상 (색상 + 텍스트 라벨 병행 표기) */
+      --debit-color: #1D4ED8;
+      --debit-bg: #EFF6FF;
+      --debit-border: #BFDBFE;
+
+      --credit-color: #B91C1C;
+      --credit-bg: #FEF2F2;
+      --credit-border: #FECACA;
+
+      /* 상태 색상 */
+      --success-color: #15803D;
+      --success-bg: #F0FDF4;
+      --warn-color: #B45309;
+      --warn-bg: #FFFBEB;
+
+      --border-light: #E6DDD0;
+      --shadow-sm: 0 2px 8px rgba(44, 34, 30, 0.06);
+      --shadow-md: 0 8px 24px rgba(44, 34, 30, 0.09);
+      --shadow-lg: 0 14px 36px rgba(44, 34, 30, 0.12);
+
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+
+      --header-h: 64px;
+      --footer-h: 72px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    }
+
+    /* ==========================================================================
+       2. 기본 리셋 및 접근성
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+      font-size: 16px;
+      overflow: hidden; /* 슬라이드 컨테이너 내부 스크롤 사용 */
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+      touch-action: manipulation;
+    }
+
+    button:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--accent-cafe);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ==========================================================================
+       3. 상단 내비게이션 & 진행률 바
+       ========================================================================== */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      gap: 10px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-soft);
+      color: var(--accent-cafe);
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      border: 1px solid var(--border-light);
+    }
+
+    .part-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .part-nav::-webkit-scrollbar { display: none; }
+
+    .part-tab {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+    }
+    .part-tab:hover { background: var(--bg-soft); }
+    .part-tab.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+    }
+    .part-tab[data-part="invest"].active { background: var(--accent-invest); }
+    .part-tab[data-part="tangible"].active { background: var(--accent-tangible); }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .mode-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 1.5px solid var(--border-light);
+      background: var(--bg-paper);
+      color: var(--text-main);
+      min-height: 36px;
+    }
+    .mode-toggle-btn[data-mode="self"] {
+      border-color: var(--accent-invest);
+      background: var(--accent-invest-bg);
+      color: var(--accent-invest);
+    }
+
+    .toc-open-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: var(--bg-soft);
+      font-weight: 700;
+      font-size: 0.85rem;
+      min-height: 36px;
+      border: 1px solid var(--border-light);
+    }
+
+    .progress-track {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--border-light);
+      z-index: 99;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 4.16%;
+      background: linear-gradient(90deg, var(--accent-invest), var(--accent-tangible));
+      transition: width 0.3s ease;
+    }
+
+    /* ==========================================================================
+       4. 슬라이드 뷰포트 & 레이아웃
+       ========================================================================== */
+    .slides-viewport {
+      position: fixed;
+      top: calc(var(--header-h) + 4px);
+      bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px 16px 36px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .slide {
+      display: none;
+      max-width: 1040px;
+      margin: 0 auto;
+      animation: slideFadeIn 0.28s ease-out;
+    }
+    .slide.active {
+      display: block;
+    }
+
+    @keyframes slideFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 슬라이드 헤더 영역 */
+    .slide-top-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .badge-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .pill-intro { background: #EFE6D8; color: #5C3A1D; }
+    .pill-invest { background: var(--accent-invest-bg); color: var(--accent-invest); border: 1px solid var(--accent-invest-border); }
+    .pill-tangible { background: var(--accent-tangible-bg); color: var(--accent-tangible); border: 1px solid var(--accent-tangible-border); }
+    .pill-worksheet {
+      background: #2C221E;
+      color: #FFF8EE;
+      font-size: 0.84rem;
+    }
+    .pill-extra {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+
+    .slide-title {
+      font-size: clamp(1.45rem, 3vw, 2.05rem);
+      font-weight: 900;
+      color: var(--text-main);
+      margin: 0 0 8px;
+      line-height: 1.28;
+      letter-spacing: -0.02em;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      color: var(--text-sub);
+      margin: 0 0 20px;
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       5. 카드, 그리드, 공통 UI 컴포넌트
+       ========================================================================== */
+    .card {
+      background: var(--bg-paper);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+
+    .card-soft {
+      background: var(--bg-soft);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 860px) {
+      .grid-5 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+      .slides-viewport { padding: 14px 12px 32px; }
+      .card { padding: 16px; }
+    }
+
+    /* ==========================================================================
+       6. 표지 (Slide 01) 전용 스타일
+       ========================================================================== */
+    .cover-hero {
+      background: linear-gradient(135deg, #FFFDF9 0%, #F4EAE0 100%);
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: clamp(24px, 4vw, 44px);
+      box-shadow: var(--shadow-md);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: center;
+    }
+    @media (max-width: 780px) {
+      .cover-hero { grid-template-columns: 1fr; text-align: center; }
+    }
+
+    .cover-kicker {
+      display: inline-block;
+      background: var(--accent-cafe);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .cover-title {
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin: 0 0 12px;
+      color: var(--text-main);
+      letter-spacing: -0.03em;
+    }
+
+    .cover-desc {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-sub);
+      margin: 0 0 24px;
+      font-weight: 600;
+    }
+
+    .cover-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    @media (max-width: 780px) {
+      .cover-actions { justify-content: center; }
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--text-main);
+      color: #FFFFFF;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 14px 26px;
+      border-radius: 14px;
+      min-height: 50px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s, background 0.2s;
+    }
+    .btn-primary:hover { background: #43342E; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-jump {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      min-height: 48px;
+      border: 1.5px solid var(--border-light);
+      background: #FFFFFF;
+    }
+    .btn-jump.invest { color: var(--accent-invest); border-color: var(--accent-invest-border); background: var(--accent-invest-bg); }
+    .btn-jump.tangible { color: var(--accent-tangible); border-color: var(--accent-tangible-border); background: var(--accent-tangible-bg); }
+
+    .cover-illustration {
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ==========================================================================
+       7. 학습지 문항 공통 7단계 구조 스타일
+       ========================================================================== */
+    .scene-box {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 18px;
+      align-items: center;
+      background: #FFFDF9;
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 680px) {
+      .scene-box { grid-template-columns: 1fr; }
+    }
+
+    .scene-visual {
+      background: var(--bg-soft);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 150px;
+      border: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scene-visual svg {
+      width: 100%;
+      max-width: 190px;
+      height: auto;
+      display: block;
+    }
+
+    .scene-caption {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .problem-statement {
+      background: #FFFFFF;
+      border-left: 5px solid var(--accent-cafe);
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .problem-statement.invest { border-left-color: var(--accent-invest); }
+    .problem-statement.tangible { border-left-color: var(--accent-tangible); }
+
+    .step-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--accent-cafe);
+      background: var(--bg-soft);
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    /* 2단계: 먼저 생각하기 */
+    .think-questions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .think-item {
+      background: var(--bg-soft);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.96rem;
+      color: var(--text-main);
+      border: 1px dashed #CDBFA8;
+    }
+
+    /* 3단계: 단계별 힌트 */
+    .hint-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .hint-btn {
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      background: #FFFBEB;
+      color: #92400E;
+      border: 1.5px solid #FCD34D;
+      min-height: 42px;
+      transition: background 0.15s;
+    }
+    .hint-btn[aria-expanded="true"] {
+      background: #F59E0B;
+      color: #FFFFFF;
+      border-color: #D97706;
+    }
+    .hint-panel {
+      display: none;
+      background: #FFFDF5;
+      border: 1px solid #FDE68A;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: #78350F;
+    }
+    .hint-panel.open { display: block; }
+
+    /* 4단계: 학습지 직접 쓰기 안내 & 미니 선택기 */
+    .write-prompt-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #F4EFE6;
+      border: 1.5px solid #D8CBB8;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+    }
+    .write-prompt-text {
+      font-weight: 800;
+      font-size: 0.98rem;
+      color: var(--text-main);
+    }
+
+    .mini-picker {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .mini-picker-title {
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+    }
+    .picker-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .picker-chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: 1.5px solid var(--border-light);
+      background: var(--bg-cream);
+      min-height: 40px;
+    }
+    .picker-chip.selected-correct {
+      background: var(--success-bg);
+      border-color: var(--success-color);
+      color: var(--success-color);
+    }
+    .picker-chip.selected-wrong {
+      background: var(--warn-bg);
+      border-color: var(--warn-color);
+      color: var(--warn-color);
+    }
+    .picker-feedback {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       8. 한 줄 분개 표기 (데스크톱/아이패드/스마트폰 완벽 대응)
+       ========================================================================== */
+    .answer-toggle-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      background: var(--text-main);
+      color: #FFFFFF;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: background 0.2s;
+    }
+    .answer-toggle-btn:hover { background: #463730; }
+    .answer-toggle-btn[aria-expanded="true"] {
+      background: #5E4E46;
+    }
+
+    .answer-box {
+      display: none;
+      margin-top: 14px;
+      background: #FFFFFF;
+      border: 2px solid var(--text-main);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      animation: slideFadeIn 0.22s ease-out;
+    }
+    .answer-box.open { display: block; }
+
+    /* 한 줄 분개 스크롤 래퍼 */
+    .journal-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+
+    .journal-scroll-hint {
+      display: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-align: right;
+    }
+    @media (max-width: 640px) {
+      .journal-scroll-hint { display: block; }
+    }
+
+    .journal-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap; /* 반드시 한 줄로 표시 */
+      min-width: max-content;
+      background: #FAF8F5;
+      border: 1.5px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: clamp(1rem, 2.1vw, 1.22rem);
+      font-weight: 900;
+    }
+
+    .j-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 9px;
+      border-radius: 7px;
+      font-size: 0.88em;
+      font-weight: 900;
+    }
+    .j-debit-tag {
+      background: var(--debit-bg);
+      color: var(--debit-color);
+      border: 1.5px solid var(--debit-border);
+    }
+    .j-credit-tag {
+      background: var(--credit-bg);
+      color: var(--credit-color);
+      border: 1.5px solid var(--credit-border);
+    }
+
+    .j-debit-text { color: var(--debit-color); }
+    .j-credit-text { color: var(--credit-color); }
+    .j-divider {
+      display: inline-block;
+      width: 2px;
+      height: 22px;
+      background: #D6CBB9;
+      margin: 0 4px;
+    }
+
+    .reason-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .reason-card {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.93rem;
+      font-weight: 700;
+    }
+    .reason-card.debit {
+      background: var(--debit-bg);
+      border: 1px solid var(--debit-border);
+      color: #1E3A8A;
+    }
+    .reason-card.credit {
+      background: var(--credit-bg);
+      border: 1px solid var(--credit-border);
+      color: #7F1D1D;
+    }
+
+    .balance-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--success-bg);
+      color: var(--success-color);
+      border: 1px solid #BBF7D0;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .self-explain-box {
+      background: var(--bg-soft);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+      margin-bottom: 12px;
+    }
+    .self-explain-box strong {
+      display: block;
+      color: var(--accent-cafe);
+      margin-bottom: 4px;
+    }
+
+    /* 7단계: 추가 연습 아코디언 */
+    .extra-practice-wrap {
+      border-top: 1px dashed var(--border-light);
+      padding-top: 12px;
+      margin-top: 10px;
+    }
+    .extra-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: #FEF3C7;
+      color: #92400E;
+      font-weight: 800;
+      font-size: 0.9rem;
+      min-height: 40px;
+    }
+    .extra-panel {
+      display: none;
+      margin-top: 10px;
+      background: #FFFDF7;
+      border: 1px solid #FDE68A;
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .extra-panel.open { display: block; }
+
+    /* ==========================================================================
+       9. 인터랙티브 활동 (분류 활동, 포함 vs 추가, 퀴즈)
+       ========================================================================== */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .choice-btn {
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--border-light);
+      background: #FFFFFF;
+      font-size: 0.98rem;
+      font-weight: 700;
+      min-height: 52px;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+    .choice-btn:hover { border-color: var(--accent-cafe); background: var(--bg-card-hover); }
+    .choice-btn:active { transform: scale(0.99); }
+    .choice-btn.is-correct {
+      border-color: var(--success-color);
+      background: var(--success-bg);
+      color: var(--success-color);
+    }
+    .choice-btn.is-wrong {
+      border-color: var(--warn-color);
+      background: var(--warn-bg);
+      color: var(--warn-color);
+    }
+
+    .quiz-feedback {
+      display: none;
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: var(--success-bg); color: #14532D; border: 1px solid #86EFAC; }
+    .quiz-feedback.retry { background: var(--warn-bg); color: #78350F; border: 1px solid #FCD34D; }
+
+    /* 취득원가 포함 vs 추가 인터랙티브 비교기 */
+    .cost-sim-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .cost-sim-tab {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.96rem;
+      border: 2px solid var(--border-light);
+      background: #FFFFFF;
+      min-height: 48px;
+    }
+    .cost-sim-tab.active {
+      border-color: var(--accent-tangible);
+      background: var(--accent-tangible-bg);
+      color: var(--accent-tangible);
+    }
+
+    .cost-blocks {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+      background: var(--bg-soft);
+      border-radius: 14px;
+      margin-bottom: 12px;
+    }
+    .cost-block {
+      background: #FFFFFF;
+      border: 2px solid var(--accent-tangible-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+      min-width: 145px;
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+    .cost-block.included {
+      border-style: dashed;
+      background: #FFF7ED;
+    }
+    .cost-block.total {
+      background: var(--accent-tangible);
+      color: #FFFFFF;
+      border-color: var(--accent-tangible);
+      font-weight: 900;
+    }
+
+    /* 비교 테이블 */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+    }
+    table.comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 540px;
+      background: #FFFFFF;
+    }
+    table.comp-table th, table.comp-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-light);
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    table.comp-table th {
+      background: var(--bg-soft);
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* 알아두기 한 줄 박스 */
+    .note-inline {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      color: #334155;
+      margin-top: 10px;
+    }
+
+    /* 혼자 공부 모드 전용 안내 배지 */
+    .self-only { display: none; }
+    body.mode-self .self-only { display: block; }
+
+    /* ==========================================================================
+       10. 하단 컨트롤 바 & 목차 모달
+       ========================================================================== */
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      min-height: 48px;
+      min-width: 104px;
+      border: 1.5px solid var(--border-light);
+      background: #FFFFFF;
+      color: var(--text-main);
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .nav-btn.next {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+    .nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      text-align: center;
+    }
+
+    /* 목차 모달 */
+    .toc-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44, 34, 30, 0.55);
+      z-index: 200;
+      padding: 20px 16px;
+      overflow-y: auto;
+    }
+    .toc-modal.open {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .toc-dialog {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      max-width: 760px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: var(--shadow-lg);
+      margin: auto;
+    }
+    .toc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 12px;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+    }
+    .toc-item-btn {
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-cream);
+      font-size: 0.88rem;
+      font-weight: 700;
+      min-height: 44px;
+    }
+    .toc-item-btn.current {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+  <!-- 상단 고정 내비게이션 -->
+  <header class="app-header">
+    <div class="header-left">
+      <span class="brand-badge">☕ 카페 사장님의 자산 장부</span>
+      <nav class="part-nav" aria-label="단원 바로가기">
+        <button type="button" class="part-tab active" data-part="intro" data-goto="1">도입</button>
+        <button type="button" class="part-tab" data-part="invest" data-goto="5">1. 투자자산</button>
+        <button type="button" class="part-tab" data-part="tangible" data-goto="13">2. 유형자산</button>
+        <button type="button" class="part-tab" data-part="summary" data-goto="22">종합 정리</button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <button type="button" id="modeToggleBtn" class="mode-toggle-btn" data-mode="class" aria-pressed="false">
+        👩‍🏫 수업 모드
+      </button>
+      <button type="button" id="tocOpenBtn" class="toc-open-btn" aria-label="전체 목차 열기">
+        목차
+      </button>
+    </div>
+  </header>
+
+  <!-- 상단 진행률 바 -->
+  <div class="progress-track" aria-hidden="true">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- 슬라이드 뷰포트 시작 -->
+  <main class="slides-viewport" id="slidesViewport">
+
+    <!-- ========================================================================
+         SLIDE 01: 표지
+         ======================================================================== -->
+    <section class="slide active" id="slide-01" data-slide="1" data-part="intro" data-title="표지: 카페 사장님의 자산 장부">
+      <div class="cover-hero">
+        <div>
+          <span class="cover-kicker">서울관광고 카페경영과 1학년 · 회계원리</span>
+          <h1 class="cover-title">카페 사장님의<br>자산 장부</h1>
+          <p class="cover-desc">투자자산과 유형자산 취득, 실제 거래 장면을 보고 한 줄로 분개하기</p>
+          <p class="self-only" style="font-size:0.92rem; color:var(--accent-invest); font-weight:700; margin-bottom:16px;">
+            💡 혼자 공부 모드입니다. 각 문제에서 힌트를 열어 보고, 학습지에 직접 쓴 뒤 정답을 확인해 보세요.
+          </p>
+          <div class="cover-actions">
+            <button type="button" class="btn-primary" data-goto="2">수업 시작하기 →</button>
+            <button type="button" class="btn-jump invest" data-goto="5">1. 투자자산 바로가기</button>
+            <button type="button" class="btn-jump tangible" data-goto="13">2. 유형자산 바로가기</button>
+          </div>
+        </div>
+        <div class="cover-illustration" aria-label="카페 건물, 커피머신, 정기예금과 투자 자산을 나타낸 일러스트">
+          <svg viewBox="0 0 320 240" role="img" aria-label="카페 경영과 자산 관리 그림">
+            <rect x="8" y="8" width="304" height="224" rx="16" fill="#FAF6F0" stroke="#E6DDD0" stroke-width="2"/>
+            <!-- 카페 건물 -->
+            <rect x="26" y="64" width="124" height="118" rx="10" fill="#FFFFFF" stroke="#8B5A2B" stroke-width="3"/>
+            <path d="M20 68 L156 68 L146 44 L30 44 Z" fill="#C85A17"/>
+            <rect x="44" y="88" width="44" height="36" rx="4" fill="#EFF6FF" stroke="#8B5A2B" stroke-width="2"/>
+            <rect x="98" y="88" width="38" height="94" rx="4" fill="#F3ECE1" stroke="#8B5A2B" stroke-width="2"/>
+            <text x="88" y="61" text-anchor="middle" font-size="12" font-weight="800" fill="#FFFFFF">SEOUL CAFE</text>
+            <!-- 커피머신 아이콘 -->
+            <rect x="176" y="44" width="118" height="62" rx="10" fill="#FDF1E8" stroke="#F2C3A4" stroke-width="2"/>
+            <rect x="192" y="56" width="34" height="36" rx="5" fill="#5E4E46"/>
+            <rect x="198" y="62" width="22" height="10" rx="2" fill="#E6DDD0"/>
+            <rect x="204" y="78" width="10" height="10" rx="2" fill="#FFFFFF"/>
+            <text x="236" y="71" font-size="11" font-weight="800" fill="#C85A17">유형자산</text>
+            <text x="236" y="87" font-size="10" font-weight="700" fill="#5E4E46">커피머신·건물</text>
+            <!-- 투자자산 카드 -->
+            <rect x="176" y="120" width="118" height="62" rx="10" fill="#EBF5F1" stroke="#A8D5C5" stroke-width="2"/>
+            <circle cx="206" cy="151" r="16" fill="#1E6B52"/>
+            <text x="206" y="156" text-anchor="middle" font-size="14" font-weight="900" fill="#FFFFFF">₩</text>
+            <text x="232" y="147" font-size="11" font-weight="800" fill="#1E6B52">투자자산</text>
+            <text x="232" y="163" font-size="10" font-weight="700" fill="#5E4E46">예금·국채·주식</text>
+            <!-- 하단 바 -->
+            <rect x="26" y="196" width="268" height="24" rx="8" fill="#2C221E"/>
+            <text x="160" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#FAF6F0">교과서 128~131쪽 · 학습지 A (1~2쪽) 연계</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 02: 오늘 배우는 내용
+         ======================================================================== -->
+    <section class="slide" id="slide-02" data-slide="2" data-part="intro" data-title="오늘 배우는 내용">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-intro">도입 · 학습 안내</span>
+          <span class="pill pill-worksheet">학습지 A (1~2쪽)</span>
+        </div>
+      </div>
+      <h2 class="slide-title">오늘 우리가 배울 두 가지 자산</h2>
+      <p class="slide-subtitle">카페를 운영하다 보면 ‘돈을 불리기 위해’ 사거나, ‘영업에 직접 쓰기 위해’ 사는 자산이 생깁니다.</p>
+
+      <div class="grid-2">
+        <div class="card" style="border-top: 5px solid var(--accent-invest);">
+          <span class="pill pill-invest" style="margin-bottom:10px;">PART 1 · 학습지 1쪽</span>
+          <h3 style="margin:0 0 8px; font-size:1.3rem;">투자자산</h3>
+          <p style="margin:0 0 12px; color:var(--text-sub); font-weight:600;">
+            여유 자금을 <strong>장기적으로 운용하거나 투자 수익</strong>을 얻을 목적으로 보유하는 자산
+          </p>
+          <ul style="margin:0; padding-left:18px; color:var(--text-main); font-weight:700;">
+            <li>장기금융상품 (3년 만기 정기예금)</li>
+            <li>만기보유증권 (만기까지 보유할 국채)</li>
+            <li>매도가능증권 (장기 보유 목적 주식)</li>
+            <li>장기대여금 (2년간 빌려준 돈과 이자)</li>
+            <li>투자부동산 (투자 목적 상가 건물)</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-top: 5px solid var(--accent-tangible);">
+          <span class="pill pill-tangible" style="margin-bottom:10px;">PART 2 · 학습지 2쪽</span>
+          <h3 style="margin:0 0 8px; font-size:1.3rem;">유형자산의 취득</h3>
+          <p style="margin:0 0 12px; color:var(--text-sub); font-weight:600;">
+            <strong>영업 활동에 직접 사용</strong>할 목적으로 1년 이상 보유하는 형태가 있는 자산
+          </p>
+          <ul style="margin:0; padding-left:18px; color:var(--text-main); font-weight:700;">
+            <li>토지 (영업용 토지 + 취득세)</li>
+            <li>비품 (커피머신과 설치비, 컴퓨터 2대)</li>
+            <li>건설중인자산 → 건물 (공사 중 → 완공)</li>
+            <li>기계장치 (공장용 기계 + 운송비)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card-soft" style="margin-top:4px;">
+        <strong>🎯 오늘의 최종 목표</strong>
+        <p style="margin:6px 0 0; font-weight:700; font-size:1.02rem;">
+          실제 거래 장면을 보고 ① <strong>보유 목적</strong>과 ② <strong>거래 조건(금액·지급수단)</strong>을 파악해,
+          <span class="j-debit-text">(차)</span>와 <span class="j-credit-text">(대)</span>를 한 줄로 정확히 분개할 수 있다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 03: 전시학습 연결
+         ======================================================================== -->
+    <section class="slide" id="slide-03" data-slide="3" data-part="intro" data-title="전시학습 연결">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-intro">도입 · 복습</span>
+        </div>
+      </div>
+      <h2 class="slide-title">잠깐! 오늘 수업 전에 꼭 기억할 4가지</h2>
+      <p class="slide-subtitle">이전 시간에 배운 기본 규칙을 확인하고, 간단한 퀴즈로 워밍업해 봅시다.</p>
+
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0;">
+          <div style="font-weight:900; margin-bottom:6px;">1. 자산의 증가와 감소</div>
+          <p style="margin:0; font-weight:700;">
+            자산이 늘어나면 <span class="j-tag j-debit-tag">차변</span>,
+            자산이 줄어들면 <span class="j-tag j-credit-tag">대변</span>에 기록합니다.
+          </p>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div style="font-weight:900; margin-bottom:6px;">2. 현금 지급 vs 당좌수표 발행</div>
+          <p style="margin:0; font-weight:700;">
+            현금을 주면 <strong>현금 감소</strong>, 당좌수표를 발행하면 <strong>당좌예금 감소</strong>입니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 워밍업 퀴즈 1 -->
+      <div class="card" data-quiz-group="warmup-1">
+        <div class="step-chip">워밍업 퀴즈 1</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          카페에서 영업용으로 쓸 의자를 사고 <strong>당좌수표를 발행</strong>해 지급했습니다. 대변에 적을 계정과목은?
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="false" data-msg="현금을 직접 준 것이 아니라 당좌수표를 발행했어요. 수표와 연결된 예금 계정을 떠올려 보세요.">현금</button>
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 당좌수표를 발행하면 당좌예금(자산)이 감소하므로 대변에 당좌예금을 적습니다.">당좌예금</button>
+          <button type="button" class="choice-btn" data-correct="false" data-msg="외상으로 산 것이 아니라 당좌수표로 바로 지급했어요. 수표 발행 시 줄어드는 자산을 찾아보세요.">외상매입금</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+
+      <!-- 워밍업 퀴즈 2 -->
+      <div class="card" data-quiz-group="warmup-2">
+        <div class="step-chip">워밍업 퀴즈 2</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          손님에게 되팔려고 사 온 ‘원두·텀블러’와 카페에서 계속 사용할 ‘커피머신’은 같은 계정과목일까요?
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="false" data-msg="보유 목적이 달라요! 팔려고 사 온 것은 상품, 영업에 계속 쓸 것은 비품(유형자산)입니다.">둘 다 상품으로 처리한다</button>
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정확합니다! 판매 목적이면 상품(재고자산), 영업 사용 목적이면 비품(유형자산)으로 구분합니다.">판매용은 상품, 영업용 머신은 비품으로 구분한다</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 04: 이번 단원의 핵심 질문 (자산 분류 활동)
+         ======================================================================== -->
+    <section class="slide" id="slide-04" data-slide="4" data-part="intro" data-title="핵심 질문: 왜 가지고 있을까?">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-intro">도입 · 분류 활동</span>
+        </div>
+      </div>
+      <h2 class="slide-title">“무엇을 샀을까?”보다 중요한 질문: “왜 가지고 있을까?”</h2>
+      <p class="slide-subtitle">아래 4가지 자산이 <strong>투자 목적(투자자산)</strong>인지, <strong>영업 사용 목적(유형자산)</strong>인지 눌러서 분류해 보세요.</p>
+
+      <div class="grid-2">
+        <!-- 항목 1 -->
+        <div class="card" data-quiz-group="classify-1">
+          <div style="font-weight:900; font-size:1.08rem; margin-bottom:6px;">🏢 카페 매장으로 직접 사용할 건물</div>
+          <p style="margin:0 0 10px; font-size:0.9rem; color:var(--text-sub);">손님을 맞이하고 커피를 판매하는 공간으로 사용</p>
+          <div class="choice-grid" style="grid-template-columns:1fr 1fr;">
+            <button type="button" class="choice-btn" data-correct="false" data-msg="이 건물은 시세 차익이나 임대가 아니라 카페 영업에 직접 쓰는 건물이에요.">투자자산</button>
+            <button type="button" class="choice-btn" data-correct="true" data-msg="맞아요! 영업에 직접 사용하는 건물은 유형자산(건물)입니다.">유형자산</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </div>
+
+        <!-- 항목 2 -->
+        <div class="card" data-quiz-group="classify-2">
+          <div style="font-weight:900; font-size:1.08rem; margin-bottom:6px;">🏬 투자 목적으로 구입한 상가 건물</div>
+          <p style="margin:0 0 10px; font-size:0.9rem; color:var(--text-sub);">우리 카페 영업에는 쓰지 않고 장기 투자 목적으로 보유</p>
+          <div class="choice-grid" style="grid-template-columns:1fr 1fr;">
+            <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 같은 건물이라도 투자 목적이면 투자자산(투자부동산)으로 분류합니다.">투자자산</button>
+            <button type="button" class="choice-btn" data-correct="false" data-msg="물건 이름은 건물이지만, ‘투자 목적’이라는 단서를 다시 확인해 보세요.">유형자산</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </div>
+
+        <!-- 항목 3 -->
+        <div class="card" data-quiz-group="classify-3">
+          <div style="font-weight:900; font-size:1.08rem; margin-bottom:6px;">☕ 카페 영업용 커피머신</div>
+          <p style="margin:0 0 10px; font-size:0.9rem; color:var(--text-sub);">매일 에스프레소를 추출하기 위해 매장에 설치</p>
+          <div class="choice-grid" style="grid-template-columns:1fr 1fr;">
+            <button type="button" class="choice-btn" data-correct="false" data-msg="돈을 굴리기 위한 투자가 아니라 카페 영업에 직접 사용하는 기계예요.">투자자산</button>
+            <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 영업에 오래 사용하는 커피머신은 유형자산(비품)입니다.">유형자산</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </div>
+
+        <!-- 항목 4 -->
+        <div class="card" data-quiz-group="classify-4">
+          <div style="font-weight:900; font-size:1.08rem; margin-bottom:6px;">🏦 3년 만기 정기예금</div>
+          <p style="margin:0 0 10px; font-size:0.9rem; color:var(--text-sub);">여유 자금을 은행에 3년간 맡겨 이자를 얻음</p>
+          <div class="choice-grid" style="grid-template-columns:1fr 1fr;">
+            <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 만기가 1년 이상인 정기예금은 투자자산(장기금융상품)입니다.">투자자산</button>
+            <button type="button" class="choice-btn" data-correct="false" data-msg="정기예금은 영업에 쓰는 물건이 아니라 자금을 장기 운용하는 금융상품이에요.">유형자산</button>
+          </div>
+          <div class="quiz-feedback" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 05: PART 1 투자자산의 개념과 전체 지도
+         ======================================================================== -->
+    <section class="slide" id="slide-05" data-slide="5" data-part="invest" data-title="투자자산 개념과 전체 지도">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">교과서 128~129쪽</span>
+        </div>
+      </div>
+      <h2 class="slide-title">투자자산 한눈에 보기 (5가지 핵심 계정과목)</h2>
+      <p class="slide-subtitle">여유 자금을 장기간 운용하거나 투자 수익을 얻기 위해 보유하는 자산입니다. 카드를 눌러 설명을 확인하세요.</p>
+
+      <div class="grid-5" style="margin-bottom:14px;">
+        <button type="button" class="card invest-map-card" data-map-target="map-desc-1" style="text-align:center; margin-bottom:0; cursor:pointer;">
+          <div style="font-size:2rem; margin-bottom:6px;">🏦</div>
+          <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">3년 정기예금</div>
+          <div style="font-weight:900; color:var(--accent-invest); margin-top:4px;">장기금융상품</div>
+        </button>
+        <button type="button" class="card invest-map-card" data-map-target="map-desc-2" style="text-align:center; margin-bottom:0; cursor:pointer;">
+          <div style="font-size:2rem; margin-bottom:6px;">📜</div>
+          <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">만기 보유 국채</div>
+          <div style="font-weight:900; color:var(--accent-invest); margin-top:4px;">만기보유증권</div>
+        </button>
+        <button type="button" class="card invest-map-card" data-map-target="map-desc-3" style="text-align:center; margin-bottom:0; cursor:pointer;">
+          <div style="font-size:2rem; margin-bottom:6px;">📈</div>
+          <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">장기 보유 주식</div>
+          <div style="font-weight:900; color:var(--accent-invest); margin-top:4px;">매도가능증권</div>
+        </button>
+        <button type="button" class="card invest-map-card" data-map-target="map-desc-4" style="text-align:center; margin-bottom:0; cursor:pointer;">
+          <div style="font-size:2rem; margin-bottom:6px;">🤝</div>
+          <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">2년간 빌려준 돈</div>
+          <div style="font-weight:900; color:var(--accent-invest); margin-top:4px;">장기대여금</div>
+        </button>
+        <button type="button" class="card invest-map-card" data-map-target="map-desc-5" style="text-align:center; margin-bottom:0; cursor:pointer;">
+          <div style="font-size:2rem; margin-bottom:6px;">🏬</div>
+          <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">투자용 상가 건물</div>
+          <div style="font-weight:900; color:var(--accent-invest); margin-top:4px;">투자부동산</div>
+        </button>
+      </div>
+
+      <div class="card" id="investMapDetail" style="border-left:5px solid var(--accent-invest); background:var(--accent-invest-bg);">
+        <div id="map-desc-1" class="map-desc-item">
+          <span class="pill pill-worksheet" style="margin-bottom:6px;">학습지 1쪽 · 01번</span>
+          <div style="font-weight:900; font-size:1.1rem; color:var(--accent-invest);">장기금융상품</div>
+          <p style="margin:4px 0 0; font-weight:600;">오랜 기간(결산일 기준 만기 1년 이상) 사용할 목적으로 금융기관에 예치한 정기예금·정기적금 등을 말합니다.</p>
+        </div>
+        <div id="map-desc-2" class="map-desc-item" style="display:none;">
+          <span class="pill pill-worksheet" style="margin-bottom:6px;">학습지 1쪽 · 02번</span>
+          <div style="font-weight:900; font-size:1.1rem; color:var(--accent-invest);">만기보유증권</div>
+          <p style="margin:4px 0 0; font-weight:600;">정해진 만기까지 보유할 목적으로 취득한 국채·공채·사채 등의 채권을 말합니다.</p>
+        </div>
+        <div id="map-desc-3" class="map-desc-item" style="display:none;">
+          <span class="pill pill-worksheet" style="margin-bottom:6px;">학습지 1쪽 · 03번</span>
+          <div style="font-weight:900; font-size:1.1rem; color:var(--accent-invest);">매도가능증권</div>
+          <p style="margin:4px 0 0; font-weight:600;">장기간 보유하거나 필요할 때 처분할 목적으로 취득한 주식·채권 등에 교과서 분류를 적용해 사용합니다.</p>
+        </div>
+        <div id="map-desc-4" class="map-desc-item" style="display:none;">
+          <span class="pill pill-worksheet" style="margin-bottom:6px;">학습지 1쪽 · 04~05번</span>
+          <div style="font-weight:900; font-size:1.1rem; color:var(--accent-invest);">장기대여금</div>
+          <p style="margin:4px 0 0; font-weight:600;">다른 회사나 타인에게 1년 이상 장기간 돈을 빌려주고 나중에 돌려받을 권리를 말합니다.</p>
+        </div>
+        <div id="map-desc-5" class="map-desc-item" style="display:none;">
+          <span class="pill pill-worksheet" style="margin-bottom:6px;">학습지 1쪽 · 06번</span>
+          <div style="font-weight:900; font-size:1.1rem; color:var(--accent-invest);">투자부동산</div>
+          <p style="margin:4px 0 0; font-weight:600;">영업에 직접 쓰지 않고 투자 목적으로 보유하는 토지나 건물을 말합니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 06: 장기금융상품 + 학습지 01
+         ======================================================================== -->
+    <section class="slide" id="slide-06" data-slide="6" data-part="invest" data-title="장기금융상품 (학습지 01)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">학습지 1쪽 · 01번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">장기금융상품: 3년 만기 정기예금 가입</h2>
+
+      <!-- 1단계: 실제 거래 장면 -->
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="3년 만기 정기예금 통장과 현금 100만 원">
+            <rect x="18" y="20" width="110" height="96" rx="10" fill="#1E6B52"/>
+            <rect x="28" y="34" width="90" height="22" rx="4" fill="#EBF5F1"/>
+            <text x="73" y="49" text-anchor="middle" font-size="11" font-weight="800" fill="#1E6B52">3년 만기 정기예금</text>
+            <text x="73" y="82" text-anchor="middle" font-size="13" font-weight="900" fill="#FFFFFF">1,000,000원</text>
+            <text x="73" y="100" text-anchor="middle" font-size="9" fill="#A8D5C5">오랜 기간 은행 예치</text>
+            <rect x="136" y="54" width="52" height="34" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+            <text x="162" y="75" text-anchor="middle" font-size="11" font-weight="800" fill="#92400E">현금</text>
+          </svg>
+          <div class="scene-caption">현금 1,000,000원 → 3년 정기예금</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement invest">
+            [학습지 01] 나래 상사는 3년 만기 정기예금에 현금 1,000,000원을 예입하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 <strong>장기금융상품</strong>이란 오랜 기간 사용할 목적으로 금융기관에 예치한 상품을 말합니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 2단계: 먼저 생각하기 -->
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 어떤 자산이 늘어났을까요?</div>
+          <div class="think-item">② 무엇을 지급(감소)했을까요?</div>
+          <div class="think-item">③ 만기가 ‘3년’이라는 점이 왜 중요할까요?</div>
+        </div>
+
+        <!-- 3단계: 힌트 열기 -->
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-06-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-06-2" aria-expanded="false">힌트 2 · 자산 증감</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-06-3" aria-expanded="false">힌트 3 · 계정과목</button>
+        </div>
+        <div id="h-06-1" class="hint-panel">핵심 단어는 <strong>「3년 만기 정기예금」</strong>과 <strong>「현금 1,000,000원」</strong>입니다.</div>
+        <div id="h-06-2" class="hint-panel">정기예금(자산)이 1,000,000원 <strong>증가(차변)</strong>하고, 현금(자산)이 1,000,000원 <strong>감소(대변)</strong>합니다.</div>
+        <div id="h-06-3" class="hint-panel">만기가 1년 이상인 정기예금은 <strong>장기금융상품</strong> 계정과목을 사용합니다.</div>
+
+        <!-- 4단계: 학습지에 직접 쓰기 -->
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 1쪽 01번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+        <div class="mini-picker" data-picker-group="pick-06">
+          <div class="mini-picker-title">화면에서 먼저 골라보기: 차변에 들어갈 계정과목은?</div>
+          <div class="picker-chips">
+            <button type="button" class="picker-chip" data-correct="true" data-msg="맞아요! 3년 만기 정기예금이므로 장기금융상품입니다.">장기금융상품</button>
+            <button type="button" class="picker-chip" data-correct="false" data-msg="보통예금은 입출금이 자유로운 예금이에요. 3년 만기 정기예금에 맞는 계정을 골라 보세요.">보통예금</button>
+            <button type="button" class="picker-chip" data-correct="false" data-msg="현금은 은행에 넣었으므로 감소(대변)하는 계정이에요.">현금</button>
+          </div>
+          <div class="picker-feedback" aria-live="polite"></div>
+        </div>
+
+        <!-- 5단계: 분개 확인 -->
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-06" aria-expanded="false">
+          정답 및 해설 보기 (학습지 01)
+        </button>
+        <div id="ans-06" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">장기금융상품 1,000,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 1,000,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 장기금융상품(자산) 1,000,000원 증가</div>
+            <div class="reason-card credit">대변: 현금(자산) 1,000,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 1,000,000원 = 대변 합계 1,000,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “왜 보통예금이 아니라 장기금융상품을 차변에 적었을까요?” → 3년 만기로 장기간 예치한 정기예금(자산 증가)이기 때문입니다.
+          </div>
+          <div class="extra-practice-wrap">
+            <button type="button" class="extra-toggle-btn" data-toggle-target="ext-06" aria-expanded="false">
+              ✨ 7단계 · 추가 연습 (학습지 외 문제)
+            </button>
+            <div id="ext-06" class="extra-panel">
+              <span class="pill pill-extra" style="margin-bottom:6px;">추가 연습</span>
+              <p style="margin:0 0 8px; font-weight:700;">카페 나래가 2년 만기 정기예금에 <strong>당좌수표를 발행</strong>하여 500,000원을 예입했다면?</p>
+              <div class="journal-scroll-wrap">
+                <div class="journal-line">
+                  <span class="j-tag j-debit-tag">차</span>
+                  <span class="j-debit-text">장기금융상품 500,000원</span>
+                  <span class="j-divider" aria-hidden="true"></span>
+                  <span class="j-tag j-credit-tag">대</span>
+                  <span class="j-credit-text">당좌예금 500,000원</span>
+                </div>
+              </div>
+              <p style="margin:4px 0 0; font-size:0.9rem; color:var(--text-sub);">지급 수단이 당좌수표로 바뀌면 대변이 현금 대신 <strong>당좌예금</strong>이 됩니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 07: 만기보유증권 + 학습지 02
+         ======================================================================== -->
+    <section class="slide" id="slide-07" data-slide="7" data-part="invest" data-title="만기보유증권 (학습지 02)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">학습지 1쪽 · 02번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">만기보유증권: 만기까지 보유할 국채 취득</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="만기일이 적힌 국채 증서">
+            <rect x="20" y="16" width="160" height="106" rx="10" fill="#FFFFFF" stroke="#1E6B52" stroke-width="3"/>
+            <rect x="30" y="26" width="140" height="24" rx="4" fill="#EBF5F1"/>
+            <text x="100" y="42" text-anchor="middle" font-size="12" font-weight="900" fill="#1E6B52">대한민국 국채 (채권)</text>
+            <text x="100" y="72" text-anchor="middle" font-size="15" font-weight="900" fill="#2C221E">500,000원</text>
+            <rect x="46" y="84" width="108" height="24" rx="12" fill="#1E6B52"/>
+            <text x="100" y="100" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">📅 정해진 만기 있음</text>
+          </svg>
+          <div class="scene-caption">국채는 만기가 정해져 있는 채권</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement invest">
+            [학습지 02] 송도 상사는 만기까지 보유할 목적으로 국채를 500,000원에 현금 취득하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 <strong>만기보유증권</strong>이란 정해진 만기까지 보유할 목적으로 취득한 채권(국채·공채·사채 등)을 말합니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 국채는 만기가 있는 채권일까요?</div>
+          <div class="think-item">② 어떤 목적으로 국채를 샀을까요?</div>
+          <div class="think-item">③ 대금은 무엇으로 지급했을까요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-07-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-07-2" aria-expanded="false">힌트 2 · 자산 증감</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-07-3" aria-expanded="false">힌트 3 · 계정과목</button>
+        </div>
+        <div id="h-07-1" class="hint-panel">핵심 단어는 <strong>「만기까지 보유할 목적」</strong>, <strong>「국채(채권)」</strong>, <strong>「현금 취득」</strong>입니다.</div>
+        <div id="h-07-2" class="hint-panel">투자자산이 500,000원 <strong>증가(차변)</strong>하고, 현금(자산)이 500,000원 <strong>감소(대변)</strong>합니다.</div>
+        <div id="h-07-3" class="hint-panel">만기가 있는 채권을 만기까지 보유할 목적이므로 <strong>만기보유증권</strong>을 사용합니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 1쪽 02번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+        <div class="mini-picker" data-picker-group="pick-07">
+          <div class="mini-picker-title">화면에서 먼저 골라보기: 차변에 들어갈 계정과목은?</div>
+          <div class="picker-chips">
+            <button type="button" class="picker-chip" data-correct="true" data-msg="정답입니다! 만기까지 보유할 목적의 국채는 만기보유증권입니다.">만기보유증권</button>
+            <button type="button" class="picker-chip" data-correct="false" data-msg="문제에 ‘만기까지 보유할 목적’과 ‘국채’가 명시되어 있어요. 다시 확인해 보세요.">매도가능증권</button>
+            <button type="button" class="picker-chip" data-correct="false" data-msg="은행 예금이 아니라 국가가 발행한 채권(국채)입니다.">장기금융상품</button>
+          </div>
+          <div class="picker-feedback" aria-live="polite"></div>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-07" aria-expanded="false">
+          정답 및 해설 보기 (학습지 02)
+        </button>
+        <div id="ans-07" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">만기보유증권 500,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 500,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 만기보유증권(자산) 500,000원 증가</div>
+            <div class="reason-card credit">대변: 현금(자산) 500,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 500,000원 = 대변 합계 500,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “왜 국채를 만기보유증권으로 처리할까요?” → 국채는 만기가 정해진 채권이고, 만기까지 보유할 목적으로 취득했기 때문입니다.
+          </div>
+          <div class="extra-practice-wrap">
+            <button type="button" class="extra-toggle-btn" data-toggle-target="ext-07" aria-expanded="false">
+              ✨ 7단계 · 추가 연습 (학습지 외 문제)
+            </button>
+            <div id="ext-07" class="extra-panel">
+              <span class="pill pill-extra" style="margin-bottom:6px;">추가 연습</span>
+              <p style="margin:0 0 8px; font-weight:700;">만기까지 보유할 목적으로 사채 1,200,000원을 <strong>당좌수표를 발행</strong>해 취득했다면?</p>
+              <div class="journal-scroll-wrap">
+                <div class="journal-line">
+                  <span class="j-tag j-debit-tag">차</span>
+                  <span class="j-debit-text">만기보유증권 1,200,000원</span>
+                  <span class="j-divider" aria-hidden="true"></span>
+                  <span class="j-tag j-credit-tag">대</span>
+                  <span class="j-credit-text">당좌예금 1,200,000원</span>
+                </div>
+              </div>
+              <p style="margin:4px 0 0; font-size:0.9rem; color:var(--text-sub);">사채도 만기가 있는 채권이므로 차변은 <strong>만기보유증권</strong>, 수표 발행이므로 대변은 <strong>당좌예금</strong>입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 08: 매도가능증권 + 학습지 03
+         ======================================================================== -->
+    <section class="slide" id="slide-08" data-slide="8" data-part="invest" data-title="매도가능증권 (학습지 03)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">학습지 1쪽 · 03번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">매도가능증권: 다른 회사 주식의 장기 보유 취득</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="다른 회사 주식 차트와 주권 이미지">
+            <rect x="20" y="18" width="160" height="104" rx="10" fill="#FFFFFF" stroke="#1E6B52" stroke-width="2.5"/>
+            <polyline points="36,92 68,76 98,82 132,52 164,42" fill="none" stroke="#1E6B52" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="164" cy="42" r="5" fill="#C85A17"/>
+            <text x="100" y="34" text-anchor="middle" font-size="11" font-weight="800" fill="#2C221E">다른 회사 주식 (장기 보유)</text>
+            <text x="100" y="112" text-anchor="middle" font-size="13" font-weight="900" fill="#1E6B52">300,000원</text>
+          </svg>
+          <div class="scene-caption">주식에는 채권과 같은 확정 만기가 없음</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement invest">
+            [학습지 03] 은성 상사는 장기간 보유할 목적으로 다른 회사 주식을 300,000원에 현금 취득하였다. (교과서의 매도가능증권 분류 적용)
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-main); font-weight:700;">
+            📌 <strong>이 문제에서는 교과서의 매도가능증권 분류를 적용합니다.</strong>
+          </p>
+          <div class="note-inline">
+            <span>ℹ️</span>
+            <span><strong>알아두기:</strong> 실무에서 적용하는 회계기준에 따라 금융상품의 분류 명칭은 교과서와 다를 수 있으며, 교과서와 학습지 문제에서는 제시된 계정과목(매도가능증권)을 사용합니다.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 주식은 채권처럼 확정된 만기가 있을까요?</div>
+          <div class="think-item">② 문제 조건에서 어떤 분류를 적용하라고 했나요?</div>
+          <div class="think-item">③ 무엇을 지급하고 주식을 얻었나요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-08-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-08-2" aria-expanded="false">힌트 2 · 자산 증감</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-08-3" aria-expanded="false">힌트 3 · 계정과목</button>
+        </div>
+        <div id="h-08-1" class="hint-panel">핵심 단어는 <strong>「장기간 보유할 목적」</strong>, <strong>「다른 회사 주식」</strong>, <strong>「교과서의 매도가능증권 분류 적용」</strong>입니다.</div>
+        <div id="h-08-2" class="hint-panel">매도가능증권(자산)이 300,000원 <strong>증가(차변)</strong>하고, 현금(자산)이 300,000원 <strong>감소(대변)</strong>합니다.</div>
+        <div id="h-08-3" class="hint-panel">주식은 만기가 없으므로 만기보유증권이 될 수 없고, 이 문제에서는 <strong>매도가능증권</strong>을 사용합니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 1쪽 03번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+        <div class="mini-picker" data-picker-group="pick-08">
+          <div class="mini-picker-title">화면에서 먼저 골라보기: 차변에 들어갈 계정과목은?</div>
+          <div class="picker-chips">
+            <button type="button" class="picker-chip" data-correct="false" data-msg="주식에는 채권과 같은 확정 만기가 없어서 만기보유증권으로 분류하지 않아요.">만기보유증권</button>
+            <button type="button" class="picker-chip" data-correct="true" data-msg="정답입니다! 장기 보유 목적의 주식에 교과서의 매도가능증권 분류를 적용합니다.">매도가능증권</button>
+            <button type="button" class="picker-chip" data-correct="false" data-msg="다른 회사에 돈을 빌려준 것이 아니라 주식을 취득한 거래예요.">장기대여금</button>
+          </div>
+          <div class="picker-feedback" aria-live="polite"></div>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-08" aria-expanded="false">
+          정답 및 해설 보기 (학습지 03)
+        </button>
+        <div id="ans-08" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">매도가능증권 300,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 300,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 매도가능증권(자산) 300,000원 증가</div>
+            <div class="reason-card credit">대변: 현금(자산) 300,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 300,000원 = 대변 합계 300,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “왜 주식을 만기보유증권으로 적으면 안 될까요?” → 주식은 채권과 달리 확정된 만기가 없기 때문이며, 이 문제에서는 교과서의 매도가능증권 분류를 적용합니다.
+          </div>
+          <div class="extra-practice-wrap">
+            <button type="button" class="extra-toggle-btn" data-toggle-target="ext-08" aria-expanded="false">
+              ✨ 7단계 · 추가 연습 (학습지 외 문제)
+            </button>
+            <div id="ext-08" class="extra-panel">
+              <span class="pill pill-extra" style="margin-bottom:6px;">추가 연습</span>
+              <p style="margin:0 0 8px; font-weight:700;">장기 보유 목적으로 다른 회사 주식 100주(1주당 4,000원)를 현금 취득했다면? (교과서의 매도가능증권 분류 적용)</p>
+              <div class="journal-scroll-wrap">
+                <div class="journal-line">
+                  <span class="j-tag j-debit-tag">차</span>
+                  <span class="j-debit-text">매도가능증권 400,000원</span>
+                  <span class="j-divider" aria-hidden="true"></span>
+                  <span class="j-tag j-credit-tag">대</span>
+                  <span class="j-credit-text">현금 400,000원</span>
+                </div>
+              </div>
+              <p style="margin:4px 0 0; font-size:0.9rem; color:var(--text-sub);">계산: 100주 × 4,000원 = 400,000원</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 09: 장기대여금 + 학습지 04
+         ======================================================================== -->
+    <section class="slide" id="slide-09" data-slide="9" data-part="invest" data-title="장기대여금 대여 (학습지 04)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">학습지 1쪽 · 04번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">장기대여금: 다른 회사에 2년간 돈을 빌려줄 때</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="부여 상사가 다른 회사에 80만 원을 2년간 빌려주는 모습">
+            <rect x="14" y="34" width="60" height="68" rx="8" fill="#EBF5F1" stroke="#1E6B52" stroke-width="2"/>
+            <text x="44" y="64" text-anchor="middle" font-size="11" font-weight="800" fill="#1E6B52">부여 상사</text>
+            <text x="44" y="82" text-anchor="middle" font-size="9" font-weight="700" fill="#5E4E46">받을 권리↑</text>
+            <path d="M78 68 L120 68" stroke="#C85A17" stroke-width="4" marker-end="url(#arrow)"/>
+            <text x="99" y="54" text-anchor="middle" font-size="10" font-weight="900" fill="#C85A17">800,000원</text>
+            <text x="99" y="86" text-anchor="middle" font-size="9" font-weight="700" fill="#5E4E46">2년간 대여</text>
+            <rect x="126" y="34" width="60" height="68" rx="8" fill="#FFFFFF" stroke="#8C7A70" stroke-width="2"/>
+            <text x="156" y="72" text-anchor="middle" font-size="11" font-weight="800" fill="#2C221E">다른 회사</text>
+          </svg>
+          <div class="scene-caption">현금이 나가고 ‘받을 권리(장기대여금)’가 생김</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement invest">
+            [학습지 04] 부여 상사는 다른 회사에 현금 800,000원을 2년간 빌려주었다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 돈을 빌려주면 나중에 <strong>돌려받을 권리(자산)</strong>가 생깁니다. 기간이 1년 이상이면 <strong>장기대여금</strong>입니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 돈을 빌려준 부여 상사에게 어떤 권리가 생겼나요?</div>
+          <div class="think-item">② 빌려준 기간이 2년(1년 이상)이면 어떤 계정일까요?</div>
+          <div class="think-item">③ 내 주머니에서 빠져나간 자산은 무엇인가요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-09-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-09-2" aria-expanded="false">힌트 2 · 자산 증감</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-09-3" aria-expanded="false">힌트 3 · 계정과목</button>
+        </div>
+        <div id="h-09-1" class="hint-panel">핵심 단어는 <strong>「2년간 빌려주었다」</strong>와 <strong>「현금 800,000원」</strong>입니다.</div>
+        <div id="h-09-2" class="hint-panel">받을 권리(자산)가 800,000원 <strong>증가(차변)</strong>하고, 현금(자산)이 800,000원 <strong>감소(대변)</strong>합니다.</div>
+        <div id="h-09-3" class="hint-panel">1년 이상 빌려준 돈이므로 <strong>장기대여금</strong> 계정과목을 사용합니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 1쪽 04번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-09" aria-expanded="false">
+          정답 및 해설 보기 (학습지 04)
+        </button>
+        <div id="ans-09" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">장기대여금 800,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 800,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 장기대여금(자산) 800,000원 증가</div>
+            <div class="reason-card credit">대변: 현금(자산) 800,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 800,000원 = 대변 합계 800,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “돈이 나갔는데 왜 차변에 자산(장기대여금)이 늘어나나요?” → 현금은 줄었지만, 2년 뒤에 돌려받을 수 있는 권리(장기대여금)가 새로 생겼기 때문입니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 10: 장기대여금 회수 (원금 + 이자) + 학습지 05
+         ======================================================================== -->
+    <section class="slide" id="slide-10" data-slide="10" data-part="invest" data-title="장기대여금 회수 (학습지 05)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">학습지 1쪽 · 05번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">장기대여금 회수: 원금과 이자를 함께 돌려받을 때</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="원금 80만 원과 이자 4만 원이 합쳐져 현금 84만 원으로 돌아오는 그림">
+            <rect x="14" y="18" width="84" height="44" rx="8" fill="#FEF2F2" stroke="#FECACA" stroke-width="2"/>
+            <text x="56" y="36" text-anchor="middle" font-size="10" font-weight="800" fill="#B91C1C">원금 회수</text>
+            <text x="56" y="53" text-anchor="middle" font-size="11" font-weight="900" fill="#2C221E">800,000원</text>
+
+            <rect x="14" y="74" width="84" height="44" rx="8" fill="#FEF3C7" stroke="#FCD34D" stroke-width="2"/>
+            <text x="56" y="92" text-anchor="middle" font-size="10" font-weight="800" fill="#92400E">이자 (수익)</text>
+            <text x="56" y="109" text-anchor="middle" font-size="11" font-weight="900" fill="#2C221E">40,000원</text>
+
+            <text x="110" y="74" text-anchor="middle" font-size="16" font-weight="900" fill="#5E4E46">→</text>
+
+            <rect x="122" y="34" width="66" height="68" rx="10" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="2.5"/>
+            <text x="155" y="60" text-anchor="middle" font-size="11" font-weight="800" fill="#1D4ED8">현금 입금</text>
+            <text x="155" y="80" text-anchor="middle" font-size="12" font-weight="900" fill="#1D4ED8">840,000원</text>
+          </svg>
+          <div class="scene-caption">원금 800,000원 + 이자 40,000원 = 현금 840,000원</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement invest">
+            [학습지 05] 위 장기대여금의 만기가 되어 원금 800,000원과 이자 40,000원을 현금으로 함께 회수하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 돌려받은 돈 840,000원 안에는 <strong>원금(장기대여금 감소)</strong>과 <strong>이자(이자수익 발생)</strong>가 함께 들어 있습니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 받은 현금은 모두 얼마인가요?</div>
+          <div class="think-item">② 원금을 돌려받으면 ‘장기대여금’은 늘어날까요, 줄어들까요?</div>
+          <div class="think-item">③ 이자 40,000원은 어떤 계정과목으로 기록할까요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-10-1" aria-expanded="false">힌트 1 · 현금 합계</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-10-2" aria-expanded="false">힌트 2 · 원금 처리</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-10-3" aria-expanded="false">힌트 3 · 이자 처리</button>
+        </div>
+        <div id="h-10-1" class="hint-panel">원금 800,000원 + 이자 40,000원 = <strong>현금 840,000원 증가(차변)</strong>입니다.</div>
+        <div id="h-10-2" class="hint-panel">빌려준 원금을 돌려받았으므로 받을 권리인 <strong>장기대여금 800,000원 감소(대변)</strong>입니다.</div>
+        <div id="h-10-3" class="hint-panel">돈을 빌려주고 받은 이자는 수익의 발생이므로 대변에 <strong>이자수익 40,000원</strong>을 적습니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 1쪽 05번</strong>에 먼저 분개해 보세요. (대변에 2개 계정!)</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-10" aria-expanded="false">
+          정답 및 해설 보기 (학습지 05)
+        </button>
+        <div id="ans-10" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">현금 840,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">장기대여금 800,000원, 이자수익 40,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 현금(자산) 840,000원 증가</div>
+            <div class="reason-card credit">대변: 장기대여금(자산) 800,000원 감소 / 이자수익(수익) 40,000원 발생</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 840,000원 = 대변 합계 840,000원 (800,000 + 40,000)</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “왜 장기대여금이 대변에 기록될까요?” → 빌려줬던 원금을 돌려받았으므로, 앞으로 받을 권리(자산)가 사라졌기 때문입니다.
+          </div>
+          <div class="extra-practice-wrap">
+            <button type="button" class="extra-toggle-btn" data-toggle-target="ext-10" aria-expanded="false">
+              ✨ 7단계 · 추가 연습 (학습지 외 문제)
+            </button>
+            <div id="ext-10" class="extra-panel">
+              <span class="pill pill-extra" style="margin-bottom:6px;">추가 연습</span>
+              <p style="margin:0 0 8px; font-weight:700;">장기대여금 원금 500,000원과 이자 25,000원을 현금으로 함께 회수했다면?</p>
+              <div class="journal-scroll-wrap">
+                <div class="journal-line">
+                  <span class="j-tag j-debit-tag">차</span>
+                  <span class="j-debit-text">현금 525,000원</span>
+                  <span class="j-divider" aria-hidden="true"></span>
+                  <span class="j-tag j-credit-tag">대</span>
+                  <span class="j-credit-text">장기대여금 500,000원, 이자수익 25,000원</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 11: 투자부동산 + 학습지 06
+         ======================================================================== -->
+    <section class="slide" id="slide-11" data-slide="11" data-part="invest" data-title="투자부동산 (학습지 06)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 투자자산</span>
+          <span class="pill pill-worksheet">학습지 1쪽 · 06번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">투자부동산: 투자 목적 상가 vs 영업용 카페 건물</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="투자 목적 상가 건물과 영업용 카페 건물 비교">
+            <!-- 투자용 상가 -->
+            <rect x="12" y="26" width="82" height="92" rx="8" fill="#EBF5F1" stroke="#1E6B52" stroke-width="2.5"/>
+            <rect x="26" y="46" width="54" height="48" rx="4" fill="#FFFFFF" stroke="#1E6B52" stroke-width="2"/>
+            <text x="53" y="40" text-anchor="middle" font-size="9" font-weight="900" fill="#1E6B52">투자 목적</text>
+            <text x="53" y="74" text-anchor="middle" font-size="10" font-weight="800" fill="#2C221E">상가 건물</text>
+            <text x="53" y="110" text-anchor="middle" font-size="10" font-weight="900" fill="#1E6B52">투자부동산</text>
+            <!-- 영업용 건물 -->
+            <rect x="106" y="26" width="82" height="92" rx="8" fill="#FDF1E8" stroke="#C85A17" stroke-width="2"/>
+            <rect x="120" y="46" width="54" height="48" rx="4" fill="#FFFFFF" stroke="#C85A17" stroke-width="2"/>
+            <text x="147" y="40" text-anchor="middle" font-size="9" font-weight="900" fill="#C85A17">영업 목적</text>
+            <text x="147" y="74" text-anchor="middle" font-size="10" font-weight="800" fill="#2C221E">카페 건물</text>
+            <text x="147" y="110" text-anchor="middle" font-size="10" font-weight="900" fill="#C85A17">건물</text>
+          </svg>
+          <div class="scene-caption">물건 이름이 아니라 ‘보유 목적’을 먼저 확인!</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement invest">
+            [학습지 06] 투자 목적으로 상가 건물을 2,000,000원에 구입하고 당좌수표를 발행하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 ‘건물’이라는 단어만 보고 바로 건물 계정으로 적지 마세요. <strong>투자 목적</strong>이면 <strong>투자부동산</strong>입니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 이 상가 건물은 어떤 목적으로 구입했나요?</div>
+          <div class="think-item">② ‘건물’과 ‘투자부동산’ 중 무엇을 선택해야 할까요?</div>
+          <div class="think-item">③ 당좌수표를 발행하면 어떤 자산이 줄어드나요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-11-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-11-2" aria-expanded="false">힌트 2 · 자산 증감</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-11-3" aria-expanded="false">힌트 3 · 지급 수단</button>
+        </div>
+        <div id="h-11-1" class="hint-panel">핵심 단어는 <strong>「투자 목적」</strong>, <strong>「상가 건물」</strong>, <strong>「당좌수표 발행」</strong>입니다.</div>
+        <div id="h-11-2" class="hint-panel">투자부동산(자산)이 2,000,000원 <strong>증가(차변)</strong>합니다.</div>
+        <div id="h-11-3" class="hint-panel">당좌수표를 발행했으므로 대변에 <strong>당좌예금 2,000,000원 감소</strong>로 기록합니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 1쪽 06번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-11" aria-expanded="false">
+          정답 및 해설 보기 (학습지 06)
+        </button>
+        <div id="ans-11" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">투자부동산 2,000,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">당좌예금 2,000,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 투자부동산(자산) 2,000,000원 증가</div>
+            <div class="reason-card credit">대변: 당좌예금(자산) 2,000,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 2,000,000원 = 대변 합계 2,000,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “만약 카페 매장으로 직접 쓰려고 이 상가 건물을 샀다면 차변 계정과목이 어떻게 달라질까요?” → 영업 목적의 건물이므로 유형자산인 <strong>건물</strong>로 기록합니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 12: 투자자산 구별 미니 퀴즈
+         ======================================================================== -->
+    <section class="slide" id="slide-12" data-slide="12" data-part="invest" data-title="투자자산 구별 미니 퀴즈">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-invest">PART 1 · 마무리 퀴즈</span>
+          <span class="pill pill-extra">스스로 점검</span>
+        </div>
+      </div>
+      <h2 class="slide-title">투자자산 5가지 계정과목 구별 퀴즈</h2>
+      <p class="slide-subtitle">상황을 읽고 가장 알맞은 투자자산 계정과목을 골라 보세요. 틀려도 다시 고를 수 있습니다.</p>
+
+      <!-- 퀴즈 1 -->
+      <div class="card" data-quiz-group="inv-q1">
+        <div class="step-chip">퀴즈 1</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          여유 자금 1,500,000원을 <strong>만기까지 보유할 목적으로 국채</strong>를 사는 데 사용했다.
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="false" data-msg="은행 예금이 아니라 국가가 발행한 채권(국채)이에요.">장기금융상품</button>
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 만기가 있는 채권을 만기까지 보유할 목적이므로 만기보유증권입니다.">만기보유증권</button>
+          <button type="button" class="choice-btn" data-correct="false" data-msg="‘만기까지 보유할 목적’과 ‘국채’라는 단서를 다시 살펴보세요.">매도가능증권</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+
+      <!-- 퀴즈 2 -->
+      <div class="card" data-quiz-group="inv-q2">
+        <div class="step-chip">퀴즈 2</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          우리 카페 영업에는 쓰지 않고, <strong>장기 투자 목적으로 토지</strong>를 구입했다.
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="false" data-msg="영업에 사용할 토지가 아니라 ‘투자 목적’으로 구입한 토지예요.">토지</button>
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 투자 목적으로 보유하는 토지나 건물은 투자부동산으로 분류합니다.">투자부동산</button>
+          <button type="button" class="choice-btn" data-correct="false" data-msg="돈을 빌려준 것이 아니라 부동산을 취득한 거래예요.">장기대여금</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+
+      <!-- 퀴즈 3 -->
+      <div class="card" data-quiz-group="inv-q3">
+        <div class="step-chip">퀴즈 3</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          거래처에 <strong>3년간 현금을 빌려주고</strong> 나중에 원금과 이자를 받기로 했다. 빌려준 날 차변 계정과목은?
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 1년 이상 장기간 돈을 빌려주고 받을 권리는 장기대여금입니다.">장기대여금</button>
+          <button type="button" class="choice-btn" data-correct="false" data-msg="금융기관에 예금한 것이 아니라 거래처에 돈을 빌려준 거래예요.">장기금융상품</button>
+          <button type="button" class="choice-btn" data-correct="false" data-msg="이자수익은 나중에 이자를 받을 때 대변에 기록하는 수익 계정이에요.">이자수익</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+    </section>
+<!-- ========================================================================
+         SLIDE 13: PART 2 유형자산의 개념
+         ======================================================================== -->
+    <section class="slide" id="slide-13" data-slide="13" data-part="tangible" data-title="유형자산의 개념">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">교과서 130~131쪽</span>
+        </div>
+      </div>
+      <h2 class="slide-title">유형자산: 카페 영업에 직접 쓰는 형태 있는 자산</h2>
+      <p class="slide-subtitle">되팔려고 사 온 <strong>상품</strong>이 아니라, 우리 가게에서 <strong>1년 이상 계속 사용할</strong> 물건들입니다.</p>
+
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card" style="margin-bottom:0; border-top:4px solid var(--accent-cafe);">
+          <div style="font-weight:900; font-size:1.1rem; margin-bottom:6px;">🛍️ 판매 목적 → 상품 (재고자산)</div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            손님에게 팔기 위해 사 온 원두, 디저트, 판매용 텀블러<br>
+            (예: 커피머신 판매 회사가 팔려고 사 온 커피머신은 <strong>상품</strong>)
+          </p>
+        </div>
+        <div class="card" style="margin-bottom:0; border-top:4px solid var(--accent-tangible);">
+          <div style="font-weight:900; font-size:1.1rem; margin-bottom:6px; color:var(--accent-tangible);">☕ 영업 사용 목적 → 유형자산</div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            우리 카페에서 매일 영업에 사용하기 위해 보유하는 자산<br>
+            (예: 카페에서 커피를 내리려고 사 온 커피머신은 <strong>비품</strong>)
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-5">
+        <div class="card" style="text-align:center; margin-bottom:0; padding:14px;">
+          <div style="font-size:1.8rem;">🗺️</div>
+          <div style="font-weight:900; color:var(--accent-tangible); margin-top:4px;">토지</div>
+          <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">영업용 땅</div>
+        </div>
+        <div class="card" style="text-align:center; margin-bottom:0; padding:14px;">
+          <div style="font-size:1.8rem;">🏗️</div>
+          <div style="font-weight:900; color:var(--accent-tangible); margin-top:4px;">건설중인자산</div>
+          <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">짓고 있는 건물</div>
+        </div>
+        <div class="card" style="text-align:center; margin-bottom:0; padding:14px;">
+          <div style="font-size:1.8rem;">🏢</div>
+          <div style="font-weight:900; color:var(--accent-tangible); margin-top:4px;">건물</div>
+          <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">완공된 영업 건물</div>
+        </div>
+        <div class="card" style="text-align:center; margin-bottom:0; padding:14px;">
+          <div style="font-size:1.8rem;">⚙️</div>
+          <div style="font-weight:900; color:var(--accent-tangible); margin-top:4px;">기계장치</div>
+          <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">공장용 기계</div>
+        </div>
+        <div class="card" style="text-align:center; margin-bottom:0; padding:14px;">
+          <div style="font-size:1.8rem;">💻</div>
+          <div style="font-weight:900; color:var(--accent-tangible); margin-top:4px;">비품</div>
+          <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">커피머신·컴퓨터</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 14: 취득원가 계산의 기본 원리 (포함 vs 추가 인터랙티브 비교)
+         ======================================================================== -->
+    <section class="slide" id="slide-14" data-slide="14" data-part="tangible" data-title="취득원가 계산의 기본 원리">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 핵심 원리</span>
+          <span class="pill pill-worksheet">학습지 2쪽 핵심</span>
+        </div>
+      </div>
+      <h2 class="slide-title">유형자산 취득원가 = 구입대금 + 직접 관련 부대비용</h2>
+      <p class="slide-subtitle">자산을 사서 쓸 수 있게 만들기까지 든 <strong>취득세·설치비·운송비</strong>는 자산 가격에 합칩니다. 단, 문구의 <strong>「포함」</strong>과 <strong>「추가」</strong>를 꼭 구분하세요!</p>
+
+      <div class="card">
+        <div class="step-chip">인터랙티브 비교 · 버튼을 눌러 계산 차이를 확인하세요</div>
+        <div class="cost-sim-tabs" role="tablist">
+          <button type="button" class="cost-sim-tab active" data-cost-mode="add" aria-selected="true">
+            ➕ 별도 추가 지급 (예: 토지 500만 + 취득세 10만)
+          </button>
+          <button type="button" class="cost-sim-tab" data-cost-mode="inc" aria-selected="false">
+            📦 이미 포함된 금액 (예: 설치비 10만 포함 200만)
+          </button>
+        </div>
+
+        <div id="costSimAdd" class="cost-sim-panel">
+          <div class="cost-blocks">
+            <div class="cost-block">
+              <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">구입대금</div>
+              <div style="font-size:1.2rem; font-weight:900;">5,000,000원</div>
+            </div>
+            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-tangible);">+</div>
+            <div class="cost-block">
+              <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">부대비용 (취득세)</div>
+              <div style="font-size:1.2rem; font-weight:900;">100,000원</div>
+            </div>
+            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-tangible);">=</div>
+            <div class="cost-block total">
+              <div style="font-size:0.82rem; opacity:0.9;">취득원가 (총지급액)</div>
+              <div style="font-size:1.25rem;">5,100,000원</div>
+            </div>
+          </div>
+          <p style="margin:0; font-weight:700; text-align:center; color:var(--text-main);">
+            구입대금과 부대비용을 <strong>함께 지급</strong>하므로 두 금액을 더해 <strong>5,100,000원</strong>으로 기록합니다.
+          </p>
+        </div>
+
+        <div id="costSimInc" class="cost-sim-panel" style="display:none;">
+          <div class="cost-blocks">
+            <div class="cost-block total">
+              <div style="font-size:0.82rem; opacity:0.9;">지급 총액 (설치비 포함)</div>
+              <div style="font-size:1.25rem;">2,000,000원</div>
+            </div>
+            <div style="font-size:1.2rem; font-weight:900; color:var(--text-muted);">← 안에 이미 들어 있음</div>
+            <div class="cost-block included">
+              <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">설치비 (포함됨)</div>
+              <div style="font-size:1.1rem; font-weight:900; color:var(--accent-tangible);">100,000원</div>
+            </div>
+          </div>
+          <p style="margin:0; font-weight:700; text-align:center; color:var(--accent-tangible);">
+            ⚠️ 이미 2,000,000원 안에 설치비가 들어 있으므로 <strong>다시 더하지 않습니다!</strong> (총액 2,000,000원)
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 15: 영업용 토지와 취득세 + 학습지 유형자산 01
+         ======================================================================== -->
+    <section class="slide" id="slide-15" data-slide="15" data-part="tangible" data-title="영업용 토지와 취득세 (학습지 2쪽 01)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">학습지 2쪽 · 01번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">영업용 토지와 취득세: 부대비용을 합쳐서 기록하기</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="영업용 토지 500만 원과 취득세 10만 원 합산 510만 원">
+            <rect x="16" y="18" width="168" height="58" rx="10" fill="#FDF1E8" stroke="#C85A17" stroke-width="2.5"/>
+            <text x="100" y="42" text-anchor="middle" font-size="12" font-weight="900" fill="#C85A17">영업용 토지 5,000,000원</text>
+            <text x="100" y="62" text-anchor="middle" font-size="11" font-weight="800" fill="#5E4E46">+ 취득세 100,000원</text>
+            <rect x="30" y="88" width="140" height="34" rx="8" fill="#C85A17"/>
+            <text x="100" y="109" text-anchor="middle" font-size="12" font-weight="900" fill="#FFFFFF">당좌수표 5,100,000원</text>
+          </svg>
+          <div class="scene-caption">토지 가격 + 취득세 = 5,100,000원</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement tangible">
+            [학습지 2쪽 01] 영업용 토지를 5,000,000원에 구입하고 취득세 100,000원을 포함하여 전액 당좌수표로 지급하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 토지를 사면서 낸 <strong>취득세</strong>는 세금과공과(비용)로 따로 적지 않고, <strong>토지 취득원가</strong>에 더합니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 영업용 토지이므로 투자부동산과 토지 중 무엇일까요?</div>
+          <div class="think-item">② 취득세 100,000원은 토지 금액에 더할까요, 따로 적을까요?</div>
+          <div class="think-item">③ 당좌수표로 지급한 총액은 얼마인가요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-15-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-15-2" aria-expanded="false">힌트 2 · 취득원가 계산</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-15-3" aria-expanded="false">힌트 3 · 지급 수단</button>
+        </div>
+        <div id="h-15-1" class="hint-panel">핵심 단어는 <strong>「영업용 토지」</strong>, <strong>「취득세 100,000원」</strong>, <strong>「당좌수표 지급」</strong>입니다.</div>
+        <div id="h-15-2" class="hint-panel">토지 취득원가 = 5,000,000원 + 100,000원 = <strong>5,100,000원</strong>입니다.</div>
+        <div id="h-15-3" class="hint-panel">당좌수표를 발행했으므로 대변에 <strong>당좌예금 5,100,000원</strong>을 적습니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 2쪽 01번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-15" aria-expanded="false">
+          정답 및 해설 보기 (학습지 2쪽 01)
+        </button>
+        <div id="ans-15" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">토지 5,100,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">당좌예금 5,100,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 토지(자산) 5,100,000원 증가 (구입대금 + 취득세)</div>
+            <div class="reason-card credit">대변: 당좌예금(자산) 5,100,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 5,100,000원 = 대변 합계 5,100,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “왜 취득세 100,000원을 따로 적지 않고 토지에 합쳤나요?” → 토지를 취득하는 과정에서 직접 발생한 부대비용이기 때문입니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 16: 커피머신과 설치비 + 학습지 유형자산 02
+         ======================================================================== -->
+    <section class="slide" id="slide-16" data-slide="16" data-part="tangible" data-title="커피머신과 설치비 (학습지 2쪽 02)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">학습지 2쪽 · 02번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">커피머신과 설치비: ‘포함한 금액’ 주의하기!</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="카페 영업용 커피머신과 설치비 포함 200만 원 영수증">
+            <rect x="26" y="20" width="66" height="84" rx="8" fill="#5E4E46"/>
+            <rect x="34" y="30" width="50" height="18" rx="3" fill="#E6DDD0"/>
+            <rect x="46" y="64" width="26" height="24" rx="4" fill="#FFFFFF"/>
+            <rect x="104" y="22" width="82" height="92" rx="8" fill="#FFFFFF" stroke="#C85A17" stroke-width="2"/>
+            <text x="145" y="44" text-anchor="middle" font-size="10" font-weight="800" fill="#5E4E46">총 지급 현금</text>
+            <text x="145" y="66" text-anchor="middle" font-size="12" font-weight="900" fill="#C85A17">2,000,000원</text>
+            <rect x="112" y="78" width="66" height="24" rx="6" fill="#FDF1E8"/>
+            <text x="145" y="94" text-anchor="middle" font-size="9" font-weight="800" fill="#C85A17">설치비 10만 포함</text>
+          </svg>
+          <div class="scene-caption">이미 설치비가 포함된 총액 2,000,000원</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement tangible">
+            [학습지 2쪽 02] 카페의 영업용 커피머신을 2,000,000원에 구입하였다. 설치비 100,000원을 포함한 금액을 현금 지급하였다. (머신은 비품으로 처리)
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--accent-tangible); font-weight:800;">
+            ⚠️ 문구를 천천히 읽으세요! 설치비 100,000원을 <strong>포함한 금액</strong>이 2,000,000원입니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 포함 vs 추가 시각 비교 박스 -->
+      <div class="grid-2" style="margin-bottom:14px;">
+        <div class="card" style="margin-bottom:0; border:2px solid var(--accent-tangible); background:var(--accent-tangible-bg);">
+          <span class="pill pill-worksheet" style="margin-bottom:6px;">학습지 원래 문제</span>
+          <div style="font-weight:900; font-size:1rem;">“설치비를 포함해 2,000,000원 지급”</div>
+          <p style="margin:6px 0 0; font-weight:800; color:var(--accent-tangible);">→ 지급 총액 = 2,000,000원 (다시 더하지 않음!)</p>
+        </div>
+        <div class="card" style="margin-bottom:0; border:1.5px dashed var(--border-light); background:#FFFFFF;">
+          <span class="pill pill-extra" style="margin-bottom:6px;">조건 비교용 별도 예시</span>
+          <div style="font-weight:900; font-size:1rem;">“머신 2,000,000원에 설치비 100,000원 추가 지급”</div>
+          <p style="margin:6px 0 0; font-weight:700; color:var(--text-sub);">→ 지급 총액 = 2,100,000원 (별도 추가 시 합산)</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 현금으로 실제로 낸 총액은 200만 원일까요, 210만 원일까요?</div>
+          <div class="think-item">② 커피머신은 어떤 계정과목으로 처리하라고 했나요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-16-1" aria-expanded="false">힌트 1 · 금액 확인</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-16-2" aria-expanded="false">힌트 2 · 계정과목</button>
+        </div>
+        <div id="h-16-1" class="hint-panel">설치비 100,000원을 <strong>포함한 금액</strong>이 2,000,000원이므로, 100,000원을 다시 더하면 중복 계산이 됩니다.</div>
+        <div id="h-16-2" class="hint-panel">문제 조건에 따라 커피머신은 <strong>비품</strong>(자산 증가 → 차변), 지급 수단은 <strong>현금</strong>(자산 감소 → 대변)입니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 2쪽 02번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-16" aria-expanded="false">
+          정답 및 해설 보기 (학습지 2쪽 02)
+        </button>
+        <div id="ans-16" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">비품 2,000,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 2,000,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 비품(자산) 2,000,000원 증가</div>
+            <div class="reason-card credit">대변: 현금(자산) 2,000,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 2,000,000원 = 대변 합계 2,000,000원</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “이 문제에서 설치비 100,000원을 다시 더하면 안 되는 이유는 무엇일까요?” → 이미 설치비를 포함한 총 지급 금액이 2,000,000원이기 때문입니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 17: 건설중인자산 + 학습지 유형자산 03
+         ======================================================================== -->
+    <section class="slide" id="slide-17" data-slide="17" data-part="tangible" data-title="건설중인자산 (학습지 2쪽 03)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">학습지 2쪽 · 03번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">건설중인자산: 건물을 아직 짓고 있을 때</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="신축 공사 중인 카페 건물과 크레인">
+            <rect x="28" y="42" width="90" height="76" rx="4" fill="#FDF1E8" stroke="#C85A17" stroke-width="2.5" stroke-dasharray="6 4"/>
+            <line x1="28" y1="68" x2="118" y2="68" stroke="#C85A17" stroke-width="2"/>
+            <line x1="28" y1="94" x2="118" y2="94" stroke="#C85A17" stroke-width="2"/>
+            <text x="73" y="85" text-anchor="middle" font-size="11" font-weight="900" fill="#C85A17">공사 중 🚧</text>
+            <path d="M132 118 L132 24 L176 24" stroke="#5E4E46" stroke-width="4" fill="none"/>
+            <line x1="168" y1="24" x2="168" y2="54" stroke="#5E4E46" stroke-width="2"/>
+            <rect x="154" y="54" width="28" height="18" rx="3" fill="#F59E0B"/>
+          </svg>
+          <div class="scene-caption">완공 전에는 ‘건물’이 아니라 ‘건설중인자산’</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement tangible">
+            [학습지 2쪽 03] 신축 중인 카페 건물의 공사대금 중 1,000,000원을 현금으로 지급하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 아직 완공되지 않아 사용할 수 없는 건물의 공사대금은 임시로 <strong>건설중인자산</strong> 계정에 모아 둡니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 이 카페 건물은 완공되었나요, 짓고 있는 중인가요?</div>
+          <div class="think-item">② 완공 전에 지급한 공사대금은 어떤 계정과목일까요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-17-1" aria-expanded="false">힌트 1 · 핵심 단어</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-17-2" aria-expanded="false">힌트 2 · 계정과목</button>
+        </div>
+        <div id="h-17-1" class="hint-panel">핵심 단어는 <strong>「신축 중인 카페 건물」</strong>, <strong>「공사대금 1,000,000원」</strong>, <strong>「현금 지급」</strong>입니다.</div>
+        <div id="h-17-2" class="hint-panel">완공 전이므로 차변에 <strong>건설중인자산</strong>(자산 증가), 대변에 <strong>현금</strong>(자산 감소)을 적습니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 2쪽 03번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-17" aria-expanded="false">
+          정답 및 해설 보기 (학습지 2쪽 03)
+        </button>
+        <div id="ans-17" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">건설중인자산 1,000,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 1,000,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 건설중인자산(자산) 1,000,000원 증가</div>
+            <div class="reason-card credit">대변: 현금(자산) 1,000,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 1,000,000원 = 대변 합계 1,000,000원</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 18: 건물 완공과 계정 대체 + 학습지 유형자산 04
+         ======================================================================== -->
+    <section class="slide" id="slide-18" data-slide="18" data-part="tangible" data-title="건물 완공과 대체 (학습지 2쪽 04)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">학습지 2쪽 · 04번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">건물 완공: 건설중인자산을 건물로 바꾸기 (계정 대체)</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="건설중인자산 100만 원과 잔금 현금 400만 원이 합쳐져 완공 건물 500만 원이 되는 과정">
+            <rect x="10" y="18" width="76" height="42" rx="8" fill="#FEF2F2" stroke="#FECACA" stroke-width="2"/>
+            <text x="48" y="36" text-anchor="middle" font-size="9" font-weight="800" fill="#B91C1C">기존 건설중인자산</text>
+            <text x="48" y="52" text-anchor="middle" font-size="10" font-weight="900" fill="#2C221E">1,000,000원</text>
+
+            <rect x="10" y="72" width="76" height="42" rx="8" fill="#FEF2F2" stroke="#FECACA" stroke-width="2"/>
+            <text x="48" y="90" text-anchor="middle" font-size="9" font-weight="800" fill="#B91C1C">잔금 (현금)</text>
+            <text x="48" y="106" text-anchor="middle" font-size="10" font-weight="900" fill="#2C221E">4,000,000원</text>
+
+            <text x="98" y="72" text-anchor="middle" font-size="16" font-weight="900" fill="#C85A17">→</text>
+
+            <rect x="110" y="28" width="80" height="78" rx="10" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="2.5"/>
+            <text x="150" y="54" text-anchor="middle" font-size="11" font-weight="900" fill="#1D4ED8">🏢 완공 건물</text>
+            <text x="150" y="76" text-anchor="middle" font-size="12" font-weight="900" fill="#1D4ED8">5,000,000원</text>
+            <text x="150" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#1E3A8A">총 취득원가</text>
+          </svg>
+          <div class="scene-caption">기존 100만 + 잔금 400만 = 건물 500만 원</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement tangible">
+            [학습지 2쪽 04] 위 카페 건물이 완공되어 잔금 4,000,000원을 현금 지급하고 건물을 인수하였다. (기존 건설중인자산 1,000,000원)
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 건물이 완공되었으니 임시 계정이던 <strong>건설중인자산을 없애고(대변)</strong>, 전체 공사비 5,000,000원을 <strong>건물(차변)</strong>로 바꿉니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 완공된 건물 1채의 총 가격은 얼마인가요?</div>
+          <div class="think-item">② 이전에 차변에 적어 둔 ‘건설중인자산’은 이제 어느 변에서 없앨까요?</div>
+          <div class="think-item">③ 오늘 추가로 지급한 현금은 얼마인가요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-18-1" aria-expanded="false">힌트 1 · 건물 총액</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-18-2" aria-expanded="false">힌트 2 · 계정 대체</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-18-3" aria-expanded="false">힌트 3 · 잔금 지급</button>
+        </div>
+        <div id="h-18-1" class="hint-panel">기존 공사대금 1,000,000원 + 잔금 4,000,000원 = <strong>건물 5,000,000원 증가(차변)</strong>입니다.</div>
+        <div id="h-18-2" class="hint-panel">공사가 끝났으므로 기존 <strong>건설중인자산 1,000,000원 감소(대변)</strong>로 없앱니다.</div>
+        <div id="h-18-3" class="hint-panel">잔금으로 지급한 <strong>현금 4,000,000원 감소(대변)</strong>를 함께 적습니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 2쪽 04번</strong>에 먼저 분개해 보세요. (대변에 2개 계정!)</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-18" aria-expanded="false">
+          정답 및 해설 보기 (학습지 2쪽 04)
+        </button>
+        <div id="ans-18" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">건물 5,000,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">건설중인자산 1,000,000원, 현금 4,000,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 건물(자산) 5,000,000원 증가</div>
+            <div class="reason-card credit">대변: 건설중인자산(자산) 1,000,000원 감소 / 현금(자산) 4,000,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 5,000,000원 = 대변 합계 5,000,000원 (1,000,000 + 4,000,000)</div>
+          <div class="self-explain-box">
+            <strong>🗣️ 6단계 · 스스로 설명하기</strong>
+            “왜 건설중인자산을 대변에 적어 없애야 할까요?” → 건물이 완공되어 이제는 ‘건설 중인 자산’이 아니라 완성된 ‘건물’이 되었기 때문입니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 19: 기계장치와 운송비 + 학습지 유형자산 05
+         ======================================================================== -->
+    <section class="slide" id="slide-19" data-slide="19" data-part="tangible" data-title="기계장치와 운송비 (학습지 2쪽 05)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">학습지 2쪽 · 05번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">기계장치와 운송비: 구입대금에 운송비 더하기</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="공장용 기계 300만 원과 운송비 10만 원 합산 310만 원">
+            <rect x="16" y="18" width="168" height="58" rx="10" fill="#FDF1E8" stroke="#C85A17" stroke-width="2.5"/>
+            <text x="100" y="42" text-anchor="middle" font-size="12" font-weight="900" fill="#C85A17">공장용 기계 3,000,000원</text>
+            <text x="100" y="62" text-anchor="middle" font-size="11" font-weight="800" fill="#5E4E46">+ 운송비 100,000원 (추가)</text>
+            <rect x="30" y="88" width="140" height="34" rx="8" fill="#C85A17"/>
+            <text x="100" y="109" text-anchor="middle" font-size="12" font-weight="900" fill="#FFFFFF">당좌수표 3,100,000원</text>
+          </svg>
+          <div class="scene-caption">기계 가격 + 운송비 = 3,100,000원</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement tangible">
+            [학습지 2쪽 05] 공장용 기계 3,000,000원을 구입하고 운송비 100,000원을 더해 당좌수표로 지급하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 생산 활동에 사용하는 공장용 기계는 <strong>기계장치</strong> 계정을 쓰며, 운송비도 취득원가에 포함합니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 공장용 기계의 계정과목은 무엇인가요?</div>
+          <div class="think-item">② 운송비 100,000원을 ‘더해’ 지급했으므로 총액은 얼마인가요?</div>
+          <div class="think-item">③ 당좌수표로 지급했으므로 대변 계정과목은 무엇인가요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-19-1" aria-expanded="false">힌트 1 · 취득원가</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-19-2" aria-expanded="false">힌트 2 · 계정과목</button>
+        </div>
+        <div id="h-19-1" class="hint-panel">3,000,000원 + 100,000원 = <strong>3,100,000원</strong>입니다.</div>
+        <div id="h-19-2" class="hint-panel">차변은 <strong>기계장치</strong>(자산 증가), 대변은 당좌수표 발행이므로 <strong>당좌예금</strong>(자산 감소)입니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 2쪽 05번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-19" aria-expanded="false">
+          정답 및 해설 보기 (학습지 2쪽 05)
+        </button>
+        <div id="ans-19" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">기계장치 3,100,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">당좌예금 3,100,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 기계장치(자산) 3,100,000원 증가 (구입대금 + 운송비)</div>
+            <div class="reason-card credit">대변: 당좌예금(자산) 3,100,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 3,100,000원 = 대변 합계 3,100,000원</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 20: 컴퓨터 2대 구입 + 학습지 유형자산 06
+         ======================================================================== -->
+    <section class="slide" id="slide-20" data-slide="20" data-part="tangible" data-title="컴퓨터 2대 구입 (학습지 2쪽 06)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 유형자산 취득</span>
+          <span class="pill pill-worksheet">학습지 2쪽 · 06번</span>
+        </div>
+      </div>
+      <h2 class="slide-title">영업용 컴퓨터 구입: 1대 가격 × 수량 계산하기</h2>
+
+      <div class="scene-box">
+        <div class="scene-visual">
+          <svg viewBox="0 0 200 140" role="img" aria-label="카페용 컴퓨터 2대, 각 30만 원, 합계 60만 원">
+            <rect x="20" y="24" width="68" height="46" rx="6" fill="#2C221E"/>
+            <rect x="26" y="30" width="56" height="34" rx="3" fill="#EFF6FF"/>
+            <text x="54" y="51" text-anchor="middle" font-size="10" font-weight="900" fill="#1D4ED8">300,000원</text>
+            <rect x="112" y="24" width="68" height="46" rx="6" fill="#2C221E"/>
+            <rect x="118" y="30" width="56" height="34" rx="3" fill="#EFF6FF"/>
+            <text x="146" y="51" text-anchor="middle" font-size="10" font-weight="900" fill="#1D4ED8">300,000원</text>
+            <rect x="24" y="88" width="152" height="32" rx="8" fill="#FDF1E8" stroke="#C85A17" stroke-width="2"/>
+            <text x="100" y="108" text-anchor="middle" font-size="11" font-weight="900" fill="#C85A17">300,000원 × 2대 = 600,000원</text>
+          </svg>
+          <div class="scene-caption">1대당 300,000원 × 2대 = 600,000원</div>
+        </div>
+        <div>
+          <div class="step-chip">1단계 · 거래 장면</div>
+          <div class="problem-statement tangible">
+            [학습지 2쪽 06] 카페에서 사용할 컴퓨터 2대를 1대당 300,000원에 현금 구입하였다.
+          </div>
+          <p style="margin:0; font-size:0.95rem; color:var(--text-sub); font-weight:600;">
+            💡 카페에서 영업용으로 사용하는 컴퓨터·책상·의자·커피머신 등은 <strong>비품</strong> 계정을 사용합니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-chip">2단계 · 먼저 생각하기</div>
+        <div class="think-questions">
+          <div class="think-item">① 1대당 300,000원짜리 컴퓨터를 2대 샀으니 총액은 얼마인가요?</div>
+          <div class="think-item">② 카페 영업용 컴퓨터의 계정과목은 무엇인가요?</div>
+        </div>
+
+        <div class="step-chip">3단계 · 필요한 만큼 힌트 열기</div>
+        <div class="hint-bar">
+          <button type="button" class="hint-btn" data-toggle-target="h-20-1" aria-expanded="false">힌트 1 · 금액 계산</button>
+          <button type="button" class="hint-btn" data-toggle-target="h-20-2" aria-expanded="false">힌트 2 · 계정과목</button>
+        </div>
+        <div id="h-20-1" class="hint-panel">300,000원 × 2대 = <strong>600,000원</strong>입니다.</div>
+        <div id="h-20-2" class="hint-panel">차변은 <strong>비품</strong>(자산 증가), 대변은 <strong>현금</strong>(자산 감소)입니다.</div>
+
+        <div class="write-prompt-box">
+          <span class="write-prompt-text">✏️ 여기서 잠깐! <strong>학습지 2쪽 06번</strong>에 먼저 분개해 보세요.</span>
+        </div>
+
+        <button type="button" class="answer-toggle-btn" data-toggle-target="ans-20" aria-expanded="false">
+          정답 및 해설 보기 (학습지 2쪽 06)
+        </button>
+        <div id="ans-20" class="answer-box">
+          <div class="journal-scroll-hint">← 좌우로 밀어 전체 분개 보기 →</div>
+          <div class="journal-scroll-wrap">
+            <div class="journal-line">
+              <span class="j-tag j-debit-tag">차</span>
+              <span class="j-debit-text">비품 600,000원</span>
+              <span class="j-divider" aria-hidden="true"></span>
+              <span class="j-tag j-credit-tag">대</span>
+              <span class="j-credit-text">현금 600,000원</span>
+            </div>
+          </div>
+          <div class="reason-grid">
+            <div class="reason-card debit">차변: 비품(자산) 600,000원 증가 (300,000원 × 2대)</div>
+            <div class="reason-card credit">대변: 현금(자산) 600,000원 감소</div>
+          </div>
+          <div class="balance-check">✓ 차변 합계 600,000원 = 대변 합계 600,000원</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 21: 유형자산 취득원가 미니 퀴즈
+         ======================================================================== -->
+    <section class="slide" id="slide-21" data-slide="21" data-part="tangible" data-title="유형자산 취득원가 미니 퀴즈">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-tangible">PART 2 · 마무리 퀴즈</span>
+          <span class="pill pill-extra">스스로 점검</span>
+        </div>
+      </div>
+      <h2 class="slide-title">유형자산 취득원가 핵심 점검 퀴즈</h2>
+      <p class="slide-subtitle">포함/추가 구분, 수량 계산, 완공 전후 계정을 빠르게 확인해 봅시다.</p>
+
+      <div class="card" data-quiz-group="tan-q1">
+        <div class="step-chip">퀴즈 1 · 포함 vs 추가</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          영업용 냉장고를 1,500,000원에 구입하면서, <strong>설치비 50,000원을 포함한 금액</strong>을 현금 지급했다. 비품 취득원가는?
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 설치비가 이미 1,500,000원에 포함되어 있으므로 다시 더하지 않습니다.">1,500,000원</button>
+          <button type="button" class="choice-btn" data-correct="false" data-msg="‘설치비를 포함한 금액’이라는 문구를 다시 읽어 보세요. 이미 총액에 들어 있어요!">1,550,000원</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="card" data-quiz-group="tan-q2">
+        <div class="step-chip">퀴즈 2 · 수량 계산</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          카페 매장에서 쓸 포스기(비품) <strong>3대</strong>를 1대당 <strong>400,000원</strong>에 현금 구입했다. 차변 금액은?
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="false" data-msg="1대 가격이 400,000원이고, 총 3대를 구입했어요.">400,000원</button>
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 400,000원 × 3대 = 1,200,000원입니다.">1,200,000원</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="card" data-quiz-group="tan-q3">
+        <div class="step-chip">퀴즈 3 · 완공 전후 계정</div>
+        <div style="font-weight:800; font-size:1.05rem; margin-bottom:8px;">
+          신축 중인 건물이 <strong>완공</strong>되어 인수할 때, 기존에 차변에 적어 두었던 <strong>건설중인자산</strong>은 어느 변에 기록해 없애나요?
+        </div>
+        <div class="choice-grid">
+          <button type="button" class="choice-btn" data-correct="false" data-msg="차변에 적으면 건설중인자산이 또 늘어나게 돼요. 자산 감소는 어느 변일까요?">차변</button>
+          <button type="button" class="choice-btn" data-correct="true" data-msg="정답입니다! 완공되었으므로 건설중인자산을 대변에 적어 없애고, 차변에 건물로 대체합니다.">대변</button>
+        </div>
+        <div class="quiz-feedback" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 22: 투자자산과 유형자산 비교 정리
+         ======================================================================== -->
+    <section class="slide" id="slide-22" data-slide="22" data-part="summary" data-title="투자자산 vs 유형자산 비교 정리">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-intro">마무리 · 한눈에 정리</span>
+        </div>
+      </div>
+      <h2 class="slide-title">투자자산 vs 유형자산 핵심 비교</h2>
+      <p class="slide-subtitle">오늘 배운 두 단원의 차이를 표로 정리해 봅시다.</p>
+
+      <div class="table-wrap" style="margin-bottom:16px;">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th style="width:18%;">구분</th>
+              <th style="width:41%; color:var(--accent-invest);">투자자산 (학습지 1쪽)</th>
+              <th style="width:41%; color:var(--accent-tangible);">유형자산 (학습지 2쪽)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>보유 목적</strong></td>
+              <td>장기 자금 운용, 투자 수익 얻기</td>
+              <td>영업 활동에 1년 이상 직접 사용</td>
+            </tr>
+            <tr>
+              <td><strong>대표 계정과목</strong></td>
+              <td>장기금융상품, 만기보유증권, 매도가능증권, 장기대여금, 투자부동산</td>
+              <td>토지, 건설중인자산, 건물, 기계장치, 비품</td>
+            </tr>
+            <tr>
+              <td><strong>금액 확인 포인트</strong></td>
+              <td>원금과 이자수익 구분하기</td>
+              <td>부대비용(취득세·설치비·운송비)의 <strong>포함 vs 추가</strong> 구분, 단가 × 수량</td>
+            </tr>
+            <tr>
+              <td><strong>헷갈리기 쉬운 점</strong></td>
+              <td>투자 목적 상가는 ‘건물’이 아니라 <strong>투자부동산</strong></td>
+              <td>완공 전에는 <strong>건설중인자산</strong>, 완공 후 <strong>건물</strong>로 대체</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-inline">
+        <span>📘</span>
+        <span><strong>다음에 배울 내용 예고:</strong> 유형자산을 사용하면서 가치가 줄어드는 ‘감가상각’과 자산을 파는 ‘처분’은 다음 단원에서 이어서 배웁니다.</span>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 23: 종합 미션 (추가 연습 4문제)
+         ======================================================================== -->
+    <section class="slide" id="slide-23" data-slide="23" data-part="summary" data-title="종합 미션 (추가 연습)">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-intro">마무리 · 종합 미션</span>
+          <span class="pill pill-extra">추가 연습 (학습지 외 문제)</span>
+        </div>
+      </div>
+      <h2 class="slide-title">종합 미션: 투자자산 + 유형자산 섞어서 분개하기</h2>
+      <p class="slide-subtitle">학습지에는 없는 <strong>추가 연습</strong> 4문제입니다. 먼저 머릿속으로 분개한 뒤 정답을 열어 확인하세요.</p>
+
+      <div class="grid-2">
+        <!-- 미션 1 -->
+        <div class="card">
+          <span class="pill pill-extra" style="margin-bottom:8px;">추가 연습 1</span>
+          <p style="margin:0 0 12px; font-weight:800;">투자 목적으로 토지 3,000,000원을 구입하고 당좌수표를 발행하였다.</p>
+          <button type="button" class="answer-toggle-btn" data-toggle-target="m-ans-1" aria-expanded="false">정답 확인</button>
+          <div id="m-ans-1" class="answer-box">
+            <div class="journal-scroll-wrap">
+              <div class="journal-line">
+                <span class="j-tag j-debit-tag">차</span>
+                <span class="j-debit-text">투자부동산 3,000,000원</span>
+                <span class="j-divider"></span>
+                <span class="j-tag j-credit-tag">대</span>
+                <span class="j-credit-text">당좌예금 3,000,000원</span>
+              </div>
+            </div>
+            <p style="margin:0; font-size:0.88rem; color:var(--text-sub); font-weight:700;">투자 목적이므로 토지가 아니라 <strong>투자부동산</strong>입니다.</p>
+          </div>
+        </div>
+
+        <!-- 미션 2 -->
+        <div class="card">
+          <span class="pill pill-extra" style="margin-bottom:8px;">추가 연습 2</span>
+          <p style="margin:0 0 12px; font-weight:800;">영업용 토지 4,000,000원을 구입하고 취득세 200,000원을 더해 당좌수표로 지급하였다.</p>
+          <button type="button" class="answer-toggle-btn" data-toggle-target="m-ans-2" aria-expanded="false">정답 확인</button>
+          <div id="m-ans-2" class="answer-box">
+            <div class="journal-scroll-wrap">
+              <div class="journal-line">
+                <span class="j-tag j-debit-tag">차</span>
+                <span class="j-debit-text">토지 4,200,000원</span>
+                <span class="j-divider"></span>
+                <span class="j-tag j-credit-tag">대</span>
+                <span class="j-credit-text">당좌예금 4,200,000원</span>
+              </div>
+            </div>
+            <p style="margin:0; font-size:0.88rem; color:var(--text-sub); font-weight:700;">영업용 토지 + 취득세(부대비용) = 4,200,000원</p>
+          </div>
+        </div>
+
+        <!-- 미션 3 -->
+        <div class="card">
+          <span class="pill pill-extra" style="margin-bottom:8px;">추가 연습 3</span>
+          <p style="margin:0 0 12px; font-weight:800;">만기까지 보유할 목적으로 국채 700,000원을 현금 취득하였다.</p>
+          <button type="button" class="answer-toggle-btn" data-toggle-target="m-ans-3" aria-expanded="false">정답 확인</button>
+          <div id="m-ans-3" class="answer-box">
+            <div class="journal-scroll-wrap">
+              <div class="journal-line">
+                <span class="j-tag j-debit-tag">차</span>
+                <span class="j-debit-text">만기보유증권 700,000원</span>
+                <span class="j-divider"></span>
+                <span class="j-tag j-credit-tag">대</span>
+                <span class="j-credit-text">현금 700,000원</span>
+              </div>
+            </div>
+            <p style="margin:0; font-size:0.88rem; color:var(--text-sub); font-weight:700;">만기까지 보유할 목적의 국채(채권)는 <strong>만기보유증권</strong>입니다.</p>
+          </div>
+        </div>
+
+        <!-- 미션 4 -->
+        <div class="card">
+          <span class="pill pill-extra" style="margin-bottom:8px;">추가 연습 4</span>
+          <p style="margin:0 0 12px; font-weight:800;">카페 영업용 의자 5개(1개당 80,000원)를 현금 구입하였다.</p>
+          <button type="button" class="answer-toggle-btn" data-toggle-target="m-ans-4" aria-expanded="false">정답 확인</button>
+          <div id="m-ans-4" class="answer-box">
+            <div class="journal-scroll-wrap">
+              <div class="journal-line">
+                <span class="j-tag j-debit-tag">차</span>
+                <span class="j-debit-text">비품 400,000원</span>
+                <span class="j-divider"></span>
+                <span class="j-tag j-credit-tag">대</span>
+                <span class="j-credit-text">현금 400,000원</span>
+              </div>
+            </div>
+            <p style="margin:0; font-size:0.88rem; color:var(--text-sub); font-weight:700;">80,000원 × 5개 = 400,000원</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         SLIDE 24: 마무리 체크
+         ======================================================================== -->
+    <section class="slide" id="slide-24" data-slide="24" data-part="summary" data-title="마무리 체크">
+      <div class="slide-top-meta">
+        <div class="badge-group">
+          <span class="pill pill-intro">마무리 · 스스로 체크</span>
+        </div>
+      </div>
+      <h2 class="slide-title">오늘 수업 마무리 체크 🎉</h2>
+      <p class="slide-subtitle">아래 3가지 질문에 스스로 답할 수 있다면 오늘 학습 목표를 완벽하게 달성한 것입니다!</p>
+
+      <div class="card">
+        <div style="font-weight:900; font-size:1.05rem; margin-bottom:10px;">✅ 오늘의 핵심 질문 3가지</div>
+        <ol style="margin:0; padding-left:20px; font-weight:700; line-height:1.9;">
+          <li>같은 건물이라도 <strong>투자 목적</strong>일 때와 <strong>영업 목적</strong>일 때 계정과목이 어떻게 다른가요?</li>
+          <li>부대비용이 <strong>‘이미 포함된 금액’</strong>일 때와 <strong>‘추가 지급’</strong>일 때 금액 계산이 어떻게 다른가요?</li>
+          <li>건물이 완공되었을 때 기존 <strong>건설중인자산</strong>은 왜 대변에 적어 없애나요?</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:900; font-size:1rem; margin-bottom:10px;">🔎 헷갈리는 개념 다시 보기</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" class="btn-jump invest" data-goto="10">장기대여금 원금·이자 회수</button>
+          <button type="button" class="btn-jump invest" data-goto="11">투자부동산 vs 영업용 건물</button>
+          <button type="button" class="btn-jump tangible" data-goto="16">커피머신 설치비(포함 vs 추가)</button>
+          <button type="button" class="btn-jump tangible" data-goto="18">건물 완공과 건설중인자산 대체</button>
+        </div>
+      </div>
+
+      <div class="cover-actions" style="margin-top:16px;">
+        <button type="button" class="btn-primary" data-goto="1">처음부터 다시 보기 ↺</button>
+        <button type="button" class="btn-jump" id="finalTocBtn">전체 목차 열기</button>
+      </div>
+    </section>
+</main>
+
+  <!-- 하단 고정 컨트롤 바 -->
+  <footer class="app-footer" aria-label="슬라이드 이동 컨트롤">
+    <button type="button" id="prevBtn" class="nav-btn" aria-label="이전 슬라이드">
+      ← 이전
+    </button>
+    <div id="slideCounter" class="slide-counter" aria-live="polite">
+      1 / 24
+    </div>
+    <button type="button" id="nextBtn" class="nav-btn next" aria-label="다음 슬라이드">
+      다음 →
+    </button>
+  </footer>
+
+  <!-- 전체 목차 모달 -->
+  <div id="tocModal" class="toc-modal" role="dialog" aria-modal="true" aria-labelledby="tocTitle">
+    <div class="toc-dialog">
+      <div class="toc-header">
+        <h3 id="tocTitle" style="margin:0; font-size:1.15rem; font-weight:900;">📑 전체 슬라이드 목차</h3>
+        <button type="button" id="tocCloseBtn" class="toc-open-btn" aria-label="목차 닫기">닫기 ✕</button>
+      </div>
+      <div id="tocGrid" class="toc-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ======================================================================
+         1. 핵심 DOM 요소 및 상태 초기화
+         ====================================================================== */
+      const STORAGE_KEY_SLIDE = 'cafe_accounting_last_slide_v1';
+      const STORAGE_KEY_MODE = 'cafe_accounting_study_mode_v1';
+
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const totalSlides = slides.length;
+      const viewport = document.getElementById('slidesViewport');
+      const progressFill = document.getElementById('progressFill');
+      const slideCounter = document.getElementById('slideCounter');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const partTabs = Array.from(document.querySelectorAll('.part-tab'));
+      const modeToggleBtn = document.getElementById('modeToggleBtn');
+
+      const tocModal = document.getElementById('tocModal');
+      const tocGrid = document.getElementById('tocGrid');
+      const tocOpenBtn = document.getElementById('tocOpenBtn');
+      const tocCloseBtn = document.getElementById('tocCloseBtn');
+      const finalTocBtn = document.getElementById('finalTocBtn');
+
+      let currentSlide = 1;
+
+      /* 안전한 로컬 스토리지 래퍼 (시크릿 모드/권한 제한 환경에서도 오류 방지) */
+      function safeGetStorage(key) {
+        try {
+          return window.localStorage.getItem(key);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function safeSetStorage(key, value) {
+        try {
+          window.localStorage.setItem(key, String(value));
+        } catch (e) {
+          /* 저장 실패 시 무시하고 학습 계속 진행 */
+        }
+      }
+
+      /* ======================================================================
+         2. 슬라이드 이동 및 UI 동기화
+         ====================================================================== */
+      function goToSlide(num, shouldSave = true) {
+        const target = Math.max(1, Math.min(totalSlides, Number(num) || 1));
+        currentSlide = target;
+
+        slides.forEach((slideEl) => {
+          const slideNum = Number(slideEl.dataset.slide);
+          slideEl.classList.toggle('active', slideNum === currentSlide);
+        });
+
+        /* 상단 진행률 및 하단 번호 업데이트 */
+        const percent = (currentSlide / totalSlides) * 100;
+        if (progressFill) progressFill.style.width = percent.toFixed(2) + '%';
+        if (slideCounter) slideCounter.textContent = currentSlide + ' / ' + totalSlides;
+
+        /* 이전/다음 버튼 활성 상태 */
+        if (prevBtn) prevBtn.disabled = currentSlide === 1;
+        if (nextBtn) nextBtn.disabled = currentSlide === totalSlides;
+
+        /* 상단 단원 탭 활성 표시 */
+        const activeSlideEl = slides[currentSlide - 1];
+        const activePart = activeSlideEl ? activeSlideEl.dataset.part : 'intro';
+        partTabs.forEach((tab) => {
+          tab.classList.toggle('active', tab.dataset.part === activePart);
+        });
+
+        /* 목차 현재 위치 갱신 */
+        if (tocGrid) {
+          tocGrid.querySelectorAll('.toc-item-btn').forEach((btn) => {
+            btn.classList.toggle('current', Number(btn.dataset.goto) === currentSlide);
+          });
+        }
+
+        /* 스크롤 맨 위로 부드럽게 복귀 */
+        if (viewport) viewport.scrollTop = 0;
+
+        if (shouldSave) {
+          safeSetStorage(STORAGE_KEY_SLIDE, currentSlide);
+        }
+      }
+
+      /* 이전 / 다음 버튼 클릭 */
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+      }
+
+      /* data-goto 속성을 가진 모든 버튼(상단 탭, 표지 버튼, 마무리 바로가기 등) */
+      document.addEventListener('click', (e) => {
+        const gotoBtn = e.target.closest('[data-goto]');
+        if (!gotoBtn) return;
+        const targetSlide = Number(gotoBtn.dataset.goto);
+        if (!Number.isNaN(targetSlide)) {
+          goToSlide(targetSlide);
+          closeToc();
+        }
+      });
+
+      /* 키보드 좌우 화살표 & ESC(목차 닫기) 지원 */
+      document.addEventListener('keydown', (e) => {
+        if (tocModal && tocModal.classList.contains('open')) {
+          if (e.key === 'Escape') closeToc();
+          return;
+        }
+        if (e.key === 'ArrowRight') {
+          goToSlide(currentSlide + 1);
+        } else if (e.key === 'ArrowLeft') {
+          goToSlide(currentSlide - 1);
+        }
+      });
+
+      /* 터치 스와이프 이동 (단, 가로 스크롤 분개 영역/표 내부에서는 스와이프 방지) */
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let ignoreSwipe = false;
+
+      if (viewport) {
+        viewport.addEventListener('touchstart', (e) => {
+          if (e.touches.length !== 1) return;
+          const target = e.target;
+          ignoreSwipe = Boolean(target.closest('.journal-scroll-wrap, .table-wrap, .part-nav'));
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        viewport.addEventListener('touchend', (e) => {
+          if (ignoreSwipe || e.changedTouches.length !== 1) return;
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          const dy = e.changedTouches[0].clientY - touchStartY;
+          if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+            if (dx < 0 && currentSlide < totalSlides) {
+              goToSlide(currentSlide + 1);
+            } else if (dx > 0 && currentSlide > 1) {
+              goToSlide(currentSlide - 1);
+            }
+          }
+        }, { passive: true });
+      }
+
+      /* ======================================================================
+         3. 전체 목차 모달 동적 생성 및 제어
+         ====================================================================== */
+      function buildToc() {
+        if (!tocGrid) return;
+        tocGrid.innerHTML = '';
+        slides.forEach((slideEl) => {
+          const num = Number(slideEl.dataset.slide);
+          const title = slideEl.dataset.title || ('슬라이드 ' + num);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'toc-item-btn';
+          btn.dataset.goto = String(num);
+          btn.textContent = String(num).padStart(2, '0') + '. ' + title;
+          tocGrid.appendChild(btn);
+        });
+      }
+
+      function openToc() {
+        if (!tocModal) return;
+        tocModal.classList.add('open');
+        if (tocCloseBtn) tocCloseBtn.focus();
+      }
+
+      function closeToc() {
+        if (!tocModal) return;
+        tocModal.classList.remove('open');
+      }
+
+      if (tocOpenBtn) tocOpenBtn.addEventListener('click', openToc);
+      if (finalTocBtn) finalTocBtn.addEventListener('click', openToc);
+      if (tocCloseBtn) tocCloseBtn.addEventListener('click', closeToc);
+      if (tocModal) {
+        tocModal.addEventListener('click', (e) => {
+          if (e.target === tocModal) closeToc();
+        });
+      }
+
+      /* ======================================================================
+         4. 단계별 힌트, 정답 보기, 추가 연습 토글 (iOS Safari 안정화)
+         ====================================================================== */
+      document.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('[data-toggle-target]');
+        if (!toggleBtn) return;
+
+        const targetId = toggleBtn.dataset.toggleTarget;
+        const panel = document.getElementById(targetId);
+        if (!panel) return;
+
+        const isOpen = panel.classList.toggle('open');
+        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+
+        /* 정답 버튼의 경우 열림/닫힘 문구 자연스럽게 전환 */
+        if (toggleBtn.classList.contains('answer-toggle-btn')) {
+          if (!toggleBtn.dataset.origText) {
+            toggleBtn.dataset.origText = toggleBtn.textContent.trim();
+          }
+          toggleBtn.textContent = isOpen ? '정답 가리기 ▲' : toggleBtn.dataset.origText;
+        }
+      });
+
+      /* ======================================================================
+         5. 선택형 퀴즈 및 자산 분류 활동 (Slide 03, 04, 12, 21)
+         ====================================================================== */
+      document.addEventListener('click', (e) => {
+        const choiceBtn = e.target.closest('.choice-btn');
+        if (!choiceBtn) return;
+
+        const group = choiceBtn.closest('[data-quiz-group]');
+        if (!group) return;
+
+        const isCorrect = choiceBtn.dataset.correct === 'true';
+        const msg = choiceBtn.dataset.msg || (isCorrect ? '정답입니다!' : '다시 한 번 생각해 보세요.');
+
+        /* 같은 그룹 내 기존 선택 스타일 초기화 후 현재 선택 반영 */
+        group.querySelectorAll('.choice-btn').forEach((btn) => {
+          btn.classList.remove('is-correct', 'is-wrong');
+        });
+        choiceBtn.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+
+        const feedback = group.querySelector('.quiz-feedback');
+        if (feedback) {
+          feedback.textContent = (isCorrect ? '✅ ' : '💡 ') + msg;
+          feedback.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'retry');
+        }
+      });
+
+      /* ======================================================================
+         6. 학습지 문항 내 미니 계정과목 선택기 (Slide 06, 07, 08)
+         ====================================================================== */
+      document.addEventListener('click', (e) => {
+        const chip = e.target.closest('.picker-chip');
+        if (!chip) return;
+
+        const group = chip.closest('[data-picker-group]');
+        if (!group) return;
+
+        const isCorrect = chip.dataset.correct === 'true';
+        const msg = chip.dataset.msg || '';
+
+        group.querySelectorAll('.picker-chip').forEach((btn) => {
+          btn.classList.remove('selected-correct', 'selected-wrong');
+        });
+        chip.classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+
+        const feedback = group.querySelector('.picker-feedback');
+        if (feedback) {
+          feedback.textContent = (isCorrect ? '✅ ' : '💡 ') + msg;
+          feedback.style.color = isCorrect ? 'var(--success-color)' : 'var(--warn-color)';
+        }
+      });
+
+      /* ======================================================================
+         7. 투자자산 전체 지도 카드 전환 (Slide 05)
+         ====================================================================== */
+      document.addEventListener('click', (e) => {
+        const mapCard = e.target.closest('.invest-map-card');
+        if (!mapCard) return;
+
+        const targetId = mapCard.dataset.mapTarget;
+        document.querySelectorAll('.map-desc-item').forEach((item) => {
+          item.style.display = item.id === targetId ? 'block' : 'none';
+        });
+      });
+
+      /* ======================================================================
+         8. 취득원가 포함 vs 추가 인터랙티브 비교 (Slide 14)
+         ====================================================================== */
+      document.addEventListener('click', (e) => {
+        const simTab = e.target.closest('.cost-sim-tab');
+        if (!simTab) return;
+
+        const mode = simTab.dataset.costMode;
+        document.querySelectorAll('.cost-sim-tab').forEach((tab) => {
+          const active = tab === simTab;
+          tab.classList.toggle('active', active);
+          tab.setAttribute('aria-selected', String(active));
+        });
+
+        const addPanel = document.getElementById('costSimAdd');
+        const incPanel = document.getElementById('costSimInc');
+        if (addPanel) addPanel.style.display = mode === 'add' ? 'block' : 'none';
+        if (incPanel) incPanel.style.display = mode === 'inc' ? 'block' : 'none';
+      });
+
+      /* ======================================================================
+         9. 교사용(수업) 모드 / 혼자 공부 모드 전환
+         ====================================================================== */
+      function applyStudyMode(mode) {
+        const isSelf = mode === 'self';
+        document.body.classList.toggle('mode-self', isSelf);
+        if (modeToggleBtn) {
+          modeToggleBtn.dataset.mode = isSelf ? 'self' : 'class';
+          modeToggleBtn.setAttribute('aria-pressed', String(isSelf));
+          modeToggleBtn.textContent = isSelf ? '📱 혼자 공부 모드' : '👩‍🏫 수업 모드';
+        }
+        safeSetStorage(STORAGE_KEY_MODE, isSelf ? 'self' : 'class');
+      }
+
+      if (modeToggleBtn) {
+        modeToggleBtn.addEventListener('click', () => {
+          const nextMode = modeToggleBtn.dataset.mode === 'self' ? 'class' : 'self';
+          applyStudyMode(nextMode);
+        });
+      }
+
+      /* ======================================================================
+         10. 앱 초기 실행 (목차 생성, 저장된 모드·슬라이드 복원)
+         ====================================================================== */
+      buildToc();
+
+      const savedMode = safeGetStorage(STORAGE_KEY_MODE);
+      if (savedMode === 'self' || savedMode === 'class') {
+        applyStudyMode(savedMode);
+      }
+
+      const savedSlide = Number(safeGetStorage(STORAGE_KEY_SLIDE));
+      if (savedSlide >= 1 && savedSlide <= totalSlides) {
+        goToSlide(savedSlide, false);
+      } else {
+        goToSlide(1, false);
+      }
+    })();
+  </script>
+</body>
+</html>

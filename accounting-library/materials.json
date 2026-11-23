@@ -142,6 +142,27 @@
     "lesson": 1
   },
   {
+    "id": "investment-fixed-assets-01-slides",
+    "unit": "투자자산·유형자산",
+    "account": "투자자산·유형자산 취득",
+    "lesson": 1,
+    "title": "수업 슬라이드 | 카페 사장님의 자산 장부",
+    "description": "투자자산과 유형자산 취득을 24장 슬라이드로 익힙니다. 학습지 01~06 거래를 카페 장면으로 보며 한 줄 분개를 연습하고, 수업 모드와 혼자 공부 모드를 전환할 수 있습니다.",
+    "pages": "128~131",
+    "tags": [
+      "투자자산",
+      "유형자산",
+      "취득원가",
+      "분개",
+      "슬라이드"
+    ],
+    "slides": "materials/investment-fixed-assets-01/slides.html",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 5,
+    "accountOrder": 1
+  },
+  {
     "id": "investment-fixed-assets-01",
     "unit": "투자자산·유형자산",
     "account": "투자자산·유형자산 취득",
