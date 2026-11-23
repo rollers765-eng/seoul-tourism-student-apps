@@ -666,7 +666,7 @@ body{overflow-wrap:anywhere}
 }
 
 /* ---------- 수업 자료 화면(PPT·영상 캡처) ---------- */
-.shots{display:grid;gap:10px;margin:0}
+.shots{display:grid;gap:10px;margin:0;align-items:start}
 .shots figure{margin:0;background:#fffdf8;border:1px solid var(--line);border-radius:12px;overflow:hidden;
   box-shadow:0 8px 20px -18px rgba(36,26,19,.6)}
 .shots img{display:block;width:100%;height:auto;background:#f3ece0}
@@ -688,6 +688,7 @@ body{overflow-wrap:anywhere}
 .ytlist{display:grid;gap:8px;list-style:none;margin:0;padding:0}
 @media (min-width:700px){.ytlist{grid-template-columns:1fr 1fr}}
 .ytlist li{margin:0}
+.ytlist li:only-child{grid-column:1/-1}
 .ytlist a{display:flex;gap:9px;align-items:flex-start;height:100%;padding:9px 10px;border-radius:10px;
   border:1px solid var(--line);background:#fff;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
 .ytlist a:hover,.ytlist a:focus-visible{border-color:#c34a33;transform:translateY(-1px)}
