@@ -1,0 +1,3302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>자산 취득 분개 트레이닝 v2 — 투자자산 · 유형자산</title>
+<style>
+  :root {
+    --bg: #FAF6EF;
+    --surface: #FFFFFF;
+    --surface-warm: #F4EDE1;
+    --surface-muted: #EFE7DA;
+    --border: #DFD5C5;
+    --border-strong: #C6B9A4;
+    --ink: #22201E;
+    --ink-soft: #59524A;
+    --green: #1B5E46;
+    --green-dark: #134432;
+    --green-soft: #E5F2EC;
+    --orange: #C45514;
+    --orange-dark: #9B400B;
+    --orange-soft: #FCEEE5;
+    --brown: #7B4A21;
+    --debit: #1A4E8A;
+    --debit-soft: #EAF1FA;
+    --credit: #B53B2A;
+    --credit-soft: #FBECE9;
+    --ok: #18794E;
+    --ok-soft: #E6F6EE;
+    --bad: #C43B2B;
+    --bad-soft: #FDECEB;
+    --shadow-sm: 0 2px 8px rgba(34, 32, 30, 0.06);
+    --shadow-md: 0 8px 24px rgba(34, 32, 30, 0.10);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 22px;
+    --font-sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+    --trans: 180ms ease;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* ===== Top Bar ===== */
+  .topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 16px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    z-index: 30;
+  }
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 10px;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 700 0.98rem/1.2 var(--font-sans);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+  }
+  .brand-btn:hover { background: var(--surface-warm); }
+
+  .slide-counter {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    background: var(--surface-warm);
+    padding: 5px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Mode Switch */
+  .mode-switch {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface-muted);
+    padding: 3px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    gap: 2px;
+  }
+
+  .mode-btn {
+    min-height: 38px;
+    min-width: 44px;
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--ink-soft);
+    font: 700 0.88rem/1 var(--font-sans);
+    cursor: pointer;
+    transition: background var(--trans), color var(--trans);
+    white-space: nowrap;
+  }
+
+  .mode-btn[aria-pressed="true"] {
+    background: var(--green);
+    color: #FFFFFF;
+    box-shadow: var(--shadow-sm);
+  }
+  body.mode-student .mode-btn[data-mode="student"][aria-pressed="true"] {
+    background: var(--orange);
+  }
+
+  .toc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font: 700 0.9rem/1 var(--font-sans);
+    cursor: pointer;
+  }
+  .toc-btn:hover { background: var(--surface-warm); }
+
+  .progress-track {
+    flex: 0 0 4px;
+    background: var(--surface-muted);
+    width: 100%;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    transition: width var(--trans);
+  }
+  body.mode-student .progress-fill { background: var(--orange); }
+
+  /* ===== Stage & Slides ===== */
+  .stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    display: none;
+    height: 100%;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px 12px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .slide.active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font: 700 0.96rem/1.1 var(--font-sans);
+    cursor: pointer;
+    transition: transform var(--trans), background var(--trans), border-color var(--trans);
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-primary { background: var(--green); border-color: var(--green); color: #FFFFFF; }
+  .btn-primary:hover:not(:disabled) { background: var(--green-dark); }
+  .btn-orange { background: var(--orange); border-color: var(--orange); color: #FFFFFF; }
+  .btn-orange:hover:not(:disabled) { background: var(--orange-dark); }
+  .btn-dark { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+  .btn-soft { background: var(--surface-warm); border-color: var(--border); color: var(--ink); }
+
+  /* ===== Badges ===== */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .badge-info { background: var(--surface-muted); color: var(--ink-soft); }
+  .badge-worksheet { background: var(--surface-warm); color: var(--green-dark); border: 1px solid #C5D8CE; }
+  .badge-drill { background: var(--green); color: #FFFFFF; }
+  .badge-drill.cat-tangible { background: var(--orange); color: #FFFFFF; }
+  .badge-mixed { background: var(--ink); color: #FAF6EF; }
+  .badge-exam { background: var(--orange-soft); color: var(--orange-dark); border: 1px solid #F1C9AE; }
+  .badge-exam.cat-invest { background: var(--green-soft); color: var(--green-dark); border: 1px solid #B7DAC9; }
+
+  /* ===== S-00 Cover ===== */
+  .cover-wrap {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.25fr 0.95fr;
+    gap: 28px;
+    align-items: center;
+  }
+  .cover-kicker {
+    display: inline-block;
+    padding: 6px 12px;
+    background: var(--green-soft);
+    color: var(--green-dark);
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+  }
+  .cover-title {
+    margin: 0 0 12px;
+    font-size: clamp(2rem, 4.2vw, 3.3rem);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  .cover-sub {
+    margin: 0 0 24px;
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .cover-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .cover-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+  }
+  .cover-art svg { width: 100%; max-width: 380px; height: auto; }
+
+  /* ===== Info Slides (S-01, S-02, S-03) ===== */
+  .slide-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+  }
+  .slide-title {
+    margin: 4px 0 0;
+    font-size: clamp(1.35rem, 2.5vw, 2rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--ink-soft);
+    font-size: 1rem;
+  }
+  .card li + li { margin-top: 6px; }
+
+  .step-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .step-box {
+    background: var(--surface-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-box svg { flex: 0 0 42px; width: 42px; height: 42px; }
+  .step-box strong { display: block; font-size: 1rem; margin-bottom: 2px; }
+  .step-box span { font-size: 0.9rem; color: var(--ink-soft); }
+
+  .ios-note {
+    background: var(--orange-soft);
+    border: 1px solid #F0C4A5;
+    color: var(--orange-dark);
+    border-radius: var(--radius-sm);
+    padding: 11px 16px;
+    font-weight: 800;
+    font-size: 0.98rem;
+    text-align: center;
+  }
+
+  .remind-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-content: center;
+  }
+  .remind-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--green);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .remind-card.warm { border-top-color: var(--orange); }
+  .remind-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--green-soft);
+    color: var(--green-dark);
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .remind-card.warm .remind-num { background: var(--orange-soft); color: var(--orange-dark); }
+  .remind-card h3 { margin: 0 0 8px; font-size: 1.2rem; font-weight: 900; }
+  .remind-card p { margin: 0; font-size: 1.02rem; color: var(--ink-soft); }
+  .pay-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .pay-pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--surface-warm);
+    border: 1px solid var(--border-strong);
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+
+  /* S-03 Account Map */
+  .map-section { margin-bottom: 14px; }
+  .map-label {
+    font-size: 1rem;
+    font-weight: 900;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .map-label.invest { color: var(--green-dark); }
+  .map-label.tangible { color: var(--orange-dark); }
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+  }
+  .map-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-height: 76px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-left: 5px solid var(--green);
+    border-radius: var(--radius-sm);
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: transform var(--trans), box-shadow var(--trans);
+  }
+  .map-card.tangible { border-left-color: var(--orange); }
+  .map-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+  .map-card strong { font-size: 1.08rem; color: var(--ink); }
+  .map-card span { font-size: 0.86rem; color: var(--ink-soft); }
+
+  /* ===== Problem Slides ===== */
+  .p-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .p-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .p-id-tag {
+    font-weight: 900;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+  .p-title {
+    margin: 0 0 8px;
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    font-weight: 800;
+    color: var(--ink-soft);
+    flex-shrink: 0;
+  }
+  .p-scene-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--green);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+  }
+  .slide.cat-tangible .p-scene-box { border-left-color: var(--orange); }
+  .slide[data-style="mixed"] .p-scene-box { border-left-color: var(--ink); }
+  .p-icon {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-warm);
+    border-radius: 12px;
+  }
+  .p-scene {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.3vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.4;
+    color: var(--ink);
+    word-break: keep-all;
+  }
+  .p-extra:empty { display: none; }
+  .p-extra {
+    margin-bottom: 10px;
+    font-size: 0.96rem;
+    color: var(--orange-dark);
+    font-weight: 700;
+  }
+
+  .p-workspace {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* Mode Visibility */
+  body.mode-teacher .student-only { display: none !important; }
+  body.mode-student .teacher-only { display: none !important; }
+
+  /* ===== Teacher Mode Workspace ===== */
+  .teacher-board {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 18px;
+    padding: 18px 22px 36px;
+    background: var(--surface);
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+    min-height: 220px;
+  }
+  .t-entry-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .t-entry-label {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--ink-soft);
+  }
+  .t-line-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .t-line {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: clamp(1.5rem, 2.6vw, 2.15rem);
+    font-weight: 800;
+    white-space: nowrap;
+    min-width: max-content;
+  }
+  .side-tag {
+    display: inline-block;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.9em;
+  }
+  .side-tag.debit { color: var(--debit); background: var(--debit-soft); }
+  .side-tag.credit { color: var(--credit); background: var(--credit-soft); }
+  .t-blank-acct {
+    display: inline-block;
+    width: clamp(150px, 18vw, 230px);
+    border-bottom: 3.5px solid var(--ink);
+    height: 1.15em;
+  }
+  .t-blank-amt {
+    display: inline-block;
+    width: clamp(130px, 15vw, 195px);
+    border-bottom: 3.5px solid var(--ink);
+    height: 1.15em;
+  }
+  .t-blank-sep { width: 20px; display: inline-block; }
+
+  .teacher-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .teacher-answer-box {
+    display: none;
+    margin-top: 12px;
+    padding: 16px 20px;
+    background: var(--green-soft);
+    border: 1.5px solid #9EC9B5;
+    border-radius: var(--radius-md);
+  }
+  .teacher-answer-box.open { display: block; }
+  .ans-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ans-line {
+    font-size: clamp(1.15rem, 1.9vw, 1.55rem);
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.45;
+    word-break: keep-all;
+  }
+  .ans-explain {
+    margin: 0;
+    font-size: clamp(0.98rem, 1.35vw, 1.12rem);
+    color: var(--green-dark);
+    font-weight: 600;
+  }
+
+  /* ===== Student Mode Workspace ===== */
+  .student-hint {
+    background: var(--surface-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    margin-bottom: 10px;
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: var(--brown);
+  }
+  .student-hint:empty { display: none; }
+
+  .journal-scroll-wrap {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+  }
+  .scroll-cue {
+    display: none;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    text-align: right;
+    margin-bottom: 4px;
+  }
+
+  .s-entry-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    min-width: 560px;
+  }
+  .s-entry-label {
+    font-size: 0.92rem;
+    font-weight: 900;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .s-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .s-side-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .s-side-head {
+    font-size: 0.9rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .s-row {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .slot {
+    position: relative;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--bg);
+    border: 2px dashed var(--border-strong);
+    border-radius: 10px;
+    transition: border-color var(--trans), background var(--trans);
+  }
+  .slot.slot-drop-ready {
+    border-color: var(--orange);
+    background: var(--orange-soft);
+  }
+  .slot.slot-drop-hover {
+    border-style: solid;
+    border-color: var(--green);
+    background: var(--green-soft);
+  }
+  .slot.filled {
+    border-style: solid;
+    border-color: var(--border-strong);
+    background: var(--surface);
+  }
+  .slot.is-ok {
+    border-color: var(--ok);
+    background: var(--ok-soft);
+  }
+  .slot.is-bad {
+    border-color: var(--bad);
+    background: var(--bad-soft);
+  }
+
+  .slot-input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font: 800 1.02rem/1.2 var(--font-sans);
+    color: var(--ink);
+    outline: none;
+    padding: 4px 2px;
+  }
+  .slot-input::placeholder {
+    color: #9A9083;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .slot-clear {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-muted);
+    color: var(--ink-soft);
+    font-weight: 900;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .slot.filled .slot-clear { display: inline-flex; }
+
+  /* Chips */
+  .chip-bank {
+    background: var(--surface-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chip-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip-row-label {
+    font-size: 0.84rem;
+    font-weight: 900;
+    color: var(--ink-soft);
+    min-width: 58px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font: 800 0.98rem/1 var(--font-sans);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--trans), background var(--trans), border-color var(--trans);
+  }
+  .chip-account { border-color: #A8CBB9; color: var(--green-dark); }
+  .chip-amount { border-color: #E6BEA3; color: var(--orange-dark); }
+  .chip.selected {
+    background: var(--green);
+    border-color: var(--green);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+  }
+  .chip-amount.selected {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #FFFFFF;
+  }
+
+  .student-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .grade-feedback {
+    display: none;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.96rem;
+    margin-bottom: 8px;
+  }
+  .grade-feedback.open { display: block; }
+  .grade-feedback.ok { background: var(--ok-soft); border: 1px solid #9CD8BA; color: #125638; }
+  .grade-feedback.bad { background: var(--bad-soft); border: 1px solid #E9B3AD; color: #8B2418; }
+
+  .explain-box {
+    display: none;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1.5px solid var(--green);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+  }
+  .explain-box.open { display: block; }
+  .explain-box .ans-line { font-size: 1.05rem; }
+  .explain-box .ans-explain { font-size: 0.95rem; margin-top: 6px; color: var(--ink-soft); }
+
+  /* ===== Compare Slide (A2-02b) ===== */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+  .compare-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .compare-card.left { border-color: var(--green); }
+  .compare-card.right { border-color: var(--orange); }
+  .compare-tag {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+  .compare-card.left .compare-tag { background: var(--green-soft); color: var(--green-dark); }
+  .compare-card.right .compare-tag { background: var(--orange-soft); color: var(--orange-dark); }
+  .compare-quote { font-size: 1.15rem; font-weight: 800; margin: 0; }
+  .compare-formula {
+    background: var(--surface-warm);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 1.15rem;
+    font-weight: 900;
+  }
+  .compare-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--ink-soft);
+  }
+  .compare-takeaway {
+    background: var(--ink);
+    color: #FAF6EF;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .mini-check {
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+  }
+  .mini-check-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  /* ===== Summary, Self-check, Outro (Z-01 ~ Z-03) ===== */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+    font-size: 0.96rem;
+  }
+  .summary-table th, .summary-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .summary-table th { background: var(--surface-warm); font-weight: 900; }
+  .trap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+  }
+  .trap-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--orange);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 0.93rem;
+  }
+  .trap-item strong { display: block; margin-bottom: 3px; color: var(--orange-dark); }
+
+  .score-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .score-big { font-size: 1.6rem; font-weight: 900; color: var(--green-dark); }
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 8px;
+  }
+  .result-pill {
+    min-height: 44px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font: 800 0.88rem/1.1 var(--font-sans);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .result-pill.is-ok { background: var(--ok-soft); border-color: #9CD8BA; color: #125638; }
+  .result-pill.is-bad { background: var(--bad-soft); border-color: #E9B3AD; color: #8B2418; }
+
+  .outro-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+  }
+  .outro-next {
+    background: var(--surface-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 22px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  /* ===== Bottom Navigation ===== */
+  .bottombar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 25;
+  }
+  .bottom-label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ===== TOC Drawer ===== */
+  .toc-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(34, 32, 30, 0.42);
+    z-index: 60;
+    display: none;
+  }
+  .toc-backdrop.open { display: block; }
+  .toc-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(380px, 90vw);
+    background: var(--surface);
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform var(--trans);
+    box-shadow: -8px 0 28px rgba(0, 0, 0, 0.14);
+  }
+  .toc-drawer.open { transform: translateX(0); }
+  .toc-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    border-bottom: 1px solid var(--border);
+  }
+  .toc-head h2 { margin: 0; font-size: 1.1rem; font-weight: 900; }
+  .toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px 28px;
+  }
+  .toc-group-title {
+    margin: 14px 0 6px;
+    font-size: 0.84rem;
+    font-weight: 900;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .toc-item {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink);
+    font: 700 0.92rem/1.25 var(--font-sans);
+    text-align: left;
+    cursor: pointer;
+  }
+  .toc-item:hover { background: var(--surface-warm); }
+  .toc-item.current {
+    background: var(--green-soft);
+    border-color: #A8CEBC;
+    color: var(--green-dark);
+  }
+
+  /* ===== Drag Ghost ===== */
+  .drag-ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 120;
+    pointer-events: none;
+    display: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: var(--ink);
+    color: #FFFFFF;
+    font: 800 1rem/1 var(--font-sans);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+    transform: translate(-50%, -140%);
+    white-space: nowrap;
+  }
+  .drag-ghost.active { display: block; }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 820px) {
+    .slide { padding: 12px 14px 10px; }
+    .cover-wrap, .guide-grid, .remind-grid, .compare-grid { grid-template-columns: 1fr; }
+    .compare-arrow { transform: rotate(90deg); padding: 2px 0; }
+    .step-row { grid-template-columns: 1fr; }
+    .brand-text { display: none; }
+    .scroll-cue { display: block; }
+    .p-scene-box { padding: 12px 14px; }
+    .p-icon { display: none; }
+  }
+</style>
+</head>
+<body class="mode-teacher">
+<div class="app-shell">
+  <!-- 상단 고정 바 -->
+  <header class="topbar">
+    <div class="brand-group">
+      <button type="button" class="brand-btn" data-action="go-home" aria-label="처음으로 이동">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="4" fill="#1B5E46"/>
+          <path d="M7 8h10M7 12h10M7 16h6" stroke="#FAF6EF" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-text">자산 취득 분개 트레이닝</span>
+      </button>
+      <span class="slide-counter" id="slideCounter">1 / 50</span>
+    </div>
+
+    <div class="topbar-right">
+      <div class="mode-switch" role="group" aria-label="사용 모드 전환">
+        <button type="button" class="mode-btn" data-mode="teacher" aria-pressed="true">수업 모드</button>
+        <button type="button" class="mode-btn" data-mode="student" aria-pressed="false">혼자 공부</button>
+      </div>
+      <button type="button" class="toc-btn" id="openTocBtn" aria-label="목차 열기">목차</button>
+    </div>
+  </header>
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- 목차 드로어 -->
+  <div class="toc-backdrop" id="tocBackdrop"></div>
+  <aside class="toc-drawer" id="tocDrawer" aria-hidden="true" aria-label="슬라이드 목차">
+    <div class="toc-head">
+      <h2>전체 목차</h2>
+      <button type="button" class="btn btn-soft" id="closeTocBtn" aria-label="목차 닫기">닫기</button>
+    </div>
+    <div class="toc-list" id="tocList"></div>
+  </aside>
+
+  <!-- 슬라이드 스테이지 -->
+  <main class="stage" id="stage">
+
+    <!-- S-00 표지 -->
+    <section class="slide cover active" id="S-00" data-type="info" data-group="안내" data-badge="표지" data-nav-title="표지">
+      <div class="cover-wrap">
+        <div>
+          <span class="cover-kicker">회계원리 · 교과서 128~131쪽</span>
+          <h1 class="cover-title">자산 취득 분개 트레이닝</h1>
+          <p class="cover-sub">학습지 A 12문항 + 자격증 실전 드릴 30문항</p>
+          <div class="cover-actions">
+            <button type="button" class="btn btn-primary" data-action="start-teacher">수업 모드로 시작</button>
+            <button type="button" class="btn btn-orange" data-action="start-student">혼자 공부 모드로 시작</button>
+            <button type="button" class="btn btn-soft" data-action="open-toc">목차</button>
+          </div>
+        </div>
+        <div class="cover-art" aria-hidden="true">
+          <svg viewBox="0 0 360 270" fill="none">
+            <rect x="16" y="20" width="210" height="230" rx="16" fill="#FAF6EF" stroke="#C6B9A4" stroke-width="2.5"/>
+            <rect x="34" y="42" width="174" height="28" rx="6" fill="#1B5E46"/>
+            <text x="121" y="61" text-anchor="middle" fill="#FAF6EF" font-size="13" font-weight="700">분개장 · JOURNAL</text>
+            <line x1="121" y1="82" x2="121" y2="230" stroke="#DFD5C5" stroke-width="2"/>
+            <rect x="36" y="92" width="76" height="22" rx="5" fill="#EAF1FA"/>
+            <text x="74" y="107" text-anchor="middle" fill="#1A4E8A" font-size="11" font-weight="700">(차) 자산</text>
+            <rect x="130" y="92" width="76" height="22" rx="5" fill="#FBECE9"/>
+            <text x="168" y="107" text-anchor="middle" fill="#B53B2A" font-size="11" font-weight="700">(대) 지급</text>
+            <line x1="36" y1="134" x2="110" y2="134" stroke="#8C7E6D" stroke-width="3" stroke-linecap="round"/>
+            <line x1="130" y1="134" x2="204" y2="134" stroke="#8C7E6D" stroke-width="3" stroke-linecap="round"/>
+            <line x1="36" y1="166" x2="100" y2="166" stroke="#C6B9A4" stroke-width="3" stroke-linecap="round"/>
+            <line x1="130" y1="166" x2="196" y2="166" stroke="#C6B9A4" stroke-width="3" stroke-linecap="round"/>
+            <line x1="36" y1="198" x2="106" y2="198" stroke="#C6B9A4" stroke-width="3" stroke-linecap="round"/>
+            <line x1="130" y1="198" x2="190" y2="198" stroke="#C6B9A4" stroke-width="3" stroke-linecap="round"/>
+            <!-- 영수증 -->
+            <path d="M242 46h96v120l-12-9-12 9-12-9-12 9-12-9-12 9-12-9-12 9V46z" fill="#FFFFFF" stroke="#C45514" stroke-width="2.5"/>
+            <text x="290" y="72" text-anchor="middle" fill="#C45514" font-size="12" font-weight="800">CAFE RECEIPT</text>
+            <line x1="256" y1="88" x2="324" y2="88" stroke="#DFD5C5" stroke-width="2"/>
+            <line x1="256" y1="106" x2="310" y2="106" stroke="#59524A" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="256" y1="124" x2="320" y2="124" stroke="#59524A" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="256" y1="142" x2="300" y2="142" stroke="#C45514" stroke-width="3" stroke-linecap="round"/>
+            <!-- 커피잔 -->
+            <rect x="252" y="192" width="54" height="44" rx="10" fill="#C45514"/>
+            <path d="M306 202h12a10 10 0 0 1 0 20h-12" stroke="#C45514" stroke-width="4" fill="none"/>
+            <path d="M268 184c0-6 6-6 6-12M284 184c0-6 6-6 6-12" stroke="#7B4A21" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- S-01 사용 안내 -->
+    <section class="slide" id="S-01" data-type="info" data-group="안내" data-badge="사용 안내" data-nav-title="사용 안내">
+      <div class="slide-head">
+        <div>
+          <span class="badge badge-info">사용 안내</span>
+          <h2 class="slide-title">두 가지 모드와 칩 조작법</h2>
+        </div>
+      </div>
+      <div class="guide-grid">
+        <div class="card">
+          <h3><span class="badge badge-drill">수업 모드</span> 전자칠판 · 판서용</h3>
+          <ul>
+            <li>분개 칸은 <strong>깨끗한 빈 밑줄</strong>만 표시됩니다.</li>
+            <li>정답은 자동 노출되지 않고 <strong>정답 보기</strong>를 누를 때만 열립니다.</li>
+            <li>상단 스위치로 언제든 현재 문항 그대로 모드를 전환합니다.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="badge badge-drill cat-tangible">혼자 공부</span> 아이패드 · 스마트폰용</h3>
+          <ul>
+            <li>계정과목·금액 칩을 차변·대변 칸에 직접 배치해 연습합니다.</li>
+            <li><strong>채점</strong>으로 줄별 O/X와 차대변 합계를 바로 확인합니다.</li>
+            <li>제출 후 <strong>해설 보기</strong>로 이유와 함정 포인트를 점검합니다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-box">
+          <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <rect x="4" y="6" width="18" height="14" rx="4" fill="#1B5E46"/>
+            <path d="M16 18l12 12m0 0h-8m8 0v-8" stroke="#C45514" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="22" y="26" width="18" height="12" rx="4" stroke="#59524A" stroke-width="2" stroke-dasharray="3 2"/>
+          </svg>
+          <div>
+            <strong>1. 끌기 (드래그)</strong>
+            <span>칩을 끌어 원하는 빈 칸에 놓기</span>
+          </div>
+        </div>
+        <div class="step-box">
+          <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <rect x="4" y="8" width="16" height="14" rx="4" fill="#C45514"/>
+            <circle cx="12" cy="15" r="3" fill="#FFFFFF"/>
+            <path d="M22 15h6" stroke="#22201E" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="28" y="8" width="14" height="14" rx="4" fill="#E5F2EC" stroke="#1B5E46" stroke-width="2"/>
+            <text x="22" y="37" text-anchor="middle" fill="#59524A" font-size="10" font-weight="800">TAP → TAP</text>
+          </svg>
+          <div>
+            <strong>2. 탭 배치</strong>
+            <span>칩을 한 번 탭 → 빈 칸을 탭해 배치</span>
+          </div>
+        </div>
+        <div class="step-box">
+          <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <rect x="4" y="10" width="36" height="24" rx="5" fill="#FFFFFF" stroke="#22201E" stroke-width="2"/>
+            <path d="M10 22h14" stroke="#1B5E46" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="27" y1="16" x2="27" y2="28" stroke="#C45514" stroke-width="2.5"/>
+          </svg>
+          <div>
+            <strong>3. 직접 타이핑</strong>
+            <span>빈 칸을 눌러 계정 선택·숫자 입력</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ios-note">아이폰·아이패드는 탭 배치를 쓰면 됩니다. (배치된 칩은 × 버튼이나 탭으로 취소)</div>
+    </section>
+
+    <!-- S-02 3분 리마인드 -->
+    <section class="slide" id="S-02" data-type="info" data-group="안내" data-badge="3분 리마인드" data-nav-title="3분 리마인드">
+      <div class="slide-head">
+        <div>
+          <span class="badge badge-info">3분 리마인드</span>
+          <h2 class="slide-title">분개 전 반드시 확인할 4가지</h2>
+        </div>
+      </div>
+      <div class="remind-grid">
+        <div class="remind-card">
+          <span class="remind-num">1</span>
+          <h3>자산 증가 = 차변 / 감소 = 대변</h3>
+          <p>자산을 새로 취득하면 <strong>차변(왼쪽)</strong>, 현금·예금이 나가거나 기존 자산을 대체하면 <strong>대변(오른쪽)</strong>.</p>
+        </div>
+        <div class="remind-card warm">
+          <span class="remind-num">2</span>
+          <h3>취득원가 = 구입대금 + 직접 부대비용</h3>
+          <p>취득세·등록세·중개수수료·운송비·설치비·시운전비는 모두 자산 원가에 더한다. (이미 포함인지 꼭 확인!)</p>
+        </div>
+        <div class="remind-card">
+          <span class="remind-num">3</span>
+          <h3>보유 목적이 계정과목을 결정</h3>
+          <p>같은 건물·토지라도 <strong>영업용</strong>이면 건물·토지(유형자산), <strong>투자용</strong>이면 투자부동산(투자자산).</p>
+        </div>
+        <div class="remind-card warm">
+          <span class="remind-num">4</span>
+          <h3>지급수단 5칸</h3>
+          <p>어떻게 지급했는지 문장 끝을 확인한다.</p>
+          <div class="pay-pills">
+            <span class="pay-pill">현금</span>
+            <span class="pay-pill">보통예금</span>
+            <span class="pay-pill">당좌예금</span>
+            <span class="pay-pill">지급어음</span>
+            <span class="pay-pill">미지급금</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S-03 계정 지도 -->
+    <section class="slide" id="S-03" data-type="info" data-group="안내" data-badge="계정 지도" data-nav-title="계정 지도">
+      <div class="slide-head">
+        <div>
+          <span class="badge badge-info">계정 지도</span>
+          <h2 class="slide-title">카드를 누르면 해당 계정의 첫 문제로 이동합니다</h2>
+        </div>
+      </div>
+
+      <div class="map-section">
+        <p class="map-label invest">● 투자자산 (5개 · 교과서 128~129쪽)</p>
+        <div class="map-grid">
+          <button type="button" class="map-card" data-jump="A1-01"><strong>장기금융상품</strong><span>만기 1년 이상 예·적금</span></button>
+          <button type="button" class="map-card" data-jump="A1-02"><strong>만기보유증권</strong><span>만기 보유 목적 채권</span></button>
+          <button type="button" class="map-card" data-jump="A1-03"><strong>매도가능증권</strong><span>장기 보유 주식·채권</span></button>
+          <button type="button" class="map-card" data-jump="A1-04"><strong>장기대여금</strong><span>1년 이상 현금 대여</span></button>
+          <button type="button" class="map-card" data-jump="A1-06"><strong>투자부동산</strong><span>투자 목적 토지·건물</span></button>
+        </div>
+      </div>
+
+      <div class="map-section">
+        <p class="map-label tangible">● 유형자산 (6개 · 교과서 130~131쪽)</p>
+        <div class="map-grid">
+          <button type="button" class="map-card tangible" data-jump="A2-01"><strong>토지</strong><span>영업용 대지·부지</span></button>
+          <button type="button" class="map-card tangible" data-jump="A2-04"><strong>건물</strong><span>영업용 매장·공장 건물</span></button>
+          <button type="button" class="map-card tangible" data-jump="A2-03"><strong>건설중인자산</strong><span>완공 전 공사대금</span></button>
+          <button type="button" class="map-card tangible" data-jump="A2-05"><strong>기계장치</strong><span>생산용 기계·설비</span></button>
+          <button type="button" class="map-card tangible" data-jump="A2-02"><strong>비품</strong><span>커피머신·컴퓨터·가구</span></button>
+          <button type="button" class="map-card tangible" data-jump="D2-06"><strong>차량운반구</strong><span>영업용 승합차·화물차</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 학습지 A · 투자자산 (A1-01 ~ A1-06) ===== -->
+    <section class="slide problem cat-invest" id="A1-01" data-type="journal" data-group="학습지 A · 투자자산" data-badge="학습지 A · 투자자산 01" data-style="worksheet" data-icon="receipt">
+      <h2 class="p-title">3년 만기 정기예금에 예입</h2>
+      <p class="p-scene">나래 상가는 3년 만기 정기예금에 현금 1,000,000원을 예입하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"장기금융상품","amount":1000000}],
+            "credit": [{"account":"현금","amount":1000000}]
+          }
+        ],
+        "accounts": ["장기금융상품","현금","보통예금","만기보유증권","매도가능증권"],
+        "amounts": [1000000, 100000, 500000, 1100000],
+        "hint": "만기 1년 이상 정기예금 + 지급수단이 현금인지 확인",
+        "explain": "결산일 현재 만기가 1년 이상 남은 정기예금은 장기금융상품(투자자산)으로 처리합니다. 현금을 예입했으므로 차변에 장기금융상품, 대변에 현금을 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="A1-02" data-type="journal" data-group="학습지 A · 투자자산" data-badge="학습지 A · 투자자산 02" data-style="worksheet" data-icon="receipt">
+      <h2 class="p-title">만기 보유 목적 국채 취득</h2>
+      <p class="p-scene">송도 상가는 만기까지 보유할 목적으로 국채를 500,000원에 현금 취득하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"만기보유증권","amount":500000}],
+            "credit": [{"account":"현금","amount":500000}]
+          }
+        ],
+        "accounts": ["만기보유증권","매도가능증권","장기금융상품","현금","보통예금"],
+        "amounts": [500000, 50000, 300000, 1000000],
+        "hint": "만기가 있는 채권 + '만기까지 보유할 목적' 확인",
+        "explain": "국채·공채·사채 등 만기가 고정된 채권을 만기까지 보유할 의도와 능력이 있으면 만기보유증권으로 분류합니다. 주식은 만기가 없어 만기보유증권이 될 수 없습니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="A1-03" data-type="journal" data-group="학습지 A · 투자자산" data-badge="학습지 A · 투자자산 03" data-style="worksheet" data-icon="receipt">
+      <h2 class="p-title">장기 보유 목적 주식 취득</h2>
+      <p class="p-scene">은성 상가는 장기간 보유할 목적으로 다른 회사 주식을 300,000원에 현금 취득하였다. (교과서의 매도가능증권 분류 적용)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"매도가능증권","amount":300000}],
+            "credit": [{"account":"현금","amount":300000}]
+          }
+        ],
+        "accounts": ["매도가능증권","만기보유증권","장기금융상품","현금","보통예금"],
+        "amounts": [300000, 30000, 500000, 600000],
+        "hint": "주식은 만기가 없으므로 만기보유증권 불가",
+        "explain": "주식은 만기가 없는 지분증권이므로 만기보유증권으로 분류할 수 없습니다. 장기간 보유 목적의 주식은 교과서 기준에 따라 매도가능증권(차변)으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="A1-04" data-type="journal" data-group="학습지 A · 투자자산" data-badge="학습지 A · 투자자산 04" data-style="worksheet" data-icon="receipt">
+      <h2 class="p-title">2년간 현금 대여</h2>
+      <p class="p-scene">부여 상가는 다른 회사에 현금 800,000원을 2년간 빌려주었다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"장기대여금","amount":800000}],
+            "credit": [{"account":"현금","amount":800000}]
+          }
+        ],
+        "accounts": ["장기대여금","장기금융상품","미지급금","현금","보통예금"],
+        "amounts": [800000, 80000, 400000, 840000],
+        "hint": "대여 기간이 1년 이상이면 장기대여금",
+        "explain": "다른 기업에 대여 기간 1년 이상으로 현금을 빌려주면 장기대여금(투자자산)이 증가합니다. 현금이 나갔으므로 대변에 현금 800,000원을 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="A1-05" data-type="journal" data-group="학습지 A · 투자자산" data-badge="학습지 A · 투자자산 05" data-style="worksheet" data-icon="receipt">
+      <h2 class="p-title">장기대여금 원금과 이자 회수</h2>
+      <p class="p-scene">위 장기대여금의 만기가 되어 원금 800,000원과 이자 40,000원을 현금으로 함께 회수하였다.</p>
+      <div class="p-extra">학습지 분개 2줄 방식(① 원금 회수, ② 이자 수취)과 한 줄 복합분개 모두 정답으로 인정합니다.</div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "label": "① 원금 회수",
+            "debit": [{"account":"현금","amount":800000}],
+            "credit": [{"account":"장기대여금","amount":800000}]
+          },
+          {
+            "label": "② 이자 수취",
+            "debit": [{"account":"현금","amount":40000}],
+            "credit": [{"account":"이자수익","amount":40000}]
+          }
+        ],
+        "altEntries": [
+          {
+            "debit": [{"account":"현금","amount":840000}],
+            "credit": [{"account":"장기대여금","amount":800000},{"account":"이자수익","amount":40000}]
+          }
+        ],
+        "accounts": ["현금","장기대여금","이자수익","보통예금","장기금융상품"],
+        "amounts": [800000, 40000, 840000, 760000],
+        "hint": "원금 회수(장기대여금 감소) + 이자(이자수익 발생)",
+        "explain": "두 줄로 나누어 쓰는 것이 학습지 방식입니다: ① (차) 현금 800,000원 (대) 장기대여금 800,000원 / ② (차) 현금 40,000원 (대) 이자수익 40,000원. 한 줄 복합분개 '(차) 현금 840,000원 (대) 장기대여금 800,000원, 이자수익 40,000원'도 회계적으로 같아 정답으로 인정합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="A1-06" data-type="journal" data-group="학습지 A · 투자자산" data-badge="학습지 A · 투자자산 06" data-style="worksheet" data-icon="check">
+      <h2 class="p-title">투자 목적 상가 건물 구입</h2>
+      <p class="p-scene">투자 목적으로 상가 건물을 2,000,000원에 구입하고 당좌수표를 발행하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"투자부동산","amount":2000000}],
+            "credit": [{"account":"당좌예금","amount":2000000}]
+          }
+        ],
+        "accounts": ["투자부동산","건물","토지","당좌예금","현금","보통예금"],
+        "amounts": [2000000, 200000, 1000000, 2100000],
+        "hint": "영업용이 아니라 '투자 목적' + 당좌수표 발행 = 당좌예금",
+        "explain": "건물이라도 투자 목적이므로 유형자산(건물)이 아니라 투자부동산(투자자산)으로 처리합니다. 당좌수표를 발행해 지급하면 대변은 현금이 아닌 당좌예금입니다."
+      }
+      </script>
+    </section>
+
+<!-- ===== 학습지 A · 유형자산 (A2-01 ~ A2-06 + 포함/추가 비교 1장) ===== -->
+    <section class="slide problem cat-tangible" id="A2-01" data-type="journal" data-group="학습지 A · 유형자산" data-badge="학습지 A · 유형자산 01" data-style="worksheet" data-icon="check">
+      <h2 class="p-title">영업용 토지 구입과 취득세</h2>
+      <p class="p-scene">영업용 토지를 5,000,000원에 구입하고 취득세 100,000원을 포함하여 전액 당좌수표로 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"토지","amount":5100000}],
+            "credit": [{"account":"당좌예금","amount":5100000}]
+          }
+        ],
+        "accounts": ["토지","투자부동산","건물","당좌예금","현금","보통예금"],
+        "amounts": [5100000, 5000000, 100000, 4900000],
+        "hint": "취득세는 토지 취득원가에 더하기 + 당좌수표 발행 = 당좌예금",
+        "explain": "영업용 토지의 취득세는 취득 부대비용이므로 구입대금 5,000,000원에 더해 토지 5,100,000원으로 기록합니다. 당좌수표를 발행했으므로 대변은 당좌예금입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="A2-02" data-type="journal" data-group="학습지 A · 유형자산" data-badge="학습지 A · 유형자산 02" data-style="worksheet" data-icon="coffee">
+      <h2 class="p-title">영업용 커피머신 구입 (포함 함정)</h2>
+      <p class="p-scene">카페의 영업용 커피머신을 2,000,000원에 구입하였다. 설치비 100,000원을 포함한 금액을 현금 지급하였다. (머신은 비품으로 처리)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"비품","amount":2000000}],
+            "credit": [{"account":"현금","amount":2000000}]
+          }
+        ],
+        "accounts": ["비품","기계장치","건물","현금","보통예금"],
+        "amounts": [2000000, 2100000, 1900000, 100000],
+        "hint": "'설치비 100,000원을 포함한 금액'이 얼마인지 문장을 다시 읽기",
+        "explain": "설치비 100,000원을 '포함한 금액'이 2,000,000원이므로 실제 지급 총액과 취득원가는 2,000,000원입니다. 100,000원을 한 번 더 더해 2,100,000원으로 쓰지 않도록 주의하세요."
+      }
+      </script>
+    </section>
+
+    <!-- 포함 vs 추가 비교 슬라이드 -->
+    <section class="slide cat-tangible" id="A2-02b" data-type="compare" data-group="학습지 A · 유형자산" data-badge="함정 비교 · 포함 vs 추가" data-nav-title="포함 vs 추가 비교">
+      <div class="slide-head">
+        <div>
+          <span class="badge badge-exam">함정 비교 · A2-02 복습</span>
+          <h2 class="slide-title">취득원가: "포함한 금액" vs "추가로 지급"</h2>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-card left">
+          <span class="compare-tag">학습지 A2-02 원문 · 이미 포함</span>
+          <p class="compare-quote">설치비 100,000원을 <strong>포함한</strong> 금액 2,000,000원 지급</p>
+          <div class="compare-formula">
+            비품 <strong>2,000,000원</strong><br>
+            <span style="font-size:0.9rem;color:#59524A;font-weight:700;">(지급 총액 = 2,000,000원, 설치비 중복 합산 금지)</span>
+          </div>
+        </div>
+        <div class="compare-arrow" aria-hidden="true">VS</div>
+        <div class="compare-card right">
+          <span class="compare-tag">비교용 예시 (학습지 원문 아님) · 별도 추가</span>
+          <p class="compare-quote">머신 2,000,000원 + 설치비 100,000원을 <strong>추가로</strong> 지급</p>
+          <div class="compare-formula">
+            비품 <strong>2,100,000원</strong><br>
+            <span style="font-size:0.9rem;color:#59524A;font-weight:700;">(구입대금 2,000,000원 + 설치비 100,000원)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-takeaway">숫자를 더하기 전에 <u>이미 포함된 금액인지</u> 먼저 확인하자!</div>
+
+      <div class="mini-check student-only" id="compareMiniCheck">
+        <strong>미니 체크 (혼자 공부):</strong> 다음 중 비품 취득원가가 <strong>2,000,000원</strong>인 쪽을 고르세요.
+        <div class="mini-check-btns">
+          <button type="button" class="btn btn-soft" data-compare-pick="left">① 설치비 100,000원을 포함한 금액 2,000,000원 지급</button>
+          <button type="button" class="btn btn-soft" data-compare-pick="right">② 머신 2,000,000원 + 설치비 100,000원 추가 지급</button>
+        </div>
+        <div class="grade-feedback" id="compareFeedback" style="margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <section class="slide problem cat-tangible" id="A2-03" data-type="journal" data-group="학습지 A · 유형자산" data-badge="학습지 A · 유형자산 03" data-style="worksheet" data-icon="building">
+      <h2 class="p-title">신축 중인 카페 건물 공사대금 지급</h2>
+      <p class="p-scene">신축 중인 카페 건물의 공사대금 중 1,000,000원을 현금으로 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"건설중인자산","amount":1000000}],
+            "credit": [{"account":"현금","amount":1000000}]
+          }
+        ],
+        "accounts": ["건설중인자산","건물","선급금","현금","보통예금"],
+        "amounts": [1000000, 4000000, 5000000, 100000],
+        "hint": "완공 전 공사대금은 건물이 아니라 건설중인자산",
+        "explain": "건물이 아직 완공되지 않았으므로 건물 계정이 아니라 건설중인자산(유형자산) 차변에 기록합니다. 현금으로 지급했으므로 대변은 현금입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="A2-04" data-type="journal" data-group="학습지 A · 유형자산" data-badge="학습지 A · 유형자산 04" data-style="worksheet" data-icon="building">
+      <h2 class="p-title">카페 건물 완공 및 인수</h2>
+      <p class="p-scene">위 카페 건물이 완공되어 잔금 4,000,000원을 현금 지급하고 건물을 인수하였다. (기존 건설중인자산 1,000,000원)</p>
+      <div class="p-extra">기준 정답은 복합분개 한 줄이며, 학습지 2줄 분할 표기도 정답으로 인정합니다.</div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"건물","amount":5000000}],
+            "credit": [{"account":"건설중인자산","amount":1000000},{"account":"현금","amount":4000000}]
+          }
+        ],
+        "altEntries": [
+          {
+            "debit": [{"account":"건설중인자산","amount":4000000}],
+            "credit": [{"account":"현금","amount":4000000}]
+          },
+          {
+            "debit": [{"account":"건물","amount":5000000}],
+            "credit": [{"account":"건설중인자산","amount":5000000}]
+          }
+        ],
+        "accounts": ["건물","건설중인자산","현금","투자부동산","보통예금"],
+        "amounts": [5000000, 4000000, 1000000, 3000000],
+        "hint": "기존 건설중인자산 1,000,000원 + 잔금 4,000,000원 = 건물 5,000,000원",
+        "explain": "건물이 완공되면 기존 건설중인자산 1,000,000원을 대변에서 없애고, 잔금 현금 4,000,000원과 합쳐 차변에 건물 5,000,000원으로 대체합니다. 두 줄 표기(① 건설중인자산 4,000,000 / 현금 4,000,000 ② 건물 5,000,000 / 건설중인자산 5,000,000)도 정답입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="A2-05" data-type="journal" data-group="학습지 A · 유형자산" data-badge="학습지 A · 유형자산 05" data-style="worksheet" data-icon="machine">
+      <h2 class="p-title">공장용 기계 구입과 운송비</h2>
+      <p class="p-scene">공장용 기계 3,000,000원을 구입하고 운송비 100,000원을 더해 당좌수표로 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"기계장치","amount":3100000}],
+            "credit": [{"account":"당좌예금","amount":3100000}]
+          }
+        ],
+        "accounts": ["기계장치","비품","차량운반구","당좌예금","현금"],
+        "amounts": [3100000, 3000000, 100000, 2900000],
+        "hint": "운송비를 더해 기계장치 취득원가 계산 + 당좌수표 = 당좌예금",
+        "explain": "기계 구입 시 발생한 운송비 100,000원은 취득 부대비용이므로 기계장치 원가(3,100,000원)에 포함합니다. 당좌수표 발행은 대변에 당좌예금으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="A2-06" data-type="journal" data-group="학습지 A · 유형자산" data-badge="학습지 A · 유형자산 06" data-style="worksheet" data-icon="coffee">
+      <h2 class="p-title">영업용 컴퓨터 2대 현금 구입</h2>
+      <p class="p-scene">카페에서 사용할 컴퓨터 2대를 1대당 300,000원에 현금 구입하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"비품","amount":600000}],
+            "credit": [{"account":"현금","amount":600000}]
+          }
+        ],
+        "accounts": ["비품","기계장치","현금","보통예금","미지급금"],
+        "amounts": [600000, 300000, 900000, 60000],
+        "hint": "수량(2대) × 단가(300,000원) 확인",
+        "explain": "영업에 1년 이상 사용하는 컴퓨터는 비품으로 처리합니다. 1대당 300,000원이므로 2대 합계 600,000원을 차변 비품, 대변 현금으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <!-- ===== 자격증 실전 드릴 · 투자자산 (D1-01 ~ D1-12) ===== -->
+    <section class="slide problem cat-invest" id="D1-01" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 01" data-exam="전산회계 2급형" data-style="drill" data-icon="receipt">
+      <h2 class="p-title">3년 만기 정기예금 보통예금 이체</h2>
+      <p class="p-scene">3년 만기 정기예금에 가입하면서 보통예금에서 10,000,000원을 이체하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"장기금융상품","amount":10000000}],
+            "credit": [{"account":"보통예금","amount":10000000}]
+          }
+        ],
+        "accounts": ["장기금융상품","보통예금","현금","당좌예금","만기보유증권"],
+        "amounts": [10000000, 1000000, 3000000, 10100000],
+        "hint": "만기 1년 이상 + 보통예금에서 이체",
+        "explain": "만기 1년 이상 정기예금이므로 차변은 장기금융상품입니다. 지급수단이 현금이 아니라 보통예금이므로 대변에 보통예금을 기록하는 점이 핵심입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-02" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 02" data-exam="전산회계 2급형" data-style="drill" data-icon="receipt">
+      <h2 class="p-title">국채 취득과 중개수수료</h2>
+      <p class="p-scene">국채를 2,000,000원에 취득하고 중개수수료 20,000원과 함께 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"만기보유증권","amount":2020000}],
+            "credit": [{"account":"보통예금","amount":2020000}]
+          }
+        ],
+        "accounts": ["만기보유증권","매도가능증권","장기금융상품","보통예금","현금"],
+        "amounts": [2020000, 2000000, 20000, 1980000],
+        "hint": "중개수수료도 취득원가에 포함",
+        "explain": "국채 취득 시 발생한 중개수수료 20,000원은 취득 부대비용으로 취득원가에 더합니다. 따라서 만기보유증권 2,020,000원, 보통예금 2,020,000원으로 분개합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-03" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 03" data-exam="전산회계 2급형" data-style="drill" data-icon="receipt">
+      <h2 class="p-title">매도가능증권 주식 취득과 거래수수료</h2>
+      <p class="p-scene">다른 회사 주식을 3,000,000원에 취득하고 거래수수료 30,000원은 별도로 현금 지급하였다. (매도가능증권)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"매도가능증권","amount":3030000}],
+            "credit": [{"account":"현금","amount":3030000}]
+          }
+        ],
+        "accounts": ["매도가능증권","만기보유증권","장기금융상품","현금","보통예금"],
+        "amounts": [3030000, 3000000, 30000, 2970000],
+        "hint": "매도가능증권 취득 시 거래수수료는 취득원가에 가산",
+        "explain": "매도가능증권 취득 과정에서 발생한 거래수수료 30,000원은 별도 비용이 아니라 취득원가에 포함합니다. 총 3,030,000원을 차변 매도가능증권, 대변 현금으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-04" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 04" data-exam="전산회계 2급형" data-style="drill" data-icon="check">
+      <h2 class="p-title">5년 만기 회사채 당좌수표 취득</h2>
+      <p class="p-scene">5년 만기 회사채를 5,000,000원에 취득하고 당좌수표를 발행하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"만기보유증권","amount":5000000}],
+            "credit": [{"account":"당좌예금","amount":5000000}]
+          }
+        ],
+        "accounts": ["만기보유증권","매도가능증권","장기금융상품","당좌예금","보통예금"],
+        "amounts": [5000000, 500000, 5500000, 2500000],
+        "hint": "만기 있는 채권(회사채) + 당좌수표 발행 = 당좌예금",
+        "explain": "5년 만기 회사채는 만기가 확정된 채무증권이므로 만기보유증권(차변)입니다. 당좌수표를 발행해 지급했으므로 대변은 당좌예금입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-05" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 05" data-exam="FAT 2급형" data-style="drill" data-icon="receipt">
+      <h2 class="p-title">거래처 3년간 대여</h2>
+      <p class="p-scene">거래처에 5,000,000원을 3년간 대여하고 보통예금에서 이체하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"장기대여금","amount":5000000}],
+            "credit": [{"account":"보통예금","amount":5000000}]
+          }
+        ],
+        "accounts": ["장기대여금","장기금융상품","선급금","보통예금","현금"],
+        "amounts": [5000000, 500000, 5500000, 3000000],
+        "hint": "대여 기간 3년(1년 이상) + 보통예금 이체",
+        "explain": "대여 기간이 1년 이상(3년)이므로 장기대여금(투자자산)이 증가합니다. 보통예금에서 이체했으므로 대변은 보통예금 5,000,000원입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-06" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 06" data-exam="FAT 2급형" data-style="drill" data-icon="receipt">
+      <h2 class="p-title">장기대여금 만기 원금·이자 입금</h2>
+      <p class="p-scene">위 대여금이 만기가 되어 원금 5,000,000원과 이자 500,000원을 보통예금으로 입금받았다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"보통예금","amount":5500000}],
+            "credit": [{"account":"장기대여금","amount":5000000},{"account":"이자수익","amount":500000}]
+          }
+        ],
+        "accounts": ["보통예금","장기대여금","이자수익","현금","장기금융상품"],
+        "amounts": [5500000, 5000000, 500000, 4500000],
+        "hint": "차변은 원금+이자 합계, 대변은 원금(장기대여금)과 이자(이자수익)로 분리",
+        "explain": "보통예금으로 총 5,500,000원이 입금되므로 차변에 보통예금 5,500,000원을 적고, 대변에 장기대여금 감소 5,000,000원과 이자수익 500,000원을 나누어 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-07" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 07" data-exam="전산회계 2급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">투자 목적 상가 취득과 부대비용</h2>
+      <p class="p-scene">투자 목적의 상가를 200,000,000원에 취득하고 취득세 4,000,000원과 중개수수료 2,000,000원을 함께 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"투자부동산","amount":206000000}],
+            "credit": [{"account":"보통예금","amount":206000000}]
+          }
+        ],
+        "accounts": ["투자부동산","건물","토지","보통예금","당좌예금"],
+        "amounts": [206000000, 200000000, 204000000, 202000000],
+        "hint": "투자 목적 = 투자부동산 / 취득세 + 중개수수료 모두 합산",
+        "explain": "투자 목적 상가는 투자부동산으로 분류합니다. 취득세 4,000,000원과 중개수수료 2,000,000원을 모두 더해 취득원가 206,000,000원을 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-08" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 08" data-exam="전산회계 2급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">토지·건물 일괄 취득 (공정가치 배분)</h2>
+      <p class="p-scene">영업에 사용할 토지와 건물을 500,000,000원에 일괄 취득하였다. 공정가치 평가액은 토지 300,000,000원, 건물 200,000,000원이며 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"토지","amount":300000000},{"account":"건물","amount":200000000}],
+            "credit": [{"account":"보통예금","amount":500000000}]
+          }
+        ],
+        "accounts": ["토지","건물","투자부동산","보통예금","당좌예금"],
+        "amounts": [300000000, 200000000, 500000000, 250000000],
+        "hint": "일괄 취득은 공정가치 비율로 토지와 건물을 나누어 차변에 기록",
+        "explain": "토지와 건물을 한꺼번에 취득한 경우 공정가치 비율(300,000,000원 : 200,000,000원)로 나누어 각각 토지·건물 계정에 기록합니다. 영업용이므로 투자부동산이 아닙니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-09" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 09" data-exam="전산회계운용사 3급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">영업용 건물 취득과 취득세·등록세</h2>
+      <p class="p-scene">영업용 건물을 150,000,000원에 취득하고 취득세 3,000,000원, 등록세 1,500,000원을 함께 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"건물","amount":154500000}],
+            "credit": [{"account":"보통예금","amount":154500000}]
+          }
+        ],
+        "accounts": ["건물","투자부동산","건설중인자산","보통예금","당좌예금"],
+        "amounts": [154500000, 150000000, 153000000, 151500000],
+        "hint": "영업용 = 건물 / 취득세 + 등록세 모두 취득원가에 포함",
+        "explain": "영업용이므로 투자부동산이 아니라 건물(유형자산)입니다. 취득세 3,000,000원과 등록세 1,500,000원을 모두 더해 154,500,000원으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-10" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 10" data-exam="전산회계운용사 3급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">투자 목적 건물 계약금과 잔금 (분개 2개)</h2>
+      <p class="p-scene">투자 목적의 건물을 100,000,000원에 취득하기로 하고 계약금 10,000,000원을 보통예금에서 지급하였다. 이후 잔금 90,000,000원을 보통예금에서 지급하고 소유권을 이전받았다. (분개 2개)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "label": "① 계약금",
+            "debit": [{"account":"선급금","amount":10000000}],
+            "credit": [{"account":"보통예금","amount":10000000}]
+          },
+          {
+            "label": "② 잔금·소유권 이전",
+            "debit": [{"account":"투자부동산","amount":100000000}],
+            "credit": [{"account":"선급금","amount":10000000},{"account":"보통예금","amount":90000000}]
+          }
+        ],
+        "accounts": ["선급금","투자부동산","건물","보통예금","미지급금"],
+        "amounts": [10000000, 90000000, 100000000, 110000000],
+        "hint": "계약금은 먼저 선급금(자산)으로, 인수 시 선급금을 대변으로 대체",
+        "explain": "계약금 지급 시에는 먼저 선급금 10,000,000원으로 처리합니다. 소유권을 이전받을 때 투자부동산 100,000,000원을 차변에 기록하고, 대변에서 선급금 10,000,000원과 잔금 보통예금 90,000,000원을 정리합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-11" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 11" data-exam="전산회계 2급형" data-style="drill" data-icon="receipt">
+      <h2 class="p-title">만기보유증권 만기 상환과 이자</h2>
+      <p class="p-scene">보유하던 만기보유증권 5,000,000원이 만기가 되어 이자 300,000원과 함께 보통예금으로 입금받았다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"보통예금","amount":5300000}],
+            "credit": [{"account":"만기보유증권","amount":5000000},{"account":"이자수익","amount":300000}]
+          }
+        ],
+        "accounts": ["보통예금","만기보유증권","이자수익","매도가능증권","현금"],
+        "amounts": [5300000, 5000000, 300000, 4700000],
+        "hint": "만기 상환으로 만기보유증권 감소(대변) + 이자수익 발생(대변)",
+        "explain": "만기보유증권이 만기 상환되면 원금 5,000,000원은 대변에서 만기보유증권을 감소시키고, 이자 300,000원은 이자수익으로 기록합니다. 합계 5,300,000원이 보통예금(차변)으로 들어옵니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="D1-12" data-type="journal" data-group="자격증 실전 드릴 · 투자자산" data-badge="자격증 실전 드릴 · 투자자산 12" data-exam="FAT 2급형" data-style="drill" data-icon="note">
+      <h2 class="p-title">주식 취득 대금 혼합 지급</h2>
+      <p class="p-scene">다른 회사 주식을 1,000,000원에 취득하고 대금 중 400,000원은 보통예금에서 지급하고 나머지는 다음 달에 지급하기로 하였다. (매도가능증권)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"매도가능증권","amount":1000000}],
+            "credit": [{"account":"보통예금","amount":400000},{"account":"미지급금","amount":600000}]
+          }
+        ],
+        "accounts": ["매도가능증권","만기보유증권","보통예금","미지급금","지급어음"],
+        "amounts": [1000000, 400000, 600000, 1400000],
+        "hint": "지급수단이 섞인 거래: 대변을 보통예금과 미지급금으로 나누기",
+        "explain": "주식 취득원가 1,000,000원은 차변 매도가능증권에 기록합니다. 대금 중 400,000원은 보통예금, 다음 달 지급할 나머지 600,000원은 상품 외 거래의 외상이므로 미지급금(부채)으로 처리합니다."
+      }
+      </script>
+    </section>
+
+<!-- ===== 자격증 실전 드릴 · 유형자산 (D2-01 ~ D2-12) ===== -->
+    <section class="slide problem cat-tangible" id="D2-01" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 01" data-exam="전산회계 2급형" data-style="drill" data-icon="machine">
+      <h2 class="p-title">기계장치 취득과 운송비·설치비</h2>
+      <p class="p-scene">기계장치를 20,000,000원에 취득하고 운송비 200,000원, 설치비 300,000원을 포함해 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"기계장치","amount":20500000}],
+            "credit": [{"account":"보통예금","amount":20500000}]
+          }
+        ],
+        "accounts": ["기계장치","비품","건물","보통예금","당좌예금"],
+        "amounts": [20500000, 20000000, 20200000, 20300000],
+        "hint": "운송비와 설치비는 모두 기계장치 취득원가에 가산",
+        "explain": "기계장치를 사용할 수 있는 상태까지 드는 운송비 200,000원과 설치비 300,000원은 취득 부대비용입니다. 합계 20,500,000원을 차변 기계장치, 대변 보통예금으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-02" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 02" data-exam="전산회계 2급형" data-style="drill" data-icon="check">
+      <h2 class="p-title">영업용 건물 취득과 취득세·중개수수료</h2>
+      <p class="p-scene">영업용 건물을 300,000,000원에 취득하고 취득세 9,000,000원, 중개수수료 3,000,000원을 포함해 당좌수표를 발행하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"건물","amount":312000000}],
+            "credit": [{"account":"당좌예금","amount":312000000}]
+          }
+        ],
+        "accounts": ["건물","투자부동산","토지","당좌예금","보통예금"],
+        "amounts": [312000000, 300000000, 309000000, 303000000],
+        "hint": "취득세 + 중개수수료 합산 / 당좌수표 발행 = 당좌예금",
+        "explain": "영업용 건물 취득 시 발생한 취득세 9,000,000원과 중개수수료 3,000,000원을 모두 더해 건물 312,000,000원으로 기록합니다. 당좌수표를 발행했으므로 대변은 당좌예금입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-03" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 03" data-exam="전산회계 2급형" data-style="drill" data-icon="check">
+      <h2 class="p-title">영업용 토지 취득과 제세공과·수수료</h2>
+      <p class="p-scene">영업용 토지를 80,000,000원에 취득하고 취득세 1,600,000원, 등록세 800,000원, 중개수수료 400,000원을 포함해 당좌수표를 발행하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"토지","amount":82800000}],
+            "credit": [{"account":"당좌예금","amount":82800000}]
+          }
+        ],
+        "accounts": ["토지","투자부동산","건물","당좌예금","보통예금"],
+        "amounts": [82800000, 80000000, 82400000, 81600000],
+        "hint": "취득세 + 등록세 + 중개수수료 3가지를 빠짐없이 합산",
+        "explain": "토지 취득원가는 구입대금 80,000,000원에 취득세 1,600,000원, 등록세 800,000원, 중개수수료 400,000원을 모두 더한 82,800,000원입니다. 당좌수표 발행이므로 대변은 당좌예금입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-04" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 04" data-exam="전산회계 2급형" data-style="drill" data-icon="note">
+      <h2 class="p-title">기계장치 취득 — 현금과 약속어음</h2>
+      <p class="p-scene">기계장치를 10,000,000원에 취득하고 대금 중 3,000,000원은 현금으로, 나머지는 3개월 만기 약속어음을 발행해 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"기계장치","amount":10000000}],
+            "credit": [{"account":"현금","amount":3000000},{"account":"지급어음","amount":7000000}]
+          }
+        ],
+        "accounts": ["기계장치","비품","현금","지급어음","미지급금"],
+        "amounts": [10000000, 3000000, 7000000, 13000000],
+        "hint": "대변에 현금 3,000,000원과 약속어음 7,000,000원을 나누어 기록",
+        "explain": "차변에 기계장치 10,000,000원을 기록하고, 대변에는 지급수단별로 현금 3,000,000원과 약속어음 발행분 지급어음 7,000,000원을 나누어 적습니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-05" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 05" data-exam="전산회계운용사 3급형" data-style="drill" data-icon="note">
+      <h2 class="p-title">사무실용 비품 외상 구입</h2>
+      <p class="p-scene">사무실용 비품을 3,000,000원에 구입하고 대금은 다음 달에 지급하기로 하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"비품","amount":3000000}],
+            "credit": [{"account":"미지급금","amount":3000000}]
+          }
+        ],
+        "accounts": ["비품","기계장치","미지급금","지급어음","현금"],
+        "amounts": [3000000, 300000, 6000000, 1500000],
+        "hint": "상품이 아닌 유형자산 외상 구입 = 미지급금",
+        "explain": "사무실용 비품은 상품이 아니므로 대금을 나중에 지급하기로 하면 외상매입금이 아니라 미지급금(부채)으로 처리합니다. 차변 비품 3,000,000원, 대변 미지급금 3,000,000원입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-06" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 06" data-exam="전산회계운용사 3급형" data-style="drill" data-icon="machine">
+      <h2 class="p-title">영업용 승합차 취득과 등록세·번호판 대금</h2>
+      <p class="p-scene">영업용 승합차를 25,000,000원에 취득하고 등록세 1,250,000원, 번호판 대금 50,000원을 포함해 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"차량운반구","amount":26300000}],
+            "credit": [{"account":"보통예금","amount":26300000}]
+          }
+        ],
+        "accounts": ["차량운반구","기계장치","비품","보통예금","당좌예금"],
+        "amounts": [26300000, 25000000, 26250000, 25050000],
+        "hint": "영업용 차량 = 차량운반구 / 등록세 + 번호판 대금 모두 포함",
+        "explain": "영업용 승합차는 차량운반구로 처리합니다. 등록세 1,250,000원과 번호판 대금 50,000원은 모두 취득 부대비용이므로 합계 26,300,000원을 차량운반구 원가로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-07" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 07" data-exam="전산회계 2급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">신축 중인 공장 건물 공사대금 지급</h2>
+      <p class="p-scene">신축 중인 공장 건물의 공사대금 중 50,000,000원을 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"건설중인자산","amount":50000000}],
+            "credit": [{"account":"보통예금","amount":50000000}]
+          }
+        ],
+        "accounts": ["건설중인자산","건물","선급금","보통예금","현금"],
+        "amounts": [50000000, 150000000, 200000000, 5000000],
+        "hint": "완공 전 공사대금은 건설중인자산",
+        "explain": "신축 중인 건물은 아직 완공되지 않았으므로 건물 계정이 아니라 건설중인자산(차변)으로 처리합니다. 보통예금에서 지급했으므로 대변은 보통예금 50,000,000원입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-08" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 08" data-exam="전산회계 2급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">공장 건물 완공 및 잔금 지급</h2>
+      <p class="p-scene">위 공장 건물이 완공되어 잔금 150,000,000원을 보통예금에서 지급하고 인수하였다. (기존 건설중인자산 50,000,000원)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"건물","amount":200000000}],
+            "credit": [{"account":"건설중인자산","amount":50000000},{"account":"보통예금","amount":150000000}]
+          }
+        ],
+        "accounts": ["건물","건설중인자산","보통예금","투자부동산","현금"],
+        "amounts": [200000000, 150000000, 50000000, 100000000],
+        "hint": "기존 건설중인자산 50,000,000원 대체 + 잔금 150,000,000원 = 건물 200,000,000원",
+        "explain": "건물이 완공되면 기존 건설중인자산 50,000,000원을 대변에서 제거하고, 잔금 보통예금 150,000,000원과 합쳐 차변에 건물 200,000,000원으로 대체합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-09" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 09" data-exam="FAT 2급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">영업용 토지·건물 일괄 취득</h2>
+      <p class="p-scene">영업용 토지 100,000,000원과 건물 60,000,000원을 160,000,000원에 일괄 취득하고 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"토지","amount":100000000},{"account":"건물","amount":60000000}],
+            "credit": [{"account":"보통예금","amount":160000000}]
+          }
+        ],
+        "accounts": ["토지","건물","투자부동산","보통예금","당좌예금"],
+        "amounts": [100000000, 60000000, 160000000, 40000000],
+        "hint": "토지와 건물은 별도 계정으로 차변에 각각 기록",
+        "explain": "토지와 건물을 일괄 취득하더라도 각 자산의 금액(토지 100,000,000원, 건물 60,000,000원)을 차변에 구분해 기록하고, 대변에 총 지급액 보통예금 160,000,000원을 적습니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-10" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 10" data-exam="FAT 2급형" data-style="drill" data-icon="machine">
+      <h2 class="p-title">기계장치 취득과 시운전비</h2>
+      <p class="p-scene">기계장치를 30,000,000원에 취득하고 시운전비 500,000원을 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"기계장치","amount":30500000}],
+            "credit": [{"account":"보통예금","amount":30500000}]
+          }
+        ],
+        "accounts": ["기계장치","비품","건설중인자산","보통예금","현금"],
+        "amounts": [30500000, 30000000, 500000, 29500000],
+        "hint": "시운전비도 기계장치 취득원가에 포함",
+        "explain": "기계장치를 정상 가동하기 위해 지출한 시운전비 500,000원은 취득 부대비용입니다. 구입대금과 합쳐 기계장치 30,500,000원, 보통예금 30,500,000원으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-11" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 11" data-exam="전산회계운용사 3급형" data-style="drill" data-icon="building">
+      <h2 class="p-title">같은 상가 건물, 보유 목적별 비교 (분개 2개)</h2>
+      <p class="p-scene">같은 상가 건물 120,000,000원(취득세 1,200,000원 포함)을 두 경우로 취득하였다. (분개 2개)</p>
+      <div class="p-extra">지급수단은 두 경우 모두 보통예금으로 처리합니다.</div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "label": "① 영업에 사용할 목적",
+            "debit": [{"account":"건물","amount":121200000}],
+            "credit": [{"account":"보통예금","amount":121200000}]
+          },
+          {
+            "label": "② 투자 목적",
+            "debit": [{"account":"투자부동산","amount":121200000}],
+            "credit": [{"account":"보통예금","amount":121200000}]
+          }
+        ],
+        "accounts": ["건물","투자부동산","토지","보통예금","당좌예금"],
+        "amounts": [121200000, 120000000, 1200000, 118800000],
+        "hint": "물건이 아니라 보유 목적이 계정과목을 결정",
+        "explain": "같은 상가 건물이라도 영업에 사용할 목적이면 건물(유형자산), 투자 목적이면 투자부동산(투자자산)으로 분류합니다. 취득세 1,200,000원을 더해 121,200,000원으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="D2-12" data-type="journal" data-group="자격증 실전 드릴 · 유형자산" data-badge="자격증 실전 드릴 · 유형자산 12" data-exam="전산회계 2급형" data-style="drill" data-icon="machine">
+      <h2 class="p-title">기계장치 계약금 지급과 인수 (분개 2개)</h2>
+      <p class="p-scene">기계장치를 20,000,000원에 취득하기로 하고 계약금 5,000,000원을 보통예금에서 지급하였다. 이후 기계장치를 인수하고 잔금 15,000,000원을 보통예금에서 지급하였다. (분개 2개)</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "label": "① 계약금",
+            "debit": [{"account":"선급금","amount":5000000}],
+            "credit": [{"account":"보통예금","amount":5000000}]
+          },
+          {
+            "label": "② 인수",
+            "debit": [{"account":"기계장치","amount":20000000}],
+            "credit": [{"account":"선급금","amount":5000000},{"account":"보통예금","amount":15000000}]
+          }
+        ],
+        "accounts": ["선급금","기계장치","건설중인자산","보통예금","미지급금"],
+        "amounts": [5000000, 15000000, 20000000, 25000000],
+        "hint": "계약금은 선급금 → 인수 시 선급금 대체 + 잔금 보통예금",
+        "explain": "계약금 5,000,000원은 먼저 선급금(자산)으로 기록합니다. 기계장치를 인수할 때 차변에 기계장치 20,000,000원을 기록하고, 대변에 선급금 5,000,000원과 잔금 보통예금 15,000,000원을 적습니다."
+      }
+      </script>
+    </section>
+
+    <!-- ===== 혼합 실전 (X-01 ~ X-06, 힌트 없음) ===== -->
+    <section class="slide problem cat-tangible" id="X-01" data-type="journal" data-group="혼합 실전" data-badge="혼합 실전 01" data-exam="전산회계 2급형" data-style="mixed" data-icon="check">
+      <h2 class="p-title">영업용 토지 취득과 당좌수표</h2>
+      <p class="p-scene">영업용 토지를 50,000,000원에 취득하고 취득세 1,000,000원, 중개수수료 500,000원을 포함해 당좌수표를 발행하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"토지","amount":51500000}],
+            "credit": [{"account":"당좌예금","amount":51500000}]
+          }
+        ],
+        "accounts": ["토지","투자부동산","건물","당좌예금","보통예금"],
+        "amounts": [51500000, 50000000, 51000000, 50500000],
+        "hint": "",
+        "explain": "영업용 토지이므로 차변은 토지이며, 취득세 1,000,000원과 중개수수료 500,000원을 더해 51,500,000원이 됩니다. 당좌수표 발행은 대변에 당좌예금으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="X-02" data-type="journal" data-group="혼합 실전" data-badge="혼합 실전 02" data-exam="FAT 2급형" data-style="mixed" data-icon="coffee">
+      <h2 class="p-title">비품 구입과 운송비 현금 지급</h2>
+      <p class="p-scene">비품을 2,000,000원에 구입하고 운송비 100,000원을 더해 현금으로 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"비품","amount":2100000}],
+            "credit": [{"account":"현금","amount":2100000}]
+          }
+        ],
+        "accounts": ["비품","기계장치","차량운반구","현금","보통예금"],
+        "amounts": [2100000, 2000000, 100000, 1900000],
+        "hint": "",
+        "explain": "운송비 100,000원을 '더해' 지급했으므로 취득원가는 2,100,000원입니다. 학습지 A2-02('포함한 금액')와 표현 차이를 구별하는 것이 핵심 함정입니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="X-03" data-type="journal" data-group="혼합 실전" data-badge="혼합 실전 03" data-exam="전산회계 2급형" data-style="mixed" data-icon="check">
+      <h2 class="p-title">만기보유증권 혼합 지급</h2>
+      <p class="p-scene">만기보유증권을 3,000,000원에 취득하고 대금 중 1,000,000원은 보통예금에서, 2,000,000원은 당좌수표를 발행해 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"만기보유증권","amount":3000000}],
+            "credit": [{"account":"보통예금","amount":1000000},{"account":"당좌예금","amount":2000000}]
+          }
+        ],
+        "accounts": ["만기보유증권","매도가능증권","보통예금","당좌예금","현금"],
+        "amounts": [3000000, 1000000, 2000000, 4000000],
+        "hint": "",
+        "explain": "차변에 만기보유증권 3,000,000원을 기록하고, 대변에는 보통예금 1,000,000원과 당좌수표 발행분 당좌예금 2,000,000원을 각각 나누어 적습니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="X-04" data-type="journal" data-group="혼합 실전" data-badge="혼합 실전 04" data-exam="전산회계운용사 3급형" data-style="mixed" data-icon="machine">
+      <h2 class="p-title">영업용 차량 취득과 취득세</h2>
+      <p class="p-scene">영업용 차량을 15,000,000원에 취득하고 취득세 450,000원을 포함해 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"차량운반구","amount":15450000}],
+            "credit": [{"account":"보통예금","amount":15450000}]
+          }
+        ],
+        "accounts": ["차량운반구","기계장치","비품","보통예금","당좌예금"],
+        "amounts": [15450000, 15000000, 450000, 14550000],
+        "hint": "",
+        "explain": "영업용 차량은 차량운반구로 처리하며, 취득세 450,000원을 취득원가에 더해 15,450,000원을 차변 차량운반구, 대변 보통예금으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-invest" id="X-05" data-type="journal" data-group="혼합 실전" data-badge="혼합 실전 05" data-exam="전산회계 2급형" data-style="mixed" data-icon="building">
+      <h2 class="p-title">투자 목적 토지 취득과 중개수수료</h2>
+      <p class="p-scene">투자 목적의 토지를 200,000,000원에 취득하고 중개수수료 2,000,000원을 포함해 보통예금에서 지급하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"투자부동산","amount":202000000}],
+            "credit": [{"account":"보통예금","amount":202000000}]
+          }
+        ],
+        "accounts": ["투자부동산","토지","건물","보통예금","당좌예금"],
+        "amounts": [202000000, 200000000, 2000000, 198000000],
+        "hint": "",
+        "explain": "토지라도 투자 목적이므로 유형자산(토지)이 아니라 투자부동산(투자자산)입니다. 중개수수료 2,000,000원을 더해 202,000,000원으로 기록합니다."
+      }
+      </script>
+    </section>
+
+    <section class="slide problem cat-tangible" id="X-06" data-type="journal" data-group="혼합 실전" data-badge="혼합 실전 06" data-exam="FAT 2급형" data-style="mixed" data-icon="note">
+      <h2 class="p-title">기계장치 현금·외상 혼합 지급</h2>
+      <p class="p-scene">기계장치를 8,000,000원에 구입하고 대금 중 2,000,000원은 현금으로 지급하고 나머지는 다음 달에 지급하기로 하였다.</p>
+      <div class="p-extra"></div>
+      <script type="application/json" class="p-data">
+      {
+        "entries": [
+          {
+            "debit": [{"account":"기계장치","amount":8000000}],
+            "credit": [{"account":"현금","amount":2000000},{"account":"미지급금","amount":6000000}]
+          }
+        ],
+        "accounts": ["기계장치","비품","현금","미지급금","지급어음"],
+        "amounts": [8000000, 2000000, 6000000, 10000000],
+        "hint": "",
+        "explain": "차변에 기계장치 8,000,000원을 기록하고, 대변에는 현금 지급분 2,000,000원과 다음 달 지급할 미지급금 6,000,000원을 나누어 적습니다."
+      }
+      </script>
+    </section>
+
+<!-- Z-01 정리 -->
+    <section class="slide" id="Z-01" data-type="info" data-group="마무리" data-badge="핵심 정리" data-nav-title="핵심 정리">
+      <div class="slide-head">
+        <div>
+          <span class="badge badge-info">핵심 정리</span>
+          <h2 class="slide-title">투자자산 vs 유형자산 한눈에 비교</h2>
+        </div>
+      </div>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>투자자산 (교과서 128~129쪽)</th>
+            <th>유형자산 (교과서 130~131쪽)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>보유 목적</strong></td>
+            <td>장기 투자 수익 · 타 기업 지배·통제</td>
+            <td>기업의 영업·생산 활동에 1년 이상 사용</td>
+          </tr>
+          <tr>
+            <td><strong>주요 계정</strong></td>
+            <td>장기금융상품, 만기보유증권, 매도가능증권, 장기대여금, 투자부동산</td>
+            <td>토지, 건물, 건설중인자산, 기계장치, 비품, 차량운반구</td>
+          </tr>
+          <tr>
+            <td><strong>취득원가</strong></td>
+            <td>구입대금 + 직접 취득부대비용(중개·거래수수료, 취득세 등)</td>
+            <td>구입대금 + 직접 부대비용(취득세·등록세·운송비·설치비·시운전비 등)</td>
+          </tr>
+          <tr>
+            <td><strong>지급수단</strong></td>
+            <td colspan="2">현금 · 보통예금 · 당좌예금(당좌수표) · 지급어음(약속어음) · 미지급금(다음 달 지급)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin:4px 0 8px;font-size:1.05rem;font-weight:900;">자격증에서 자주 나오는 함정 5가지</h3>
+      <div class="trap-grid">
+        <div class="trap-item"><strong>1. 포함 vs 추가</strong>"설치비를 포함한 금액"은 이미 합쳐진 총액! 중복 합산 금지.</div>
+        <div class="trap-item"><strong>2. 일괄 취득 구분</strong>토지·건물을 함께 사면 공정가치 비율로 각각 나누어 기록.</div>
+        <div class="trap-item"><strong>3. 보유 목적 구분</strong>같은 상가·토지도 영업용은 건물·토지, 투자용은 투자부동산.</div>
+        <div class="trap-item"><strong>4. 계약금 → 선급금</strong>계약금은 먼저 선급금으로 두고, 인수 시 대변에서 대체.</div>
+        <div class="trap-item"><strong>5. 지급수단 혼합</strong>현금+어음, 보통예금+미지급금 등은 대변에 나누어 차대 합계 일치.</div>
+      </div>
+    </section>
+
+    <!-- Z-02 오늘의 셀프 체크 -->
+    <section class="slide" id="Z-02" data-type="summary" data-group="마무리" data-badge="오늘의 셀프 체크" data-nav-title="오늘의 셀프 체크">
+      <div class="slide-head">
+        <div>
+          <span class="badge badge-info">오늘의 셀프 체크</span>
+          <h2 class="slide-title">문항별 채점 결과 모아보기</h2>
+        </div>
+      </div>
+
+      <div class="score-summary">
+        <div>
+          <div class="score-big" id="scoreSummaryText">채점 완료 0 / 42문항</div>
+          <div style="font-size:0.92rem;color:#59524A;font-weight:700;" id="scoreSubText">혼자 공부 모드에서 채점한 결과가 여기에 모입니다.</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-orange" id="retryWrongBtn">틀린 문제만 다시 보기</button>
+          <button type="button" class="btn btn-soft" id="resetAllScoreBtn">기록 초기화</button>
+        </div>
+      </div>
+
+      <div class="result-grid" id="resultGrid"></div>
+    </section>
+
+    <!-- Z-03 마무리 -->
+    <section class="slide" id="Z-03" data-type="info" data-group="마무리" data-badge="마무리" data-nav-title="마무리">
+      <div class="outro-box">
+        <span class="badge badge-drill">학습 완료</span>
+        <h2 class="cover-title" style="margin:0;">수고했습니다!</h2>
+        <p class="cover-sub" style="margin:0;">학습지 A 12문항과 자격증 실전 드릴 30문항을 모두 살펴보았습니다.</p>
+        <div class="outro-next">다음 단원 예고: 투자자산의 평가·처분과 유형자산의 <strong>감가상각·처분</strong>은 다음 시간에 배웁니다.</div>
+        <div class="cover-actions" style="justify-content:center;">
+          <button type="button" class="btn btn-primary" data-action="go-home">처음으로</button>
+          <button type="button" class="btn btn-soft" data-action="open-toc">목차</button>
+          <button type="button" class="btn btn-orange" id="nextUnitBtn">다음 단원 예고 보기</button>
+        </div>
+        <div class="grade-feedback" id="nextUnitMsg" style="max-width:540px;"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 하단 내비게이션 -->
+  <footer class="bottombar">
+    <button type="button" class="btn btn-soft" id="prevBtn" aria-label="이전 슬라이드">← 이전</button>
+    <div class="bottom-label" id="bottomLabel">표지</div>
+    <button type="button" class="btn btn-primary" id="nextBtn" aria-label="다음 슬라이드">다음 →</button>
+  </footer>
+</div>
+
+<!-- 드래그 고스트 & 계정과목 자동완성 -->
+<div class="drag-ghost" id="dragGhost" aria-hidden="true"></div>
+<datalist id="accountDatalist">
+  <option value="장기금융상품"></option>
+  <option value="만기보유증권"></option>
+  <option value="매도가능증권"></option>
+  <option value="장기대여금"></option>
+  <option value="투자부동산"></option>
+  <option value="토지"></option>
+  <option value="건설중인자산"></option>
+  <option value="건물"></option>
+  <option value="기계장치"></option>
+  <option value="비품"></option>
+  <option value="차량운반구"></option>
+  <option value="현금"></option>
+  <option value="당좌예금"></option>
+  <option value="보통예금"></option>
+  <option value="지급어음"></option>
+  <option value="미지급금"></option>
+  <option value="선급금"></option>
+  <option value="이자수익"></option>
+</datalist>
+
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_MODE = 'acct_v2_mode';
+  const STORAGE_RESULTS = 'acct_v2_results';
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const totalSlides = slides.length;
+  let currentIdx = 0;
+  let currentMode = 'teacher';
+  let results = {};
+  let selectedChip = null;
+  let wrongOnlyQueue = [];
+
+  const slideCounter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+  const bottomLabel = document.getElementById('bottomLabel');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const tocBackdrop = document.getElementById('tocBackdrop');
+  const tocDrawer = document.getElementById('tocDrawer');
+  const tocList = document.getElementById('tocList');
+  const dragGhost = document.getElementById('dragGhost');
+  const stage = document.getElementById('stage');
+
+  const ICONS = {
+    receipt: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 3h14v18l-2.5-2-2.5 2-2-2-2 2-2.5-2L5 21V3z" stroke="#1B5E46" stroke-width="2"/><path d="M8 8h8M8 12h6" stroke="#1B5E46" stroke-width="2" stroke-linecap="round"/></svg>',
+    coffee: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="12" height="11" rx="2" stroke="#C45514" stroke-width="2"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2M8 5v1M12 5v1" stroke="#C45514" stroke-width="2" stroke-linecap="round"/></svg>',
+    building: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="17" rx="1.5" stroke="#7B4A21" stroke-width="2"/><path d="M8 8h2M14 8h2M8 12h2M14 12h2M10 21v-4h4v4" stroke="#7B4A21" stroke-width="2" stroke-linecap="round"/></svg>',
+    machine: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="#C45514" stroke-width="2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" stroke="#C45514" stroke-width="2" stroke-linecap="round"/></svg>',
+    check: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="#1A4E8A" stroke-width="2"/><path d="M7 10h6M7 14h10" stroke="#1A4E8A" stroke-width="2" stroke-linecap="round"/></svg>',
+    note: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" stroke="#7B4A21" stroke-width="2"/><path d="M8 10h8M8 14h5" stroke="#7B4A21" stroke-width="2" stroke-linecap="round"/></svg>'
+  };
+
+  function safeGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeSet(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) {}
+  }
+
+  function formatWon(n) {
+    const num = Number(n);
+    if (!Number.isFinite(num)) return String(n);
+    return num.toLocaleString('ko-KR') + '원';
+  }
+  function parseAmount(str) {
+    if (str === null || str === undefined) return NaN;
+    const cleaned = String(str).replace(/[,원\s]/g, '');
+    if (!cleaned) return NaN;
+    return Number(cleaned);
+  }
+  function normAcct(str) {
+    return String(str || '').replace(/\s+/g, '').trim();
+  }
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function formatEntryLine(entry) {
+    const dStr = entry.debit.map(i => i.account + ' ' + formatWon(i.amount)).join(', ');
+    const cStr = entry.credit.map(i => i.account + ' ' + formatWon(i.amount)).join(', ');
+    const prefix = entry.label ? '<strong>' + entry.label + ':</strong> ' : '';
+    return prefix +
+      '<span class="side-tag debit">(차)</span> ' + dStr + ' ' +
+      '<span class="side-tag credit">(대)</span> ' + cStr;
+  }
+
+  /* ===== Problem Slide Builder ===== */
+  const problemDataMap = {};
+
+  function buildProblemSlides() {
+    slides.forEach((sec) => {
+      if (sec.dataset.type !== 'journal') return;
+      const dataEl = sec.querySelector('.p-data');
+      if (!dataEl) return;
+      let data;
+      try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+      problemDataMap[sec.id] = data;
+
+      const titleEl = sec.querySelector('.p-title');
+      const sceneEl = sec.querySelector('.p-scene');
+      const extraEl = sec.querySelector('.p-extra');
+      const styleType = sec.dataset.style || 'worksheet';
+      const badgeText = sec.dataset.badge || sec.id;
+      const examText = sec.dataset.exam || '';
+      const iconKey = sec.dataset.icon || 'receipt';
+      const isTangible = sec.classList.contains('cat-tangible');
+
+      // Top bar of problem
+      const topDiv = document.createElement('div');
+      topDiv.className = 'p-top';
+      const badgesDiv = document.createElement('div');
+      badgesDiv.className = 'p-badges';
+
+      const mainBadge = document.createElement('span');
+      mainBadge.className = 'badge badge-' + styleType + (isTangible ? ' cat-tangible' : '');
+      mainBadge.textContent = badgeText;
+      badgesDiv.appendChild(mainBadge);
+
+      if (examText) {
+        const examBadge = document.createElement('span');
+        examBadge.className = 'badge badge-exam' + (isTangible ? '' : ' cat-invest');
+        examBadge.textContent = examText;
+        badgesDiv.appendChild(examBadge);
+      }
+
+      const idTag = document.createElement('span');
+      idTag.className = 'p-id-tag';
+      idTag.textContent = sec.id;
+
+      topDiv.appendChild(badgesDiv);
+      topDiv.appendChild(idTag);
+
+      // Wrap scene with icon box
+      const sceneBox = document.createElement('div');
+      sceneBox.className = 'p-scene-box';
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'p-icon';
+      iconWrap.setAttribute('aria-hidden', 'true');
+      iconWrap.innerHTML = ICONS[iconKey] || ICONS.receipt;
+      sceneBox.appendChild(iconWrap);
+      sceneBox.appendChild(sceneEl);
+
+      sec.insertBefore(topDiv, titleEl);
+      sec.insertBefore(sceneBox, extraEl);
+
+      // Workspace container
+      const ws = document.createElement('div');
+      ws.className = 'p-workspace';
+
+      // --- 1. Teacher Mode Area ---
+      const teacherWrap = document.createElement('div');
+      teacherWrap.className = 'teacher-only';
+
+      const board = document.createElement('div');
+      board.className = 'teacher-board';
+
+      data.entries.forEach((ent) => {
+        const grp = document.createElement('div');
+        grp.className = 't-entry-group';
+        if (ent.label) {
+          const lb = document.createElement('div');
+          lb.className = 't-entry-label';
+          lb.textContent = ent.label;
+          grp.appendChild(lb);
+        }
+        const rows = Math.max(ent.debit.length, ent.credit.length, (data.entries.length === 1 && (ent.debit.length > 1 || ent.credit.length > 1)) ? 2 : 1);
+        for (let r = 0; r < rows; r++) {
+          const lw = document.createElement('div');
+          lw.className = 't-line-wrap';
+          lw.innerHTML =
+            '<div class="t-line">' +
+              '<span class="side-tag debit">(차)</span>' +
+              '<span class="t-blank-acct"></span>' +
+              '<span class="t-blank-amt"></span>' +
+              '<span class="t-blank-sep"></span>' +
+              '<span class="side-tag credit">(대)</span>' +
+              '<span class="t-blank-acct"></span>' +
+              '<span class="t-blank-amt"></span>' +
+            '</div>';
+          grp.appendChild(lw);
+        }
+        board.appendChild(grp);
+      });
+
+      const tCtrl = document.createElement('div');
+      tCtrl.className = 'teacher-controls';
+      const toggleAnsBtn = document.createElement('button');
+      toggleAnsBtn.type = 'button';
+      toggleAnsBtn.className = 'btn btn-primary t-ans-toggle';
+      toggleAnsBtn.textContent = '정답 보기';
+      toggleAnsBtn.setAttribute('aria-expanded', 'false');
+      tCtrl.appendChild(toggleAnsBtn);
+
+      const tAnsBox = document.createElement('div');
+      tAnsBox.className = 'teacher-answer-box';
+      tAnsBox.innerHTML =
+        '<div class="ans-lines">' +
+          data.entries.map(e => '<div class="ans-line">' + formatEntryLine(e) + '</div>').join('') +
+        '</div>' +
+        '<p class="ans-explain">' + data.explain + '</p>';
+
+      toggleAnsBtn.addEventListener('click', () => {
+        const isOpen = tAnsBox.classList.toggle('open');
+        toggleAnsBtn.textContent = isOpen ? '정답 숨기기' : '정답 보기';
+        toggleAnsBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      teacherWrap.appendChild(board);
+      teacherWrap.appendChild(tCtrl);
+      teacherWrap.appendChild(tAnsBox);
+
+      // --- 2. Student Mode Area ---
+      const studentWrap = document.createElement('div');
+      studentWrap.className = 'student-only';
+
+      if (data.hint) {
+        const hintEl = document.createElement('div');
+        hintEl.className = 'student-hint';
+        hintEl.textContent = '힌트: ' + data.hint;
+        studentWrap.appendChild(hintEl);
+      }
+
+      const cue = document.createElement('div');
+      cue.className = 'scroll-cue';
+      cue.textContent = '← 분개 칸을 좌우로 밀어 볼 수 있어요 →';
+      studentWrap.appendChild(cue);
+
+      const jScroll = document.createElement('div');
+      jScroll.className = 'journal-scroll-wrap';
+
+      // Determine row counts for student slots (if altEntries has 2 entries or 2 rows, accommodate gracefully)
+      const entrySlotsCount = data.entries.length;
+      for (let ei = 0; ei < entrySlotsCount; ei++) {
+        const ent = data.entries[ei];
+        const card = document.createElement('div');
+        card.className = 's-entry-card';
+        card.dataset.entryIndex = String(ei);
+
+        if (ent.label) {
+          const lb = document.createElement('div');
+          lb.className = 's-entry-label';
+          lb.textContent = ent.label;
+          card.appendChild(lb);
+        }
+
+        const cols = document.createElement('div');
+        cols.className = 's-columns';
+
+        const debitRows = Math.max(ent.debit.length, (sec.id === 'A1-05' && ei === 0) ? 1 : 1);
+        const creditRows = Math.max(ent.credit.length, (sec.id === 'A1-05' && ei === 0) ? 2 : 1);
+
+        cols.appendChild(buildSideCol(sec.id, ei, 'debit', debitRows));
+        cols.appendChild(buildSideCol(sec.id, ei, 'credit', creditRows));
+        card.appendChild(cols);
+        jScroll.appendChild(card);
+      }
+
+      studentWrap.appendChild(jScroll);
+
+      // Chip bank (shuffled)
+      const bank = document.createElement('div');
+      bank.className = 'chip-bank';
+
+      const acctRow = document.createElement('div');
+      acctRow.className = 'chip-row';
+      const acctLbl = document.createElement('span');
+      acctLbl.className = 'chip-row-label';
+      acctLbl.textContent = '계정과목';
+      acctRow.appendChild(acctLbl);
+      shuffle(data.accounts).forEach((acct) => {
+        acctRow.appendChild(createChip('account', acct, acct));
+      });
+
+      const amtRow = document.createElement('div');
+      amtRow.className = 'chip-row';
+      const amtLbl = document.createElement('span');
+      amtLbl.className = 'chip-row-label';
+      amtLbl.textContent = '금액';
+      amtRow.appendChild(amtLbl);
+      shuffle(data.amounts).forEach((amt) => {
+        amtRow.appendChild(createChip('amount', String(amt), formatWon(amt)));
+      });
+
+      bank.appendChild(acctRow);
+      bank.appendChild(amtRow);
+      studentWrap.appendChild(bank);
+
+      // Student action buttons
+      const actions = document.createElement('div');
+      actions.className = 'student-actions';
+
+      const gradeBtn = document.createElement('button');
+      gradeBtn.type = 'button';
+      gradeBtn.className = 'btn btn-orange';
+      gradeBtn.textContent = '채점';
+
+      const explainBtn = document.createElement('button');
+      explainBtn.type = 'button';
+      explainBtn.className = 'btn btn-primary';
+      explainBtn.textContent = '해설 보기';
+      explainBtn.disabled = true;
+
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'btn btn-soft';
+      resetBtn.textContent = '다시 하기';
+
+      actions.appendChild(gradeBtn);
+      actions.appendChild(explainBtn);
+      actions.appendChild(resetBtn);
+      studentWrap.appendChild(actions);
+
+      const feedback = document.createElement('div');
+      feedback.className = 'grade-feedback';
+      studentWrap.appendChild(feedback);
+
+      const explainBox = document.createElement('div');
+      explainBox.className = 'explain-box';
+      explainBox.innerHTML =
+        '<div class="ans-lines">' +
+          data.entries.map(e => '<div class="ans-line">' + formatEntryLine(e) + '</div>').join('') +
+        '</div>' +
+        '<p class="ans-explain">' + data.explain + '</p>';
+      studentWrap.appendChild(explainBox);
+
+      gradeBtn.addEventListener('click', () => {
+        gradeSlide(sec, data, feedback, explainBtn);
+      });
+      explainBtn.addEventListener('click', () => {
+        const isOpen = explainBox.classList.toggle('open');
+        explainBtn.textContent = isOpen ? '해설 숨기기' : '해설 보기';
+      });
+      resetBtn.addEventListener('click', () => {
+        resetSlide(sec, feedback, explainBox, explainBtn);
+      });
+
+      ws.appendChild(teacherWrap);
+      ws.appendChild(studentWrap);
+      sec.appendChild(ws);
+    });
+  }
+
+  function buildSideCol(slideId, entryIdx, side, rowCount) {
+    const col = document.createElement('div');
+    col.className = 's-side-col';
+    const head = document.createElement('div');
+    head.className = 's-side-head';
+    head.innerHTML = side === 'debit'
+      ? '<span class="side-tag debit">(차) 차변</span>'
+      : '<span class="side-tag credit">(대) 대변</span>';
+    col.appendChild(head);
+
+    for (let r = 0; r < rowCount; r++) {
+      const row = document.createElement('div');
+      row.className = 's-row';
+      row.appendChild(createSlot('account', slideId, entryIdx, side, r));
+      row.appendChild(createSlot('amount', slideId, entryIdx, side, r));
+      col.appendChild(row);
+    }
+    return col;
+  }
+
+  function createSlot(kind, slideId, entryIdx, side, rowIdx) {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.dataset.slotKind = kind;
+    slot.dataset.slideId = slideId;
+    slot.dataset.entryIndex = String(entryIdx);
+    slot.dataset.side = side;
+    slot.dataset.rowIndex = String(rowIdx);
+
+    const input = document.createElement('input');
+    input.className = 'slot-input';
+    input.type = 'text';
+    input.autocomplete = 'off';
+    if (kind === 'account') {
+      input.placeholder = '계정과목';
+      input.setAttribute('list', 'accountDatalist');
+    } else {
+      input.placeholder = '금액';
+      input.setAttribute('inputmode', 'numeric');
+    }
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'slot-clear';
+    clearBtn.textContent = '×';
+    clearBtn.setAttribute('aria-label', '입력 지우기');
+
+    input.addEventListener('input', () => {
+      syncSlotFilled(slot, input);
+    });
+
+    // Tap-to-place: if a chip of matching kind is selected, place it into this slot
+    slot.addEventListener('click', (e) => {
+      if (e.target === clearBtn) return;
+      if (selectedChip && selectedChip.dataset.chipKind === kind) {
+        e.preventDefault();
+        placeValueInSlot(slot, selectedChip.dataset.chipKind === 'amount'
+          ? formatWon(selectedChip.dataset.chipValue)
+          : selectedChip.dataset.chipValue);
+        clearSelectedChip();
+        input.blur();
+      }
+    });
+
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      input.value = '';
+      syncSlotFilled(slot, input);
+    });
+
+    slot.appendChild(input);
+    slot.appendChild(clearBtn);
+    return slot;
+  }
+
+  function syncSlotFilled(slot, input) {
+    slot.classList.remove('is-ok', 'is-bad');
+    if (input.value.trim()) slot.classList.add('filled');
+    else slot.classList.remove('filled');
+  }
+
+  function placeValueInSlot(slot, val) {
+    const input = slot.querySelector('.slot-input');
+    if (!input) return;
+    input.value = val;
+    syncSlotFilled(slot, input);
+  }
+
+  /* ===== Chips: Pointer Events Drag + Tap-to-Place (iOS Safari Safe) ===== */
+  let dragState = null;
+
+  function createChip(kind, rawValue, label) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip chip-' + kind;
+    chip.dataset.chipKind = kind;
+    chip.dataset.chipValue = rawValue;
+    chip.textContent = label;
+
+    chip.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      chip.setPointerCapture(e.pointerId);
+      dragState = {
+        chip,
+        kind,
+        rawValue,
+        label,
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        dragging: false,
+        hoverSlot: null
+      };
+    });
+
+    chip.addEventListener('pointermove', (e) => {
+      if (!dragState || dragState.pointerId !== e.pointerId) return;
+      const dx = e.clientX - dragState.startX;
+      const dy = e.clientY - dragState.startY;
+      if (!dragState.dragging && Math.hypot(dx, dy) >= 8) {
+        dragState.dragging = true;
+        clearSelectedChip();
+        dragGhost.textContent = dragState.label;
+        dragGhost.classList.add('active');
+        highlightSlots(dragState.kind, true);
+      }
+      if (dragState.dragging) {
+        dragGhost.style.left = e.clientX + 'px';
+        dragGhost.style.top = e.clientY + 'px';
+        updateDropHover(e.clientX, e.clientY, dragState.kind);
+      }
+    });
+
+    chip.addEventListener('pointerup', (e) => {
+      if (!dragState || dragState.pointerId !== e.pointerId) return;
+      const st = dragState;
+      dragState = null;
+
+      if (st.dragging) {
+        dragGhost.classList.remove('active');
+        if (st.hoverSlot) {
+          placeValueInSlot(st.hoverSlot, st.kind === 'amount' ? formatWon(st.rawValue) : st.rawValue);
+          st.hoverSlot.classList.remove('slot-drop-hover');
+        }
+        highlightSlots(st.kind, false);
+      } else {
+        // Tap (< 8px move) -> toggle selection
+        if (selectedChip === chip) {
+          clearSelectedChip();
+        } else {
+          clearSelectedChip();
+          selectedChip = chip;
+          chip.classList.add('selected');
+          highlightSlots(kind, true);
+        }
+      }
+    });
+
+    chip.addEventListener('pointercancel', () => {
+      if (!dragState) return;
+      const kindToClear = dragState.kind;
+      dragState = null;
+      dragGhost.classList.remove('active');
+      highlightSlots(kindToClear, false);
+    });
+
+    return chip;
+  }
+
+  document.addEventListener('touchmove', (e) => {
+    if (dragState && dragState.dragging) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  function clearSelectedChip() {
+    if (selectedChip) {
+      const k = selectedChip.dataset.chipKind;
+      selectedChip.classList.remove('selected');
+      selectedChip = null;
+      highlightSlots(k, false);
+    }
+  }
+
+  function highlightSlots(kind, on) {
+    const activeSlide = slides[currentIdx];
+    if (!activeSlide) return;
+    activeSlide.querySelectorAll('.slot[data-slot-kind="' + kind + '"]').forEach((s) => {
+      s.classList.toggle('slot-drop-ready', on);
+      if (!on) s.classList.remove('slot-drop-hover');
+    });
+  }
+
+  function updateDropHover(x, y, kind) {
+    const el = document.elementFromPoint(x, y);
+    const slot = el ? el.closest('.slot[data-slot-kind="' + kind + '"]') : null;
+    if (dragState.hoverSlot && dragState.hoverSlot !== slot) {
+      dragState.hoverSlot.classList.remove('slot-drop-hover');
+    }
+    dragState.hoverSlot = slot;
+    if (slot) slot.classList.add('slot-drop-hover');
+  }
+
+  /* ===== Grading Logic ===== */
+  function readUserEntries(sec) {
+    const cards = Array.from(sec.querySelectorAll('.s-entry-card'));
+    return cards.map((card) => {
+      const readSide = (side) => {
+        const rows = Array.from(card.querySelectorAll('.s-side-col'))
+          [side === 'debit' ? 0 : 1]
+          .querySelectorAll('.s-row');
+        const list = [];
+        rows.forEach((row) => {
+          const aSlot = row.querySelector('.slot[data-slot-kind="account"]');
+          const mSlot = row.querySelector('.slot[data-slot-kind="amount"]');
+          const acct = normAcct(aSlot.querySelector('.slot-input').value);
+          const amt = parseAmount(mSlot.querySelector('.slot-input').value);
+          if (acct || Number.isFinite(amt)) {
+            list.push({ account: acct, amount: amt, aSlot, mSlot });
+          }
+        });
+        return list;
+      };
+      return { debit: readSide('debit'), credit: readSide('credit') };
+    });
+  }
+
+  function matchSide(userList, expectedList) {
+    const used = new Array(expectedList.length).fill(false);
+    let allMatch = userList.length === expectedList.length;
+
+    userList.forEach((u) => {
+      let foundIdx = -1;
+      for (let i = 0; i < expectedList.length; i++) {
+        if (!used[i] && normAcct(expectedList[i].account) === u.account && expectedList[i].amount === u.amount) {
+          foundIdx = i;
+          break;
+        }
+      }
+      if (foundIdx >= 0) {
+        used[foundIdx] = true;
+        u.aSlot.classList.add('is-ok');
+        u.mSlot.classList.add('is-ok');
+      } else {
+        allMatch = false;
+        const acctMatch = expectedList.some(e => normAcct(e.account) === u.account);
+        const amtMatch = expectedList.some(e => e.amount === u.amount);
+        u.aSlot.classList.add(acctMatch ? 'is-ok' : 'is-bad');
+        u.mSlot.classList.add(amtMatch ? 'is-ok' : 'is-bad');
+      }
+    });
+    return allMatch && used.every(Boolean);
+  }
+
+  function checkAgainstExpected(userEntries, expectedEntries) {
+    // Filter out completely empty user entry cards when comparing against 1-entry alt
+    const nonEmptyUser = userEntries.filter(e => e.debit.length > 0 || e.credit.length > 0);
+    if (nonEmptyUser.length !== expectedEntries.length) return false;
+    let ok = true;
+    for (let i = 0; i < expectedEntries.length; i++) {
+      const dOk = matchSide(nonEmptyUser[i].debit, expectedEntries[i].debit);
+      const cOk = matchSide(nonEmptyUser[i].credit, expectedEntries[i].credit);
+      if (!dOk || !cOk) ok = false;
+    }
+    return ok;
+  }
+
+  function gradeSlide(sec, data, feedback, explainBtn) {
+    sec.querySelectorAll('.slot').forEach(s => s.classList.remove('is-ok', 'is-bad'));
+    const userEntries = readUserEntries(sec);
+    const nonEmpty = userEntries.filter(e => e.debit.length > 0 || e.credit.length > 0);
+
+    if (nonEmpty.length === 0) {
+      feedback.className = 'grade-feedback open bad';
+      feedback.textContent = '✗ 아직 입력된 칸이 없습니다. 칩을 놓거나 직접 입력해 보세요.';
+      return;
+    }
+
+    // Check debit sum === credit sum for each non-empty entry
+    let balanceOk = true;
+    nonEmpty.forEach((ent) => {
+      const dSum = ent.debit.reduce((s, i) => s + (Number.isFinite(i.amount) ? i.amount : 0), 0);
+      const cSum = ent.credit.reduce((s, i) => s + (Number.isFinite(i.amount) ? i.amount : 0), 0);
+      if (dSum !== cSum || dSum <= 0) balanceOk = false;
+    });
+
+    let isCorrect = false;
+    // Try primary entries first
+    if (checkAgainstExpected(userEntries, data.entries)) {
+      isCorrect = true;
+    } else if (data.altEntries) {
+      sec.querySelectorAll('.slot').forEach(s => s.classList.remove('is-ok', 'is-bad'));
+      if (checkAgainstExpected(userEntries, data.altEntries)) {
+        isCorrect = true;
+      } else {
+        // Re-apply primary marks for helpful feedback
+        sec.querySelectorAll('.slot').forEach(s => s.classList.remove('is-ok', 'is-bad'));
+        checkAgainstExpected(userEntries, data.entries);
+      }
+    }
+
+    explainBtn.disabled = false;
+    results[sec.id] = isCorrect ? 'ok' : 'bad';
+    safeSet(STORAGE_RESULTS, JSON.stringify(results));
+    renderSelfCheck();
+
+    if (isCorrect) {
+      feedback.className = 'grade-feedback open ok';
+      feedback.textContent = '✓ 정답입니다! 차변 합계와 대변 합계가 정확히 일치합니다.';
+    } else if (!balanceOk) {
+      feedback.className = 'grade-feedback open bad';
+      feedback.textContent = '✗ 차변 합계와 대변 합계가 다릅니다. 빨간 테두리 칸의 계정과목과 금액을 다시 확인해 보세요.';
+    } else {
+      feedback.className = 'grade-feedback open bad';
+      feedback.textContent = '✗ 차대 합계는 맞지만 일부 계정과목 또는 금액이 다릅니다. 빨간 테두리 칸을 확인하고 해설 보기를 참고해 보세요.';
+    }
+  }
+
+  function resetSlide(sec, feedback, explainBox, explainBtn) {
+    sec.querySelectorAll('.slot').forEach((s) => {
+      const inp = s.querySelector('.slot-input');
+      if (inp) inp.value = '';
+      s.classList.remove('filled', 'is-ok', 'is-bad');
+    });
+    feedback.className = 'grade-feedback';
+    feedback.textContent = '';
+    explainBox.classList.remove('open');
+    explainBtn.textContent = '해설 보기';
+    explainBtn.disabled = true;
+    clearSelectedChip();
+  }
+
+  /* ===== Mode Switch ===== */
+  function setMode(mode) {
+    currentMode = mode === 'student' ? 'student' : 'teacher';
+    document.body.classList.toggle('mode-teacher', currentMode === 'teacher');
+    document.body.classList.toggle('mode-student', currentMode === 'student');
+    document.querySelectorAll('.mode-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.mode === currentMode));
+    });
+    clearSelectedChip();
+    safeSet(STORAGE_MODE, currentMode);
+  }
+
+  /* ===== Navigation & TOC ===== */
+  function goToSlide(idx) {
+    if (idx < 0 || idx >= totalSlides) return;
+    clearSelectedChip();
+    slides[currentIdx].classList.remove('active');
+    currentIdx = idx;
+    const cur = slides[currentIdx];
+    cur.classList.add('active');
+    cur.scrollTop = 0;
+
+    slideCounter.textContent = (currentIdx + 1) + ' / ' + totalSlides;
+    progressFill.style.width = (((currentIdx + 1) / totalSlides) * 100) + '%';
+    bottomLabel.textContent = cur.dataset.badge || cur.dataset.navTitle || cur.id;
+
+    prevBtn.disabled = currentIdx === 0;
+    nextBtn.disabled = currentIdx === totalSlides - 1;
+
+    tocList.querySelectorAll('.toc-item').forEach((item) => {
+      item.classList.toggle('current', Number(item.dataset.idx) === currentIdx);
+    });
+    if (cur.id === 'Z-02') renderSelfCheck();
+  }
+
+  function jumpToId(id) {
+    const idx = slides.findIndex(s => s.id === id);
+    if (idx >= 0) goToSlide(idx);
+  }
+
+  function buildTOC() {
+    tocList.innerHTML = '';
+    let lastGroup = '';
+    slides.forEach((s, idx) => {
+      const grp = s.dataset.group || '기타';
+      if (grp !== lastGroup) {
+        const h = document.createElement('div');
+        h.className = 'toc-group-title';
+        h.textContent = grp;
+        tocList.appendChild(h);
+        lastGroup = grp;
+      }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toc-item';
+      btn.dataset.idx = String(idx);
+      const title = s.dataset.navTitle || (s.id + ' · ' + (s.querySelector('.p-title') ? s.querySelector('.p-title').textContent : ''));
+      btn.innerHTML = '<span>' + title + '</span><span style="font-size:0.8rem;color:#59524A;">' + (idx + 1) + '</span>';
+      btn.addEventListener('click', () => {
+        goToSlide(idx);
+        closeTOC();
+      });
+      tocList.appendChild(btn);
+    });
+  }
+
+  function openTOC() {
+    tocBackdrop.classList.add('open');
+    tocDrawer.classList.add('open');
+    tocDrawer.setAttribute('aria-hidden', 'false');
+  }
+  function closeTOC() {
+    tocBackdrop.classList.remove('open');
+    tocDrawer.classList.remove('open');
+    tocDrawer.setAttribute('aria-hidden', 'true');
+  }
+
+  /* ===== Self-Check Summary (Z-02) ===== */
+  function renderSelfCheck() {
+    const grid = document.getElementById('resultGrid');
+    const summaryText = document.getElementById('scoreSummaryText');
+    const subText = document.getElementById('scoreSubText');
+    if (!grid) return;
+
+    const probSlides = slides.filter(s => s.dataset.type === 'journal');
+    let okCnt = 0, badCnt = 0;
+    grid.innerHTML = '';
+
+    probSlides.forEach((s) => {
+      const st = results[s.id];
+      if (st === 'ok') okCnt++;
+      else if (st === 'bad') badCnt++;
+
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'result-pill' + (st === 'ok' ? ' is-ok' : st === 'bad' ? ' is-bad' : '');
+      const mark = st === 'ok' ? '✓' : st === 'bad' ? '✗' : '–';
+      pill.innerHTML = '<span>' + s.id + '</span><span>' + mark + '</span>';
+      pill.addEventListener('click', () => jumpToId(s.id));
+      grid.appendChild(pill);
+    });
+
+    const done = okCnt + badCnt;
+    summaryText.textContent = '정답 ' + okCnt + ' / ' + probSlides.length + '문항 (채점 ' + done + ')';
+    subText.textContent = badCnt > 0
+      ? '다시 확인할 문항이 ' + badCnt + '개 있습니다. 아래 번호를 눌러 바로 이동할 수 있어요.'
+      : (done === 0 ? '혼자 공부 모드에서 채점한 결과가 여기에 모입니다.' : '채점한 문항을 모두 정확히 맞혔습니다!');
+  }
+
+  /* ===== Event Bindings ===== */
+  document.querySelectorAll('.mode-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+
+  document.getElementById('openTocBtn').addEventListener('click', openTOC);
+  document.getElementById('closeTocBtn').addEventListener('click', closeTOC);
+  tocBackdrop.addEventListener('click', closeTOC);
+
+  prevBtn.addEventListener('click', () => goToSlide(currentIdx - 1));
+  nextBtn.addEventListener('click', () => goToSlide(currentIdx + 1));
+
+  document.querySelectorAll('[data-action="go-home"]').forEach(b => b.addEventListener('click', () => goToSlide(0)));
+  document.querySelectorAll('[data-action="open-toc"]').forEach(b => b.addEventListener('click', openTOC));
+  document.querySelectorAll('[data-action="start-teacher"]').forEach(b => b.addEventListener('click', () => { setMode('teacher'); goToSlide(1); }));
+  document.querySelectorAll('[data-action="start-student"]').forEach(b => b.addEventListener('click', () => { setMode('student'); goToSlide(1); }));
+
+  document.querySelectorAll('[data-jump]').forEach((btn) => {
+    btn.addEventListener('click', () => jumpToId(btn.dataset.jump));
+  });
+
+  // Compare mini-check (A2-02b)
+  document.querySelectorAll('[data-compare-pick]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const fb = document.getElementById('compareFeedback');
+      if (btn.dataset.comparePick === 'left') {
+        fb.className = 'grade-feedback open ok';
+        fb.textContent = '✓ 맞습니다! 설치비 100,000원이 이미 포함된 금액 2,000,000원을 지급했으므로 비품 2,000,000원입니다.';
+      } else {
+        fb.className = 'grade-feedback open bad';
+        fb.textContent = '✗ ②는 2,000,000원에 설치비 100,000원을 추가로 지급한 경우(2,100,000원)입니다. ①을 다시 확인해 보세요.';
+      }
+    });
+  });
+
+  // Z-02 buttons
+  const retryWrongBtn = document.getElementById('retryWrongBtn');
+  if (retryWrongBtn) {
+    retryWrongBtn.addEventListener('click', () => {
+      wrongOnlyQueue = slides.filter(s => s.dataset.type === 'journal' && results[s.id] === 'bad').map(s => s.id);
+      if (wrongOnlyQueue.length === 0) {
+        alert('현재 틀린 것으로 기록된 문항이 없습니다.');
+        return;
+      }
+      setMode('student');
+      jumpToId(wrongOnlyQueue[0]);
+    });
+  }
+  const resetAllScoreBtn = document.getElementById('resetAllScoreBtn');
+  if (resetAllScoreBtn) {
+    resetAllScoreBtn.addEventListener('click', () => {
+      results = {};
+      safeSet(STORAGE_RESULTS, '{}');
+      renderSelfCheck();
+    });
+  }
+
+  // Z-03 next unit button
+  const nextUnitBtn = document.getElementById('nextUnitBtn');
+  if (nextUnitBtn) {
+    nextUnitBtn.addEventListener('click', () => {
+      const msg = document.getElementById('nextUnitMsg');
+      msg.className = 'grade-feedback open ok';
+      msg.textContent = '다음 시간에는 유형자산의 감가상각(정액법)과 투자자산·유형자산의 처분 분개를 이어서 학습합니다.';
+    });
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement ? document.activeElement.tagName : '';
+    if (e.key === 'Escape') {
+      closeTOC();
+      const activeAns = slides[currentIdx].querySelector('.teacher-answer-box.open');
+      if (activeAns) {
+        activeAns.classList.remove('open');
+        const tgl = slides[currentIdx].querySelector('.t-ans-toggle');
+        if (tgl) { tgl.textContent = '정답 보기'; tgl.setAttribute('aria-expanded', 'false'); }
+      }
+      return;
+    }
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight') goToSlide(currentIdx + 1);
+    else if (e.key === 'ArrowLeft') goToSlide(currentIdx - 1);
+  });
+
+  // Swipe navigation (disabled during chip drag or horizontal journal scroll)
+  let swipeStart = null;
+  stage.addEventListener('touchstart', (e) => {
+    if (dragState || e.touches.length !== 1) return;
+    if (e.target.closest('.chip, .journal-scroll-wrap, input, button')) return;
+    swipeStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+
+  stage.addEventListener('touchend', (e) => {
+    if (!swipeStart || dragState) { swipeStart = null; return; }
+    const t = e.changedTouches[0];
+    const dx = t.clientX - swipeStart.x;
+    const dy = t.clientY - swipeStart.y;
+    swipeStart = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) goToSlide(currentIdx + 1);
+      else goToSlide(currentIdx - 1);
+    }
+  }, { passive: true });
+
+  /* ===== Init ===== */
+  try {
+    const savedRes = safeGet(STORAGE_RESULTS);
+    if (savedRes) results = JSON.parse(savedRes) || {};
+  } catch (e) { results = {}; }
+
+  buildProblemSlides();
+  buildTOC();
+  setMode(safeGet(STORAGE_MODE) || 'teacher');
+  goToSlide(0);
+  renderSelfCheck();
+})();
+</script>
+</body>
+</html>

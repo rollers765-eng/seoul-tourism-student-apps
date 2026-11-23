@@ -146,17 +146,27 @@
     "unit": "투자자산·유형자산",
     "account": "투자자산·유형자산 취득",
     "lesson": 1,
-    "title": "수업 슬라이드 | 카페 사장님의 자산 장부",
-    "description": "투자자산과 유형자산 취득을 24장 슬라이드로 익힙니다. 학습지 01~06 거래를 카페 장면으로 보며 한 줄 분개를 연습하고, 수업 모드와 혼자 공부 모드를 전환할 수 있습니다.",
+    "title": "수업 슬라이드 | 카페 사장님의 자산 장부 · 자산 취득 분개 트레이닝",
+    "description": "같은 단원의 슬라이드 두 편입니다. v1(24장)은 카페 거래 장면을 따라가며 학습지 거래를 한 줄로 분개하는 수업 흐름형, v2(50장)는 학습지 A 12문항과 자격증 실전 드릴 30문항을 수업 모드(빈칸 판서·정답 토글)와 혼자 공부 모드(계정·금액 칩 배치·즉시 채점)로 연습하는 트레이닝형입니다.",
     "pages": "128~131",
     "tags": [
       "투자자산",
       "유형자산",
       "취득원가",
       "분개",
-      "슬라이드"
+      "슬라이드",
+      "자격증 드릴"
     ],
-    "slides": "materials/investment-fixed-assets-01/slides.html",
+    "slides": [
+      {
+        "label": "슬라이드 v1 ↗",
+        "path": "materials/investment-fixed-assets-01/slides.html"
+      },
+      {
+        "label": "슬라이드 v2 ↗",
+        "path": "materials/investment-fixed-assets-01/slides-v2.html"
+      }
+    ],
     "chapter": "Ⅱ. 자산의 회계 처리",
     "chapterOrder": 2,
     "unitOrder": 5,
