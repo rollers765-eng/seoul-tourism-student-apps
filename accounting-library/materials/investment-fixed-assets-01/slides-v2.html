@@ -108,6 +108,37 @@
   }
   .brand-btn:hover { background: var(--surface-warm); }
 
+  /* 자료실 복귀 링크 (상단 바 왼쪽 끝) */
+  .library-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 6px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-warm);
+    color: var(--ink);
+    font: 700 0.88rem/1 var(--font-sans);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background var(--trans), border-color var(--trans), color var(--trans);
+  }
+  .library-back:hover {
+    background: var(--green-soft);
+    border-color: var(--green);
+    color: var(--green-dark);
+  }
+  .library-back:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 2px;
+  }
+  .library-back-arrow {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
   .slide-counter {
     font-size: 0.9rem;
     font-weight: 700;
@@ -1136,6 +1167,16 @@
     .p-scene-box { padding: 12px 14px; }
     .p-icon { display: none; }
   }
+
+  /* 좁은 화면: 장수 표시(counter)를 접고 복귀 링크를 살짝 줄여 한 줄을 유지한다 */
+  @media (max-width: 560px) {
+    .slide-counter { display: none; }
+    .library-back { padding: 6px 10px; font-size: 0.82rem; }
+  }
+  /* 그보다 더 좁으면 장식용 처음으로 아이콘을 접어 「← 자료실」 자리를 확보한다 */
+  @media (max-width: 420px) {
+    .brand-btn { display: none; }
+  }
 </style>
 </head>
 <body class="mode-teacher">
@@ -1143,6 +1184,7 @@
   <!-- 상단 고정 바 -->
   <header class="topbar">
     <div class="brand-group">
+      <a class="library-back" href="../../index.html?unit=%ED%88%AC%EC%9E%90%EC%9E%90%EC%82%B0%C2%B7%EC%9C%A0%ED%98%95%EC%9E%90%EC%82%B0&amp;account=%ED%88%AC%EC%9E%90%EC%9E%90%EC%82%B0%C2%B7%EC%9C%A0%ED%98%95%EC%9E%90%EC%82%B0%20%EC%B7%A8%EB%93%9D#materials" aria-label="회계원리 자료실로 돌아가기"><span class="library-back-arrow" aria-hidden="true">←</span><span class="library-back-text">자료실</span></a>
       <button type="button" class="brand-btn" data-action="go-home" aria-label="처음으로 이동">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <rect x="3" y="3" width="18" height="18" rx="4" fill="#1B5E46"/>
