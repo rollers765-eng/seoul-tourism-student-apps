@@ -14,7 +14,7 @@
 <script>
 function go(id, sel){const f=document.getElementById(id);
   f.addEventListener('load',()=>{try{const el=f.contentDocument.querySelector(sel); if(el) el.scrollIntoView({block:'start'});}catch(e){}});}
-go('m1','.casepanel .shots');
-go('m2','#m1-1 .shots');
+go('m1','.casepanel .shots-head');
+go('m2','#m1-1 .shots-head');
 </script>
 </body></html>
