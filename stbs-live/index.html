@@ -122,6 +122,7 @@
       <div class="club">방송반 라이브 <span class="onair" id="badge"><i></i><span id="badgeText">준비 중</span></span></div>
     </div>
     <div class="tabs" role="group" aria-label="보기 방식">
+      <button class="btn yellow" id="shortcutBtn" type="button">⬇ 바로가기 설치</button>
       <button class="btn" id="mVideo" type="button">📺 라이브 영상</button>
       <button class="btn" id="mChan" type="button">📡 채널 자동 라이브</button>
     </div>
@@ -228,6 +229,13 @@
   </div>
 </div>
 
+<dialog id="shortcutDlg">
+  <h3>🖥️ 바탕화면 바로가기 만들기</h3>
+  <p>바로가기 파일을 내려받았습니다. 다운로드 폴더에서 <strong>STBS-LIVE.url</strong> 파일을 바탕화면으로 옮겨 주세요.</p>
+  <p>그다음 바탕화면의 파일을 두 번 누르면 방송 페이지가 열립니다.</p>
+  <div class="row"><button class="btn on" id="shortcutClose" type="button">확인</button></div>
+</dialog>
+
 <dialog id="dlg">
   <h3>⚙️ 설정</h3>
   <p>바꾼 내용은 이 컴퓨터에 기억돼요.</p>
@@ -258,6 +266,16 @@ const AUTO_GO   = 0;   // 안내 화면에서 이 시간(초) 뒤 유튜브로 �
 
 const KEY = 'sgths-live-v5';
 const $ = id => document.getElementById(id);
+$('shortcutBtn').onclick = () => {
+  const url = 'https://rollers765-eng.github.io/seoul-tourism-student-apps/stbs-live/';
+  const file = new Blob(['[InternetShortcut]\r\nURL=' + url + '\r\n'], {type:'application/internet-shortcut'});
+  const objectUrl = URL.createObjectURL(file);
+  const link = document.createElement('a'); link.href = objectUrl; link.download = 'STBS-LIVE.url';
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+  $('shortcutDlg').showModal();
+};
+$('shortcutClose').onclick = () => $('shortcutDlg').close();
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } };
 const saveCfg = c => { try { localStorage.setItem(KEY, JSON.stringify(c)); return true; } catch(e){ return false; } };
 let cfg = load();
