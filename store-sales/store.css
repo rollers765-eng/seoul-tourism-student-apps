@@ -634,3 +634,25 @@ body{overflow-wrap:anywhere}
 @media (min-width:760px) and (max-width:979px){
   .casegrid{grid-template-columns:1fr 1fr}
 }
+
+/* 수정: 구역 내비 현재 항목 · 상단 스트립 정렬 */
+.navbar.subnav .nav-scroll a[aria-current="true"],
+.navbar .nav-scroll a[aria-current="page"]{background:var(--espresso);border-color:var(--espresso);color:#fff8ec}
+.navbar.subnav .nav-scroll a[aria-current="true"] i,
+.navbar .nav-scroll a[aria-current="page"] i{color:#8fe3c7}
+.phbar{align-items:center;min-height:38px}
+.phbar i{transform:none;align-self:center}
+
+/* 수정: 콜아웃 안의 인라인 강조가 줄바꿈되지 않도록 */
+.callout > b:first-of-type,
+.callout.warn > b:first-of-type,
+.callout.mint > b:first-of-type,
+.callout.indigo > b:first-of-type{display:block;font-size:10.5px;letter-spacing:.08em;margin-bottom:3px}
+.callout b{display:inline;letter-spacing:inherit;font-size:inherit;margin-bottom:0}
+.callout > b:first-of-type{letter-spacing:.08em;font-size:10.5px}
+.callout.warn > b:first-of-type{color:#a33524}
+.callout.mint > b:first-of-type{color:#0a7a5c}
+.callout.indigo > b:first-of-type{color:#3f5b8b}
+.callout.mint b,.callout.warn b,.callout.indigo b{color:inherit}
+.goalbox > b{display:block}
+.goalbox li b{font-size:inherit;letter-spacing:0;color:var(--espresso)}
