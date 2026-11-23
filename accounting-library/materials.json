@@ -173,6 +173,30 @@
     "accountOrder": 1
   },
   {
+    "id": "fixed-assets-depreciation-intangible-02",
+    "unit": "유형자산·무형자산",
+    "account": "감가상각·처분·무형자산",
+    "lesson": 2,
+    "title": "학습지 B | 유형자산의 감가상각·처분과 무형자산",
+    "description": "자본적·수익적 지출, 정액법 감가상각, 유형자산 처분손익, 무형자산까지 41장 슬라이드로 익힙니다. 수업 모드(빈칸 판서·정답 토글)와 혼자 공부 모드(계정과목·금액 칩 드래그·터치 배치·직접 입력 채점)를 전환할 수 있습니다.",
+    "pages": "132~137",
+    "tags": [
+      "자본적 지출",
+      "수익적 지출",
+      "감가상각",
+      "정액법",
+      "처분손익",
+      "무형자산",
+      "분개"
+    ],
+    "slides": "materials/fixed-assets-depreciation-intangible-02/slides.html",
+    "worksheetPdf": "materials/fixed-assets-depreciation-intangible-02/worksheet.pdf",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 6,
+    "accountOrder": 1
+  },
+  {
     "id": "investment-fixed-assets-01",
     "unit": "투자자산·유형자산",
     "account": "투자자산·유형자산 취득",

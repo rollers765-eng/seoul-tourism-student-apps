@@ -1,0 +1,3212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+<title>회계원리 | 유형자산의 감가상각·처분과 무형자산 (학습지 B)</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --surface-soft: #f3ede3;
+    --ink: #2b211a;
+    --ink-sub: #6b5b4f;
+    --line: #e2d7c8;
+    --primary: #8b5a2b;
+    --primary-dark: #5c3a1a;
+    --cap: #1d63b8;
+    --cap-bg: #eaf3ff;
+    --cap-line: #a6cbf7;
+    --rev: #d9641e;
+    --rev-bg: #fff2e8;
+    --rev-line: #f7c39f;
+    --ok: #1b8a5a;
+    --ok-bg: #e6f7ef;
+    --bad: #c93b3b;
+    --bad-bg: #fdecec;
+    --gold: #d99b1e;
+    --shadow: 0 8px 24px rgba(43, 33, 26, 0.08);
+    --radius: 18px;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  /* 상단 고정 바 */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 58px;
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom: 1.5px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    z-index: 100;
+    gap: 8px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    background: var(--surface-soft);
+    border: 1.5px solid var(--line);
+    color: var(--primary-dark);
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .back-btn:hover { background: #eadfce; transform: translateX(-2px); }
+
+  .top-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .slide-counter {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--primary-dark);
+    background: var(--surface-soft);
+    padding: 5px 11px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .toc-btn {
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+  }
+  .toc-btn:hover { background: var(--surface-soft); }
+
+  .mode-switch {
+    display: inline-flex;
+    background: var(--surface-soft);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .mode-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.88rem;
+    color: var(--ink-sub);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.22s ease, color 0.22s ease, transform 0.18s ease;
+  }
+  .mode-btn.active {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* 메인 무대 */
+  .stage {
+    position: fixed;
+    top: 58px;
+    bottom: 62px;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 14px 18px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .slide {
+    display: none;
+    width: 100%;
+    max-width: 1060px;
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 26px 24px;
+    margin: auto 0;
+  }
+
+  .slide.active {
+    display: block;
+    animation: slideEnter 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes slideEnter {
+    from { opacity: 0; transform: translateX(18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* 순차 등장 (stagger) */
+  .slide.active .stagger > * {
+    opacity: 0;
+    animation: itemFadeUp 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .slide.active .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+  .slide.active .stagger > *:nth-child(2) { animation-delay: 0.13s; }
+  .slide.active .stagger > *:nth-child(3) { animation-delay: 0.21s; }
+  .slide.active .stagger > *:nth-child(4) { animation-delay: 0.29s; }
+  .slide.active .stagger > *:nth-child(5) { animation-delay: 0.37s; }
+
+  @keyframes itemFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 하단 내비게이션 */
+  .bottombar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 62px;
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1.5px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    z-index: 100;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    min-width: 112px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .nav-btn:hover:not(:disabled) { background: var(--surface-soft); transform: translateY(-1px); }
+  .nav-btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .nav-btn.primary:hover:not(:disabled) { background: var(--primary-dark); }
+  .nav-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+  .progress-wrap {
+    flex: 1;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .progress-track {
+    width: 100%;
+    height: 8px;
+    background: var(--surface-soft);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--gold));
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  .progress-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* 배지 및 제목 */
+  .s-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 800;
+    background: var(--surface-soft);
+    color: var(--primary-dark);
+    border: 1px solid var(--line);
+  }
+  .badge.ws { background: #fff4df; color: #7c4a03; border-color: #edd095; }
+  .badge.drill { background: #eaf4ff; color: #154c91; border-color: #b7d6fb; }
+  .badge.concept { background: #eef6ef; color: #1b6644; border-color: #bfe0cb; }
+
+  .s-title, .p-title {
+    margin: 4px 0 10px;
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .p-scene {
+    font-size: 1.22rem;
+    font-weight: 700;
+    background: #fcfaf6;
+    border-left: 5px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 0 0 14px;
+    color: var(--ink);
+  }
+
+  /* 말풍선 용어 도움말 */
+  .term-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff8e6;
+    border: 1.5px solid #f0cf7b;
+    color: #694900;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 2px 4px 6px 0;
+  }
+
+  /* 개념/비교 레이아웃 */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .card {
+    background: #fcfaf7;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .card.cap {
+    background: var(--cap-bg);
+    border-color: var(--cap-line);
+  }
+  .card.rev {
+    background: var(--rev-bg);
+    border-color: var(--rev-line);
+  }
+
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 900;
+  }
+  .card.cap h3 { color: var(--cap); }
+  .card.rev h3 { color: var(--rev); }
+
+  .explain-box {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--surface-soft);
+    font-size: 1.02rem;
+    color: var(--ink);
+  }
+
+  .svg-box {
+    width: 100%;
+    background: #fffdf9;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .svg-box svg {
+    width: 100%;
+    max-height: 225px;
+    height: auto;
+    display: block;
+  }
+
+  /* 애니메이션 1: 정액법 연도별 장부금액 감소 막대 타임라인 */
+  .bar-timeline rect.bar-fill {
+    transform-origin: bottom;
+    transform: scaleY(0);
+  }
+  .slide.active .bar-timeline rect.bar-fill {
+    animation: growBar 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .slide.active .bar-timeline .b1 { animation-delay: 0.06s; }
+  .slide.active .bar-timeline .b2 { animation-delay: 0.14s; }
+  .slide.active .bar-timeline .b3 { animation-delay: 0.22s; }
+  .slide.active .bar-timeline .b4 { animation-delay: 0.30s; }
+  .slide.active .bar-timeline .b5 { animation-delay: 0.38s; }
+  .slide.active .bar-timeline .b6 { animation-delay: 0.46s; }
+
+  @keyframes growBar {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+  }
+
+  /* 애니메이션 2: 자본적/수익적 비교 카드 토글·플립 */
+  .flip-card {
+    perspective: 900px;
+    cursor: pointer;
+    min-height: 230px;
+  }
+  .flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 230px;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 14px;
+    padding: 15px 16px;
+    border: 2px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .flip-front.cap { background: var(--cap-bg); border-color: var(--cap-line); }
+  .flip-front.rev { background: var(--rev-bg); border-color: var(--rev-line); }
+  .flip-back {
+    transform: rotateY(180deg);
+    background: #ffffff;
+    border-color: var(--primary);
+  }
+  .flip-hint {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: var(--ink-sub);
+    text-align: right;
+  }
+
+  /* 애니메이션 3: 처분손익 저울 기울기 */
+  .scale-beam {
+    transform-origin: 240px 85px;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .scale-beam.gain { transform: rotate(-9deg); }
+  .scale-beam.loss { transform: rotate(9deg); }
+  .scale-beam.even { transform: rotate(0deg); }
+
+  .scale-toggle-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .mini-pill {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-weight: 800;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.18s ease;
+  }
+  .mini-pill.active-cap { background: var(--cap); color: #fff; border-color: var(--cap); }
+  .mini-pill.active-rev { background: var(--rev); color: #fff; border-color: var(--rev); }
+
+  /* 분개 영역 (수업 모드 & 혼자 공부 모드 공통) */
+  .journal-box {
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    padding: 12px 14px;
+    margin-top: 8px;
+  }
+
+  .j-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    font-weight: 900;
+    font-size: 1rem;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid var(--line);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .j-header span:first-child { color: var(--cap); }
+  .j-header span:last-child { color: var(--rev); }
+
+  .j-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .j-side {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .side-tag {
+    font-weight: 900;
+    font-size: 0.9rem;
+    padding: 4px 7px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .side-tag.dr { background: var(--cap-bg); color: var(--cap); }
+  .side-tag.cr { background: var(--rev-bg); color: var(--rev); }
+
+  /* 수업 모드 빈 밑줄 */
+  .board-lines {
+    display: none;
+  }
+  body.mode-teach .board-lines {
+    display: block;
+  }
+  body.mode-teach .study-only {
+    display: none !important;
+  }
+  body.mode-study .teach-only {
+    display: none !important;
+  }
+
+  .board-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 10px 0;
+  }
+  .board-slot {
+    border-bottom: 2.5px solid #9e8e7e;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+    font-size: 1.05rem;
+    color: var(--ink-sub);
+  }
+
+  /* 혼자 공부 모드 입력 칸 */
+  .slot-input {
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    border: 1.5px solid #cbbba8;
+    border-radius: 10px;
+    padding: 0 9px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: #fffdf9;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .slot-input.amt {
+    max-width: 132px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .slot-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(139, 90, 43, 0.16);
+  }
+  .slot-input.target-ready {
+    border-color: var(--gold);
+    background: #fffbeb;
+    box-shadow: 0 0 0 3px rgba(217, 155, 30, 0.2);
+  }
+
+  /* 애니메이션 4: 혼자 공부 모드 바운스 / 초록 펄스 / 오답 흔들림 */
+  .slot-input.pop-in {
+    animation: chipBounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes chipBounce {
+    0%   { transform: scale(0.88); }
+    60%  { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  .state-correct {
+    border-color: var(--ok) !important;
+    background: var(--ok-bg) !important;
+    animation: greenPulse 0.42s ease;
+  }
+  @keyframes greenPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(27, 138, 90, 0.45); }
+    70%  { box-shadow: 0 0 0 8px rgba(27, 138, 90, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(27, 138, 90, 0); }
+  }
+
+  .state-wrong {
+    border-color: var(--bad) !important;
+    background: var(--bad-bg) !important;
+    animation: softShake 0.34s ease;
+  }
+  @keyframes softShake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-5px); }
+    55%      { transform: translateX(5px); }
+    80%      { transform: translateX(-3px); }
+  }
+
+  /* 칩 트레이 */
+  .chip-tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--surface-soft);
+    border-radius: 12px;
+    border: 1px dashed #cbbba8;
+  }
+  .chip {
+    padding: 8px 13px;
+    border-radius: 999px;
+    border: 1.5px solid #cbbba8;
+    background: #fff;
+    color: var(--ink);
+    font-weight: 800;
+    font-size: 0.94rem;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .chip.amt-chip {
+    background: #fdf8ee;
+    border-color: #dfc38a;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip.selected {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    transform: translateY(-2px) scale(1.04);
+  }
+
+  /* 계산 빈칸 행 */
+  .calc-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: #f8f4ed;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+  }
+  .calc-input {
+    width: 138px;
+    height: 38px;
+    border: 1.5px solid #cbbba8;
+    border-radius: 9px;
+    padding: 0 9px;
+    font-size: 0.98rem;
+    font-weight: 800;
+    text-align: right;
+    background: #fff;
+  }
+  .calc-select {
+    height: 38px;
+    border: 1.5px solid #cbbba8;
+    border-radius: 9px;
+    padding: 0 10px;
+    font-size: 0.96rem;
+    font-weight: 800;
+    background: #fff;
+  }
+
+  /* 액션 버튼 및 정답 패널 */
+  .action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .btn-act {
+    padding: 9px 16px;
+    border-radius: 11px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .btn-act.check {
+    background: var(--ok);
+    color: #fff;
+    border-color: var(--ok);
+  }
+  .btn-act.answer {
+    background: var(--primary-dark);
+    color: #fff;
+    border-color: var(--primary-dark);
+  }
+  .btn-act:active { transform: scale(0.97); }
+
+  .feedback-msg {
+    font-weight: 800;
+    font-size: 0.96rem;
+    margin-left: 4px;
+  }
+  .feedback-msg.ok { color: var(--ok); }
+  .feedback-msg.bad { color: var(--bad); }
+
+  .answer-panel {
+    display: none;
+    margin-top: 12px;
+    padding: 13px 16px;
+    border-radius: 12px;
+    background: #f2f8f5;
+    border: 1.5px solid #9fd4bc;
+  }
+  .answer-panel.open {
+    display: block;
+    animation: itemFadeUp 0.26s ease both;
+  }
+  .one-line-entry {
+    font-size: 1.08rem;
+    font-weight: 900;
+    color: var(--ink);
+    background: #fff;
+    padding: 9px 12px;
+    border-radius: 9px;
+    border: 1px solid #cce6da;
+    margin-bottom: 8px;
+    word-break: keep-all;
+  }
+  .one-line-entry .dr-txt { color: var(--cap); }
+  .one-line-entry .cr-txt { color: var(--rev); margin-left: 16px; }
+
+  /* B1 빠른 판별 테이블 */
+  .b1-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.98rem;
+  }
+  .b1-table th, .b1-table td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+  }
+  .b1-table th {
+    background: var(--surface-soft);
+    font-weight: 900;
+  }
+  .cr-choice {
+    padding: 6px 13px;
+    border-radius: 9px;
+    border: 1.5px solid #cbbba8;
+    background: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    margin-right: 4px;
+  }
+  .cr-choice.picked-C { background: var(--cap); color: #fff; border-color: var(--cap); }
+  .cr-choice.picked-R { background: var(--rev); color: #fff; border-color: var(--rev); }
+
+  /* 목차 모달 */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 18, 12, 0.48);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: #fff;
+    width: 100%;
+    max-width: 780px;
+    max-height: 82vh;
+    border-radius: 18px;
+    padding: 18px 20px;
+    overflow-y: auto;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.22);
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .toc-item {
+    text-align: left;
+    padding: 9px 11px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: #fcfaf7;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .toc-item.current {
+    border-color: var(--primary);
+    background: #f5eadb;
+    font-weight: 900;
+  }
+
+  /* 전자칠판 1024x768 최적화 */
+  @media (max-width: 1060px) and (min-width: 769px) {
+    .slide { padding: 16px 20px 18px; }
+    .s-title, .p-title { font-size: 1.38rem; }
+    .p-scene { font-size: 1.1rem; padding: 10px 14px; }
+    .svg-box svg { max-height: 185px; }
+  }
+
+  /* 모바일 & 태블릿 반응형 */
+  @media (max-width: 768px) {
+    .topbar { padding: 0 8px; height: 54px; }
+    .back-btn { padding: 6px 9px; font-size: 0.82rem; }
+    .mode-btn { padding: 5px 9px; font-size: 0.8rem; }
+    .slide-counter { font-size: 0.82rem; padding: 4px 8px; }
+    .toc-btn { padding: 5px 8px; font-size: 0.82rem; }
+    .stage { top: 54px; bottom: 58px; padding: 10px 10px 16px; }
+    .slide { padding: 14px 14px 18px; border-radius: 14px; }
+    .s-title, .p-title { font-size: 1.24rem; }
+    .p-scene { font-size: 1.04rem; padding: 9px 12px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .j-row, .board-row { grid-template-columns: 1fr; gap: 6px; }
+    .j-header { display: none; }
+    .slot-input.amt { max-width: 118px; }
+    .nav-btn { min-width: 84px; height: 40px; font-size: 0.92rem; }
+    .one-line-entry .cr-txt { display: block; margin-left: 0; margin-top: 4px; }
+  }
+
+  /* 접근성: 동작 줄이기 설정 존중 */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .chip { touch-action: none; -webkit-user-select: none; user-select: none; }
+  .chip.dragging { opacity: .65; transform: scale(1.06); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+  .slot-input { scroll-margin: 90px; }
+</style>
+</head>
+<body class="mode-teach">
+
+<header class="topbar">
+  <a class="back-btn" href="../../index.html" aria-label="회계원리 자료실로 돌아가기">← 회계원리 자료실</a>
+  <div class="top-center">
+    <span class="slide-counter" id="slideCounter">1 / 41</span>
+    <button type="button" class="toc-btn" id="openTocBtn" aria-label="전체 목차 열기">목차</button>
+  </div>
+  <div class="mode-switch" role="group" aria-label="학습 모드 선택">
+    <button type="button" class="mode-btn active" id="btnModeTeach" data-mode="teach">수업 모드</button>
+    <button type="button" class="mode-btn" id="btnModeStudy" data-mode="study">혼자 공부</button>
+  </div>
+</header>
+
+<main class="stage" id="stage">
+
+<!-- ==================== 도입 3장 (1~3) ==================== -->
+
+<!-- Slide 1: 표지 -->
+<section class="slide active" id="S-01" data-type="concept" data-group="도입" data-badge="서울관광고 1학년 회계원리 · 학습지 B">
+  <div class="s-head">
+    <span class="badge ws">학습지 B 연계 수업 자료</span>
+    <span class="badge">교과서 132~137쪽</span>
+  </div>
+  <div class="stagger">
+    <h1 class="s-title" style="font-size:1.95rem; margin-top:6px;">유형자산의 감가상각과 무형자산</h1>
+    <p style="font-size:1.12rem; color:var(--ink-sub); margin:0 0 12px;">카페 매장의 기계·건물 수리부터 감가상각, 처분, 보이지 않는 자산까지 한눈에 익혀 봅시다.</p>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 220" role="img" aria-label="카페 매장의 유형자산과 무형자산 일러스트">
+        <rect x="10" y="10" width="740" height="200" rx="16" fill="#fcf6ec" stroke="#e2d7c8" stroke-width="2"/>
+        <!-- 카페 건물 -->
+        <rect x="42" y="52" width="180" height="130" rx="10" fill="#fff" stroke="#8b5a2b" stroke-width="2.5"/>
+        <polygon points="32,56 132,18 232,56" fill="#d9641e"/>
+        <rect x="75" y="112" width="44" height="70" rx="4" fill="#eaf3ff" stroke="#1d63b8" stroke-width="2"/>
+        <rect x="142" y="82" width="56" height="44" rx="6" fill="#fff8e6" stroke="#d99b1e" stroke-width="2"/>
+        <text x="132" y="45" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">SEOUL CAFE</text>
+        <text x="132" y="200" text-anchor="middle" font-size="14" font-weight="800" fill="#5c3a1a">건물 · 개량 vs 수리</text>
+
+        <!-- 커피머신 (감가상각) -->
+        <rect x="285" y="64" width="175" height="118" rx="12" fill="#fff" stroke="#1d63b8" stroke-width="2.5"/>
+        <rect x="308" y="82" width="128" height="34" rx="6" fill="#eaf3ff"/>
+        <circle cx="342" cy="99" r="9" fill="#1d63b8"/>
+        <circle cx="372" cy="99" r="9" fill="#d99b1e"/>
+        <circle cx="402" cy="99" r="9" fill="#1b8a5a"/>
+        <rect x="335" y="138" width="32" height="28" rx="4" fill="#d9641e"/>
+        <rect x="380" y="138" width="32" height="28" rx="4" fill="#8b5a2b"/>
+        <text x="372" y="200" text-anchor="middle" font-size="14" font-weight="800" fill="#1d63b8">기계장치 · 감가상각과 처분</text>
+
+        <!-- 무형자산 구름 -->
+        <rect x="520" y="58" width="198" height="124" rx="14" fill="#fff" stroke="#1b8a5a" stroke-width="2.5" stroke-dasharray="6 4"/>
+        <circle cx="572" cy="102" r="24" fill="#e6f7ef" stroke="#1b8a5a" stroke-width="2"/>
+        <text x="572" y="107" text-anchor="middle" font-size="13" font-weight="900" fill="#1b8a5a">영업권</text>
+        <circle cx="655" cy="96" r="22" fill="#eaf3ff" stroke="#1d63b8" stroke-width="2"/>
+        <text x="655" y="101" text-anchor="middle" font-size="13" font-weight="900" fill="#1d63b8">개발비</text>
+        <rect x="556" y="136" width="126" height="30" rx="15" fill="#fff8e6" stroke="#d99b1e" stroke-width="2"/>
+        <text x="619" y="156" text-anchor="middle" font-size="13" font-weight="900" fill="#7c4a03">소프트웨어</text>
+        <text x="619" y="200" text-anchor="middle" font-size="14" font-weight="800" fill="#1b8a5a">무형자산 · 보이지 않는 가치</text>
+      </svg>
+    </div>
+    <div class="grid-3">
+      <div class="card"><h3>1단계 · 지출 구분</h3><p style="margin:0;">자산에 더할까(자본적), 수선비로 처리할까(수익적)?</p></div>
+      <div class="card"><h3>2단계 · 감가상각과 처분</h3><p style="margin:0;">사용 기간에 나누어 비용 처리하고, 팔 때 손익을 계산해요.</p></div>
+      <div class="card"><h3>3단계 · 무형자산</h3><p style="margin:0;">영업권·개발비·소프트웨어 취득 분개를 익혀요.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 2: 사용 안내 -->
+<section class="slide" id="S-02" data-type="concept" data-group="도입" data-badge="사용 안내">
+  <div class="s-head">
+    <span class="badge concept">수업·복습 활용법</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">두 가지 모드와 혼자 공부 사용법</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>수업 모드 (전자칠판 · 판서용)</h3>
+        <p style="margin:0 0 6px;">• 거래 문장과 깔끔한 빈 밑줄만 크게 보여 줍니다.</p>
+        <p style="margin:0;">• 정답과 칩은 숨겨져 있으며, <strong>「정답 보기」</strong>를 누르면 한 줄 분개와 해설이 열립니다.</p>
+      </div>
+      <div class="card" style="background:#f4faf7; border-color:#b7decb;">
+        <h3 style="color:var(--ok);">혼자 공부 모드 (아이패드 · 스마트폰)</h3>
+        <p style="margin:0 0 6px;">• 아래 칩을 이용해 직접 분개하고 즉시 채점할 수 있어요.</p>
+        <p style="margin:0;">• <strong>드래그</strong>하거나, 빈칸을 눌러 <strong>키보드로 직접 입력</strong>해도 됩니다.</p>
+      </div>
+    </div>
+    <div class="svg-box" style="margin-top:12px;">
+      <svg viewBox="0 0 760 150" role="img" aria-label="칩 선택, 빈칸 선택, 채점하기 3단계 안내">
+        <rect x="18" y="18" width="210" height="114" rx="14" fill="#fff8e6" stroke="#e5be67" stroke-width="2"/>
+        <text x="123" y="52" text-anchor="middle" font-size="16" font-weight="900" fill="#7c4a03">① 칩 선택</text>
+        <rect x="63" y="68" width="120" height="34" rx="17" fill="#8b5a2b"/>
+        <text x="123" y="90" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">감가상각비</text>
+
+        <path d="M240 75 L268 75" stroke="#8b5a2b" stroke-width="3" marker-end="url(#arrGuide)"/>
+        <defs><marker id="arrGuide" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#8b5a2b"/></marker></defs>
+
+        <rect x="275" y="18" width="210" height="114" rx="14" fill="#eaf3ff" stroke="#a6cbf7" stroke-width="2"/>
+        <text x="380" y="52" text-anchor="middle" font-size="16" font-weight="900" fill="#1d63b8">② 빈칸 선택</text>
+        <rect x="315" y="68" width="130" height="36" rx="9" fill="#fff" stroke="#1d63b8" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="380" y="91" text-anchor="middle" font-size="13" font-weight="800" fill="#1d63b8">(차) 계정과목 칸 탭!</text>
+
+        <path d="M497 75 L525 75" stroke="#8b5a2b" stroke-width="3" marker-end="url(#arrGuide)"/>
+
+        <rect x="532" y="18" width="210" height="114" rx="14" fill="#e6f7ef" stroke="#9fd4bc" stroke-width="2"/>
+        <text x="637" y="52" text-anchor="middle" font-size="16" font-weight="900" fill="#1b8a5a">③ 채점하기</text>
+        <rect x="577" y="68" width="120" height="36" rx="10" fill="#1b8a5a"/>
+        <text x="637" y="91" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">채점하기 ✓</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 3: 3분 리마인드 -->
+<section class="slide" id="S-03" data-type="concept" data-group="도입" data-badge="3분 리마인드">
+  <div class="s-head">
+    <span class="badge concept">지난 시간 핵심 복습</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">본격 출발 전, 꼭 기억할 3가지</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 205" role="img" aria-label="자산 증가 차변, 취득원가 구성, 보유 목적별 계정과목 도식">
+        <!-- 카드 1 -->
+        <rect x="14" y="14" width="228" height="176" rx="14" fill="#eaf3ff" stroke="#a6cbf7" stroke-width="2"/>
+        <text x="128" y="44" text-anchor="middle" font-size="16" font-weight="900" fill="#1d63b8">① 자산의 자리</text>
+        <rect x="34" y="62" width="90" height="64" rx="8" fill="#1d63b8"/>
+        <text x="79" y="90" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">차변 (+)</text>
+        <text x="79" y="110" text-anchor="middle" font-size="12" fill="#dcebff">자산 증가</text>
+        <rect x="132" y="62" width="90" height="64" rx="8" fill="#fff" stroke="#a6cbf7" stroke-width="1.5"/>
+        <text x="177" y="90" text-anchor="middle" font-size="14" font-weight="900" fill="#d9641e">대변 (-)</text>
+        <text x="177" y="110" text-anchor="middle" font-size="12" fill="#6b5b4f">자산 감소</text>
+        <text x="128" y="156" text-anchor="middle" font-size="13" font-weight="700" fill="#2b211a">자산이 늘면 왼쪽(차변)!</text>
+        <text x="128" y="175" text-anchor="middle" font-size="12" fill="#6b5b4f">팔아서 없어지면 오른쪽(대변)</text>
+
+        <!-- 카드 2 -->
+        <rect x="266" y="14" width="228" height="176" rx="14" fill="#fff8e6" stroke="#edd095" stroke-width="2"/>
+        <text x="380" y="44" text-anchor="middle" font-size="16" font-weight="900" fill="#7c4a03">② 취득원가 공식</text>
+        <rect x="292" y="62" width="176" height="34" rx="8" fill="#fff" stroke="#d99b1e" stroke-width="1.5"/>
+        <text x="380" y="84" text-anchor="middle" font-size="14" font-weight="800" fill="#2b211a">구입 가격</text>
+        <text x="380" y="113" text-anchor="middle" font-size="16" font-weight="900" fill="#d9641e">+</text>
+        <rect x="292" y="120" width="176" height="34" rx="8" fill="#fff" stroke="#d99b1e" stroke-width="1.5"/>
+        <text x="380" y="142" text-anchor="middle" font-size="13" font-weight="800" fill="#2b211a">취득 부대비용(설치비 등)</text>
+        <text x="380" y="175" text-anchor="middle" font-size="13" font-weight="900" fill="#7c4a03">= 취득원가</text>
+
+        <!-- 카드 3 -->
+        <rect x="518" y="14" width="228" height="176" rx="14" fill="#e6f7ef" stroke="#9fd4bc" stroke-width="2"/>
+        <text x="632" y="44" text-anchor="middle" font-size="16" font-weight="900" fill="#1b8a5a">③ 보유 목적별 이름</text>
+        <rect x="536" y="64" width="192" height="44" rx="8" fill="#fff" stroke="#9fd4bc"/>
+        <text x="632" y="83" text-anchor="middle" font-size="13" font-weight="800" fill="#1b8a5a">매장에서 영업에 사용</text>
+        <text x="632" y="101" text-anchor="middle" font-size="12" fill="#2b211a">→ 유형자산 (건물·비품 등)</text>
+        <rect x="536" y="118" width="192" height="44" rx="8" fill="#fff" stroke="#9fd4bc"/>
+        <text x="632" y="137" text-anchor="middle" font-size="13" font-weight="800" fill="#6b5b4f">판매용 · 투자용</text>
+        <text x="632" y="155" text-anchor="middle" font-size="12" fill="#2b211a">→ 상품 또는 투자부동산</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>핵심 정리:</strong> 같은 건물이나 자동차라도 <strong>영업 활동에 쓰면 유형자산</strong>입니다. 사용할 수 있는 상태가 될 때까지 들어간 부대비용은 모두 <strong>취득원가</strong>에 더합니다.
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 개념 1~3장 (4~6) ==================== -->
+
+<!-- Slide 4: 자본적 지출 vs 수익적 지출 (건물 사례) -->
+<section class="slide" id="S-04" data-type="compare" data-group="개념 · 지출 구분" data-badge="개념 01 · 자본적 지출 vs 수익적 지출">
+  <div class="s-head">
+    <span class="badge concept">개념 비교</span>
+    <div>
+      <span class="term-bubble">자본적 지출 = 자산에 더하는 지출</span>
+      <span class="term-bubble">수익적 지출 = 당기 비용(수선비) 처리</span>
+    </div>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">같은 건물 지출이라도 성격에 따라 갈립니다</h2>
+    <div class="grid-2">
+      <!-- 플립 카드 1: 자본적 지출 -->
+      <div class="flip-card" role="button" tabindex="0" aria-label="자본적 지출 카드 뒤집기" onclick="this.classList.toggle('flipped')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped');}">
+        <div class="flip-inner">
+          <div class="flip-face flip-front cap">
+            <div>
+              <span class="badge" style="background:#1d63b8;color:#fff;border:none;">자본적 지출 (C)</span>
+              <h3 style="color:var(--cap); margin-top:8px;">창고 증축 · 엘리베이터 신설</h3>
+              <p style="margin:6px 0;">• 자산의 <strong>성능이 높아지거나</strong></p>
+              <p style="margin:6px 0;">• <strong>사용기간(내용연수)이 늘어나는</strong> 지출</p>
+            </div>
+            <svg viewBox="0 0 320 84" style="width:100%;height:78px;">
+              <rect x="20" y="24" width="110" height="52" rx="6" fill="#fff" stroke="#1d63b8" stroke-width="2"/>
+              <text x="75" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="#1d63b8">기존 건물</text>
+              <text x="152" y="55" text-anchor="middle" font-size="18" font-weight="900" fill="#1d63b8">+</text>
+              <rect x="174" y="14" width="126" height="62" rx="6" fill="#1d63b8"/>
+              <text x="237" y="43" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">창고 증축</text>
+              <text x="237" y="62" text-anchor="middle" font-size="11" fill="#dcebff">가치 UP · 면적 UP</text>
+            </svg>
+            <div class="flip-hint">카드를 누르면 분개 방법 보기 ↻</div>
+          </div>
+          <div class="flip-face flip-back">
+            <div>
+              <span class="badge" style="background:#1d63b8;color:#fff;border:none;">회계 처리</span>
+              <h3 style="color:var(--cap); margin-top:8px;">해당 자산 계정에 가산!</h3>
+              <p style="margin:6px 0; font-weight:800;">(차) 건물 ××× &nbsp;&nbsp; (대) 현금 ×××</p>
+              <p style="margin:6px 0; font-size:0.94rem;">예) 건물 개량 공사비 300,000원을 현금 지급하면 <strong>건물</strong> 자산이 300,000원 늘어납니다.</p>
+            </div>
+            <div class="flip-hint">다시 누르면 앞면 보기 ↺</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 플립 카드 2: 수익적 지출 -->
+      <div class="flip-card" role="button" tabindex="0" aria-label="수익적 지출 카드 뒤집기" onclick="this.classList.toggle('flipped')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped');}">
+        <div class="flip-inner">
+          <div class="flip-face flip-front rev">
+            <div>
+              <span class="badge" style="background:#d9641e;color:#fff;border:none;">수익적 지출 (R)</span>
+              <h3 style="color:var(--rev); margin-top:8px;">낡은 벽지 교체 · 깨진 유리 수리</h3>
+              <p style="margin:6px 0;">• 망가진 곳을 고치는 <strong>원상회복</strong></p>
+              <p style="margin:6px 0;">• 원래 상태를 지키는 <strong>현상 유지</strong> 지출</p>
+            </div>
+            <svg viewBox="0 0 320 84" style="width:100%;height:78px;">
+              <rect x="20" y="20" width="118" height="56" rx="6" fill="#fff" stroke="#d9641e" stroke-width="2"/>
+              <text x="79" y="52" text-anchor="middle" font-size="13" font-weight="800" fill="#d9641e">깨진 유리창</text>
+              <text x="160" y="53" text-anchor="middle" font-size="18" font-weight="900" fill="#d9641e">→</text>
+              <rect x="182" y="20" width="118" height="56" rx="6" fill="#d9641e"/>
+              <text x="241" y="45" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">원래 모습 복구</text>
+              <text x="241" y="63" text-anchor="middle" font-size="11" fill="#fff2e8">수선비(비용) 처리</text>
+            </svg>
+            <div class="flip-hint">카드를 누르면 분개 방법 보기 ↻</div>
+          </div>
+          <div class="flip-face flip-back">
+            <div>
+              <span class="badge" style="background:#d9641e;color:#fff;border:none;">회계 처리</span>
+              <h3 style="color:var(--rev); margin-top:8px;">당기 비용(수선비)으로 처리!</h3>
+              <p style="margin:6px 0; font-weight:800;">(차) 수선비 ××× &nbsp;&nbsp; (대) 현금 ×××</p>
+              <p style="margin:6px 0; font-size:0.94rem;">예) 깨진 유리 수리비 50,000원을 현금 지급하면 비용 계정인 <strong>수선비</strong>로 기록합니다.</p>
+            </div>
+            <div class="flip-hint">다시 누르면 앞면 보기 ↺</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="explain-box">
+      <strong>참고 사례(교과서 예제 05):</strong> 건물 관련 지출 500,000원 중 60%(300,000원)는 개량, 나머지 40%(200,000원)는 수선이라면 <strong>(차) 건물 300,000 + 수선비 200,000 &nbsp; (대) 현금 500,000</strong>으로 나누어 기록합니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 5: 카페 장면 지출 구분 -->
+<section class="slide" id="S-05" data-type="compare" data-group="개념 · 지출 구분" data-badge="개념 02 · 카페 사례로 구별하기">
+  <div class="s-head">
+    <span class="badge concept">카페 실전 비교</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">카페 장비 지출: 커피머신 개조 vs 냉장고 손잡이 교체</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 195" role="img" aria-label="커피머신 성능 개조와 냉장고 손잡이 교체 비교">
+        <!-- 왼쪽: 커피머신 개조 -->
+        <rect x="16" y="14" width="350" height="168" rx="14" fill="#eaf3ff" stroke="#a6cbf7" stroke-width="2"/>
+        <text x="191" y="42" text-anchor="middle" font-size="16" font-weight="900" fill="#1d63b8">커피머신 개조 → 생산 능력 향상!</text>
+        <rect x="44" y="58" width="110" height="74" rx="10" fill="#fff" stroke="#1d63b8" stroke-width="2"/>
+        <text x="99" y="92" text-anchor="middle" font-size="13" font-weight="800" fill="#2b211a">커피머신</text>
+        <text x="99" y="112" text-anchor="middle" font-size="12" fill="#1d63b8">추출 속도 2배 UP</text>
+        <text x="176" y="100" text-anchor="middle" font-size="20" font-weight="900" fill="#1d63b8">→</text>
+        <rect x="198" y="62" width="146" height="66" rx="10" fill="#1d63b8"/>
+        <text x="271" y="90" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">자본적 지출</text>
+        <text x="271" y="112" text-anchor="middle" font-size="12" fill="#dcebff">비품(또는 기계장치) 가산</text>
+        <text x="191" y="160" text-anchor="middle" font-size="12" font-weight="700" fill="#1d63b8">※ 계정과목은 거래에서 정해 준 이름을 사용해요</text>
+
+        <!-- 오른쪽: 냉장고 손잡이 교체 -->
+        <rect x="394" y="14" width="350" height="168" rx="14" fill="#fff2e8" stroke="#f7c39f" stroke-width="2"/>
+        <text x="569" y="42" text-anchor="middle" font-size="16" font-weight="900" fill="#d9641e">냉장고 손잡이 교체 → 고장 원상회복!</text>
+        <rect x="422" y="58" width="110" height="74" rx="10" fill="#fff" stroke="#d9641e" stroke-width="2"/>
+        <text x="477" y="92" text-anchor="middle" font-size="13" font-weight="800" fill="#2b211a">매장 냉장고</text>
+        <text x="477" y="112" text-anchor="middle" font-size="12" fill="#d9641e">부러진 손잡이 수리</text>
+        <text x="554" y="100" text-anchor="middle" font-size="20" font-weight="900" fill="#d9641e">→</text>
+        <rect x="576" y="62" width="146" height="66" rx="10" fill="#d9641e"/>
+        <text x="649" y="90" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">수익적 지출</text>
+        <text x="649" y="112" text-anchor="middle" font-size="12" fill="#fff2e8">수선비 (당기 비용)</text>
+        <text x="569" y="160" text-anchor="middle" font-size="12" font-weight="700" fill="#d9641e">엔진오일 교환 · 정기 점검비도 모두 수선비!</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>구별 팁:</strong> 지출 뒤 <strong>“전보다 더 좋아졌나, 더 오래 쓰나?”</strong>에 ‘예’라면 <strong>자본적 지출(자산 가산)</strong>, <strong>“원래대로 고쳤나?”</strong>에 ‘예’라면 <strong>수익적 지출(수선비)</strong>입니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 6: 감가상각 개념 (자전거 비유) -->
+<section class="slide" id="S-06" data-type="concept" data-group="개념 · 감가상각" data-badge="개념 03 · 감가상각의 뜻">
+  <div class="s-head">
+    <span class="badge concept">감가상각 기초</span>
+    <div>
+      <span class="term-bubble">내용연수 = 사용할 것으로 예상하는 햇수</span>
+      <span class="term-bubble">잔존가치 = 사용이 끝날 때 예상 처분가액</span>
+    </div>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">감가상각이란? 원가를 사용 기간에 나누어 비용 처리!</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 195" role="img" aria-label="배달용 자전거의 취득원가, 잔존가치, 내용연수 배분 도식">
+        <!-- 자전거 일러스트 -->
+        <rect x="16" y="16" width="210" height="164" rx="14" fill="#fcf6ec" stroke="#e2d7c8" stroke-width="2"/>
+        <circle cx="75" cy="122" r="26" fill="none" stroke="#8b5a2b" stroke-width="4"/>
+        <circle cx="165" cy="122" r="26" fill="none" stroke="#8b5a2b" stroke-width="4"/>
+        <polyline points="75,122 110,82 148,82 165,122" fill="none" stroke="#1d63b8" stroke-width="4"/>
+        <line x1="110" y1="82" x2="118" y2="122" stroke="#1d63b8" stroke-width="4"/>
+        <line x1="98" y1="74" x2="120" y2="74" stroke="#2b211a" stroke-width="4"/>
+        <text x="121" y="42" text-anchor="middle" font-size="14" font-weight="900" fill="#5c3a1a">카페 배달용 자전거</text>
+        <text x="121" y="168" text-anchor="middle" font-size="12" font-weight="800" fill="#6b5b4f">취득원가 1,100,000원</text>
+
+        <!-- 원가 배분 막대 -->
+        <rect x="246" y="16" width="498" height="164" rx="14" fill="#fff" stroke="#e2d7c8" stroke-width="2"/>
+        <text x="495" y="42" text-anchor="middle" font-size="15" font-weight="900" fill="#2b211a">취득원가 1,100,000원의 구성</text>
+
+        <rect x="272" y="60" width="360" height="48" rx="8" fill="#eaf3ff" stroke="#1d63b8" stroke-width="2"/>
+        <text x="452" y="81" text-anchor="middle" font-size="14" font-weight="900" fill="#1d63b8">감가상각 대상 금액 = 1,000,000원</text>
+        <text x="452" y="99" text-anchor="middle" font-size="12" fill="#2b211a">내용연수 5년 동안 매년 나누어 비용(감가상각비) 처리</text>
+
+        <rect x="636" y="60" width="84" height="48" rx="8" fill="#fff8e6" stroke="#d99b1e" stroke-width="2"/>
+        <text x="678" y="81" text-anchor="middle" font-size="12" font-weight="900" fill="#7c4a03">잔존가치</text>
+        <text x="678" y="99" text-anchor="middle" font-size="12" font-weight="800" fill="#7c4a03">10만원</text>
+
+        <text x="495" y="138" text-anchor="middle" font-size="13" font-weight="800" fill="#c93b3b">주의! 중고시장 시세가 떨어진 금액을 그대로 적는 것이 아닙니다.</text>
+        <text x="495" y="159" text-anchor="middle" font-size="12.5" fill="#6b5b4f">(취득원가 − 잔존가치)를 정해진 규칙에 따라 사용 기간 동안 비용으로 배분합니다.</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>한 줄 요약:</strong> 유형자산은 쓰면서 가치가 줄어드므로, 한꺼번에 비용으로 잡지 않고 <strong>사용하는 기간(내용연수) 동안 합리적으로 나누어</strong> 비용 처리합니다.
+    </div>
+  </div>
+</section>
+<!-- ==================== 개념 4~13장 (7~16) ==================== -->
+
+<!-- Slide 7: 정액법 -->
+<section class="slide" id="S-07" data-type="concept" data-group="개념 · 감가상각" data-badge="개념 04 · 정액법">
+  <div class="s-head">
+    <span class="badge concept">정액법 계산과 장부금액 변화</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">정액법: 매년 똑같은 금액을 감가상각비로!</h2>
+    <div class="calc-box" style="justify-content:center; background:#eaf3ff; border-color:#a6cbf7; color:#154c91;">
+      연간 감가상각비 = (취득원가 1,100,000 − 잔존가치 100,000) ÷ 내용연수 5년 = <span style="font-size:1.15rem; color:#1d63b8;">200,000원/년</span>
+    </div>
+    <div class="svg-box">
+      <svg class="bar-timeline" viewBox="0 0 760 205" role="img" aria-label="정액법 5년간 연도별 장부금액 감소 막대 타임라인">
+        <!-- 가로축 -->
+        <line x1="55" y1="168" x2="725" y2="168" stroke="#cbbba8" stroke-width="2"/>
+        <!-- 취득시점 -->
+        <rect class="bar-fill b1" x="75" y="36" width="76" height="132" rx="6" fill="#1d63b8"/>
+        <text x="113" y="28" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">110만</text>
+        <text x="113" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#2b211a">취득 시</text>
+
+        <!-- 1년차 -->
+        <rect class="bar-fill b2" x="180" y="60" width="76" height="108" rx="6" fill="#2b74cc"/>
+        <text x="218" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">90만</text>
+        <text x="218" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#2b211a">1년 말 (-20)</text>
+
+        <!-- 2년차 -->
+        <rect class="bar-fill b3" x="285" y="84" width="76" height="84" rx="6" fill="#3f85d8"/>
+        <text x="323" y="76" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">70만</text>
+        <text x="323" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#2b211a">2년 말 (-20)</text>
+
+        <!-- 3년차 -->
+        <rect class="bar-fill b4" x="390" y="108" width="76" height="60" rx="6" fill="#5697e2"/>
+        <text x="428" y="100" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">50만</text>
+        <text x="428" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#2b211a">3년 말 (-20)</text>
+
+        <!-- 4년차 -->
+        <rect class="bar-fill b5" x="495" y="132" width="76" height="36" rx="6" fill="#70aaec"/>
+        <text x="533" y="124" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">30만</text>
+        <text x="533" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#2b211a">4년 말 (-20)</text>
+
+        <!-- 5년차 -->
+        <rect class="bar-fill b6" x="600" y="152" width="76" height="16" rx="4" fill="#d99b1e"/>
+        <text x="638" y="143" text-anchor="middle" font-size="12" font-weight="900" fill="#7c4a03">10만(잔존)</text>
+        <text x="638" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#2b211a">5년 말 (-20)</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>정액법 특징:</strong> 매년 200,000원씩 일정하게 장부금액이 줄어들어, 5년이 지나면 <strong>잔존가치 100,000원</strong>만 남습니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 8: 정률법 맛보기 -->
+<section class="slide" id="S-08" data-type="concept" data-group="개념 · 감가상각" data-badge="개념 05 · 정률법 맛보기">
+  <div class="s-head">
+    <span class="badge concept">참고 개념 · 계산 제외</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">정률법 맛보기: 처음엔 많이, 갈수록 적게!</h2>
+    <div class="grid-2">
+      <div class="svg-box" style="margin-bottom:0;">
+        <svg viewBox="0 0 360 190" role="img" aria-label="정률법 감가상각비 감소 곡선 그래프">
+          <line x1="46" y1="20" x2="46" y2="155" stroke="#8b5a2b" stroke-width="2"/>
+          <line x1="46" y1="155" x2="335" y2="155" stroke="#8b5a2b" stroke-width="2"/>
+          <text x="24" y="88" text-anchor="middle" font-size="12" font-weight="800" fill="#5c3a1a" transform="rotate(-90 24 88)">연간 감가상각비</text>
+          <text x="190" y="178" text-anchor="middle" font-size="12" font-weight="800" fill="#5c3a1a">사용 연도 (1년 → 5년)</text>
+          <!-- 곡선 -->
+          <path d="M 65 34 Q 140 105, 315 142" fill="none" stroke="#d9641e" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="65" cy="34" r="5" fill="#d9641e"/>
+          <circle cx="135" cy="88" r="5" fill="#d9641e"/>
+          <circle cx="215" cy="122" r="5" fill="#d9641e"/>
+          <circle cx="305" cy="141" r="5" fill="#d9641e"/>
+          <text x="115" y="42" font-size="12" font-weight="900" fill="#d9641e">초기 상각비 큼</text>
+          <text x="235" y="114" font-size="12" font-weight="900" fill="#d9641e">갈수록 작아짐</text>
+        </svg>
+      </div>
+      <div class="card" style="display:flex; flex-direction:column; justify-content:center;">
+        <h3 style="color:var(--rev);">정률법 공식 (개념만 이해하기)</h3>
+        <p style="background:#fff; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-weight:900;">
+          감가상각비 = (취득원가 − 감가상각누계액) × 상각률
+        </p>
+        <p style="margin:6px 0;">• 새 기계나 자동차는 <strong>처음 몇 년 동안</strong> 성능과 가치가 빠르게 줄어드는 경향이 있습니다.</p>
+        <p style="margin:0; color:var(--primary-dark); font-weight:800;">※ 우리 학습지 B에서는 정액법으로만 계산하고, 정률법은 그래프 모양만 알아 두면 충분합니다!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 9: 직접법 vs 간접법 -->
+<section class="slide" id="S-09" data-type="compare" data-group="개념 · 감가상각" data-badge="개념 06 · 직접법 vs 간접법">
+  <div class="s-head">
+    <span class="badge concept">회계 처리 방법 비교</span>
+    <span class="badge ws">학습지 B는 간접법 사용!</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">감가상각 분개: 직접법과 간접법</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="color:var(--ink-sub);">직접법 (자산에서 바로 빼기)</h3>
+        <p style="background:#fff; padding:9px 12px; border-radius:9px; border:1px solid var(--line); font-weight:900;">
+          (차) 감가상각비 200,000<br>(대) <span style="color:#c93b3b;">비품 200,000</span>
+        </p>
+        <p style="margin:6px 0 0; font-size:0.95rem;">비품 계정 금액을 직접 줄입니다. 처음에 얼마 주고 샀는지(취득원가)가 장부에서 사라지는 단점이 있습니다.</p>
+      </div>
+      <div class="card cap">
+        <h3>간접법 (감가상각누계액 별도 기록) ★</h3>
+        <p style="background:#fff; padding:9px 12px; border-radius:9px; border:1px solid var(--cap-line); font-weight:900;">
+          (차) 감가상각비 200,000<br>(대) <span style="color:var(--cap);">비품감가상각누계액 200,000</span>
+        </p>
+        <p style="margin:6px 0 0; font-size:0.95rem;">취득원가는 그대로 두고, 줄어든 금액을 <strong>「○○감가상각누계액」</strong>에 따로 모아 둡니다. 대부분 기업과 <strong>학습지 B</strong>는 간접법을 씁니다.</p>
+      </div>
+    </div>
+    <div class="explain-box">
+      <strong>계정과목 이름 규칙:</strong> 비품이면 <strong>비품감가상각누계액</strong>, 기계장치면 <strong>기계장치감가상각누계액</strong>, 차량운반구면 <strong>차량운반구감가상각누계액</strong>처럼 자산 이름 뒤에 붙입니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 10: 감가상각누계액과 장부금액 -->
+<section class="slide" id="S-10" data-type="concept" data-group="개념 · 감가상각" data-badge="개념 07 · 감가상각누계액과 장부금액">
+  <div class="s-head">
+    <span class="badge concept">장부금액 공식</span>
+    <div>
+      <span class="term-bubble">감가상각누계액 = 지금까지 쌓인 감가상각비 합계</span>
+      <span class="term-bubble">장부금액 = 취득원가 − 감가상각누계액</span>
+    </div>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">누계액이 쌓일수록 현재 장부금액은 작아집니다</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 190" role="img" aria-label="취득원가에서 감가상각누계액을 뺀 나머지가 장부금액임을 보여 주는 블록 도식">
+        <!-- 전체 취득원가 블록 -->
+        <rect x="30" y="26" width="700" height="44" rx="10" fill="#eef3f8" stroke="#8b5a2b" stroke-width="2"/>
+        <text x="380" y="53" text-anchor="middle" font-size="15" font-weight="900" fill="#2b211a">취득원가 = 3,000,000원 (처음 산 가격)</text>
+
+        <!-- 1년차 + 2년차 누계액 블록 -->
+        <rect x="30" y="88" width="140" height="58" rx="8" fill="#d9641e"/>
+        <text x="100" y="113" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">1년차 상각</text>
+        <text x="100" y="132" text-anchor="middle" font-size="12" fill="#fff2e8">400,000원</text>
+
+        <rect x="176" y="88" width="140" height="58" rx="8" fill="#e87d3e"/>
+        <text x="246" y="113" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">2년차 상각</text>
+        <text x="246" y="132" text-anchor="middle" font-size="12" fill="#fff2e8">400,000원</text>
+
+        <!-- 남은 장부금액 블록 -->
+        <rect x="324" y="88" width="406" height="58" rx="8" fill="#1d63b8"/>
+        <text x="527" y="113" text-anchor="middle" font-size="15" font-weight="900" fill="#fff">현재 장부금액 = 2,200,000원</text>
+        <text x="527" y="133" text-anchor="middle" font-size="12" fill="#dcebff">취득원가 3,000,000 − 감가상각누계액 800,000</text>
+
+        <text x="173" y="172" text-anchor="middle" font-size="13" font-weight="900" fill="#d9641e">▲ 감가상각누계액 합계 = 800,000원</text>
+        <text x="527" y="172" text-anchor="middle" font-size="13" font-weight="900" fill="#1d63b8">▲ 팔 때 비교 기준이 되는 현재 장부 가치!</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>기억하세요:</strong> 유형자산을 처분(판매)할 때는 처음 샀던 <strong>취득원가</strong>가 아니라, 누계액을 뺀 <strong>장부금액</strong>과 받은 돈을 비교합니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 11: 감가상각하지 않는 자산 -->
+<section class="slide" id="S-11" data-type="concept" data-group="개념 · 감가상각" data-badge="개념 08 · 예외 자산">
+  <div class="s-head">
+    <span class="badge concept">시험 단골 핵심</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">모든 유형자산을 감가상각할까요? 딱 2가지는 예외!</h2>
+    <div class="grid-2">
+      <div class="card" style="background:#f3faf5; border-color:#a5d8b8;">
+        <svg viewBox="0 0 320 96" style="width:100%;height:90px;margin-bottom:6px;">
+          <rect x="10" y="10" width="300" height="76" rx="12" fill="#e6f7ef"/>
+          <ellipse cx="160" cy="64" rx="115" ry="16" fill="#82c99b"/>
+          <rect x="112" y="34" width="6" height="28" fill="#6b4423"/>
+          <circle cx="115" cy="28" r="14" fill="#1b8a5a"/>
+          <rect x="198" y="38" width="6" height="24" fill="#6b4423"/>
+          <circle cx="201" cy="31" r="12" fill="#2aa36d"/>
+        </svg>
+        <h3 style="color:var(--ok);">① 토지 (Land)</h3>
+        <p style="margin:0;">시간이 지나도 닳아 없어지지 않아 <strong>내용연수를 정할 수 없으므로</strong> 감가상각하지 않습니다.</p>
+      </div>
+
+      <div class="card" style="background:#fff8eb; border-color:#edd095;">
+        <svg viewBox="0 0 320 96" style="width:100%;height:90px;margin-bottom:6px;">
+          <rect x="10" y="10" width="300" height="76" rx="12" fill="#fff4df"/>
+          <rect x="95" y="34" width="90" height="44" fill="none" stroke="#d99b1e" stroke-width="3" stroke-dasharray="6 4"/>
+          <line x1="210" y1="22" x2="210" y2="78" stroke="#8b5a2b" stroke-width="4"/>
+          <line x1="175" y1="26" x2="235" y2="26" stroke="#8b5a2b" stroke-width="4"/>
+          <line x1="180" y1="26" x2="180" y2="44" stroke="#d9641e" stroke-width="2"/>
+        </svg>
+        <h3 style="color:#7c4a03;">② 건설중인자산</h3>
+        <p style="margin:0;">건물이나 기계를 아직 짓고 있는 중이라 <strong>영업에 사용할 준비가 끝나지 않았으므로</strong> 감가상각하지 않습니다.</p>
+      </div>
+    </div>
+    <div class="explain-box">
+      <strong>한 줄 요약:</strong> <strong>토지</strong>와 <strong>건설중인자산</strong>은 감가상각 대상이 아닙니다. 건물이 완공되어 사용하기 시작하면 그때부터 감가상각합니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 12: 유형자산 처분 손익 저울 -->
+<section class="slide" id="S-12" data-type="compare" data-group="개념 · 유형자산 처분" data-badge="개념 09 · 처분이익 vs 처분손실">
+  <div class="s-head">
+    <span class="badge concept">저울로 비교하기</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">장부금액과 받은 돈(처분대금)을 저울에 올려 보세요</h2>
+    <div class="scale-toggle-row">
+      <button type="button" class="mini-pill active-cap" id="btnScaleGain" onclick="setScaleState('gain')">상황 1: 더 비싸게 팔았을 때 (이익)</button>
+      <button type="button" class="mini-pill" id="btnScaleLoss" onclick="setScaleState('loss')">상황 2: 더 싸게 팔았을 때 (손실)</button>
+    </div>
+    <div class="svg-box">
+      <svg viewBox="0 0 480 185" style="max-height:185px;" role="img" aria-label="장부금액과 처분대금을 비교하는 저울 애니메이션">
+        <!-- 받침대 -->
+        <polygon points="240,86 218,162 262,162" fill="#8b5a2b"/>
+        <rect x="180" y="162" width="120" height="12" rx="6" fill="#5c3a1a"/>
+        <!-- 기울어지는 막대 -->
+        <g class="scale-beam gain" id="scaleBeam">
+          <line x1="90" y1="85" x2="390" y2="85" stroke="#2b211a" stroke-width="5" stroke-linecap="round"/>
+          <!-- 왼쪽 접시: 장부금액 -->
+          <rect x="42" y="45" width="116" height="36" rx="8" fill="#eef3f8" stroke="#8b5a2b" stroke-width="2"/>
+          <text x="100" y="61" text-anchor="middle" font-size="11" font-weight="800" fill="#6b5b4f">장부금액</text>
+          <text x="100" y="75" text-anchor="middle" font-size="12" font-weight="900" fill="#2b211a" id="scaleLeftVal">4,500,000원</text>
+
+          <!-- 오른쪽 접시: 받은 돈 -->
+          <rect x="322" y="45" width="116" height="36" rx="8" fill="#eaf3ff" stroke="#1d63b8" stroke-width="2" id="scaleRightBox"/>
+          <text x="380" y="61" text-anchor="middle" font-size="11" font-weight="800" fill="#1d63b8" id="scaleRightLbl">받은 돈(처분대금)</text>
+          <text x="380" y="75" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8" id="scaleRightVal">5,000,000원</text>
+        </g>
+        <circle cx="240" cy="85" r="7" fill="#d99b1e"/>
+      </svg>
+    </div>
+    <div class="explain-box" id="scaleExplain">
+      <strong>처분이익 발생:</strong> 장부금액(4,500,000원)보다 받은 돈(5,000,000원)이 500,000원 더 많으므로 <strong>유형자산처분이익 500,000원(대변)</strong>이 생깁니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 13: 처분 분개 구조 -->
+<section class="slide" id="S-13" data-type="compare" data-group="개념 · 유형자산 처분" data-badge="개념 10 · 처분 분개 3단계">
+  <div class="s-head">
+    <span class="badge concept">분개 자리 잡기</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">처분 분개는 항상 이 순서로 채우면 됩니다</h2>
+    <div class="grid-3" style="margin-bottom:10px;">
+      <div class="card"><h3>① 자산·누계액 지우기</h3><p style="margin:0;">취득원가는 <strong>대변</strong>, 감가상각누계액은 <strong>차변</strong>에 적어 함께 없앱니다.</p></div>
+      <div class="card"><h3>② 받은 돈 적기</h3><p style="margin:0;">현금 등 처분대금을 <strong>차변</strong>에 적습니다.</p></div>
+      <div class="card"><h3>③ 차이 맞추기</h3><p style="margin:0;">대변이 모자라면 <strong>처분이익(대변)</strong>, 차변이 모자라면 <strong>처분손실(차변)</strong>!</p></div>
+    </div>
+    <div class="grid-2">
+      <div class="card cap">
+        <h3>처분이익일 때 (차변 2개 / 대변 2개)</h3>
+        <p style="background:#fff; padding:10px 12px; border-radius:9px; border:1px solid var(--cap-line); font-weight:900; margin:6px 0 0; font-size:0.95rem;">
+          (차) 현금 &nbsp;+&nbsp; ○○감가상각누계액<br>
+          (대) ○○자산(원가) &nbsp;+&nbsp; <span style="color:var(--cap);">유형자산처분이익</span>
+        </p>
+      </div>
+      <div class="card rev">
+        <h3>처분손실일 때 (차변 3개 / 대변 1개)</h3>
+        <p style="background:#fff; padding:10px 12px; border-radius:9px; border:1px solid var(--rev-line); font-weight:900; margin:6px 0 0; font-size:0.95rem;">
+          (차) 현금 &nbsp;+&nbsp; ○○감가상각누계액 &nbsp;+&nbsp; <span style="color:var(--rev);">유형자산처분손실</span><br>
+          (대) ○○자산(원가)
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 14: 폐기 개념 -->
+<section class="slide" id="S-14" data-type="concept" data-group="개념 · 유형자산 처분" data-badge="개념 11 · 유형자산 폐기">
+  <div class="s-head">
+    <span class="badge concept">받은 돈 0원인 경우</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">폐기란? 돈을 받지 않고 버릴 때</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 165" role="img" aria-label="장부금액 200,000원인 비품을 대가 없이 폐기하여 전액 처분손실이 되는 도식">
+        <rect x="24" y="22" width="210" height="120" rx="12" fill="#fcf6ec" stroke="#8b5a2b" stroke-width="2"/>
+        <text x="129" y="52" text-anchor="middle" font-size="14" font-weight="900" fill="#5c3a1a">낡은 비품 폐기</text>
+        <text x="129" y="76" text-anchor="middle" font-size="13" fill="#2b211a">취득원가 1,000,000원</text>
+        <text x="129" y="96" text-anchor="middle" font-size="13" fill="#2b211a">누계액 800,000원</text>
+        <text x="129" y="122" text-anchor="middle" font-size="13" font-weight="900" fill="#1d63b8">남은 장부금액 200,000원</text>
+
+        <text x="268" y="88" text-anchor="middle" font-size="22" font-weight="900" fill="#8b5a2b">→</text>
+
+        <rect x="302" y="22" width="434" height="120" rx="12" fill="#fff2e8" stroke="#f7c39f" stroke-width="2"/>
+        <text x="519" y="50" text-anchor="middle" font-size="14" font-weight="900" fill="#d9641e">받은 돈 = 0원 → 남은 장부금액 전액 손실!</text>
+        <rect x="322" y="64" width="394" height="62" rx="8" fill="#fff"/>
+        <text x="519" y="89" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2b211a">(차) 비품감가상각누계액 800,000 + 유형자산처분손실 200,000</text>
+        <text x="519" y="112" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2b211a">(대) 비품 1,000,000</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>핵심 이해:</strong> 폐기는 처분대금이 <strong>0원</strong>인 특별한 처분입니다. 장부에 남아 있던 가치(장부금액)만큼 그대로 <strong>유형자산처분손실</strong>이 됩니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 15: 무형자산 지도 -->
+<section class="slide" id="S-15" data-type="concept" data-group="개념 · 무형자산" data-badge="개념 12 · 무형자산의 종류">
+  <div class="s-head">
+    <span class="badge concept">보이지 않는 영업용 자산</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">무형자산 지도: 형태는 없지만 미래 이익을 주는 자산</h2>
+    <div class="grid-4">
+      <div class="card" style="background:#e6f7ef; border-color:#9fd4bc;">
+        <svg viewBox="0 0 120 56" style="width:100%;height:52px;"><circle cx="60" cy="28" r="20" fill="#1b8a5a"/><text x="60" y="33" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">★</text></svg>
+        <h3 style="color:var(--ok);">영업권</h3>
+        <p style="margin:0; font-size:0.92rem;">좋은 입지·단골·브랜드 때문에 순자산 가치보다 더 주고 산 초과 금액</p>
+      </div>
+      <div class="card cap">
+        <svg viewBox="0 0 120 56" style="width:100%;height:52px;"><rect x="38" y="8" width="44" height="40" rx="10" fill="#1d63b8"/><text x="60" y="33" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">R&amp;D</text></svg>
+        <h3>개발비</h3>
+        <p style="margin:0; font-size:0.92rem;">신제품·신기술 개발 지출 중 <strong>자산 인식 요건을 충족</strong>한 금액</p>
+      </div>
+      <div class="card" style="background:#fff8e6; border-color:#edd095;">
+        <svg viewBox="0 0 120 56" style="width:100%;height:52px;"><rect x="35" y="10" width="50" height="36" rx="8" fill="#d99b1e"/><text x="60" y="33" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">특허</text></svg>
+        <h3 style="color:#7c4a03;">산업재산권</h3>
+        <p style="margin:0; font-size:0.92rem;">특허권·실용신안권·디자인권·상표권처럼 법으로 보호받는 독점 권리</p>
+      </div>
+      <div class="card rev">
+        <svg viewBox="0 0 120 56" style="width:100%;height:52px;"><rect x="32" y="10" width="56" height="36" rx="8" fill="#d9641e"/><text x="60" y="33" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">APP</text></svg>
+        <h3>소프트웨어</h3>
+        <p style="margin:0; font-size:0.92rem;">카페 주문관리(POS) 프로그램처럼 업무에 쓰기 위해 구입한 프로그램</p>
+      </div>
+    </div>
+    <div class="explain-box">
+      <strong>주의할 점:</strong> 연구·개발에 쓴 돈이 모두 자산이 되는 것은 아닙니다. 기술적 실현 가능성과 시장성 등 <strong>자산 인식 요건을 충족한 지출만 「개발비」</strong>로 처리합니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 16: 영업권 계산과 분개 -->
+<section class="slide" id="S-16" data-type="concept" data-group="개념 · 무형자산" data-badge="개념 13 · 영업권 이해하기">
+  <div class="s-head">
+    <span class="badge concept">학습지 B5-01 핵심 원리</span>
+    <span class="term-bubble">영업권 = 인수 대가 − 식별 가능한 순자산의 공정가치</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">가게를 인수할 때 더 준 웃돈(권리금 성격) = 영업권</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 185" role="img" aria-label="인수 대가 3,500,000원에서 상품 공정가치 3,000,000원을 뺀 500,000원이 영업권이 되는 도식">
+        <!-- 왼쪽: 인수 대가 -->
+        <rect x="24" y="24" width="215" height="136" rx="14" fill="#fff2e8" stroke="#f7c39f" stroke-width="2"/>
+        <text x="131" y="54" text-anchor="middle" font-size="15" font-weight="900" fill="#d9641e">내가 지급한 인수 대가</text>
+        <text x="131" y="96" text-anchor="middle" font-size="20" font-weight="900" fill="#2b211a">현금 3,500,000원</text>
+        <text x="131" y="130" text-anchor="middle" font-size="12.5" fill="#6b5b4f">(대변) 현금 3,500,000</text>
+
+        <text x="266" y="98" text-anchor="middle" font-size="24" font-weight="900" fill="#8b5a2b">=</text>
+
+        <!-- 오른쪽 위: 상품 -->
+        <rect x="296" y="24" width="210" height="136" rx="14" fill="#eaf3ff" stroke="#a6cbf7" stroke-width="2"/>
+        <text x="401" y="54" text-anchor="middle" font-size="14" font-weight="900" fill="#1d63b8">인수한 순자산(상품)</text>
+        <text x="401" y="96" text-anchor="middle" font-size="19" font-weight="900" fill="#1d63b8">3,000,000원</text>
+        <text x="401" y="130" text-anchor="middle" font-size="12.5" fill="#2b211a">(차) 상품 3,000,000</text>
+
+        <text x="526" y="98" text-anchor="middle" font-size="24" font-weight="900" fill="#1b8a5a">+</text>
+
+        <!-- 오른쪽 끝: 영업권 -->
+        <rect x="546" y="24" width="190" height="136" rx="14" fill="#e6f7ef" stroke="#9fd4bc" stroke-width="2"/>
+        <text x="641" y="54" text-anchor="middle" font-size="14" font-weight="900" fill="#1b8a5a">초과 지급액 = 영업권</text>
+        <text x="641" y="96" text-anchor="middle" font-size="19" font-weight="900" fill="#1b8a5a">500,000원</text>
+        <text x="641" y="130" text-anchor="middle" font-size="12.5" fill="#2b211a">(차) 영업권 500,000</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>학습지 사례 포인트:</strong> 인수한 가게에 다른 자산·부채는 없고 <strong>상품(공정가치 3,000,000원)</strong>만 있다면, 순자산 공정가치는 3,000,000원입니다. 3,500,000원을 주었으므로 차이 <strong>500,000원</strong>이 <strong>영업권</strong>입니다.
+    </div>
+  </div>
+</section>
+<!-- ==================== 용어 사전 1장 (17) ==================== -->
+
+<!-- Slide 17: 핵심 용어 사전 -->
+<section class="slide" id="S-17" data-type="concept" data-group="용어 사전" data-badge="한눈에 보는 용어 사전">
+  <div class="s-head">
+    <span class="badge concept">헷갈리는 8개 용어 정리</span>
+  </div>
+  <div class="stagger">
+    <h2 class="s-title">오늘 꼭 알아야 할 핵심 용어 8가지</h2>
+    <div class="grid-2" style="gap:10px;">
+      <div class="card cap" style="padding:10px 14px;">
+        <h3 style="font-size:1.05rem;">① 자본적 지출</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 자산의 성능을 높이거나 사용기간을 늘리는 지출 → 해당 자산에 가산<br><strong>비유:</strong> 카페 창고를 새로 증축해 매장을 넓히기</p>
+      </div>
+      <div class="card rev" style="padding:10px 14px;">
+        <h3 style="font-size:1.05rem;">② 수익적 지출</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 망가진 곳을 고쳐 원래 상태를 유지하는 지출 → 수선비(비용)<br><strong>비유:</strong> 깨진 유리창을 새 유리로 끼워 넣기</p>
+      </div>
+      <div class="card" style="padding:10px 14px;">
+        <h3 style="font-size:1.05rem;">③ 내용연수</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 자산을 영업에 사용할 것으로 예상하는 햇수<br><strong>비유:</strong> “이 비품은 앞으로 5년 동안 쓸 수 있겠다!”</p>
+      </div>
+      <div class="card" style="padding:10px 14px;">
+        <h3 style="font-size:1.05rem;">④ 잔존가치</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 사용 기간이 끝났을 때 처분해서 받을 것으로 예상되는 금액<br><strong>비유:</strong> 5년 다 쓴 자전거를 고물상에 넘기고 받는 최소 금액</p>
+      </div>
+      <div class="card" style="padding:10px 14px;">
+        <h3 style="font-size:1.05rem;">⑤ 감가상각누계액</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 지금까지 비용으로 처리한 감가상각비가 차곡차곡 쌓인 합계<br><strong>비유:</strong> 자산에서 깎아 나갈 금액을 따로 모아 둔 ‘감액 저금통’</p>
+      </div>
+      <div class="card" style="padding:10px 14px;">
+        <h3 style="font-size:1.05rem;">⑥ 장부금액</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 취득원가에서 감가상각누계액을 뺀 현재 장부상 가치<br><strong>비유:</strong> 처음 산 가격에서 지금까지 닳은 만큼 뺀 남은 가치</p>
+      </div>
+      <div class="card" style="padding:10px 14px; background:#f3faf5; border-color:#a5d8b8;">
+        <h3 style="font-size:1.05rem; color:var(--ok);">⑦ 영업권</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 다른 사업을 인수할 때 식별 가능한 순자산 공정가치보다 더 준 금액<br><strong>비유:</strong> 단골손님과 좋은 위치 덕분에 기꺼이 더 낸 권리금 성격의 웃돈</p>
+      </div>
+      <div class="card" style="padding:10px 14px; background:#f3faf5; border-color:#a5d8b8;">
+        <h3 style="font-size:1.05rem; color:var(--ok);">⑧ 개발비</h3>
+        <p style="margin:0; font-size:0.93rem;"><strong>뜻:</strong> 신제품·신기술 개발 지출 중 자산 인식 요건을 충족한 금액<br><strong>비유:</strong> 출시 가능성과 시장성이 입증된 미래 효익 자산</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 학습지 B 11장 (18~28) ==================== -->
+
+<!-- Slide 18: 학습지 B 01 빠른 판별 퀴즈 -->
+<section class="slide problem" id="B1-ALL" data-type="b1-classify" data-group="학습지 B · 01 판별" data-badge="학습지 B · 01 빠른 판별 퀴즈" data-style="worksheet">
+  <div class="s-head">
+    <span class="badge ws">학습지 B · 01번 (8문항)</span>
+    <div>
+      <span class="badge" style="background:var(--cap-bg);color:var(--cap);border-color:var(--cap-line);">C = 자본적 지출 (자산 가산)</span>
+      <span class="badge" style="background:var(--rev-bg);color:var(--rev);border-color:var(--rev-line);">R = 수익적 지출 (수선비)</span>
+    </div>
+  </div>
+  <h2 class="p-title">자본적 지출(C) · 수익적 지출(R) 빠른 판별 퀴즈</h2>
+  <p style="margin:0 0 8px; color:var(--ink-sub); font-weight:700;">성능 향상·사용기간 연장 → 자본적 지출(C) / 원상회복·현상 유지 → 수익적 지출(R)</p>
+
+  <table class="b1-table" aria-label="자본적 지출과 수익적 지출 판별 표">
+    <thead>
+      <tr>
+        <th style="width:46px;">번호</th>
+        <th>거래 내용</th>
+        <th style="width:140px; text-align:center;">구분 (C / R)</th>
+      </tr>
+    </thead>
+    <tbody id="b1TableBody">
+      <tr data-item="B1-01" data-ans="R">
+        <td><strong>①</strong></td>
+        <td>냉장고의 고장 난 손잡이를 교체하였다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--rev);">정답: R (수익적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-02" data-ans="C">
+        <td><strong>②</strong></td>
+        <td>커피머신을 개조하여 생산 능력을 높였다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--cap);">정답: C (자본적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-03" data-ans="R">
+        <td><strong>③</strong></td>
+        <td>영업용 건물의 낡은 벽지를 교체하였다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--rev);">정답: R (수익적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-04" data-ans="C">
+        <td><strong>④</strong></td>
+        <td>창고를 증축하여 보관 공간을 넓혔다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--cap);">정답: C (자본적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-05" data-ans="R">
+        <td><strong>⑤</strong></td>
+        <td>배달차의 엔진오일을 교환하였다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--rev);">정답: R (수익적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-06" data-ans="C">
+        <td><strong>⑥</strong></td>
+        <td>건물의 사용기간을 늘리는 대규모 개량을 했다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--cap);">정답: C (자본적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-07" data-ans="R">
+        <td><strong>⑦</strong></td>
+        <td>제빙기의 정상 작동을 위한 정기 점검비를 지급했다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--rev);">정답: R (수익적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+      <tr data-item="B1-08" data-ans="C">
+        <td><strong>⑧</strong></td>
+        <td>카페 건물에 엘리베이터를 새로 설치했다.</td>
+        <td style="text-align:center;">
+          <span class="teach-only b1-blank" style="font-weight:900; color:var(--ink-sub);">( &nbsp;&nbsp;&nbsp;&nbsp; )</span>
+          <span class="teach-only b1-ans" style="display:none; font-weight:900; color:var(--cap);">정답: C (자본적)</span>
+          <span class="study-only">
+            <button type="button" class="cr-choice" data-val="C">C</button>
+            <button type="button" class="cr-choice" data-val="R">R</button>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="action-row">
+    <button type="button" class="btn-act check study-only" data-action="check-b1">채점하기</button>
+    <button type="button" class="btn-act study-only" data-action="reset-b1">다시 하기</button>
+    <button type="button" class="btn-act answer" data-action="toggle-b1-ans">정답 보기</button>
+    <span class="feedback-msg" id="fb-B1-ALL"></span>
+  </div>
+  <div class="answer-panel" id="ans-B1-ALL">
+    <div class="one-line-entry">① R &nbsp;·&nbsp; ② C &nbsp;·&nbsp; ③ R &nbsp;·&nbsp; ④ C &nbsp;·&nbsp; ⑤ R &nbsp;·&nbsp; ⑥ C &nbsp;·&nbsp; ⑦ R &nbsp;·&nbsp; ⑧ C</div>
+    <p style="margin:0;">손잡이 교체·벽지 교체·엔진오일 교환·정기 점검비는 원래 성능을 유지하는 <strong>수익적 지출(R)</strong>이고, 커피머신 개조·창고 증축·대규모 개량·엘리베이터 신설은 가치를 높이는 <strong>자본적 지출(C)</strong>입니다.</p>
+  </div>
+</section>
+
+<!-- Slide 19: 학습지 B 02-① -->
+<section class="slide problem" id="B2-01" data-type="journal" data-group="학습지 B · 02 지출 분개" data-badge="학습지 B · 02-①" data-style="worksheet">
+  <div class="s-head"><span class="badge ws">학습지 B · 02번 ①</span></div>
+  <h2 class="p-title">건물 개량 공사비 지급 분개</h2>
+  <p class="p-scene">건물의 사용기간을 늘리는 개량 공사비 300,000원을 현금으로 지급했다.</p>
+  <div class="p-extra">
+    <div class="svg-box" style="padding:8px;">
+      <svg viewBox="0 0 640 82" style="max-height:82px;" role="img" aria-label="건물 사용기간 연장 개량 공사 300,000원 현금 지급">
+        <rect x="20" y="12" width="180" height="58" rx="10" fill="#eaf3ff" stroke="#1d63b8" stroke-width="2"/>
+        <text x="110" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#1d63b8">사용기간 연장 (개량)</text>
+        <text x="110" y="58" text-anchor="middle" font-size="12" fill="#2b211a">→ 자본적 지출</text>
+        <text x="235" y="47" text-anchor="middle" font-size="20" font-weight="900" fill="#8b5a2b">+</text>
+        <rect x="270" y="12" width="160" height="58" rx="10" fill="#fcf6ec" stroke="#8b5a2b" stroke-width="2"/>
+        <text x="350" y="46" text-anchor="middle" font-size="15" font-weight="900" fill="#5c3a1a">300,000원</text>
+        <text x="460" y="47" text-anchor="middle" font-size="20" font-weight="900" fill="#8b5a2b">→</text>
+        <rect x="490" y="12" width="130" height="58" rx="10" fill="#fff2e8" stroke="#d9641e" stroke-width="2"/>
+        <text x="555" y="46" text-anchor="middle" font-size="14" font-weight="900" fill="#d9641e">현금 지급</text>
+      </svg>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"건물","amount":300000}],"credit":[{"account":"현금","amount":300000}]}],"accounts":["건물","현금","수선비","비품"],"amounts":[300000,300000,50000],"hint":"","explain":"사용기간을 늘리는 개량 공사는 자본적 지출이므로 건물 계정에 가산합니다. 대금은 현금으로 지급했으므로 대변에 현금 300,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 20: 학습지 B 02-② -->
+<section class="slide problem" id="B2-02" data-type="journal" data-group="학습지 B · 02 지출 분개" data-badge="학습지 B · 02-②" data-style="worksheet">
+  <div class="s-head"><span class="badge ws">학습지 B · 02번 ②</span></div>
+  <h2 class="p-title">건물 유리 수리비 지급 분개</h2>
+  <p class="p-scene">건물의 깨진 유리를 수리하고 50,000원을 현금으로 지급했다.</p>
+  <div class="p-extra">
+    <div class="svg-box" style="padding:8px;">
+      <svg viewBox="0 0 640 82" style="max-height:82px;" role="img" aria-label="깨진 유리 수리 원상회복 50,000원 현금 지급">
+        <rect x="20" y="12" width="180" height="58" rx="10" fill="#fff2e8" stroke="#d9641e" stroke-width="2"/>
+        <text x="110" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#d9641e">깨진 유리 원상회복</text>
+        <text x="110" y="58" text-anchor="middle" font-size="12" fill="#2b211a">→ 수익적 지출</text>
+        <text x="235" y="47" text-anchor="middle" font-size="20" font-weight="900" fill="#8b5a2b">+</text>
+        <rect x="270" y="12" width="160" height="58" rx="10" fill="#fcf6ec" stroke="#8b5a2b" stroke-width="2"/>
+        <text x="350" y="46" text-anchor="middle" font-size="15" font-weight="900" fill="#5c3a1a">50,000원</text>
+        <text x="460" y="47" text-anchor="middle" font-size="20" font-weight="900" fill="#8b5a2b">→</text>
+        <rect x="490" y="12" width="130" height="58" rx="10" fill="#fff2e8" stroke="#d9641e" stroke-width="2"/>
+        <text x="555" y="46" text-anchor="middle" font-size="14" font-weight="900" fill="#d9641e">현금 지급</text>
+      </svg>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"수선비","amount":50000}],"credit":[{"account":"현금","amount":50000}]}],"accounts":["수선비","현금","건물","소모품비"],"amounts":[50000,50000,300000],"hint":"","explain":"깨진 유리를 원래 상태로 고치는 지출은 수익적 지출이므로 당기 비용인 수선비로 처리합니다. 현금으로 지급했으므로 대변에 현금 50,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 21: 학습지 B 03-① -->
+<section class="slide problem" id="B3-01" data-type="journal" data-group="학습지 B · 03 정액법" data-badge="학습지 B · 03-①" data-style="worksheet">
+  <div class="s-head">
+    <span class="badge ws">학습지 B · 03번 ①</span>
+    <span class="term-bubble">1년 감가상각비 = (취득원가 − 잔존가치) ÷ 내용연수</span>
+  </div>
+  <h2 class="p-title">비품 정액법 감가상각 계산과 분개</h2>
+  <p class="p-scene">비품 취득원가 1,100,000원, 잔존가치 100,000원, 내용연수 5년. (1년분 감가상각 분개)</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>계산: (1,100,000 − 100,000) ÷ 5년 =</span>
+      <span class="teach-only" style="color:var(--ink-sub); border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="200000" aria-label="비품 연간 감가상각비 계산 입력" placeholder="금액 입력">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"감가상각비","amount":200000}],"credit":[{"account":"비품감가상각누계액","amount":200000}]}],"accounts":["감가상각비","비품감가상각누계액","비품","수선비"],"amounts":[200000,200000,1000000,100000,1100000],"hint":"","explain":"(1,100,000 − 100,000) ÷ 5 = 200,000원이 1년 감가상각비입니다. 간접법을 사용하므로 차변에 감가상각비 200,000원, 대변에 비품감가상각누계액 200,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 22: 학습지 B 03-② -->
+<section class="slide problem" id="B3-02" data-type="journal" data-group="학습지 B · 03 정액법" data-badge="학습지 B · 03-②" data-style="worksheet">
+  <div class="s-head">
+    <span class="badge ws">학습지 B · 03번 ②</span>
+    <span class="term-bubble">간접법: 대변에 「자산명 + 감가상각누계액」 기록</span>
+  </div>
+  <h2 class="p-title">기계장치 정액법 감가상각 계산과 분개</h2>
+  <p class="p-scene">기계장치 취득원가 2,500,000원, 잔존가치 500,000원, 내용연수 4년. (1년분 감가상각 분개)</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>계산: (2,500,000 − 500,000) ÷ 4년 =</span>
+      <span class="teach-only" style="color:var(--ink-sub); border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="500000" aria-label="기계장치 연간 감가상각비 계산 입력" placeholder="금액 입력">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"감가상각비","amount":500000}],"credit":[{"account":"기계장치감가상각누계액","amount":500000}]}],"accounts":["감가상각비","기계장치감가상각누계액","기계장치","비품감가상각누계액"],"amounts":[500000,500000,2000000,2500000],"hint":"","explain":"(2,500,000 − 500,000) ÷ 4 = 500,000원이 1년 감가상각비입니다. 차변에 감가상각비 500,000원, 대변에 기계장치감가상각누계액 500,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 23: 학습지 B 04-① -->
+<section class="slide problem" id="B4-01" data-type="journal" data-group="학습지 B · 04 유형자산 처분" data-badge="학습지 B · 04-①" data-style="worksheet">
+  <div class="s-head">
+    <span class="badge ws">학습지 B · 04번 ①</span>
+    <span class="term-bubble">장부금액 = 취득원가 − 감가상각누계액</span>
+  </div>
+  <h2 class="p-title">차량운반구 처분 (장부금액보다 비싸게 판 경우)</h2>
+  <p class="p-scene">차량운반구 원가 5,500,000원, 감가상각누계액 1,000,000원. 현금 5,000,000원에 처분하였다.</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>장부금액</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="4500000" aria-label="차량운반구 장부금액 입력" placeholder="장부금액">
+      <span>원 &nbsp;/&nbsp; 처분</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 24px;">(이익 / 손실)</span>
+      <select class="calc-select study-only" data-calc-ans="이익" aria-label="처분이익 또는 처분손실 선택">
+        <option value="">선택</option>
+        <option value="이익">이익</option>
+        <option value="손실">손실</option>
+      </select>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="500000" aria-label="처분이익 금액 입력" placeholder="손익 금액">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"현금","amount":5000000},{"account":"차량운반구감가상각누계액","amount":1000000}],"credit":[{"account":"차량운반구","amount":5500000},{"account":"유형자산처분이익","amount":500000}]}],"accounts":["현금","차량운반구감가상각누계액","차량운반구","유형자산처분이익","유형자산처분손실"],"amounts":[5000000,1000000,5500000,500000,4500000],"hint":"","explain":"장부금액은 5,500,000 − 1,000,000 = 4,500,000원인데 현금 5,000,000원을 받았으므로 유형자산처분이익 500,000원이 발생합니다. 차량운반구와 감가상각누계액을 모두 제거하고 이익은 대변에 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 24: 학습지 B 04-② -->
+<section class="slide problem" id="B4-02" data-type="journal" data-group="학습지 B · 04 유형자산 처분" data-badge="학습지 B · 04-②" data-style="worksheet">
+  <div class="s-head">
+    <span class="badge ws">학습지 B · 04번 ②</span>
+    <span class="term-bubble">처분손실은 비용 발생이므로 차변에 기록!</span>
+  </div>
+  <h2 class="p-title">기계장치 처분 (장부금액보다 싸게 판 경우)</h2>
+  <p class="p-scene">기계장치 원가 3,000,000원, 감가상각누계액 800,000원. 현금 1,900,000원에 처분하였다.</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>장부금액</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="2200000" aria-label="기계장치 장부금액 입력" placeholder="장부금액">
+      <span>원 &nbsp;/&nbsp; 처분</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 24px;">(이익 / 손실)</span>
+      <select class="calc-select study-only" data-calc-ans="손실" aria-label="처분이익 또는 처분손실 선택">
+        <option value="">선택</option>
+        <option value="이익">이익</option>
+        <option value="손실">손실</option>
+      </select>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="300000" aria-label="처분손실 금액 입력" placeholder="손익 금액">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"현금","amount":1900000},{"account":"기계장치감가상각누계액","amount":800000},{"account":"유형자산처분손실","amount":300000}],"credit":[{"account":"기계장치","amount":3000000}]}],"accounts":["현금","기계장치감가상각누계액","유형자산처분손실","기계장치","유형자산처분이익"],"amounts":[1900000,800000,300000,3000000,2200000],"hint":"","explain":"장부금액은 3,000,000 − 800,000 = 2,200,000원인데 현금 1,900,000원을 받았으므로 유형자산처분손실 300,000원이 발생합니다. 손실은 차변에 기록하여 차변 합계 3,000,000원과 대변 3,000,000원을 맞춥니다."}
+  </script>
+</section>
+
+<!-- Slide 25: 학습지 B 05-① -->
+<section class="slide problem" id="B5-01" data-type="journal" data-group="학습지 B · 05 무형자산" data-badge="학습지 B · 05-①" data-style="worksheet">
+  <div class="s-head">
+    <span class="badge ws">학습지 B · 05번 ①</span>
+    <span class="term-bubble">영업권 = 지급한 인수 대가 − 순자산(상품) 공정가치</span>
+  </div>
+  <h2 class="p-title">카페 인수 시 상품과 영업권 취득 분개</h2>
+  <p class="p-scene">다른 카페의 상품(공정가치 3,000,000원)과 영업권을 함께 현금 3,500,000원에 인수했다. 다른 자산·부채는 없다.</p>
+  <div class="p-extra">
+    <div class="svg-box" style="padding:8px;">
+      <svg viewBox="0 0 640 76" style="max-height:76px;" role="img" aria-label="현금 3,500,000원 지급으로 상품 3,000,000원과 영업권 500,000원 취득">
+        <rect x="20" y="10" width="185" height="56" rx="10" fill="#eaf3ff" stroke="#1d63b8" stroke-width="2"/>
+        <text x="112" y="43" text-anchor="middle" font-size="14" font-weight="900" fill="#1d63b8">상품 3,000,000원</text>
+        <text x="225" y="44" text-anchor="middle" font-size="18" font-weight="900" fill="#1b8a5a">+</text>
+        <rect x="245" y="10" width="185" height="56" rx="10" fill="#e6f7ef" stroke="#1b8a5a" stroke-width="2"/>
+        <text x="337" y="43" text-anchor="middle" font-size="14" font-weight="900" fill="#1b8a5a">영업권 500,000원</text>
+        <text x="450" y="44" text-anchor="middle" font-size="18" font-weight="900" fill="#8b5a2b">=</text>
+        <rect x="470" y="10" width="150" height="56" rx="10" fill="#fff2e8" stroke="#d9641e" stroke-width="2"/>
+        <text x="545" y="43" text-anchor="middle" font-size="14" font-weight="900" fill="#d9641e">현금 3,500,000</text>
+      </svg>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"상품","amount":3000000},{"account":"영업권","amount":500000}],"credit":[{"account":"현금","amount":3500000}]}],"accounts":["상품","영업권","현금","임차보증금","비품"],"amounts":[3000000,500000,3500000],"hint":"","explain":"인수 대가 3,500,000원에서 상품 공정가치 3,000,000원을 초과한 500,000원이 영업권입니다. 차변에 상품과 영업권을 각각 자산으로 기록하고 대변에 현금을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 26: 학습지 B 05-② -->
+<section class="slide problem" id="B5-02" data-type="journal" data-group="학습지 B · 05 무형자산" data-badge="학습지 B · 05-②" data-style="worksheet">
+  <div class="s-head"><span class="badge ws">학습지 B · 05번 ②</span></div>
+  <h2 class="p-title">자산 인식 요건을 충족한 개발비 지출 분개</h2>
+  <p class="p-scene">자산 인식 요건을 충족한 신제품 개발비 400,000원을 현금 지급했다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"개발비","amount":400000}],"credit":[{"account":"현금","amount":400000}]}],"accounts":["개발비","현금","광고선전비","소모품비"],"amounts":[400000,400000,300000],"hint":"","explain":"자산 인식 요건을 충족한 개발 지출은 무형자산인 개발비로 처리합니다. 차변에 개발비 400,000원, 대변에 현금 400,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 27: 학습지 B 05-③ -->
+<section class="slide problem" id="B5-03" data-type="journal" data-group="학습지 B · 05 무형자산" data-badge="학습지 B · 05-③" data-style="worksheet">
+  <div class="s-head"><span class="badge ws">학습지 B · 05번 ③</span></div>
+  <h2 class="p-title">주문관리용 소프트웨어 구입 분개</h2>
+  <p class="p-scene">카페의 주문관리용 소프트웨어 300,000원을 현금으로 구입했다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"소프트웨어","amount":300000}],"credit":[{"account":"현금","amount":300000}]}],"accounts":["소프트웨어","현금","비품","개발비"],"amounts":[300000,300000,400000],"hint":"","explain":"업무에 사용하기 위해 구입한 프로그램은 무형자산인 소프트웨어 계정으로 처리합니다. 차변에 소프트웨어 300,000원, 대변에 현금 300,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 28: 학습지 B 06 끝내기 -->
+<section class="slide problem" id="B6-ALL" data-type="b6-review" data-group="학습지 B · 06 끝내기" data-badge="학습지 B · 06 끝내기" data-style="worksheet">
+  <div class="s-head"><span class="badge ws">학습지 B · 06번 (4문항)</span></div>
+  <h2 class="p-title">오늘 배운 개념 확인 (학습지 B 끝내기)</h2>
+  <div class="grid-2" style="gap:12px;">
+    <!-- ① -->
+    <div class="card" data-b6="B6-01" data-ans="깨진 유리 교체">
+      <h3>① 수선비로 처리할 것</h3>
+      <p style="margin:0 0 8px;">건물 증축 / 깨진 유리 교체</p>
+      <div class="teach-only" style="font-weight:800; color:var(--ink-sub);">선택: ( 건물 증축 / 깨진 유리 교체 )</div>
+      <div class="study-only">
+        <button type="button" class="cr-choice b6-opt" data-val="건물 증축">건물 증축</button>
+        <button type="button" class="cr-choice b6-opt" data-val="깨진 유리 교체">깨진 유리 교체</button>
+      </div>
+    </div>
+
+    <!-- ② -->
+    <div class="card" data-b6="B6-02" data-ans="500000">
+      <h3>② 장부금액 구하기</h3>
+      <p style="margin:0 0 8px;">취득원가 800,000원 − 누계액 300,000원 = 장부금액</p>
+      <div class="teach-only" style="font-weight:800; color:var(--ink-sub);">빈칸: _______________ 원</div>
+      <div class="study-only" style="display:flex; align-items:center; gap:6px;">
+        <input type="text" inputmode="numeric" class="calc-input b6-inp" placeholder="숫자 입력"> <strong>원</strong>
+      </div>
+    </div>
+
+    <!-- ③ -->
+    <div class="card" data-b6="B6-03" data-ans="이익|150000">
+      <h3>③ 처분손익 구하기</h3>
+      <p style="margin:0 0 8px;">장부금액 500,000원, 처분대금 650,000원 → 처분</p>
+      <div class="teach-only" style="font-weight:800; color:var(--ink-sub);">빈칸: 처분 ( 이익 / 손실 ) ___________ 원</div>
+      <div class="study-only" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <span>처분</span>
+        <select class="calc-select b6-sel">
+          <option value="">선택</option>
+          <option value="이익">이익</option>
+          <option value="손실">손실</option>
+        </select>
+        <input type="text" inputmode="numeric" class="calc-input b6-inp" placeholder="금액"> <strong>원</strong>
+      </div>
+    </div>
+
+    <!-- ④ -->
+    <div class="card" data-b6="B6-04" data-ans="소프트웨어">
+      <h3>④ 눈에 보이지 않는 자산 3가지</h3>
+      <p style="margin:0 0 8px;">영업권 · 개발비 · ( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</p>
+      <div class="teach-only" style="font-weight:800; color:var(--ink-sub);">빈칸: 영업권 · 개발비 · _______________</div>
+      <div class="study-only">
+        <input type="text" class="slot-input b6-txt" placeholder="계정과목 입력 (예: 소프트웨어)">
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button type="button" class="btn-act check study-only" data-action="check-b6">채점하기</button>
+    <button type="button" class="btn-act study-only" data-action="reset-b6">다시 하기</button>
+    <button type="button" class="btn-act answer" data-action="toggle-b6-ans">정답 보기</button>
+    <span class="feedback-msg" id="fb-B6-ALL"></span>
+  </div>
+  <div class="answer-panel" id="ans-B6-ALL">
+    <div class="one-line-entry">① 깨진 유리 교체 &nbsp;·&nbsp; ② 500,000원 &nbsp;·&nbsp; ③ 처분이익 150,000원 &nbsp;·&nbsp; ④ 소프트웨어</div>
+    <p style="margin:0;">깨진 유리 교체는 원상회복이므로 수선비입니다. 장부금액 500,000원보다 650,000원을 받았으므로 처분이익 150,000원이 발생하며, 무형자산 대표 3가지는 영업권·개발비·소프트웨어입니다.</p>
+  </div>
+</section>
+<!-- ==================== 자격증 기초 연습 10장 (29~38) ==================== -->
+
+<!-- Slide 29: D-01 -->
+<section class="slide problem" id="D-01" data-type="journal" data-group="자격증 기초 연습 · 지출 구분" data-badge="기초 연습 D-01 · 전산회계 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">전산회계 2급 기초 · 기초 연습</span>
+    <span class="badge">학습지 외 추가 연습</span>
+  </div>
+  <h2 class="p-title">창고 증축 공사비 지급 분개</h2>
+  <p class="p-scene">영업용 건물에 창고를 증축하여 보관 공간을 넓히고 공사비 900,000원을 현금으로 지급했다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"건물","amount":900000}],"credit":[{"account":"현금","amount":900000}]}],"accounts":["건물","현금","수선비","임차료"],"amounts":[900000,900000,90000],"hint":"","explain":"창고 증축으로 건물의 가치와 활용 공간이 늘어났으므로 자본적 지출입니다. 차변에 건물 900,000원을 가산하고 대변에 현금 900,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 30: D-02 -->
+<section class="slide problem" id="D-02" data-type="journal" data-group="자격증 기초 연습 · 지출 구분" data-badge="기초 연습 D-02 · FAT 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">FAT 2급 기초 · 기초 연습</span>
+    <span class="badge">학습지 외 추가 연습</span>
+  </div>
+  <h2 class="p-title">배달 차량 정기 점검비 지급 분개</h2>
+  <p class="p-scene">매장 배달용 화물차의 정상 작동을 위한 정기 점검비 및 엔진오일 교환비 120,000원을 현금 지급했다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"수선비","amount":120000}],"credit":[{"account":"현금","amount":120000}]}],"accounts":["수선비","현금","차량운반구","소모품비"],"amounts":[120000,120000,1200000],"hint":"","explain":"정기 점검과 엔진오일 교환은 차량의 현상 유지를 위한 수익적 지출입니다. 차변에 수선비 120,000원, 대변에 현금 120,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 31: D-03 -->
+<section class="slide problem" id="D-03" data-type="journal" data-group="자격증 기초 연습 · 지출 구분" data-badge="기초 연습 D-03 · 전산회계 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">전산회계 2급 기초 · 기초 연습</span>
+    <span class="badge">자본적 + 수익적 혼합</span>
+  </div>
+  <h2 class="p-title">건물 개량과 수선을 함께 지급한 경우</h2>
+  <p class="p-scene">건물 수리비 600,000원을 현금 지급했다. 이 중 400,000원은 엘리베이터 성능을 높이는 자본적 지출이고, 200,000원은 외벽 도색인 수익적 지출이다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"건물","amount":400000},{"account":"수선비","amount":200000}],"credit":[{"account":"현금","amount":600000}]}],"accounts":["건물","수선비","현금","비품"],"amounts":[400000,200000,600000],"hint":"","explain":"자본적 지출 400,000원은 건물 계정에 더하고, 수익적 지출 200,000원은 수선비로 처리합니다. 대변에는 합계 현금 600,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 32: D-04 -->
+<section class="slide problem" id="D-04" data-type="journal" data-group="자격증 기초 연습 · 감가상각" data-badge="기초 연습 D-04 · 전산회계 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">전산회계 2급 기초 · 기초 연습</span>
+    <span class="term-bubble">1년 감가상각비 = (취득원가 − 잔존가치) ÷ 내용연수</span>
+  </div>
+  <h2 class="p-title">비품 정액법 감가상각 기초 연습</h2>
+  <p class="p-scene">매장용 쇼케이스(비품) 취득원가 1,600,000원, 잔존가치 100,000원, 내용연수 5년. 결산 시 1년분 감가상각을 정액법(간접법)으로 분개하시오.</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>계산: (1,600,000 − 100,000) ÷ 5년 =</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="300000" aria-label="쇼케이스 연간 감가상각비 입력" placeholder="금액 입력">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"감가상각비","amount":300000}],"credit":[{"account":"비품감가상각누계액","amount":300000}]}],"accounts":["감가상각비","비품감가상각누계액","비품","수선비"],"amounts":[300000,300000,1500000,100000],"hint":"","explain":"(1,600,000 − 100,000) ÷ 5 = 300,000원입니다. 차변에 감가상각비 300,000원, 대변에 비품감가상각누계액 300,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 33: D-05 -->
+<section class="slide problem" id="D-05" data-type="journal" data-group="자격증 기초 연습 · 감가상각" data-badge="기초 연습 D-05 · FAT 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">FAT 2급 기초 · 기초 연습</span>
+    <span class="term-bubble">잔존가치가 0원이면 취득원가 전체를 내용연수로 나눕니다</span>
+  </div>
+  <h2 class="p-title">차량운반구 정액법 감가상각 기초 연습</h2>
+  <p class="p-scene">배달용 오토바이(차량운반구) 취득원가 2,400,000원, 잔존가치 0원, 내용연수 4년. 결산 시 1년분 감가상각을 정액법(간접법)으로 분개하시오.</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>계산: (2,400,000 − 0) ÷ 4년 =</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="600000" aria-label="차량운반구 연간 감가상각비 입력" placeholder="금액 입력">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"감가상각비","amount":600000}],"credit":[{"account":"차량운반구감가상각누계액","amount":600000}]}],"accounts":["감가상각비","차량운반구감가상각누계액","차량운반구","기계장치감가상각누계액"],"amounts":[600000,600000,2400000,400000],"hint":"","explain":"(2,400,000 − 0) ÷ 4 = 600,000원입니다. 차변에 감가상각비 600,000원, 대변에 차량운반구감가상각누계액 600,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 34: D-06 -->
+<section class="slide problem" id="D-06" data-type="journal" data-group="자격증 기초 연습 · 유형자산 처분" data-badge="기초 연습 D-06 · 전산회계 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">전산회계 2급 기초 · 기초 연습</span>
+    <span class="term-bubble">장부금액 = 취득원가 − 감가상각누계액</span>
+  </div>
+  <h2 class="p-title">비품 처분이익 기초 연습</h2>
+  <p class="p-scene">사용하던 비품(취득원가 1,500,000원, 감가상각누계액 600,000원)을 현금 1,100,000원에 처분하였다.</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>장부금액</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="900000" aria-label="비품 장부금액 입력" placeholder="장부금액">
+      <span>원 &nbsp;/&nbsp; 처분</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 24px;">(이익 / 손실)</span>
+      <select class="calc-select study-only" data-calc-ans="이익" aria-label="처분이익 또는 처분손실 선택">
+        <option value="">선택</option>
+        <option value="이익">이익</option>
+        <option value="손실">손실</option>
+      </select>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="200000" aria-label="처분이익 금액 입력" placeholder="손익 금액">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"현금","amount":1100000},{"account":"비품감가상각누계액","amount":600000}],"credit":[{"account":"비품","amount":1500000},{"account":"유형자산처분이익","amount":200000}]}],"accounts":["현금","비품감가상각누계액","비품","유형자산처분이익","유형자산처분손실"],"amounts":[1100000,600000,1500000,200000,900000],"hint":"","explain":"장부금액은 1,500,000 − 600,000 = 900,000원이고, 처분대금 1,100,000원을 받았으므로 유형자산처분이익 200,000원이 발생합니다. 이익은 대변에 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 35: D-07 -->
+<section class="slide problem" id="D-07" data-type="journal" data-group="자격증 기초 연습 · 유형자산 처분" data-badge="기초 연습 D-07 · FAT 2급 기초" data-style="drill">
+  <div class="s-head">
+    <span class="badge drill">FAT 2급 기초 · 기초 연습</span>
+    <span class="term-bubble">받은 돈 &lt; 장부금액 → 유형자산처분손실(차변)</span>
+  </div>
+  <h2 class="p-title">차량운반구 처분손실 기초 연습</h2>
+  <p class="p-scene">사용하던 차량운반구(취득원가 4,000,000원, 감가상각누계액 1,500,000원)를 현금 2,100,000원에 처분하였다.</p>
+  <div class="p-extra">
+    <div class="calc-box">
+      <span>장부금액</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="2500000" aria-label="차량운반구 장부금액 입력" placeholder="장부금액">
+      <span>원 &nbsp;/&nbsp; 처분</span>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 24px;">(이익 / 손실)</span>
+      <select class="calc-select study-only" data-calc-ans="손실" aria-label="처분이익 또는 처분손실 선택">
+        <option value="">선택</option>
+        <option value="이익">이익</option>
+        <option value="손실">손실</option>
+      </select>
+      <span class="teach-only" style="border-bottom:2px solid #9e8e7e; padding:0 28px;">&nbsp;</span>
+      <input type="text" inputmode="numeric" class="calc-input study-only" data-calc-ans="400000" aria-label="처분손실 금액 입력" placeholder="손익 금액">
+      <span>원</span>
+    </div>
+  </div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"현금","amount":2100000},{"account":"차량운반구감가상각누계액","amount":1500000},{"account":"유형자산처분손실","amount":400000}],"credit":[{"account":"차량운반구","amount":4000000}]}],"accounts":["현금","차량운반구감가상각누계액","유형자산처분손실","차량운반구","유형자산처분이익"],"amounts":[2100000,1500000,400000,4000000,2500000],"hint":"","explain":"장부금액은 4,000,000 − 1,500,000 = 2,500,000원인데 현금 2,100,000원을 받았으므로 유형자산처분손실 400,000원이 발생합니다. 손실은 차변에 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 36: D-08 -->
+<section class="slide problem" id="D-08" data-type="journal" data-group="자격증 기초 연습 · 무형자산" data-badge="기초 연습 D-08 · 전산회계 2급 기초" data-style="drill">
+  <div class="s-head"><span class="badge drill">전산회계 2급 기초 · 기초 연습</span></div>
+  <h2 class="p-title">영업권 취득 기초 연습</h2>
+  <p class="p-scene">베이커리 매장의 상품(공정가치 2,000,000원)과 영업권을 함께 현금 2,350,000원에 인수했다. 다른 자산·부채는 없다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"상품","amount":2000000},{"account":"영업권","amount":350000}],"credit":[{"account":"현금","amount":2350000}]}],"accounts":["상품","영업권","현금","임차보증금"],"amounts":[2000000,350000,2350000],"hint":"","explain":"인수 대가 2,350,000원에서 상품 공정가치 2,000,000원을 뺀 초과 금액 350,000원이 영업권입니다. 차변에 상품과 영업권, 대변에 현금을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 37: D-09 -->
+<section class="slide problem" id="D-09" data-type="journal" data-group="자격증 기초 연습 · 무형자산" data-badge="기초 연습 D-09 · FAT 2급 기초" data-style="drill">
+  <div class="s-head"><span class="badge drill">FAT 2급 기초 · 기초 연습</span></div>
+  <h2 class="p-title">특허권(산업재산권) 취득 기초 연습</h2>
+  <p class="p-scene">음료 제조 공법에 관한 특허권 700,000원을 현금으로 지급하고 취득했다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"특허권","amount":700000}],"credit":[{"account":"현금","amount":700000}]}],"accounts":["특허권","현금","개발비","비품"],"amounts":[700000,700000,300000],"hint":"","explain":"특허권은 법적 독점 권리를 가진 무형자산입니다. 차변에 특허권 700,000원, 대변에 현금 700,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- Slide 38: D-10 -->
+<section class="slide problem" id="D-10" data-type="journal" data-group="자격증 기초 연습 · 무형자산" data-badge="기초 연습 D-10 · 전산회계 2급 기초" data-style="drill">
+  <div class="s-head"><span class="badge drill">전산회계 2급 기초 · 기초 연습</span></div>
+  <h2 class="p-title">재고관리 소프트웨어 구입 기초 연습</h2>
+  <p class="p-scene">매장 재고관리용 소프트웨어 450,000원을 현금으로 구입했다.</p>
+  <div class="p-extra"></div>
+  <script type="application/json" class="p-data">
+  {"entries":[{"label":"","debit":[{"account":"소프트웨어","amount":450000}],"credit":[{"account":"현금","amount":450000}]}],"accounts":["소프트웨어","현금","비품","소모품비"],"amounts":[450000,450000,700000],"hint":"","explain":"업무용으로 구입한 소프트웨어는 무형자산입니다. 차변에 소프트웨어 450,000원, 대변에 현금 450,000원을 기록합니다."}
+  </script>
+</section>
+
+<!-- ==================== 마무리 3장 (39~41) ==================== -->
+
+<!-- Slide 39: 오늘의 구조 정리 -->
+<section class="slide" id="S-39" data-type="concept" data-group="마무리" data-badge="오늘의 구조 한눈에 정리">
+  <div class="s-head"><span class="badge concept">핵심 흐름 3단계</span></div>
+  <div class="stagger">
+    <h2 class="s-title">오늘 배운 회계 흐름 3가지</h2>
+    <div class="svg-box">
+      <svg viewBox="0 0 760 210" role="img" aria-label="지출 판단, 정액법 감가상각, 처분손익 비교 핵심 도식 3개">
+        <!-- 1. 지출 판단 -->
+        <rect x="14" y="14" width="230" height="182" rx="14" fill="#eaf3ff" stroke="#a6cbf7" stroke-width="2"/>
+        <text x="129" y="42" text-anchor="middle" font-size="15" font-weight="900" fill="#1d63b8">① 지출 성격 판단</text>
+        <rect x="32" y="58" width="194" height="52" rx="8" fill="#1d63b8"/>
+        <text x="129" y="81" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">성능↑ · 기간↑ (자본적)</text>
+        <text x="129" y="99" text-anchor="middle" font-size="12" fill="#dcebff">→ 해당 자산에 가산</text>
+        <rect x="32" y="122" width="194" height="52" rx="8" fill="#d9641e"/>
+        <text x="129" y="145" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">원상회복 · 유지 (수익적)</text>
+        <text x="129" y="163" text-anchor="middle" font-size="12" fill="#fff2e8">→ 수선비 (당기 비용)</text>
+
+        <!-- 2. 정액법 감가상각 -->
+        <rect x="265" y="14" width="230" height="182" rx="14" fill="#fff8e6" stroke="#edd095" stroke-width="2"/>
+        <text x="380" y="42" text-anchor="middle" font-size="15" font-weight="900" fill="#7c4a03">② 정액법 감가상각</text>
+        <rect x="283" y="58" width="194" height="54" rx="8" fill="#fff" stroke="#d99b1e"/>
+        <text x="380" y="81" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2b211a">(취득원가 − 잔존가치)</text>
+        <text x="380" y="100" text-anchor="middle" font-size="12.5" font-weight="900" fill="#7c4a03">÷ 내용연수 = 1년 상각비</text>
+        <rect x="283" y="122" width="194" height="52" rx="8" fill="#fff" stroke="#d99b1e"/>
+        <text x="380" y="144" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">(차) 감가상각비</text>
+        <text x="380" y="163" text-anchor="middle" font-size="12" font-weight="900" fill="#d9641e">(대) ○○감가상각누계액</text>
+
+        <!-- 3. 처분손익 -->
+        <rect x="516" y="14" width="230" height="182" rx="14" fill="#e6f7ef" stroke="#9fd4bc" stroke-width="2"/>
+        <text x="631" y="42" text-anchor="middle" font-size="15" font-weight="900" fill="#1b8a5a">③ 유형자산 처분손익</text>
+        <rect x="534" y="58" width="194" height="44" rx="8" fill="#fff" stroke="#9fd4bc"/>
+        <text x="631" y="85" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2b211a">장부금액 = 원가 − 누계액</text>
+        <rect x="534" y="112" width="194" height="62" rx="8" fill="#fff" stroke="#9fd4bc"/>
+        <text x="631" y="136" text-anchor="middle" font-size="12" font-weight="900" fill="#1d63b8">받은 돈 &gt; 장부금액 → 이익(대변)</text>
+        <text x="631" y="158" text-anchor="middle" font-size="12" font-weight="900" fill="#d9641e">받은 돈 &lt; 장부금액 → 손실(차변)</text>
+      </svg>
+    </div>
+    <div class="explain-box">
+      <strong>무형자산 한 줄 복습:</strong> <strong>영업권</strong>(인수 대가 − 순자산 공정가치), <strong>개발비</strong>(요건 충족 개발 지출), <strong>산업재산권</strong>(특허권 등), <strong>소프트웨어</strong> 모두 자산이므로 취득 시 <strong>차변</strong>에 기록합니다.
+    </div>
+  </div>
+</section>
+
+<!-- Slide 40: 셀프체크 결과표 -->
+<section class="slide" id="S-40" data-type="selfcheck" data-group="마무리" data-badge="나의 학습 결과 · 셀프체크">
+  <div class="s-head">
+    <span class="badge concept">혼자 공부 성취도 점검</span>
+    <div style="display:flex; gap:8px;">
+      <button type="button" class="btn-act check" id="btnRetryWrong">틀린 문제만 다시 보기</button>
+      <button type="button" class="btn-act" id="btnClearAllProgress">전체 기록 초기화</button>
+    </div>
+  </div>
+  <h2 class="s-title">문항별 셀프체크 (정답 · 오답 · 미응시)</h2>
+  <div id="selfcheckSummary" class="explain-box" style="margin-top:0; margin-bottom:10px; font-weight:800;">
+    혼자 공부 모드에서 문제를 풀고 채점하면 여기에 문항별 결과가 자동으로 모입니다.
+  </div>
+  <div id="selfcheckGrid" class="toc-grid" style="max-height:330px; overflow-y:auto;"></div>
+</section>
+
+<!-- Slide 41: 마무리 -->
+<section class="slide" id="S-41" data-type="concept" data-group="마무리" data-badge="학습 완료">
+  <div class="stagger" style="text-align:center; padding:26px 12px;">
+    <span class="badge ws" style="font-size:1rem; padding:7px 16px;">서울관광고등학교 1학년 회계원리</span>
+    <h2 class="s-title" style="font-size:2.1rem; margin:16px 0 10px;">다음 학습에서 만나요</h2>
+    <p style="font-size:1.15rem; color:var(--ink-sub); max-width:560px; margin:0 auto 24px;">
+      유형자산의 자본적·수익적 지출, 정액법 감가상각, 처분손익과 무형자산까지 모두 완주했습니다. 헷갈리는 문제는 목차에서 언제든 다시 복습해 보세요!
+    </p>
+    <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+      <button type="button" class="nav-btn primary" id="btnGoFirst" style="min-width:140px; height:48px;">처음으로</button>
+      <button type="button" class="nav-btn" id="btnGoTocEnd" style="min-width:140px; height:48px;">목차 열기</button>
+      <a class="nav-btn" href="../../index.html" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; min-width:160px; height:48px;">← 회계원리 자료실</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="bottombar">
+  <button type="button" class="nav-btn" id="prevBtn" aria-label="이전 슬라이드">◀ 이전</button>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">도입 · 표지</div>
+  </div>
+  <button type="button" class="nav-btn primary" id="nextBtn" aria-label="다음 슬라이드">다음 ▶</button>
+</footer>
+
+<!-- 목차 모달 -->
+<div class="modal-backdrop" id="tocModal" role="dialog" aria-modal="true" aria-labelledby="tocTitle">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 id="tocTitle" style="margin:0; font-size:1.25rem;">전체 슬라이드 목차 (41장)</h3>
+      <button type="button" class="toc-btn" id="closeTocBtn">닫기 ✕</button>
+    </div>
+    <div class="toc-grid" id="tocGrid"></div>
+  </div>
+</div>
+
+<!-- 계정과목 자동완성 datalist -->
+<datalist id="accountDatalist">
+  <option value="건물"></option>
+  <option value="비품"></option>
+  <option value="기계장치"></option>
+  <option value="차량운반구"></option>
+  <option value="토지"></option>
+  <option value="건설중인자산"></option>
+  <option value="수선비"></option>
+  <option value="감가상각비"></option>
+  <option value="비품감가상각누계액"></option>
+  <option value="기계장치감가상각누계액"></option>
+  <option value="차량운반구감가상각누계액"></option>
+  <option value="건물감가상각누계액"></option>
+  <option value="유형자산처분이익"></option>
+  <option value="유형자산처분손실"></option>
+  <option value="현금"></option>
+  <option value="상품"></option>
+  <option value="영업권"></option>
+  <option value="개발비"></option>
+  <option value="특허권"></option>
+  <option value="산업재산권"></option>
+  <option value="소프트웨어"></option>
+  <option value="임차보증금"></option>
+  <option value="소모품비"></option>
+</datalist>
+<script>
+(function () {
+  "use strict";
+
+  const STORAGE_KEY = "seogwang_acc_ws_b_v1";
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const totalSlides = slides.length;
+  let currentIdx = 0;
+  let mode = "teach"; // "teach" | "study"
+  let selectedChip = null;
+  let results = {}; // { itemId: "correct" | "wrong" }
+  let retryQueue = null;
+
+  /* 안전 저장소 헬퍼 (localStorage 실패 시 메모리 유지) */
+  function loadState() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed.results === "object") {
+        results = parsed.results || {};
+      }
+      if (typeof parsed.currentIdx === "number" && parsed.currentIdx >= 0 && parsed.currentIdx < totalSlides) {
+        currentIdx = parsed.currentIdx;
+      }
+    } catch (e) {
+      /* 프라이빗 브라우징 등 localStorage 차단 시 무시 */
+    }
+  }
+
+  function saveState() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        results: results,
+        currentIdx: currentIdx
+      }));
+    } catch (e) {
+      /* 저장 불가 환경에서도 세션 진행 */
+    }
+  }
+
+  /* 숫자·문자 정규화 */
+  function normNum(val) {
+    const cleaned = String(val || "").replace(/[^0-9-]/g, "");
+    return cleaned === "" ? NaN : Number(cleaned);
+  }
+
+  function formatComma(num) {
+    if (isNaN(num)) return "";
+    return Number(num).toLocaleString("ko-KR");
+  }
+
+  function normText(val) {
+    return String(val || "").replace(/\s+/g, "").trim();
+  }
+
+  function shuffleArray(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = tmp;
+    }
+    return copy;
+  }
+
+  /* 저울 애니메이션 제어 (Slide 12) */
+  window.setScaleState = function (state) {
+    const beam = document.getElementById("scaleBeam");
+    const btnGain = document.getElementById("btnScaleGain");
+    const btnLoss = document.getElementById("btnScaleLoss");
+    const rBox = document.getElementById("scaleRightBox");
+    const rLbl = document.getElementById("scaleRightLbl");
+    const rVal = document.getElementById("scaleRightVal");
+    const exp = document.getElementById("scaleExplain");
+    if (!beam) return;
+
+    beam.classList.remove("gain", "loss", "even");
+    beam.classList.add(state);
+
+    if (state === "gain") {
+      btnGain.className = "mini-pill active-cap";
+      btnLoss.className = "mini-pill";
+      rBox.setAttribute("fill", "#eaf3ff");
+      rBox.setAttribute("stroke", "#1d63b8");
+      rLbl.setAttribute("fill", "#1d63b8");
+      rVal.setAttribute("fill", "#1d63b8");
+      rVal.textContent = "5,000,000원";
+      exp.innerHTML = "<strong>처분이익 발생:</strong> 장부금액(4,500,000원)보다 받은 돈(5,000,000원)이 500,000원 더 많으므로 <strong>유형자산처분이익 500,000원(대변)</strong>이 생깁니다.";
+    } else {
+      btnGain.className = "mini-pill";
+      btnLoss.className = "mini-pill active-rev";
+      rBox.setAttribute("fill", "#fff2e8");
+      rBox.setAttribute("stroke", "#d9641e");
+      rLbl.setAttribute("fill", "#d9641e");
+      rVal.setAttribute("fill", "#d9641e");
+      rVal.textContent = "4,100,000원";
+      exp.innerHTML = "<strong>처분손실 발생:</strong> 장부금액(4,500,000원)보다 받은 돈(4,100,000원)이 400,000원 더 적으므로 <strong>유형자산처분손실 400,000원(차변)</strong>이 생깁니다.";
+    }
+  };
+
+  /* 분개 문제 슬라이드 자동 UI 빌드 */
+  function buildJournalSlide(slide) {
+    const scriptEl = slide.querySelector("script.p-data");
+    if (!scriptEl) return;
+    let data;
+    try {
+      data = JSON.parse(scriptEl.textContent);
+    } catch (e) {
+      return;
+    }
+
+    const entry = data.entries[0];
+    const drList = entry.debit || [];
+    const crList = entry.credit || [];
+    const rowCount = Math.max(drList.length, crList.length, 1);
+
+    const jBox = document.createElement("div");
+    jBox.className = "journal-box";
+
+    /* 수업 모드용 빈 밑줄 */
+    const boardDiv = document.createElement("div");
+    boardDiv.className = "board-lines";
+    for (let r = 0; r < rowCount; r++) {
+      const brow = document.createElement("div");
+      brow.className = "board-row";
+      brow.innerHTML =
+        '<div class="board-slot"><span class="side-tag dr">(차)</span><span></span></div>' +
+        '<div class="board-slot"><span class="side-tag cr">(대)</span><span></span></div>';
+      boardDiv.appendChild(brow);
+    }
+    jBox.appendChild(boardDiv);
+
+    /* 혼자 공부 모드용 입력 줄 */
+    const studyDiv = document.createElement("div");
+    studyDiv.className = "study-only";
+    const head = document.createElement("div");
+    head.className = "j-header";
+    head.innerHTML = "<span>차변 (왼쪽 · 자산 증가 / 비용·손실)</span><span>대변 (오른쪽 · 자산 감소 / 수익·이익)</span>";
+    studyDiv.appendChild(head);
+
+    for (let r = 0; r < rowCount; r++) {
+      const row = document.createElement("div");
+      row.className = "j-row";
+
+      /* 차변 칸 */
+      const drSide = document.createElement("div");
+      drSide.className = "j-side";
+      if (r < drList.length) {
+        drSide.innerHTML =
+          '<span class="side-tag dr">(차)</span>' +
+          '<input type="text" class="slot-input acc" data-side="debit" data-kind="account" list="accountDatalist" aria-label="차변 ' + (r + 1) + '번째 계정과목" placeholder="계정과목">' +
+          '<input type="text" inputmode="numeric" class="slot-input amt" data-side="debit" data-kind="amount" aria-label="차변 ' + (r + 1) + '번째 금액" placeholder="금액">';
+      } else {
+        drSide.innerHTML = '<span style="color:#b8aa9b; font-size:0.86rem; padding-left:6px;">(차변 추가 칸 없음)</span>';
+      }
+
+      /* 대변 칸 */
+      const crSide = document.createElement("div");
+      crSide.className = "j-side";
+      if (r < crList.length) {
+        crSide.innerHTML =
+          '<span class="side-tag cr">(대)</span>' +
+          '<input type="text" class="slot-input acc" data-side="credit" data-kind="account" list="accountDatalist" aria-label="대변 ' + (r + 1) + '번째 계정과목" placeholder="계정과목">' +
+          '<input type="text" inputmode="numeric" class="slot-input amt" data-side="credit" data-kind="amount" aria-label="대변 ' + (r + 1) + '번째 금액" placeholder="금액">';
+      } else {
+        crSide.innerHTML = '<span style="color:#b8aa9b; font-size:0.86rem; padding-left:6px;">(대변 추가 칸 없음)</span>';
+      }
+
+      row.appendChild(drSide);
+      row.appendChild(crSide);
+      studyDiv.appendChild(row);
+    }
+
+    /* 칩 트레이 (계정과목 + 금액 무작위 배열) */
+    const tray = document.createElement("div");
+    tray.className = "chip-tray";
+    const accChips = shuffleArray(data.accounts || []).map(function (acc) {
+      return { kind: "account", label: acc, value: acc };
+    });
+    const amtChips = shuffleArray(data.amounts || []).map(function (amt) {
+      return { kind: "amount", label: formatComma(amt), value: String(amt) };
+    });
+
+    accChips.concat(amtChips).forEach(function (item) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip" + (item.kind === "amount" ? " amt-chip" : "");
+      btn.textContent = item.label;
+      btn.dataset.kind = item.kind;
+      btn.dataset.value = item.value;
+      btn.setAttribute("draggable", "true");
+      tray.appendChild(btn);
+    });
+    studyDiv.appendChild(tray);
+    jBox.appendChild(studyDiv);
+    slide.appendChild(jBox);
+
+    /* 버튼 줄 */
+    const actRow = document.createElement("div");
+    actRow.className = "action-row";
+    actRow.innerHTML =
+      '<button type="button" class="btn-act check study-only" data-action="check-journal">채점하기</button>' +
+      '<button type="button" class="btn-act study-only" data-action="reset-journal">다시 하기</button>' +
+      '<button type="button" class="btn-act answer" data-action="toggle-journal-ans">정답 보기</button>' +
+      '<span class="feedback-msg" id="fb-' + slide.id + '"></span>';
+    slide.appendChild(actRow);
+
+    /* 한 줄 정답 및 해설 패널 */
+    const drStr = drList.map(function (d) { return d.account + " " + formatComma(d.amount); }).join(" + ");
+    const crStr = crList.map(function (c) { return c.account + " " + formatComma(c.amount); }).join(" + ");
+
+    const ansPanel = document.createElement("div");
+    ansPanel.className = "answer-panel";
+    ansPanel.id = "ans-" + slide.id;
+    ansPanel.innerHTML =
+      '<div class="one-line-entry"><span class="dr-txt">(차) ' + drStr + '</span><span class="cr-txt">(대) ' + crStr + '</span></div>' +
+      '<p style="margin:0;">' + (data.explain || "") + '</p>';
+    slide.appendChild(ansPanel);
+
+    slide._pData = data;
+  }
+
+  /* 칩 선택 및 빈칸 배치 (탭 + Pointer/HTML5 드래그) */
+  function clearChipSelection() {
+    document.querySelectorAll(".chip.selected").forEach(function (c) { c.classList.remove("selected"); });
+    document.querySelectorAll(".slot-input.target-ready").forEach(function (inp) { inp.classList.remove("target-ready"); });
+    selectedChip = null;
+  }
+
+  function applyChipToInput(chip, input) {
+    if (!chip || !input) return;
+    const chipKind = chip.dataset.kind;
+    const inputKind = input.dataset.kind;
+    if (chipKind && inputKind && chipKind !== inputKind) return;
+
+    input.value = chipKind === "amount" ? formatComma(chip.dataset.value) : chip.dataset.value;
+    input.classList.remove("state-correct", "state-wrong", "pop-in");
+    void input.offsetWidth;
+    input.classList.add("pop-in");
+  }
+
+  /* 분개 채점 로직 (순서 무관 짝 매칭 + 차대 합계 + 계산 빈칸 검증) */
+  function gradeJournalSlide(slide) {
+    const data = slide._pData;
+    if (!data) return;
+    const entry = data.entries[0];
+    const fb = document.getElementById("fb-" + slide.id);
+    let allOk = true;
+
+    /* 1. 추가 계산 빈칸 검증 */
+    slide.querySelectorAll(".calc-input[data-calc-ans], .calc-select[data-calc-ans]").forEach(function (el) {
+      el.classList.remove("state-correct", "state-wrong");
+      const expected = el.dataset.calcAns;
+      let ok = false;
+      if (el.tagName === "SELECT") {
+        ok = el.value === expected;
+      } else {
+        ok = normNum(el.value) === normNum(expected);
+      }
+      if (ok) {
+        el.classList.add("state-correct");
+      } else {
+        el.classList.add("state-wrong");
+        allOk = false;
+      }
+    });
+
+    /* 2. 차변·대변 각각 멀티셋 매칭 */
+    ["debit", "credit"].forEach(function (side) {
+      const expectedList = (entry[side] || []).map(function (item) {
+        return { account: normText(item.account), amount: Number(item.amount), matched: false };
+      });
+
+      const rows = Array.from(slide.querySelectorAll(".j-row"));
+      rows.forEach(function (row) {
+        const accInp = row.querySelector('.slot-input.acc[data-side="' + side + '"]');
+        const amtInp = row.querySelector('.slot-input.amt[data-side="' + side + '"]');
+        if (!accInp || !amtInp) return;
+
+        accInp.classList.remove("state-correct", "state-wrong");
+        amtInp.classList.remove("state-correct", "state-wrong");
+
+        const uAcc = normText(accInp.value);
+        const uAmt = normNum(amtInp.value);
+
+        const foundIdx = expectedList.findIndex(function (exp) {
+          return !exp.matched && exp.account === uAcc && exp.amount === uAmt;
+        });
+
+        if (foundIdx !== -1) {
+          expectedList[foundIdx].matched = true;
+          accInp.classList.add("state-correct");
+          amtInp.classList.add("state-correct");
+        } else {
+          accInp.classList.add("state-wrong");
+          amtInp.classList.add("state-wrong");
+          allOk = false;
+        }
+      });
+
+      if (expectedList.some(function (exp) { return !exp.matched; })) {
+        allOk = false;
+      }
+    });
+
+    results[slide.id] = allOk ? "correct" : "wrong";
+    saveState();
+
+    if (fb) {
+      fb.textContent = allOk ? "정답입니다! 완벽하게 분개했어요." : "빨간색 칸을 다시 확인해 보세요.";
+      fb.className = "feedback-msg " + (allOk ? "ok" : "bad");
+    }
+    if (allOk) {
+      const ans = document.getElementById("ans-" + slide.id);
+      if (ans) ans.classList.add("open");
+    }
+  }
+
+  function resetJournalSlide(slide) {
+    slide.querySelectorAll(".slot-input, .calc-input").forEach(function (inp) {
+      inp.value = "";
+      inp.classList.remove("state-correct", "state-wrong", "pop-in", "target-ready");
+    });
+    slide.querySelectorAll(".calc-select").forEach(function (sel) {
+      sel.value = "";
+      sel.classList.remove("state-correct", "state-wrong");
+    });
+    const fb = document.getElementById("fb-" + slide.id);
+    if (fb) { fb.textContent = ""; fb.className = "feedback-msg"; }
+    const ans = document.getElementById("ans-" + slide.id);
+    if (ans) ans.classList.remove("open");
+    delete results[slide.id];
+    saveState();
+  }
+
+  /* B1 빠른 판별 8문항 개별 채점 */
+  function gradeB1() {
+    const rows = Array.from(document.querySelectorAll("#b1TableBody tr"));
+    let correctCnt = 0;
+    let answeredCnt = 0;
+
+    rows.forEach(function (tr) {
+      const itemId = tr.dataset.item;
+      const ans = tr.dataset.ans;
+      const pickedBtn = tr.querySelector(".cr-choice.picked-C, .cr-choice.picked-R");
+      tr.style.background = "";
+
+      if (!pickedBtn) {
+        delete results[itemId];
+        return;
+      }
+      answeredCnt++;
+      const val = pickedBtn.dataset.val;
+      if (val === ans) {
+        results[itemId] = "correct";
+        tr.style.background = "#e6f7ef";
+        correctCnt++;
+      } else {
+        results[itemId] = "wrong";
+        tr.style.background = "#fdecec";
+      }
+    });
+
+    saveState();
+    const fb = document.getElementById("fb-B1-ALL");
+    if (fb) {
+      if (answeredCnt === 0) {
+        fb.textContent = "먼저 C 또는 R 버튼을 눌러 선택해 주세요.";
+        fb.className = "feedback-msg bad";
+      } else {
+        fb.textContent = "응답한 " + answeredCnt + "문항 중 " + correctCnt + "문항 정답! (전체 8문항)";
+        fb.className = "feedback-msg " + (correctCnt === 8 ? "ok" : "bad");
+      }
+    }
+  }
+
+  function resetB1() {
+    document.querySelectorAll("#b1TableBody tr").forEach(function (tr) {
+      tr.style.background = "";
+      delete results[tr.dataset.item];
+      tr.querySelectorAll(".cr-choice").forEach(function (b) {
+        b.classList.remove("picked-C", "picked-R");
+      });
+    });
+    saveState();
+    const fb = document.getElementById("fb-B1-ALL");
+    if (fb) { fb.textContent = ""; fb.className = "feedback-msg"; }
+    const ans = document.getElementById("ans-B1-ALL");
+    if (ans) ans.classList.remove("open");
+  }
+
+  /* B6 끝내기 4문항 개별 채점 */
+  function gradeB6() {
+    const cards = Array.from(document.querySelectorAll("#B6-ALL .card[data-b6]"));
+    let okCnt = 0;
+    let ansCnt = 0;
+
+    cards.forEach(function (card) {
+      const id = card.dataset.b6;
+      const expected = card.dataset.ans;
+      card.style.borderColor = "";
+      card.style.background = "";
+
+      let userAnswered = false;
+      let isOk = false;
+
+      if (id === "B6-01") {
+        const picked = card.querySelector(".b6-opt.picked-C, .b6-opt.picked-R");
+        if (picked) {
+          userAnswered = true;
+          isOk = picked.dataset.val === expected;
+        }
+      } else if (id === "B6-02") {
+        const inp = card.querySelector(".b6-inp");
+        if (inp && inp.value.trim() !== "") {
+          userAnswered = true;
+          isOk = normNum(inp.value) === normNum(expected);
+        }
+      } else if (id === "B6-03") {
+        const sel = card.querySelector(".b6-sel");
+        const inp = card.querySelector(".b6-inp");
+        if ((sel && sel.value !== "") || (inp && inp.value.trim() !== "")) {
+          userAnswered = true;
+          const parts = expected.split("|");
+          isOk = sel.value === parts[0] && normNum(inp.value) === normNum(parts[1]);
+        }
+      } else if (id === "B6-04") {
+        const txt = card.querySelector(".b6-txt");
+        if (txt && txt.value.trim() !== "") {
+          userAnswered = true;
+          isOk = normText(txt.value) === normText(expected);
+        }
+      }
+
+      if (!userAnswered) {
+        delete results[id];
+        return;
+      }
+      ansCnt++;
+      if (isOk) {
+        results[id] = "correct";
+        card.style.borderColor = "var(--ok)";
+        card.style.background = "var(--ok-bg)";
+        okCnt++;
+      } else {
+        results[id] = "wrong";
+        card.style.borderColor = "var(--bad)";
+        card.style.background = "var(--bad-bg)";
+      }
+    });
+
+    saveState();
+    const fb = document.getElementById("fb-B6-ALL");
+    if (fb) {
+      if (ansCnt === 0) {
+        fb.textContent = "빈칸을 채운 뒤 채점하기를 눌러 주세요.";
+        fb.className = "feedback-msg bad";
+      } else {
+        fb.textContent = "응답한 " + ansCnt + "문항 중 " + okCnt + "문항 정답! (전체 4문항)";
+        fb.className = "feedback-msg " + (okCnt === 4 ? "ok" : "bad");
+      }
+    }
+  }
+
+  function resetB6() {
+    document.querySelectorAll("#B6-ALL .card[data-b6]").forEach(function (card) {
+      delete results[card.dataset.b6];
+      card.style.borderColor = "";
+      card.style.background = "";
+      card.querySelectorAll(".b6-opt").forEach(function (b) { b.classList.remove("picked-C", "picked-R"); });
+      card.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+      card.querySelectorAll("select").forEach(function (s) { s.value = ""; });
+    });
+    saveState();
+    const fb = document.getElementById("fb-B6-ALL");
+    if (fb) { fb.textContent = ""; fb.className = "feedback-msg"; }
+    const ans = document.getElementById("ans-B6-ALL");
+    if (ans) ans.classList.remove("open");
+  }
+
+  /* 셀프체크 슬라이드(S-40) 렌더링 */
+  const checkableItems = [
+    { id: "B1-01", label: "B1-① 냉장고 손잡이", slideId: "B1-ALL" },
+    { id: "B1-02", label: "B1-② 커피머신 개조", slideId: "B1-ALL" },
+    { id: "B1-03", label: "B1-③ 낡은 벽지 교체", slideId: "B1-ALL" },
+    { id: "B1-04", label: "B1-④ 창고 증축", slideId: "B1-ALL" },
+    { id: "B1-05", label: "B1-⑤ 엔진오일 교환", slideId: "B1-ALL" },
+    { id: "B1-06", label: "B1-⑥ 대규모 개량", slideId: "B1-ALL" },
+    { id: "B1-07", label: "B1-⑦ 정기 점검비", slideId: "B1-ALL" },
+    { id: "B1-08", label: "B1-⑧ 엘리베이터 신설", slideId: "B1-ALL" },
+    { id: "B2-01", label: "B2-① 개량 공사비 분개", slideId: "B2-01" },
+    { id: "B2-02", label: "B2-② 유리 수리비 분개", slideId: "B2-02" },
+    { id: "B3-01", label: "B3-① 비품 정액법", slideId: "B3-01" },
+    { id: "B3-02", label: "B3-② 기계장치 정액법", slideId: "B3-02" },
+    { id: "B4-01", label: "B4-① 차량운반구 처분이익", slideId: "B4-01" },
+    { id: "B4-02", label: "B4-② 기계장치 처분손실", slideId: "B4-02" },
+    { id: "B5-01", label: "B5-① 영업권 취득 분개", slideId: "B5-01" },
+    { id: "B5-02", label: "B5-② 개발비 취득 분개", slideId: "B5-02" },
+    { id: "B5-03", label: "B5-③ 소프트웨어 구입", slideId: "B5-03" },
+    { id: "B6-01", label: "B6-① 수선비 구별", slideId: "B6-ALL" },
+    { id: "B6-02", label: "B6-② 장부금액 계산", slideId: "B6-ALL" },
+    { id: "B6-03", label: "B6-③ 처분손익 계산", slideId: "B6-ALL" },
+    { id: "B6-04", label: "B6-④ 무형자산 3가지", slideId: "B6-ALL" },
+    { id: "D-01", label: "기초 D-01 창고 증축", slideId: "D-01" },
+    { id: "D-02", label: "기초 D-02 차량 점검비", slideId: "D-02" },
+    { id: "D-03", label: "기초 D-03 개량+수선 혼합", slideId: "D-03" },
+    { id: "D-04", label: "기초 D-04 비품 정액법", slideId: "D-04" },
+    { id: "D-05", label: "기초 D-05 차량 정액법", slideId: "D-05" },
+    { id: "D-06", label: "기초 D-06 비품 처분이익", slideId: "D-06" },
+    { id: "D-07", label: "기초 D-07 차량 처분손실", slideId: "D-07" },
+    { id: "D-08", label: "기초 D-08 영업권 취득", slideId: "D-08" },
+    { id: "D-09", label: "기초 D-09 특허권 취득", slideId: "D-09" },
+    { id: "D-10", label: "기초 D-10 소프트웨어 구입", slideId: "D-10" }
+  ];
+
+  function renderSelfcheck() {
+    const grid = document.getElementById("selfcheckGrid");
+    const summary = document.getElementById("selfcheckSummary");
+    if (!grid || !summary) return;
+
+    let okCount = 0;
+    let wrongCount = 0;
+    let unCount = 0;
+    grid.innerHTML = "";
+
+    checkableItems.forEach(function (item) {
+      const st = results[item.id];
+      let statusTxt = "미응시";
+      let bg = "#fcfaf7";
+      let bd = "var(--line)";
+      let col = "var(--ink-sub)";
+
+      if (st === "correct") {
+        okCount++;
+        statusTxt = "정답 ✓";
+        bg = "var(--ok-bg)";
+        bd = "var(--ok)";
+        col = "var(--ok)";
+      } else if (st === "wrong") {
+        wrongCount++;
+        statusTxt = "오답 ✕";
+        bg = "var(--bad-bg)";
+        bd = "var(--bad)";
+        col = "var(--bad)";
+      } else {
+        unCount++;
+      }
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "toc-item";
+      btn.style.background = bg;
+      btn.style.borderColor = bd;
+      btn.innerHTML =
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<span>' + item.label + '</span>' +
+        '<strong style="color:' + col + ';">' + statusTxt + '</strong></div>';
+      btn.addEventListener("click", function () {
+        goToSlideById(item.slideId);
+      });
+      grid.appendChild(btn);
+    });
+
+    summary.innerHTML =
+      '전체 ' + checkableItems.length + '문항 중 &nbsp; ' +
+      '<span style="color:var(--ok);">정답 ' + okCount + '개</span> · ' +
+      '<span style="color:var(--bad);">오답 ' + wrongCount + '개</span> · ' +
+      '<span style="color:var(--ink-sub);">미응시 ' + unCount + '개</span> (미응시는 오답에 포함되지 않습니다)';
+  }
+
+  /* 슬라이드 이동 및 모드 전환 */
+  function showSlide(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= totalSlides) idx = totalSlides - 1;
+    currentIdx = idx;
+    clearChipSelection();
+
+    slides.forEach(function (s, i) {
+      s.classList.toggle("active", i === currentIdx);
+    });
+
+    const curSlide = slides[currentIdx];
+    document.getElementById("slideCounter").textContent = (currentIdx + 1) + " / " + totalSlides;
+    document.getElementById("progressFill").style.width = (((currentIdx + 1) / totalSlides) * 100) + "%";
+
+    const grp = curSlide.dataset.group || "";
+    const ttl = (curSlide.querySelector(".s-title, .p-title") || {}).textContent || "";
+    document.getElementById("progressLabel").textContent = grp + (ttl ? " · " + ttl : "");
+
+    document.getElementById("prevBtn").disabled = currentIdx === 0;
+    document.getElementById("nextBtn").disabled = currentIdx === totalSlides - 1;
+    document.getElementById("stage").scrollTop = 0;
+
+    if (curSlide.id === "S-40") {
+      renderSelfcheck();
+    }
+    saveState();
+  }
+
+  function goToSlideById(id) {
+    const idx = slides.findIndex(function (s) { return s.id === id; });
+    if (idx !== -1) showSlide(idx);
+  }
+
+  function setMode(newMode) {
+    mode = newMode;
+    document.body.classList.toggle("mode-teach", mode === "teach");
+    document.body.classList.toggle("mode-study", mode === "study");
+    document.getElementById("btnModeTeach").classList.toggle("active", mode === "teach");
+    document.getElementById("btnModeStudy").classList.toggle("active", mode === "study");
+    clearChipSelection();
+
+    /* 수업 모드로 돌아갈 때 열려 있던 정답 패널을 닫아 정답 노출 방지 */
+    if (mode === "teach") {
+      document.querySelectorAll(".answer-panel.open").forEach(function (p) { p.classList.remove("open"); });
+      document.querySelectorAll(".b1-ans").forEach(function (el) { el.style.display = "none"; });
+      document.querySelectorAll(".b1-blank").forEach(function (el) { el.style.display = ""; });
+    }
+  }
+
+  /* 목차 모달 생성 */
+  function buildToc() {
+    const grid = document.getElementById("tocGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    slides.forEach(function (s, idx) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "toc-item";
+      const badge = s.dataset.badge || s.dataset.group || "";
+      const titleEl = s.querySelector(".s-title, .p-title");
+      const title = titleEl ? titleEl.textContent : s.id;
+      btn.innerHTML = '<div style="font-size:0.78rem;color:var(--primary);">' + (idx + 1) + '. ' + badge + '</div><div>' + title + '</div>';
+      btn.addEventListener("click", function () {
+        document.getElementById("tocModal").classList.remove("open");
+        showSlide(idx);
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  /* 초기화 실행 */
+  slides.forEach(function (s) {
+    if (s.dataset.type === "journal") {
+      buildJournalSlide(s);
+    }
+  });
+  buildToc();
+  loadState();
+
+  /* 전역 클릭/입력/드래그 이벤트 (iOS Safari 호환, click 단일 바인딩으로 중복 방지) */
+  document.addEventListener("click", function (e) {
+    const target = e.target;
+
+    /* 모드 전환 */
+    const modeBtn = target.closest(".mode-btn");
+    if (modeBtn) {
+      setMode(modeBtn.dataset.mode);
+      return;
+    }
+
+    /* 칩 탭 선택 */
+    const chip = target.closest(".chip");
+    if (chip) {
+      const wasSelected = chip.classList.contains("selected");
+      clearChipSelection();
+      if (!wasSelected) {
+        chip.classList.add("selected");
+        selectedChip = chip;
+        const activeSlide = slides[currentIdx];
+        activeSlide.querySelectorAll('.slot-input[data-kind="' + chip.dataset.kind + '"]').forEach(function (inp) {
+          inp.classList.add("target-ready");
+        });
+      }
+      return;
+    }
+
+    /* 빈칸 탭 배치 */
+    const slotInp = target.closest(".slot-input");
+    if (slotInp && selectedChip) {
+      applyChipToInput(selectedChip, slotInp);
+      clearChipSelection();
+      return;
+    }
+
+    /* B1 C/R 선택 */
+    const crBtn = target.closest("#b1TableBody .cr-choice");
+    if (crBtn) {
+      const td = crBtn.parentElement;
+      td.querySelectorAll(".cr-choice").forEach(function (b) { b.classList.remove("picked-C", "picked-R"); });
+      crBtn.classList.add("picked-" + crBtn.dataset.val);
+      return;
+    }
+
+    /* B6-01 선택 */
+    const b6Opt = target.closest(".b6-opt");
+    if (b6Opt) {
+      const wrap = b6Opt.parentElement;
+      wrap.querySelectorAll(".b6-opt").forEach(function (b) { b.classList.remove("picked-C", "picked-R"); });
+      b6Opt.classList.add(b6Opt.dataset.val === "깨진 유리 교체" ? "picked-R" : "picked-C");
+      return;
+    }
+
+    /* 문제 액션 버튼 */
+    const actBtn = target.closest(".btn-act");
+    if (actBtn) {
+      const action = actBtn.dataset.action;
+      const curSlide = slides[currentIdx];
+      if (action === "check-journal") {
+        gradeJournalSlide(curSlide);
+      } else if (action === "reset-journal") {
+        resetJournalSlide(curSlide);
+      } else if (action === "toggle-journal-ans") {
+        const panel = document.getElementById("ans-" + curSlide.id);
+        if (panel) panel.classList.toggle("open");
+      } else if (action === "check-b1") {
+        gradeB1();
+      } else if (action === "reset-b1") {
+        resetB1();
+      } else if (action === "toggle-b1-ans") {
+        const panel = document.getElementById("ans-B1-ALL");
+        const isOpen = panel.classList.toggle("open");
+        document.querySelectorAll(".b1-ans").forEach(function (el) { el.style.display = isOpen ? "inline" : "none"; });
+        document.querySelectorAll(".b1-blank").forEach(function (el) { el.style.display = isOpen ? "none" : "inline"; });
+      } else if (action === "check-b6") {
+        gradeB6();
+      } else if (action === "reset-b6") {
+        resetB6();
+      } else if (action === "toggle-b6-ans") {
+        const panel = document.getElementById("ans-B6-ALL");
+        if (panel) panel.classList.toggle("open");
+      }
+      return;
+    }
+  });
+
+  /* 금액 칸 직접 입력 시 자동 쉼표 포맷 */
+  document.addEventListener("blur", function (e) {
+    const el = e.target;
+    if (el.classList && (el.classList.contains("amt") || el.classList.contains("calc-input") || el.classList.contains("b6-inp"))) {
+      const num = normNum(el.value);
+      if (!isNaN(num) && el.value.trim() !== "") {
+        el.value = formatComma(num);
+      }
+    }
+  }, true);
+
+  /* 데스크톱/Pointer 드래그 앤 드롭 지원 */
+  let draggedChip = null;
+  document.addEventListener("dragstart", function (e) {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    draggedChip = chip;
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "copy";
+      e.dataTransfer.setData("text/plain", chip.dataset.value || "");
+    }
+  });
+  document.addEventListener("dragover", function (e) {
+    if (e.target.closest(".slot-input")) {
+      e.preventDefault();
+    }
+  });
+  document.addEventListener("drop", function (e) {
+    const inp = e.target.closest(".slot-input");
+    if (inp && draggedChip) {
+      e.preventDefault();
+      applyChipToInput(draggedChip, inp);
+      draggedChip = null;
+    }
+  });
+
+  /* 내비게이션 및 모달 버튼 */
+  document.getElementById("prevBtn").addEventListener("click", function () {
+    showSlide(currentIdx - 1);
+  });
+  document.getElementById("nextBtn").addEventListener("click", function () {
+    if (retryQueue && retryQueue.length > 0) {
+      const nextWrongId = retryQueue.shift();
+      goToSlideById(nextWrongId);
+      return;
+    }
+    showSlide(currentIdx + 1);
+  });
+
+  document.getElementById("openTocBtn").addEventListener("click", function () {
+    const items = document.querySelectorAll("#tocGrid .toc-item");
+    items.forEach(function (it, idx) { it.classList.toggle("current", idx === currentIdx); });
+    document.getElementById("tocModal").classList.add("open");
+  });
+  document.getElementById("closeTocBtn").addEventListener("click", function () {
+    document.getElementById("tocModal").classList.remove("open");
+  });
+  document.getElementById("tocModal").addEventListener("click", function (e) {
+    if (e.target === this) this.classList.remove("open");
+  });
+
+  document.getElementById("btnGoFirst").addEventListener("click", function () {
+    retryQueue = null;
+    showSlide(0);
+  });
+  document.getElementById("btnGoTocEnd").addEventListener("click", function () {
+    document.getElementById("openTocBtn").click();
+  });
+
+  document.getElementById("btnRetryWrong").addEventListener("click", function () {
+    const wrongSlideIds = [];
+    checkableItems.forEach(function (item) {
+      if (results[item.id] === "wrong" && wrongSlideIds.indexOf(item.slideId) === -1) {
+        wrongSlideIds.push(item.slideId);
+      }
+    });
+    if (wrongSlideIds.length === 0) {
+      alert("현재 오답으로 기록된 문항이 없습니다!");
+      return;
+    }
+    retryQueue = wrongSlideIds.slice(1);
+    goToSlideById(wrongSlideIds[0]);
+  });
+
+  document.getElementById("btnClearAllProgress").addEventListener("click", function () {
+    results = {};
+    retryQueue = null;
+    saveState();
+    renderSelfcheck();
+  });
+
+  /* 키보드 좌우 화살표 이동 (입력창 포커스 중 제외) */
+  document.addEventListener("keydown", function (e) {
+    const tag = (document.activeElement && document.activeElement.tagName) || "";
+    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+    if (e.key === "ArrowLeft") showSlide(currentIdx - 1);
+    if (e.key === "ArrowRight") showSlide(currentIdx + 1);
+    if (e.key === "Escape") document.getElementById("tocModal").classList.remove("open");
+  });
+
+  showSlide(currentIdx);
+})();
+
+  /* ===== 터치 드래그 보강 (아이폰·아이패드 Pointer Events) ===== */
+  (function () {
+    var dragState = null;
+    document.addEventListener("pointerdown", function (e) {
+      var chip = e.target.closest ? e.target.closest(".chip") : null;
+      if (!chip) return;
+      dragState = { chip: chip, x: e.clientX, y: e.clientY, moved: false, id: e.pointerId };
+      try { chip.setPointerCapture(e.pointerId); } catch (err) {}
+    }, { passive: true });
+    document.addEventListener("pointermove", function (e) {
+      if (!dragState) return;
+      if (Math.hypot(e.clientX - dragState.x, e.clientY - dragState.y) > 8) {
+        dragState.moved = true;
+        dragState.chip.classList.add("dragging");
+      }
+      if (dragState.moved) { e.preventDefault(); }
+    }, { passive: false });
+    document.addEventListener("pointerup", function (e) {
+      if (!dragState) return;
+      var chip = dragState.chip;
+      var moved = dragState.moved;
+      dragState = null;
+      chip.classList.remove("dragging");
+      try { chip.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (!moved) return;
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      var input = el && el.closest ? el.closest(".slot-input") : null;
+      if (input) {
+        if (typeof applyChipToInput === "function") applyChipToInput(chip, input);
+        if (typeof clearChipSelection === "function") clearChipSelection();
+      }
+    });
+    document.addEventListener("pointercancel", function () {
+      if (dragState) dragState.chip.classList.remove("dragging");
+      dragState = null;
+    });
+  })();
+</script>
+<!--
+[제작 후 자체 점검 체크리스트]
+- 코드 검토 확인 완료:
+  [v] 학습지 B(B1-01~B1-08, B2-01~02, B3-01~02, B4-01~02, B5-01~03, B6-01~04)의 문항·금액·계정과목·차대 위치가 기준 및 첨부 PDF와 일치함
+  [v] B4-02의 유형자산처분손실 300,000원이 차변에 배치되었으며 모든 분개의 차변·대변 합계가 일치함
+  [v] 정액법·장부금액·처분손익 계산 로직과 빈칸 검증이 일치함
+  [v] 학습지 B(worksheet)와 자격증 기초 연습(drill, D-01~D-10) 배지·그룹이 명확히 구분됨
+  [v] 수업 모드에서 후보 칩·정답·해설이 정답 보기 클릭 전까지 숨겨지며 모드 전환 시 현재 슬라이드가 유지됨
+  [v] 혼자 공부 모드에서 탭 배치·드래그·직접 입력(datalist, inputmode="numeric")·순서 무관 짝 매칭 채점 구현됨
+  [v] B1(8문항)·B6(4문항) 개별 결과 집계 및 틀린 문제 다시 보기 지원됨
+  [v] 모든 슬라이드 상단 왼쪽에 href="../../index.html" 복귀 버튼 고정 및 외부 라이브러리·CDN 없는 단일 HTML로 구성됨
+  [v] CSS transition/animation 및 인라인 SVG만 사용하고 prefers-reduced-motion 미디어 쿼리 반영됨
+- 실제 기기에서 추가 확인 필요:
+  [ ] 실물 1024×768 전자칠판 해상도 및 iPhone/iPad 실기기 Safari 터치·소프트 키보드 올라옴 시 뷰포트 여백 확인
+-->
+</html>
