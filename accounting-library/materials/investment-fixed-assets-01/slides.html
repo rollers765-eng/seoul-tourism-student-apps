@@ -381,14 +381,19 @@
     @media (max-width: 860px) {
       .grid-5 { grid-template-columns: repeat(2, 1fr); }
       .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      /* 좁은 화면에서는 제목 배지를 접어 「← 자료실」과 단원 탭 자리를 확보한다 */
+      .brand-badge { display: none; }
     }
     @media (max-width: 640px) {
       .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
       .slides-viewport { padding: 14px 12px 32px; }
       .card { padding: 16px; }
-      /* 좁은 화면에서는 제목 배지를 접어 「← 자료실」과 단원 탭 자리를 확보한다 */
-      .brand-badge { display: none; }
       .library-back { padding: 6px 10px; font-size: 0.8rem; }
+      /* 탭이 잘린 자리는 스크롤 가능하다는 신호로 부드럽게 사라지게 한다 */
+      .part-nav {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent 100%);
+        mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent 100%);
+      }
     }
 
     /* ==========================================================================
