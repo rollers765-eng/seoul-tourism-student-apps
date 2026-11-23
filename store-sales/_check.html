@@ -1,28 +1,19 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><title>viewport check</title>
 <style>
- body{margin:0;background:#cfcfcf;font:12px/1.4 sans-serif}
- .row{display:flex;gap:16px;align-items:flex-start;padding:12px;flex-wrap:wrap}
- .desk{width:1267px;height:820px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px #888}
- .desk iframe{width:1920px;height:1242px;border:0;transform:scale(.66);transform-origin:top left}
- .mob{width:390px;height:844px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px #888}
- .mob iframe{width:390px;height:844px;border:0}
- .cap{padding:4px 12px;font-weight:700;color:#333}
+ html,body{margin:0;background:#cfcfcf;font:12px/1.4 sans-serif}
+ .mob{width:390px;height:844px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px #888;margin:12px}
+ .mob iframe{width:390px;height:844px;border:0;display:block}
+ .cap{margin:12px 12px 0;font-weight:700;color:#222}
 </style></head>
 <body>
-<div class="cap">desktop 1920 (scaled 66%) — case-study</div>
-<div class="row">
-  <div class="desk"><iframe id="d1" src="case-study.html" title="desktop case"></iframe></div>
-</div>
-<div class="cap">mobile 390 — case-study</div>
-<div class="row">
-  <div class="mob"><iframe id="m1" src="case-study.html" title="mobile case"></iframe></div>
-  <div class="mob"><iframe id="m2" src="module-1.html" title="mobile module1"></iframe></div>
-</div>
+<div class="cap">mobile 390 — case-study (CASE 1 갤러리)</div>
+<div class="mob"><iframe id="m1" src="case-study.html" title="mobile case"></iframe></div>
+<div class="cap">mobile 390 — module-1 (실무 1 갤러리)</div>
+<div class="mob"><iframe id="m2" src="module-1.html" title="mobile module1"></iframe></div>
 <script>
 function go(id, sel){const f=document.getElementById(id);
   f.addEventListener('load',()=>{try{const el=f.contentDocument.querySelector(sel); if(el) el.scrollIntoView({block:'start'});}catch(e){}});}
-go('d1','.casepanel .shots');
 go('m1','.casepanel .shots');
 go('m2','#m1-1 .shots');
 </script>
