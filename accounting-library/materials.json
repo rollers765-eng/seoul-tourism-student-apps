@@ -140,5 +140,27 @@
     "unitOrder": 4,
     "accountOrder": 1,
     "lesson": 1
+  },
+  {
+    "id": "investment-fixed-assets-01",
+    "unit": "투자자산·유형자산",
+    "account": "투자자산·유형자산 취득",
+    "lesson": 1,
+    "title": "학습지 A | 투자자산·유형자산 취득 분개",
+    "description": "교과서 128~131쪽 예제 01~04를 바탕으로 장기금융상품·만기보유증권·매도가능증권·투자부동산과 영업용 유형자산의 취득을 연습합니다. A4 양면용 HTML 학습지입니다.",
+    "pages": "128~131",
+    "tags": [
+      "투자자산",
+      "만기보유증권",
+      "매도가능증권",
+      "취득원가",
+      "유형자산",
+      "분개"
+    ],
+    "worksheetHtml": "materials/investment-fixed-assets-01/worksheet.html",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unitOrder": 5,
+    "accountOrder": 1
   }
 ]
