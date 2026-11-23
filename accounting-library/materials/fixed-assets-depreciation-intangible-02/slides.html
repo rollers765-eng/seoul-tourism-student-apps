@@ -2929,9 +2929,9 @@
     document.getElementById("btnModeStudy").classList.toggle("active", mode === "study");
     clearChipSelection();
 
-    /* 수업 모드로 돌아갈 때 열려 있던 정답 패널을 닫아 정답 노출 방지 */
+    /* 모드를 바꿀 때 열려 있던 정답 패널은 닫아 정답 노출 방지 */
+    document.querySelectorAll(".answer-panel.open").forEach(function (p) { p.classList.remove("open"); });
     if (mode === "teach") {
-      document.querySelectorAll(".answer-panel.open").forEach(function (p) { p.classList.remove("open"); });
       document.querySelectorAll(".b1-ans").forEach(function (el) { el.style.display = "none"; });
       document.querySelectorAll(".b1-blank").forEach(function (el) { el.style.display = ""; });
     }
