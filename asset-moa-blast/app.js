@@ -1292,7 +1292,7 @@
     list.slice(0, 8).forEach((r, i) => {
       html += '<div class="rank-row' + (r.me ? ' me' : '') + '">' +
         '<span class="no">' + (i + 1) + '</span><span class="av">' + r.emoji + '</span>' +
-        '<span>' + r.name + (r.me ? ' (나)' : '') + '</span>' +
+        '<span>' + r.name + '</span>' +
         '<span class="sc">' + won(r.score) + '점</span></div>';
     });
     html += '<p class="section-desc" style="margin-top:12px">최고 점수 <b>' + won(SAVE.best || 0) + '점</b> · 클리어한 단계 ' + Object.keys(SAVE.stars).length + '개</p>';
