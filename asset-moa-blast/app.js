@@ -171,6 +171,27 @@
     return pool.filter((sp) => placements({ cells: sp.c }, P.grid, P.obst, side).length);
   }
 
+  function preferredShape(pool, side) {
+    const occupied = P.grid.reduce((count, cell) => count + (cell ? 1 : 0), 0);
+    if (occupied >= 4 && occupied + P.obst.size <= 42 && Math.random() < 0.4) {
+      const gaps = [];
+      for (let line = 0; line < N; line++) {
+        for (const axis of ['row', 'col']) {
+          const cells = Array.from({ length: N }, (_, i) => axis === 'row' ? idx(line, i) : idx(i, line));
+          if (cells.some((i) => P.obst.has(i))) continue;
+          const missing = cells.filter((i) => !P.grid[i]);
+          if (missing.length > 0 && missing.length <= 9) gaps.push(missing);
+        }
+      }
+      const matching = pool.filter((sp) => placements({ cells: sp.c }, P.grid, P.obst, side).some(([r, c]) => {
+        const filled = new Set(sp.c.map(([dr, dc]) => idx(r + dr, c + dc)));
+        return gaps.some((missing) => missing.every((i) => filled.has(i)));
+      }));
+      if (matching.length) return shapeWeighted(matching);
+    }
+    return shapeWeighted(pool);
+  }
+
   function nextPiece() {
     const held = P.tray.filter(Boolean);
     const accounts = new Set(held.filter((pc) => !pc.pure).map((pc) => pc.key));
@@ -179,14 +200,14 @@
       for (const entry of shuffle(open)) {
         const shapes = playableShapes(ACCOUNT_SHAPES, entry.side);
         if (shapes.length) {
-          return makePiece(shapeWeighted(shapes), entry.account, entry.side, catClass(entry.account));
+          return makePiece(preferredShape(shapes, entry.side), entry.account, entry.side, catClass(entry.account));
         }
       }
       // 막힌 계정은 미션에 남겨 두고, 빈자리가 생긴 다음 리필에서 다시 검사한다.
     }
     const available = playableShapes(SHAPES, 'any');
     const colors = PURE_CATS.filter((cat) => !held.some((pc) => pc.cat === cat));
-    return makePiece(shapeWeighted(available.length ? available : SHAPES), null, null, pickOne(colors.length ? colors : PURE_CATS));
+    return makePiece(available.length ? preferredShape(available, 'any') : shapeWeighted(SHAPES), null, null, pickOne(colors.length ? colors : PURE_CATS));
   }
 
   function refillTray() {
@@ -330,8 +351,32 @@
     paintSelection();
   }
 
+  function fitBoardToScreen() {
+    const screen = $('#screen-play');
+    if (!screen.classList.contains('active')) return;
+    const edges = getComputedStyle(screen);
+    const stack = ['.play-top', '#mission', '#tray', '.items'].map((selector) => screen.querySelector(selector));
+    const budget = () => Math.floor(screen.clientHeight - stack.reduce((sum, node) => {
+      const style = getComputedStyle(node);
+      return sum + node.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+    }, parseFloat(edges.paddingTop) + parseFloat(edges.paddingBottom)) - 1);
+    const mission = stack[1];
+    mission.classList.remove('mission-dense', 'mission-tight');
+    let width = budget();
+    if (innerWidth >= 390 && innerHeight >= 780 && width < 360) {
+      mission.classList.add('mission-dense');
+      width = budget();
+      if (width < 360) {
+        mission.classList.add('mission-tight');
+        width = budget();
+      }
+    }
+    screen.style.setProperty('--board-fit', Math.max(96, width) + 'px');
+  }
+
   function fitPlayLabels() {
     if (!P || !$('#screen-play').classList.contains('active')) return;
+    fitBoardToScreen();
     fitTrayPieces();
     fitBoardLabels();
   }
@@ -380,6 +425,8 @@
     missionProgEl.innerHTML = P.mission.map((m) => '<i class="' + (m.filled ? 'on' : '') + '"></i>').join('');
     $('#playScore').textContent = won(playScore());
     $('#playStageLabel').textContent = cornerName(P.cornerKey) + ' ' + P.stageNo + '단계 · ' + done + '/' + P.mission.length;
+    fitBoardToScreen();
+    fitBoardLabels();
   }
 
   function cornerName(key) {
@@ -398,14 +445,6 @@
     const r1 = cells[1].getBoundingClientRect();
     return { size: r0.width, stride: r1.left - r0.left, top: r0.top, left: r0.left };
   }
-  function cellAtPoint(x, y) {
-    const m = metrics(); if (!m) return null;
-    const c = Math.round((x - m.left) / m.stride);
-    const r = Math.round((y - m.top) / m.stride);
-    if (r < 0 || r >= N || c < 0 || c >= N) return { r: r, c: c, outside: true };
-    return { r: r, c: c };
-  }
-
   trayEl.addEventListener('pointerdown', function (e) {
     if (!e.isPrimary || e.button !== 0) return;
     // 같은 입력 종류의 새 primary down은 이전 제스처가 끝났다는 뜻이다.
@@ -448,10 +487,10 @@
     g.className = 'piece';
     const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
     const cols = Math.max.apply(null, pc.cells.map((a) => a[1])) + 1;
-    const s = Math.round(m.size);
+    const s = m.size;
     g.style.gridTemplateColumns = 'repeat(' + cols + ', ' + s + 'px)';
     g.style.gridTemplateRows = 'repeat(' + rows + ', ' + s + 'px)';
-    g.style.gap = '3px';
+    g.style.gap = (m.stride - m.size) + 'px';
     g.style.position = 'fixed';
     g.style.pointerEvents = 'none';
     g.style.zIndex = '70';
@@ -479,21 +518,33 @@
   function moveDrag(x, y) {
     if (!drag) return;
     const m = metrics(); if (!m) return;
-    const s = m.size;
-    const gx = x - (drag.offC + 0.5) * s - (m.stride - s) / 2;
-    const gy = y - (drag.offR + 0.5) * s - (m.stride - s) / 2;
-    drag.ghost.style.left = gx + 'px';
-    drag.ghost.style.top = gy + 'px';
-    const at = cellAtPoint(x, y);
+    const lift = drag.pointerType === 'touch' ? Math.max(44, Math.min(72, m.stride * 1.1)) : 0;
+    const row = (y - lift - m.top - m.size / 2) / m.stride - drag.offR;
+    const col = (x - m.left - m.size / 2) / m.stride - drag.offC;
+    const nearest = { r: Math.round(row), c: Math.round(col) };
+    const direct = canPlace(drag.piece, nearest.r, nearest.c, P.grid, P.obst);
+    const preferredSide = direct ? 'any' : (drag.piece.side || 'any');
+    let best = null;
+    let distance = 1.2 ** 2 + 1e-8;
+    for (let r = Math.floor(row - 1.2); r <= Math.ceil(row + 1.2); r++) {
+      for (let c = Math.floor(col - 1.2); c <= Math.ceil(col + 1.2); c++) {
+        const delta = (r - row) ** 2 + (c - col) ** 2;
+        if (delta >= distance || !canPlace(drag.piece, r, c, P.grid, P.obst) ||
+          !inSide(drag.piece, r, c, preferredSide)) continue;
+        best = { r, c };
+        distance = delta;
+      }
+    }
+    drag.target = best;
+    const anchor = best || { r: row, c: col };
+    drag.ghost.style.left = (m.left + anchor.c * m.stride) + 'px';
+    drag.ghost.style.top = (m.top + anchor.r * m.stride) + 'px';
     clearPreview();
-    drag.target = null;
-    if (!at || at.outside) return;
-    const r0 = at.r - drag.offR, c0 = at.c - drag.offC;
-    const ok = canPlace(drag.piece, r0, c0, P.grid, P.obst);
-    drag.target = ok ? { r: r0, c: c0 } : null;
-    cellsFor(drag.piece, r0, c0).forEach(([r, c]) => {
+    const preview = best || nearest;
+    const ok = best && inSide(drag.piece, preview.r, preview.c, drag.piece.side || 'any');
+    cellsFor(drag.piece, preview.r, preview.c).forEach(([r, c]) => {
       if (r < 0 || r >= N || c < 0 || c >= N) return;
-      const el = boardEl.querySelector('.cell[data-i="' + idx(r, c) + '"]');
+      const el = boardEl.children[idx(r, c)];
       if (el) el.classList.add(ok ? 'preview-ok' : 'preview-bad');
     });
   }
@@ -634,13 +685,13 @@
     const sideForPiece = miss ? miss.side : null;
     if (miss && sideForPiece !== 'any' && !inSide(piece, r0, c0, sideForPiece)) {
       P.penalty += 30;
-      P.combo = 0;
       renderMission();
       showPlacementTip(miss);
       SOUND.play('wrong');
       return;
     }
     P.settling = true;
+    clearTimeout(P.clearPaint);
     sel = null;
     // 히스토리 저장
     P.history.push({
@@ -648,7 +699,7 @@
       obst: new Set(P.obst),
       mission: P.mission.map((m) => Object.assign({}, m)),
       tray: P.tray.slice(),
-      earned: P.earned, penalty: P.penalty, combo: P.combo, clears: P.clears, placed: P.placed
+      earned: P.earned, penalty: P.penalty, combo: P.combo, comboMoves: P.comboMoves, clears: P.clears, placed: P.placed
     });
     if (P.history.length > 40) P.history.shift();
 
@@ -662,6 +713,7 @@
     const usedSlot = trayEl.querySelector('.piece[data-slot="' + slot + '"]');
     if (usedSlot && usedSlot.parentNode) usedSlot.parentNode.innerHTML = '';
     SOUND.play('place');
+    navigator.vibrate?.(15);
 
     // 미션 채움
     if (miss) {
@@ -685,8 +737,7 @@
 
     // 판 상태를 먼저 정산해 같은 입력 이벤트에서 실제로 놓을 수 있는 조각을 공급한다.
     const cleared = resolveLines();
-    if (cleared.count) afterClear(cleared);
-    else P.combo = 0;
+    updateStreak(cleared);
     P.tray[slot] = nextPiece();
     renderTray(slot);
     P.settling = false;
@@ -716,10 +767,15 @@
       if (!v) return;
       if (!v.sealed) doomed.push(i);
     });
-    // 애니메이션
-    doomed.forEach((i) => {
-      const el = boardEl.querySelector('.cell[data-i="' + i + '"] .blk');
-      if (el) { el.classList.add('clear-anim'); }
+    const centers = [];
+    cellSet.forEach((i) => {
+      const el = boardEl.children[i];
+      if (!el) return;
+      el.classList.add('line-flash');
+      const rect = el.getBoundingClientRect();
+      centers.push([rect.x + rect.width / 2, rect.y + rect.height / 2]);
+      const block = el.querySelector('.blk');
+      if (block && !P.grid[i]?.sealed) block.classList.add('clear-anim');
     });
     // 인접 장애물 제거
     let obstCleared = 0;
@@ -734,7 +790,15 @@
     });
     toRemove.forEach((j) => { P.obst.delete(j); obstCleared++; });
     doomed.forEach((i) => { P.grid[i] = null; });
-    return { lines: full, count: full.length, obstCleared: obstCleared, cells: doomed };
+    return { lines: full, count: full.length, obstCleared: obstCleared, cells: doomed, centers };
+  }
+
+  function updateStreak(res) {
+    if (res.count) {
+      afterClear(res);
+    } else if (P.comboMoves > 0 && --P.comboMoves === 0) {
+      P.combo = 0;
+    }
   }
 
   function afterClear(res) {
@@ -745,11 +809,17 @@
     const goalEl = $('#missionGoal');
     if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림!'; }
     P.combo = Math.min(9, P.combo + 1);
-    const comboGain = (P.combo - 1) * 120;
+    P.comboMoves = 3;
+    const comboGain = Math.round(pts * (P.combo - 1) * .4);
+    navigator.vibrate?.([0, 25, 40, 30]);
+    boardEl.classList.remove('line-punch');
+    void boardEl.offsetWidth;
+    boardEl.classList.add('line-punch');
+    fx.shards(res.centers, P.combo);
     if (P.combo >= 2) {
       P.earned += comboGain;
       const banner = $('#comboBanner');
-      banner.textContent = 'COMBO ×' + P.combo;
+      banner.textContent = '🔥 COMBO ×' + P.combo + ' · +' + won(comboGain);
       banner.classList.add('show');
       clearTimeout(banner._t);
       banner._t = setTimeout(() => banner.classList.remove('show'), 1100);
@@ -759,11 +829,12 @@
     }
     flashText('+' + (pts + comboGain));
     $('#playScore').textContent = won(playScore());
-    if (res.count >= 1) fx.confetti(res.count >= 3 ? 150 : res.count >= 2 ? 100 : 55);
+    if (res.count >= 2 || P.combo >= 3) fx.confetti(Math.min(180, 65 + res.count * 18 + P.combo * 12));
     if (res.count >= 2) fx.firework();
     if (res.count >= 3) fx.fireworks(2);
     const stage = P;
-    setTimeout(() => { if (P === stage) renderBoard(); }, 320);
+    clearTimeout(stage.clearPaint);
+    stage.clearPaint = setTimeout(() => { if (P === stage) renderBoard(); }, 175);
   }
 
   function flashText(text) {
@@ -803,7 +874,7 @@
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: buildObstacles(stageNo),
-      mission: buildMission(st), tray: [], earned: 0, penalty: 0, combo: 0, clears: 0, placed: 0, settling: false,
+      mission: buildMission(st), tray: [], earned: 0, penalty: 0, combo: 0, comboMoves: 0, clears: 0, placed: 0, settling: false,
       history: [], over: false, done: false, startedAt: Date.now()
     };
     SAVE.last = { corner: cornerKey, stage: stageNo }; save();
@@ -983,6 +1054,19 @@
     function kick() { if (!raf) raf = requestAnimationFrame(loop); }
     const COLORS = ['#ffe066', '#ff6f91', '#4be3b0', '#5ec2ff', '#b98cff', '#ffb020', '#ff9ede', '#8affd8'];
     return {
+      shards: function (centers, combo) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        for (const [x, y] of centers) {
+          for (let i = 0; i < Math.min(9, 4 + combo); i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * (3 + combo * .3);
+            parts.push({ type: 'c', x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2,
+              g: .2, drag: .96, s: 3 + Math.random() * 4, color: COLORS[i % COLORS.length],
+              rot: angle, vr: .3, life: 22 + Math.random() * 15 });
+          }
+        }
+        kick();
+      },
       /* 화면 전체로 터지는 꽃가루: 좌우 대포 + 위에서 쏟아지는 다색 종이 */
       confetti: function (n) {
         const w = window.innerWidth, h = window.innerHeight;
@@ -1483,7 +1567,7 @@
   window.__blast = {
     state: function () {
       return P ? {
-        corner: P.cornerKey, stage: P.stageNo, score: playScore(), earned: P.earned, penalty: P.penalty, combo: P.combo,
+        corner: P.cornerKey, stage: P.stageNo, score: playScore(), earned: P.earned, penalty: P.penalty, combo: P.combo, comboMoves: P.comboMoves,
         mission: P.mission.map((m) => ({ side: m.side, account: m.account, filled: m.filled })),
         tray: P.tray.map((p) => p && { key: p.key, pure: !!p.pure, cells: p.cells, shape: p.shape, side: p.side }),
         obstacles: Array.from(P.obst), gridFilled: P.grid.filter(Boolean).length,
@@ -1507,6 +1591,6 @@
       for (let c = 0; c < 8; c++) { const i = row * 8 + c; if (!P.grid[i]) P.grid[i] = { key: acc || '현금', cat: 'c-asset', sealed: false }; }
       return P.grid.filter(Boolean).length;
     },
-    testTurn: function () { const r = resolveLines(); if (r.count) afterClear(r); finishTurn(); return r.count; }
+    testTurn: function () { const r = resolveLines(); updateStreak(r); finishTurn(); return r.count; }
   };
 })();
