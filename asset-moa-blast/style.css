@@ -386,3 +386,18 @@ body{
   .board-wrap{max-width:344px}
   .score-wrap b{font-size:29px}
 }
+
+@media (max-height:720px){
+  .screen{padding-top:calc(6px + env(safe-area-inset-top));padding-bottom:6px}
+  .play-top .score-wrap b{font-size:27px}
+  .mission{padding:7px 9px 6px;margin:6px 0}
+  .mission-text{font-size:11px;line-height:1.32}
+  .jslot{min-height:20px;font-size:11px;padding:2px 4px}
+  .jcol{min-height:48px}
+  .board-wrap{max-width:330px}
+  .tray{min-height:106px;padding:8px 2px 6px}
+  .slot-piece{height:94px;padding-bottom:18px}
+  .piece-name{font-size:9px;padding:1px 6px}
+  .items .item-btn{padding:6px 2px;font-size:16px}
+  .mission-moa{width:26px;flex:0 0 26px}
+}
