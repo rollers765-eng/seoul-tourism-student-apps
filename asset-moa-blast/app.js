@@ -183,12 +183,14 @@
   /* 순수 색 블록 조각 — 진짜 블록 블라스트 놀이용. 계정과목이 아니라 어디든 놓을 수 있고,
      줄을 터뜨려 점수를 벌어 준다. */
   const PURE_CATS = ['c-pure1', 'c-pure2', 'c-pure3', 'c-pure4', 'c-pure5'];
-  function newPurePiece() {
+  function newPurePiece(usedCats) {
     let guard = 0;
     while (guard++ < 30) {
       const sp = shapeWeighted();
+      const avail = PURE_CATS.filter((c) => !usedCats || !usedCats[c]);
+      const pool = avail.length ? avail : PURE_CATS;
       const pc = {
-        key: null, pure: true, cat: PURE_CATS[Math.floor(Math.random() * PURE_CATS.length)],
+        key: null, pure: true, cat: pool[Math.floor(Math.random() * pool.length)],
         cells: sp.c, shape: sp.n, side: null, id: rid()
       };
       if (!P) return pc;
@@ -239,9 +241,10 @@
       });
     }
     let guard = 0;
+    const usedCats = {};
     while (tray.length < 3 && guard++ < 30) {
-      const pc = newPurePiece();
-      if (pc) tray.push(pc);
+      const pc = newPurePiece(usedCats);
+      if (pc) { usedCats[pc.cat] = 1; tray.push(pc); }
     }
     P.tray = shuffle(tray).slice(0, 3);
     renderTray();
@@ -277,7 +280,7 @@
     }
   }
 
-  function trayCell() { return window.innerWidth <= 350 ? 22 : window.innerWidth <= 400 ? 25 : 28; }
+  function trayCell() { return window.innerWidth <= 350 ? 22 : window.innerWidth <= 400 ? 26 : 29; }
 
   function renderTray() {
     trayEl.innerHTML = '';
@@ -289,7 +292,7 @@
       if (!pc) { trayEl.appendChild(wrap); return; }
       any = true;
       const el = document.createElement('div');
-      el.className = 'piece' + (pc.pure ? ' pure' : '');
+      el.className = 'piece' + (pc.pure ? ' pure' : ' acct');
       el.style.gap = '3px';
       el.setAttribute('role', 'button');
       el.setAttribute('aria-label', (pc.pure ? '색 블록 조각 · 어디든 놓아 줄을 터뜨려요' : pc.key + ' 조각 · 끌어 놓거나 눌러서 고르기'));
@@ -309,13 +312,12 @@
         const cell = document.createElement('div');
         if (map[r + ':' + c]) {
           cell.className = 'pcell ' + pc.cat;
-          if (!pc.pure && r === first[0] && c === first[1]) { cell.classList.add('lbl'); cell.textContent = pc.key.length > 5 ? pc.key.slice(0, 5) : pc.key; }
         } else cell.style.visibility = 'hidden';
         el.appendChild(cell);
       }
       wrap.appendChild(el);
       const nm = document.createElement('span');
-      nm.className = 'piece-name' + (pc.pure ? ' pure' : '');
+      nm.className = 'piece-name' + (pc.pure ? ' pure' : ' acct');
       nm.textContent = pc.pure ? '색 블록' : pc.key;
       wrap.appendChild(nm);
       trayEl.appendChild(wrap);
