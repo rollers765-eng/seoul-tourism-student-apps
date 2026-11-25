@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4a5cc4">
+<title>자산모아 블럭모아 Blast | 분개를 터뜨리는 회계 블록 퍼즐</title>
+<meta name="description" content="8×8 보드에 계정 블록을 끼워 분개를 완성하는 회계원리 학습 퍼즐. 재고·투자·유형·무형자산 160단계와 보석 챌린지.">
+<link rel="canonical" href="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="서울관광고등학교 회계원리 자료실">
+<meta property="og:title" content="자산모아 블럭모아 Blast">
+<meta property="og:description" content="블록을 터뜨리며 분개가 익어요. 재고·투자·유형·무형자산 160단계.">
+<meta property="og:url" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/">
+<meta property="og:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="자산모아 블럭모아 Blast — 모아와 함께 블록을 터뜨리며 분개를 익히는 게임">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="자산모아 블럭모아 Blast">
+<meta name="twitter:description" content="블록을 터뜨리며 분개가 익어요. 160단계 분개 퍼즐.">
+<meta name="twitter:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+<div id="app">
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div id="bubbles" aria-hidden="true"></div>
+
+  <!-- 홈 -->
+  <section class="screen active" id="screen-home">
+    <header class="home-top">
+      <button class="chip" id="btnMusic" aria-label="배경음악 켜기/끄기" aria-pressed="true">🎵</button>
+      <div class="gem-chip" id="homeGems"><span>💎</span><b>30</b></div>
+    </header>
+    <div class="logo-wrap">
+      <h1 class="logo">자산모아<span class="logo-sub">블럭모아</span><span class="logo-blast">Blast</span></h1>
+      <p class="tagline">블록을 터뜨리면, 분개가 저절로!</p>
+    </div>
+    <div class="moa-hero">
+      <img src="assets/moa.png" alt="연필과 계산기를 가방에 매단 모아" id="homeMoa">
+      <div class="speech" id="homeSpeech">오늘은 어떤 자산을 모아 볼까?</div>
+    </div>
+    <div class="dday" id="homeDday">3차 서술형 · 기말 대비</div>
+    <nav class="home-actions">
+      <button class="big-btn" id="btnPlay">▶ 바로 플레이</button>
+      <div class="row">
+        <button class="round-btn" id="btnChallenge">💎<small>보석 챌린지</small></button>
+        <button class="round-btn" id="btnShop">🛍️<small>상점</small></button>
+        <button class="round-btn" id="btnRank">🏆<small>랭킹</small></button>
+        <button class="round-btn" id="btnBook">📖<small>도감</small></button>
+      </div>
+    </nav>
+    <div class="corner-list" id="cornerList"></div>
+    <p class="footnote">서울관광고 회계원리 · 진행은 이 기기에만 저장돼요</p>
+  </section>
+
+  <!-- 스테이지 선택 -->
+  <section class="screen" id="screen-stages">
+    <header class="bar">
+      <button class="icon-btn" data-back>◀</button>
+      <h2 id="stagesTitle">재고자산</h2>
+      <div class="gem-chip small"><span>💎</span><b id="stagesGems">30</b></div>
+    </header>
+    <p class="section-desc" id="stagesDesc"></p>
+    <div class="stage-grid" id="stageGrid"></div>
+  </section>
+
+  <!-- 플레이 -->
+  <section class="screen" id="screen-play">
+    <header class="play-top">
+      <button class="icon-btn" id="playExit" aria-label="나가기">✕</button>
+      <div class="score-wrap"><b id="playScore">0</b><small id="playStageLabel">재고자산 1단계</small></div>
+      <div class="gem-chip small"><span>💎</span><b id="playGems">30</b></div>
+    </header>
+    <div class="combo-banner" id="comboBanner">COMBO ×2</div>
+    <div class="mission" id="mission">
+      <p class="mission-text" id="missionText"></p>
+      <div class="journal" id="journal"></div>
+      <div class="mission-progress" id="missionProgress"></div>
+    </div>
+    <div class="board-wrap">
+      <div class="board" id="board" role="grid" aria-label="8x8 블록 보드"></div>
+      <div class="zone-label debit">차변</div>
+      <div class="zone-label credit">대변</div>
+    </div>
+    <div class="tray" id="tray"></div>
+    <div class="items">
+      <button class="item-btn" id="itemUndo" data-item="undo">↩️<small>3</small></button>
+      <button class="item-btn" id="itemClean" data-item="clean">🧹<small>8</small></button>
+      <button class="item-btn" id="itemHint" data-item="hint">💡<small>2</small></button>
+      <button class="item-btn challenge" id="itemChallenge">💎<small>도전</small></button>
+    </div>
+    <div class="drag-layer" id="dragLayer" aria-hidden="true"></div>
+  </section>
+
+  <!-- 챌린지 -->
+  <section class="screen" id="screen-challenge">
+    <header class="bar">
+      <button class="icon-btn" data-back>◀</button>
+      <h2>💎 보석 챌린지</h2>
+      <div class="gem-chip small"><span>💎</span><b id="chGems">30</b></div>
+    </header>
+    <div class="ch-timer"><div id="chBar"></div></div>
+    <div class="ch-card" id="chCard"></div>
+  </section>
+
+  <!-- 상점 -->
+  <section class="screen" id="screen-shop">
+    <header class="bar">
+      <button class="icon-btn" data-back>◀</button>
+      <h2>🛍️ 보석 상점</h2>
+      <div class="gem-chip small"><span>💎</span><b id="shopGems">30</b></div>
+    </header>
+    <div class="shop-list" id="shopList"></div>
+    <p class="section-desc">보석은 스테이지 클리어와 보석 챌린지에서 모여요.</p>
+  </section>
+
+  <!-- 랭킹 -->
+  <section class="screen" id="screen-rank">
+    <header class="bar">
+      <button class="icon-btn" data-back>◀</button>
+      <h2>🏆 랭킹</h2>
+      <div class="gem-chip small"><span>💎</span><b id="rankGems">30</b></div>
+    </header>
+    <div id="rankBody"></div>
+  </section>
+
+  <!-- 도감 -->
+  <section class="screen" id="screen-book">
+    <header class="bar">
+      <button class="icon-btn" data-back>◀</button>
+      <h2>📖 계정과목 도감</h2>
+      <div class="gem-chip small"><span>💎</span><b id="bookGems">30</b></div>
+    </header>
+    <input class="search" id="bookSearch" placeholder="계정과목 검색" aria-label="계정과목 검색">
+    <div class="book-list" id="bookList"></div>
+  </section>
+
+  <!-- 오버레이들 -->
+  <div class="overlay" id="ovClear" hidden>
+    <div class="panel clear-panel">
+      <div class="stars" id="clearStars"></div>
+      <h2 id="clearTitle">분개 완성!</h2>
+      <p class="clear-score"><b id="clearScore">0</b>점</p>
+      <div class="breakdown" id="clearBreakdown"></div>
+      <div class="journal done" id="clearJournal"></div>
+      <p class="explain" id="clearExplain"></p>
+      <div class="row-btns">
+        <button class="ghost-btn" data-ov="retry">다시</button>
+        <button class="ghost-btn" data-ov="chal">💎 챌린지</button>
+        <button class="big-btn" data-ov="next">다음 단계 ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ovOver" hidden>
+    <div class="panel">
+      <img src="assets/moa.png" alt="" class="over-moa">
+      <h2>보드가 가득 찼어요</h2>
+      <p class="over-line" id="overLine">조각을 놓을 자리가 없어요.</p>
+      <div class="row-btns">
+        <button class="ghost-btn" data-ov="quit">나가기</button>
+        <button class="ghost-btn" data-ov="continue">💎 5 이어하기</button>
+        <button class="big-btn" data-ov="retry">다시 하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ovItem" hidden>
+    <div class="panel small">
+      <h2 id="ovItemTitle">상점</h2>
+      <p id="ovItemText"></p>
+      <div class="row-btns" id="ovItemBtns"></div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="data.js?v=1"></script>
+<script src="music.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
