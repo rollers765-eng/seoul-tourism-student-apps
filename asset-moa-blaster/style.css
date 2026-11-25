@@ -173,7 +173,7 @@ button { font-family: inherit; color: inherit; cursor: pointer; }
 #pick-slots i.on { border-style: solid; border-color: var(--mint); background: #1c4a44; }
 
 .field { flex: 1; min-height: 236px; max-height: 380px; position: relative; border: 3px solid var(--line); box-shadow: var(--shadow); overflow: hidden; }
-#canvas { display: block; width: 100%; height: 100%; touch-action: manipulation; }
+#canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; touch-action: manipulation; }
 .prompt-body { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: start; }
 #mascot { width: 32px; height: 32px; image-rendering: pixelated; margin-top: 2px; }
 .cannons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
