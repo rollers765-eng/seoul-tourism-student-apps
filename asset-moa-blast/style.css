@@ -456,7 +456,7 @@ body{
 /* ───── 챌린지 ───── */
 .ch-timer{height:10px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden;margin:2px 0 12px;flex:0 0 auto}
 .ch-timer #chBar{height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#57e3bf,#ffd166,#ff7d95);transition:width .2s linear}
-.ch-card{flex:1;background:linear-gradient(180deg,#ffffff,#f7f2ff);border-radius:22px;padding:16px;box-shadow:var(--shadow),inset 0 0 0 2px rgba(255,255,255,.9);display:flex;flex-direction:column;gap:10px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ch-card{flex:1;background:linear-gradient(180deg,#ffffff,#f7f2ff);border-radius:22px;padding:16px;box-shadow:var(--shadow),inset 0 0 0 2px rgba(255,255,255,.9);display:flex;flex-direction:column;justify-content:center;gap:10px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .ch-tag{font-size:11px;font-weight:900;color:#6b3fbd;background:#f0e9ff;border-radius:8px;padding:3px 8px;align-self:flex-start}
 .ch-q{font-size:15px;font-weight:900;line-height:1.45;letter-spacing:-.4px;margin:0;color:#2a1b4d}
 .ch-hint{font-size:11.5px;color:var(--ink-soft);font-weight:700;margin:0}
@@ -476,7 +476,7 @@ body{
 }
 .ch-input:focus{outline:none;box-shadow:inset 0 0 0 2px #8f7bf6}
 .ch-send{padding:12px 18px;border-radius:14px;border:0;font:inherit;font-weight:900;background:linear-gradient(180deg,#8ff0d0,#2fc79b);color:#04382a;box-shadow:0 3px 0 #1d8f6a;cursor:pointer}
-.ch-result{margin-top:auto;border-radius:14px;padding:11px;font-size:12px;font-weight:800;line-height:1.5;text-align:left;background:#f2ecff;color:#3d2a68}
+.ch-result{margin-top:12px;border-radius:14px;padding:11px;font-size:12px;font-weight:800;line-height:1.5;text-align:left;background:#f2ecff;color:#3d2a68}
 .ch-result.ok{background:#defcf0;color:#0b5137}
 .ch-result.no{background:#ffeef1;color:#8a2436}
 .ch-again{margin-top:8px;display:flex;gap:7px}
