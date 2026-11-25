@@ -14,7 +14,7 @@
 <body>
 <div class="wrap">
   <div class="label" id="lb">뷰포트</div>
-  <iframe id="fr" src="../index.html" title="게임 미리보기"></iframe>
+  <iframe id="fr" title="게임 미리보기"></iframe>
 </div>
 <script>
   var p = new URLSearchParams(location.search);
@@ -22,6 +22,7 @@
   var h = parseInt(p.get('h') || '844', 10);
   var fr = document.getElementById('fr');
   fr.width = w; fr.height = h;
+  fr.src = '../index.html?v=' + (p.get('r') || Date.now());
   document.getElementById('lb').textContent = w + '×' + h + ' · ' + (p.get('n') || '');
 </script>
 </body>
