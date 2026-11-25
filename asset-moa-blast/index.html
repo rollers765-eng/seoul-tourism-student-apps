@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="style.css?v=46">
+<link rel="stylesheet" href="style.css?v=47">
 </head>
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -87,7 +87,7 @@
     <div class="mission" id="mission">
       <div class="mission-head"><img src="assets/moa.png" alt="모아" class="mission-moa"><p class="mission-text" id="missionText"></p></div>
       <div class="journal" id="journal"></div>
-      <div class="mission-foot"><div class="mission-progress" id="missionProgress"></div><span class="mission-goal" id="missionGoal">🎯 한 줄 터뜨리면 +300</span></div>
+      <div class="mission-foot"><div class="mission-progress" id="missionProgress"></div><span class="mission-goal" id="missionGoal">🎯 1줄 +300 · 콤보 보너스</span></div>
     </div>
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="8x8 블록 보드"></div>
@@ -95,6 +95,7 @@
       <div class="zone-label credit">대변</div>
     </div>
     <div class="tray" id="tray"></div>
+    <div class="tip-card" id="tipCard" role="status" aria-live="polite"></div>
     <div class="items">
       <button class="item-btn" id="itemUndo" data-item="undo">↩️<small>3</small></button>
       <button class="item-btn" id="itemClean" data-item="clean">🧹<small>8</small></button>
@@ -168,10 +169,10 @@
     <div class="panel">
       <img src="assets/moa.png" alt="" class="over-moa">
       <h2>보드가 가득 찼어요</h2>
-      <p class="over-line" id="overLine">조각을 놓을 자리가 없어요.</p>
+      <p class="over-line" id="overLine">놓을 자리가 없어요. 보드를 정리하면 계속할 수 있어요.</p>
       <div class="row-btns">
         <button class="ghost-btn" data-ov="quit">나가기</button>
-        <button class="ghost-btn" data-ov="continue">💎 5 이어하기</button>
+        <button class="ghost-btn" data-ov="continue">🧹 보드 정리</button>
         <button class="big-btn" data-ov="retry">다시 하기</button>
       </div>
     </div>
@@ -191,6 +192,6 @@
 <script src="data.js?v=1"></script>
 <script src="challenge.js?v=1"></script>
 <script src="music.js?v=13"></script>
-<script src="app.js?v=46"></script>
+<script src="app.js?v=47"></script>
 </body>
 </html>

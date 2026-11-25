@@ -79,46 +79,57 @@
   function isAccount(name) { return !!ACCT[name]; }
   function sideOf(name) { return ACCT[name] ? (ACCT[name].inc === '대변' ? 'c' : 'd') : null; }
 
-  /* ───────── 조각 모양 카탈로그 ───────── */
+  /* ───────── 조각 모양 카탈로그 ─────────
+     ㄱ·ㄴ(대 3×3 / 소 2×2) · ㅁ(3×3 · 2×2 · 1×1) · ㅡ(2·3·4) · ㅣ(2·3·4) · ＋(3×3 십자)
+     각 모양은 가중치(w)만큼 주머니에 들어가서, 한 단계 안에서 확률적으로 랜덤 등장한다. */
+  const SH = (n, c, w) => ({ n: n, c: c, w: w });
   const SHAPES = [
-    { n: '1', c: [[0, 0]] },
-    { n: '2가로', c: [[0, 0], [0, 1]] },
-    { n: '2세로', c: [[0, 0], [1, 0]] },
-    { n: '3가로', c: [[0, 0], [0, 1], [0, 2]] },
-    { n: '3세로', c: [[0, 0], [1, 0], [2, 0]] },
-    { n: '4가로', c: [[0, 0], [0, 1], [0, 2], [0, 3]] },
-    { n: '4세로', c: [[0, 0], [1, 0], [2, 0], [3, 0]] },
-    { n: '5가로', c: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]] },
-    { n: '5세로', c: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]] },
-    { n: '2x2', c: [[0, 0], [0, 1], [1, 0], [1, 1]] },
-    { n: '2x3', c: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2]] },
-    { n: '3x2', c: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1]] },
-    { n: '3x3', c: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]] },
-    { n: 'ㄱ', c: [[0, 0], [1, 0], [1, 1], [1, 2]] },
-    { n: 'ㄴ', c: [[0, 2], [1, 0], [1, 1], [1, 2]] },
-    { n: '역ㄱ', c: [[0, 0], [0, 1], [0, 2], [1, 0]] },
-    { n: '역ㄴ', c: [[0, 0], [0, 1], [0, 2], [1, 2]] },
-    { n: 'T', c: [[0, 0], [0, 1], [0, 2], [1, 1]] },
-    { n: '역T', c: [[1, 0], [1, 1], [1, 2], [0, 1]] },
-    { n: '+', c: [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]] },
-    { n: 'Z', c: [[0, 0], [0, 1], [1, 1], [1, 2]] },
-    { n: 'S', c: [[0, 1], [0, 2], [1, 0], [1, 1]] },
-    { n: '대각2', c: [[0, 0], [1, 1]] },
-    { n: '대각3', c: [[0, 0], [1, 1], [2, 2]] },
-    { n: '코너3', c: [[0, 0], [1, 0], [1, 1]] },
-    { n: '코너3b', c: [[0, 0], [0, 1], [1, 1]] }
+    SH('ㅁ1', [[0, 0]], 3),                                   /* ㅁ 작은 거 (1×1) */
+    SH('ㅡ2', [[0, 0], [0, 1]], 4),
+    SH('ㅣ2', [[0, 0], [1, 0]], 4),
+    SH('ㅡ3', [[0, 0], [0, 1], [0, 2]], 4),
+    SH('ㅣ3', [[0, 0], [1, 0], [2, 0]], 4),
+    SH('ㅡ4', [[0, 0], [0, 1], [0, 2], [0, 3]], 3),
+    SH('ㅣ4', [[0, 0], [1, 0], [2, 0], [3, 0]], 3),
+    SH('ㅁ2', [[0, 0], [0, 1], [1, 0], [1, 1]], 4),            /* ㅁ 큰 거 (2×2) */
+    SH('ㅁ3', [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], 0.6), /* ㅁ 큰 거 (3×3) */
+    SH('ㄱ소', [[0, 0], [0, 1], [1, 1]], 2),
+    SH('역ㄱ소', [[0, 0], [0, 1], [1, 0]], 2),
+    SH('ㄴ소', [[0, 0], [1, 0], [1, 1]], 2),
+    SH('역ㄴ소', [[0, 1], [1, 0], [1, 1]], 2),
+    SH('ㄱ', [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]], 2),      /* ㄱ 큰 거 (3×3, 5칸) */
+    SH('역ㄱ', [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]], 2),
+    SH('ㄴ', [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2]], 2),      /* ㄴ 큰 거 (3×3, 5칸) */
+    SH('역ㄴ', [[0, 2], [1, 2], [2, 0], [2, 1], [2, 2]], 2),
+    SH('+', [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]], 2)        /* ＋ (3×3 십자) */
   ];
-  const SMALL = SHAPES.filter((s) => s.c.length <= 3);
-
-  function shapeWeighted() {
-    // 큰 조각은 조금 덜, 작은 조각은 조금 더 (막힘 방지)
+  function shapeBox(sp) {
+    const rows = Math.max.apply(null, sp.c.map((x) => x[0])) + 1;
+    const cols = Math.max.apply(null, sp.c.map((x) => x[1])) + 1;
+    return { rows: rows, cols: cols };
+  }
+  function shapeBag(list) {
     const bag = [];
-    SHAPES.forEach((s) => {
-      const w = s.c.length <= 2 ? 3 : s.c.length <= 4 ? 4 : s.c.length <= 6 ? 2 : 1;
+    list.forEach((s) => {
+      const w = Math.max(1, Math.round((s.w || 1) * 10));
       for (let i = 0; i < w; i++) bag.push(s);
     });
-    return bag[Math.floor(Math.random() * bag.length)];
+    return bag;
   }
+  const SHAPE_BAG = shapeBag(SHAPES);
+  function shapeWeighted() { return SHAPE_BAG[Math.floor(Math.random() * SHAPE_BAG.length)]; }
+
+  /* 계정과목 조각 전용 모양 — 이름표가 블록 위에 읽히도록 2칸 이상 넓고 4칸 이하인 것만 */
+  const ACCT_SHAPES = [
+    { n: 'ㅡ2', c: [[0, 0], [0, 1]], w: 3 },
+    { n: 'ㅡ3', c: [[0, 0], [0, 1], [0, 2]], w: 3 },
+    { n: 'ㅁ2', c: [[0, 0], [0, 1], [1, 0], [1, 1]], w: 4 },
+    { n: 'ㄱ소', c: [[0, 0], [0, 1], [1, 1]], w: 2 },
+    { n: '역ㄱ소', c: [[0, 0], [0, 1], [1, 0]], w: 2 },
+    { n: 'ㄴ소', c: [[0, 0], [1, 0], [1, 1]], w: 2 },
+    { n: '역ㄴ소', c: [[0, 1], [1, 0], [1, 1]], w: 2 }
+  ];
+  const ACCT_BAG = shapeBag(ACCT_SHAPES);
   const shuffle = (a) => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
   const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 
@@ -203,7 +214,7 @@
   function newAccountPiece(key, sideHint) {
     const cat = catClass(key);
     const side = sideHint || 'any';
-    const pool = SMALL.concat(SHAPES.filter((s) => s.c.length <= 4));
+    const pool = ACCT_BAG;
     let guard = 0;
     while (guard++ < 60) {
       const sp = pickOne(pool);
@@ -226,27 +237,45 @@
     return CORNER_POOL[key];
   }
 
-  /* 트레이 3칸 = 순수 색 블록 + 계정과목 조각의 혼합
-     턴1·3 → 계정 1 + 색 블록 2 / 턴2 → 계정 2 + 색 블록 1 / 턴4 → 색 블록 3(블록 블라스트 턴) */
-  function refillTray() {
-    P.turn = (P.turn || 0) + 1;
+  /* 트레이 3칸 = 일반 블록 + 계정과목 블록의 혼합.
+     블록을 하나 놓는 순간 그 칸에 새 블록이 바로 채워진다(즉시 리필).
+     계정과목 블록은 42% 확률로 등장하고, 3번 연속 안 나오면 강제로 한 번 나온다.
+     (트레이에 계정과목 블록이 하나도 없으면 그것도 강제 → 분개를 못 채우고 막히는 일이 없다) */
+  function trayAccountKeys(exceptSlot) {
+    const set = {};
+    P.tray.forEach((p, i) => { if (p && !p.pure && i !== exceptSlot) set[p.key] = 1; });
+    return set;
+  }
+  function refillSlot(slot) {
     const open = P.mission.filter((m) => !m.filled);
-    const tray = [];
-    if (open.length) {
-      const phase = P.turn % 4;
-      const accCount = phase === 0 ? 0 : (phase === 2 && open.length >= 2 ? 2 : 1);
-      shuffle(open).slice(0, accCount).forEach((m) => {
-        const pc = newAccountPiece(m.account, m.side);
-        if (pc) tray.push(pc);
-      });
+    const have = trayAccountKeys(slot);
+    let piece = null;
+    const wantAcc = open.length > 0 && (
+      Object.keys(have).length === 0 ||
+      (P.sinceAcc || 0) >= 3 ||
+      Math.random() < 0.42
+    );
+    if (wantAcc) {
+      const pool = shuffle(open.filter((m) => !have[m.account]));
+      for (let i = 0; i < pool.length; i++) {
+        const pc = newAccountPiece(pool[i].account, pool[i].side);
+        if (pc) { piece = pc; P.sinceAcc = 0; break; }
+      }
     }
-    let guard = 0;
-    const usedCats = {};
-    while (tray.length < 3 && guard++ < 30) {
-      const pc = newPurePiece(usedCats);
-      if (pc) { usedCats[pc.cat] = 1; tray.push(pc); }
+    if (!piece) {
+      const usedCats = {};
+      P.tray.forEach((p, i) => { if (p && p.pure && i !== slot) usedCats[p.cat] = 1; });
+      piece = newPurePiece(usedCats);
+      P.sinceAcc = (P.sinceAcc || 0) + 1;
     }
-    P.tray = shuffle(tray).slice(0, 3);
+    P.tray[slot] = piece;
+    P.spawnSlot = slot;
+  }
+  function refillTray() {
+    P.tray = [null, null, null];
+    P.sinceAcc = 0;
+    for (let i = 0; i < 3; i++) refillSlot(i);
+    P.spawnSlot = -1;
     renderTray();
   }
 
@@ -255,71 +284,127 @@
   }
 
   /* ───────── 렌더 ───────── */
+  /* 글자를 주어진 상자 안에 꼭 맞게 줄여 넣는다(잘림 없이 최대한 크게) */
+  const measureCtx = document.createElement('canvas').getContext('2d');
+  function fitFontSize(text, maxW, maxH, base, min) {
+    let s = base;
+    while (s > min) {
+      measureCtx.font = '900 ' + s + 'px Pretendard,system-ui,-apple-system,sans-serif';
+      const w = measureCtx.measureText(text).width;
+      if (w <= maxW - 2 && s * 1.06 <= maxH) break;
+      s -= 0.5;
+    }
+    return Math.max(min, s);
+  }
+  function fitText(el, text, maxW, maxH, base, min) {
+    el.style.fontSize = fitFontSize(text, maxW, maxH, base, min) + 'px';
+  }
+
   function renderBoard(animSet) {
     boardEl.innerHTML = '';
+    const groups = {};
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
       const i = idx(r, c), v = P.grid[i];
       const d = document.createElement('div');
       d.className = 'cell ' + (c < 4 ? 'debit' : 'credit');
       d.dataset.i = String(i);
       d.setAttribute('role', 'gridcell');
-      d.setAttribute('aria-label', (c < 4 ? '차변 ' : '대변 ') + (r + 1) + '행 ' + (c % 4 + 1) + '열' + (v && v.key ? ' · ' + v.key : (v && v.pure ? ' · 색 블록' : (P.obst.has(i) ? ' · 잠금 상자' : ' · 빈 칸'))));
+      d.setAttribute('aria-label', (c < 4 ? '차변 ' : '대변 ') + (r + 1) + '행 ' + (c % 4 + 1) + '열' + (v && v.key ? ' · ' + v.key : (v && v.pure ? ' · 블록' : (P.obst.has(i) ? ' · 잠금 상자' : ' · 빈 칸'))));
       if (P.obst.has(i)) d.classList.add('obstacle');
       else if (v) {
         const b = document.createElement('div');
-        b.className = 'blk ' + v.cat + (v.sealed ? ' sealed' : '') + (v.pure ? ' pure' : '');
-        if (v.key) {
-          const s = document.createElement('span');
-          s.textContent = v.key;
-          b.appendChild(s);
-        }
+        b.className = 'blk ' + v.cat + (v.sealed ? ' sealed' : '') + (v.pure ? ' pure' : ' acct');
         d.appendChild(b);
-        if (animSet && animSet.has(i)) { b.classList.add('drop-anim'); }
+        if (animSet && animSet.has(i)) { d.classList.add('drop-anim'); }
+        if (v.key && v.gid) {
+          const g = groups[v.gid] || (groups[v.gid] = { key: v.key, minR: r, maxR: r, minC: c, maxC: c });
+          if (r < g.minR) g.minR = r; if (r > g.maxR) g.maxR = r;
+          if (c < g.minC) g.minC = c; if (c > g.maxC) g.maxC = c;
+        }
       }
       boardEl.appendChild(d);
     }
+    Object.keys(groups).forEach((gid) => paintAccTag(groups[gid]));
   }
 
-  function trayCell() { return window.innerWidth <= 350 ? 22 : window.innerWidth <= 400 ? 26 : 29; }
+  /* 계정과목 블록 위에 이름표 하나 — 지금보다 2배 이상 큰 글자, 블록 밖으로 넘치지 않게 자동 맞춤 */
+  function paintAccTag(g) {
+    const a = boardEl.querySelector('.cell[data-i="' + idx(g.minR, g.minC) + '"]');
+    const b = boardEl.querySelector('.cell[data-i="' + idx(g.maxR, g.maxC) + '"]');
+    if (!a || !b) return;
+    const x = a.offsetLeft, y = a.offsetTop;
+    const w = b.offsetLeft + b.offsetWidth - x;
+    const h = b.offsetTop + b.offsetHeight - y;
+    const tag = document.createElement('div');
+    tag.className = 'acc-tag';
+    tag.textContent = g.key;
+    tag.style.left = x + 'px';
+    tag.style.top = y + 'px';
+    tag.style.width = w + 'px';
+    tag.style.height = h + 'px';
+    boardEl.appendChild(tag);
+    fitText(tag, g.key, w - 4, h - 4, 24, 9);
+  }
+
+  function trayMetrics() {
+    const w = trayEl.clientWidth || 372;
+    const h = trayEl.clientHeight || 130;
+    return { slotW: Math.max(72, w / 3 - 6), slotH: Math.max(84, h - 12) };
+  }
+  /* 조각마다 칸 크기를 줄여 트레이 밖으로 절대 넘치지 않게 */
+  function pieceCellSize(pc) {
+    const tm = trayMetrics();
+    const box = shapeBox({ c: pc.cells });
+    const base = window.innerWidth <= 350 ? 23 : window.innerWidth <= 400 ? 27 : 30;
+    const gap = 3;
+    const badge = pc.pure ? 2 : 32;
+    const byH = Math.floor((tm.slotH - badge - (box.rows - 1) * gap) / box.rows);
+    const byW = Math.floor((tm.slotW - (box.cols - 1) * gap) / box.cols);
+    return Math.max(13, Math.min(base, byH, byW));
+  }
 
   function renderTray() {
     trayEl.innerHTML = '';
-    const cs = trayCell();
     let any = false;
+    const tm = trayMetrics();
+    const nameBase = window.innerHeight <= 700 ? 16 : window.innerWidth >= 600 ? 22 : 20;
     P.tray.forEach((pc, si) => {
       const wrap = document.createElement('div');
-      wrap.className = 'slot-piece';
+      wrap.className = 'slot-piece' + (P.spawnSlot === si ? ' spawn' : '');
       if (!pc) { trayEl.appendChild(wrap); return; }
       any = true;
+      const cs = pieceCellSize(pc);
+      const box = shapeBox({ c: pc.cells });
       const el = document.createElement('div');
       el.className = 'piece' + (pc.pure ? ' pure' : ' acct');
       el.style.gap = '3px';
       el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', (pc.pure ? '색 블록 조각 · 어디든 놓아 줄을 터뜨려요' : pc.key + ' 조각 · 끌어 놓거나 눌러서 고르기'));
+      el.setAttribute('aria-label', pc.pure
+        ? '블록 조각 · 어디든 놓아 한 줄을 터뜨려요'
+        : pc.key + ' 조각 · ' + (pc.side === 'd' ? '차변' : pc.side === 'c' ? '대변' : '제') + ' 자리에 놓아 분개를 완성하세요');
       el.tabIndex = 0;
       el.addEventListener('keydown', function (ev) {
         if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selectPiece(si); }
       });
       el.dataset.slot = String(si);
-      const rows = Math.max.apply(null, pc.cells.map((x) => x[0])) + 1;
-      const cols = Math.max.apply(null, pc.cells.map((x) => x[1])) + 1;
-      el.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cs + 'px)';
-      el.style.gridTemplateRows = 'repeat(' + rows + ', ' + cs + 'px)';
+      el.style.gridTemplateColumns = 'repeat(' + box.cols + ', ' + cs + 'px)';
+      el.style.gridTemplateRows = 'repeat(' + box.rows + ', ' + cs + 'px)';
       const map = {};
       pc.cells.forEach(([r, c]) => { map[r + ':' + c] = 1; });
-      const first = pc.cells.slice().sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]))[0];
-      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < box.rows; r++) for (let c = 0; c < box.cols; c++) {
         const cell = document.createElement('div');
-        if (map[r + ':' + c]) {
-          cell.className = 'pcell ' + pc.cat;
-        } else cell.style.visibility = 'hidden';
+        if (map[r + ':' + c]) cell.className = 'pcell ' + pc.cat;
+        else cell.style.visibility = 'hidden';
         el.appendChild(cell);
       }
       wrap.appendChild(el);
-      const nm = document.createElement('span');
-      nm.className = 'piece-name' + (pc.pure ? ' pure' : ' acct');
-      nm.textContent = pc.pure ? '색 블록' : pc.key;
-      wrap.appendChild(nm);
+      if (!pc.pure) {
+        const nm = document.createElement('span');
+        nm.className = 'piece-name acct';
+        nm.textContent = pc.key;
+        wrap.appendChild(nm);
+        fitText(nm, pc.key, tm.slotW - 24, 34, nameBase, 12);
+      }
       trayEl.appendChild(wrap);
     });
     if (!any) {
@@ -328,6 +413,7 @@
       d.textContent = '조각을 불러오는 중…';
       trayEl.appendChild(d);
     }
+    P.spawnSlot = -1;
   }
 
   function renderMission() {
@@ -428,9 +514,9 @@
 
   function buildGhost(pc, x, y, m) {
     const g = document.createElement('div');
-    g.className = 'piece';
-    const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
-    const cols = Math.max.apply(null, pc.cells.map((a) => a[1])) + 1;
+    g.className = 'piece' + (pc.pure ? ' pure' : ' acct');
+    const box = shapeBox({ c: pc.cells });
+    const rows = box.rows, cols = box.cols;
     const s = Math.round(m.size);
     g.style.gridTemplateColumns = 'repeat(' + cols + ', ' + s + 'px)';
     g.style.gridTemplateRows = 'repeat(' + rows + ', ' + s + 'px)';
@@ -443,16 +529,25 @@
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
       const d = document.createElement('div');
       if (map[r + ':' + c]) {
-        d.className = 'blk ' + pc.cat;
+        d.className = 'blk ' + pc.cat + (pc.pure ? ' pure' : ' acct');
         d.style.position = 'relative';
         d.style.borderRadius = '7px';
-        if (pc.key) {
-          const sp = document.createElement('span');
-          sp.textContent = pc.key;
-          d.appendChild(sp);
-        }
       } else d.style.visibility = 'hidden';
       g.appendChild(d);
+    }
+    if (!pc.pure) {
+      const tag = document.createElement('div');
+      tag.className = 'acc-tag';
+      tag.textContent = pc.key;
+      tag.style.inset = '0';
+      tag.style.width = 'auto';
+      tag.style.height = 'auto';
+      g.appendChild(tag);
+      dragLayer.appendChild(g);
+      drag.ghost = g;
+      drag.size = s;
+      fitText(tag, pc.key, cols * s + (cols - 1) * 3 - 4, rows * s + (rows - 1) * 3 - 4, 24, 9);
+      return;
     }
     dragLayer.appendChild(g);
     drag.ghost = g;
@@ -553,20 +648,44 @@
   });
 
   /* ───────── 배치 ───────── */
+  function paintScore(bump) {
+    const el = $('#playScore');
+    el.textContent = won(P.score);
+    if (bump) {
+      el.classList.remove('bump');
+      void el.offsetWidth;
+      el.classList.add('bump');
+    }
+  }
+  function addScore(n, bump) {
+    P.earned = (P.earned || 0) + n;
+    P.score = Math.max(0, P.earned - (P.penalty || 0));
+    paintScore(bump !== false);
+  }
+
+  /* 잘못된 분개 위치 → 감점 + 짧은 학습 팁 + 올바른 쪽 표시 */
+  function wrongSideTip(piece, miss) {
+    const a = ACCT[piece.key] || {};
+    const need = miss.side === 'd' ? '차변' : '대변';
+    const drop = 30;
+    P.penalty = (P.penalty || 0) + drop;
+    P.score = Math.max(0, (P.earned || 0) - P.penalty);
+    P.combo = 0;
+    P.mistakes = (P.mistakes || 0) + 1;
+    SOUND.play('wrong');
+    paintScore(true);
+    flashText('−' + drop, 'bad');
+    shakeBoard();
+    highlightSide(miss.side);
+    const why = a.ex || a.desc || (piece.key + ' 계정의 자리를 다시 확인해 보세요.');
+    showTip('❌ ' + piece.key + '은(는) ' + need + ' 칸!  −' + drop + '점', why);
+  }
+
   function tryPlace(piece, slot, r0, c0) {
     if (!canPlace(piece, r0, c0, P.grid, P.obst)) return;
     const miss = piece.pure ? null : P.mission.filter((m) => !m.filled && m.account === piece.key)[0];
-    const sideForPiece = miss ? miss.side : null;
-    if (miss && sideForPiece !== 'any' && !inSide(piece, r0, c0, sideForPiece)) {
-      // 틀린 존 → 되돌리고 힌트
-      const where = sideForPiece === 'd' ? '차변' : '대변';
-      const a = ACCT[piece.key];
-      const hint = a ? (piece.key + '은(는) ' + where + '에 놓아요') : (piece.key + '은(는) ' + where + ' 칸이에요');
-      bubble('❌ ' + hint);
-      toast(hint);
-      SOUND.play('wrong');
-      P.combo = 0;
-      renderMission();
+    if (miss && miss.side !== 'any' && !inSide(piece, r0, c0, miss.side)) {
+      wrongSideTip(piece, miss);
       return;
     }
     // 히스토리 저장
@@ -575,41 +694,45 @@
       obst: new Set(P.obst),
       mission: P.mission.map((m) => Object.assign({}, m)),
       tray: P.tray.slice(),
-      score: P.score, combo: P.combo
+      score: P.score, earned: P.earned, penalty: P.penalty, combo: P.combo
     });
     if (P.history.length > 40) P.history.shift();
 
+    const gid = piece.pure ? null : rid();
     const anim = new Set();
     cellsFor(piece, r0, c0).forEach(([r, c]) => {
       const i = idx(r, c);
-      P.grid[i] = { key: piece.key, cat: piece.cat, pure: !!piece.pure, sealed: false };
+      P.grid[i] = { key: piece.key, cat: piece.cat, pure: !!piece.pure, sealed: false, gid: gid };
       anim.add(i);
     });
-    P.tray[slot] = null;
-    const usedSlot = trayEl.querySelector('.piece[data-slot="' + slot + '"]');
-    if (usedSlot && usedSlot.parentNode) usedSlot.parentNode.innerHTML = '';
     SOUND.play('place');
 
     // 미션 채움
     if (miss) {
       miss.filled = true;
       cellsFor(piece, r0, c0).forEach(([r, c]) => { P.grid[idx(r, c)].sealed = true; });
-      P.score += 150;
+      addScore(200);
       SOUND.play('right');
-      setTimeout(() => bubble('✅ ' + piece.key + ' 자리 완성!'), 60);
+      setTimeout(() => bubble('✅ ' + piece.key + ' 제자리! 분개 +200'), 60);
       const slotEl = journalEl.querySelector('.jslot[data-acc="' + piece.key + '"]');
       if (slotEl) { slotEl.classList.add('pop'); }
-      flashText('+' + 150);
+      flashText('+200');
     } else if (piece.pure) {
-      // 색 블록은 놓는 것만으로도 점수 (블록 블라스트 손맛)
-      const gain = 5 * piece.cells.length;
-      P.score += gain;
+      // 일반 블록은 놓는 것만으로도 점수 (블록 블라스트 손맛)
+      addScore(8 * piece.cells.length);
       P.placed = (P.placed || 0) + 1;
+    } else {
+      // 이미 자리가 채워진 계정 블록(되돌리기 등) — 놓아도 점수는 조금
+      addScore(8 * piece.cells.length);
     }
 
     renderBoard(anim);
     renderMission();
-    $('#playScore').textContent = won(P.score);
+    paintScore(false);
+
+    // 즉시 리필 — 놓은 자리에 바로 새 블록이 들어온다
+    refillSlot(slot);
+    renderTray();
 
     // 줄 터짐
     setTimeout(() => {
@@ -667,35 +790,88 @@
     return { lines: full, count: full.length, obstCleared: obstCleared, cells: doomed };
   }
 
+  const LINE_PTS = [0, 300, 800, 1500, 2400, 3600, 5000, 7000, 9000];
+
   function afterClear(res) {
-    const pts = [0, 100, 300, 600, 1000, 1400, 1800, 2200][Math.min(7, res.count)] + res.obstCleared * 50;
+    const base = LINE_PTS[Math.min(8, res.count)] + res.obstCleared * 60;
     P.clears += res.count;
-    P.score += pts;
+    P.combo = Math.min(9, (P.combo || 0) + 1);
+    P.maxCombo = Math.max(P.maxCombo || 0, P.combo);
+    const comboSwing = P.combo >= 2 ? (P.combo - 1) * 120 : 0;
+    addScore(base + comboSwing);
     const goalEl = $('#missionGoal');
-    if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림! +300'; }
-    P.combo = Math.min(9, P.combo + 1);
+    if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림!'; }
     if (P.combo >= 2) {
-      P.score += (P.combo - 1) * 50;
       const banner = $('#comboBanner');
-      banner.textContent = 'COMBO ×' + P.combo;
+      banner.innerHTML = 'COMBO ×' + P.combo + '<small>+' + won(base + comboSwing) + '</small>';
       banner.classList.add('show');
       clearTimeout(banner._t);
-      banner._t = setTimeout(() => banner.classList.remove('show'), 1100);
+      banner._t = setTimeout(() => banner.classList.remove('show'), 1200);
       SOUND.play('combo', P.combo);
     } else {
       SOUND.play('clear', res.count);
     }
-    flashText('+' + pts);
-    $('#playScore').textContent = won(P.score);
-    if (res.count >= 1) fx.confetti(res.count >= 3 ? 150 : res.count >= 2 ? 100 : 55);
+    flashText('+' + won(base + comboSwing));
+    showBeams(res.lines);
+    hitStop();
+    if (res.count >= 1) fx.confetti(res.count >= 3 ? 170 : res.count >= 2 ? 110 : 60);
     if (res.count >= 2) fx.firework();
     if (res.count >= 3) fx.fireworks(2);
     setTimeout(() => { renderBoard(); }, 320);
   }
 
-  function flashText(text) {
+  /* 터진 줄 위로 빛줄기가 스쳐 지나간다 */
+  function showBeams(lines) {
+    lines.forEach((l) => {
+      const i0 = l.type === 'row' ? idx(l.i, 0) : idx(0, l.i);
+      const i1 = l.type === 'row' ? idx(l.i, 7) : idx(7, l.i);
+      const a = boardEl.querySelector('.cell[data-i="' + i0 + '"]');
+      const b = boardEl.querySelector('.cell[data-i="' + i1 + '"]');
+      if (!a || !b) return;
+      const d = document.createElement('div');
+      d.className = 'beam ' + l.type;
+      d.style.left = a.offsetLeft + 'px';
+      d.style.top = a.offsetTop + 'px';
+      d.style.width = (b.offsetLeft + b.offsetWidth - a.offsetLeft) + 'px';
+      d.style.height = (b.offsetTop + b.offsetHeight - a.offsetTop) + 'px';
+      boardEl.appendChild(d);
+      setTimeout(() => d.remove(), 520);
+    });
+  }
+  function hitStop() {
+    boardEl.classList.remove('hit');
+    void boardEl.offsetWidth;
+    boardEl.classList.add('hit');
+    setTimeout(() => boardEl.classList.remove('hit'), 420);
+  }
+  function shakeBoard() {
+    const w = boardEl.parentNode;
+    w.classList.remove('shake');
+    void w.offsetWidth;
+    w.classList.add('shake');
+    setTimeout(() => w.classList.remove('shake'), 380);
+  }
+  function highlightSide(side) {
+    const el = document.querySelector('.zone-label.' + (side === 'd' ? 'debit' : 'credit'));
+    if (!el) return;
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 1500);
+  }
+  let tipTimer = null;
+  function showTip(big, small) {
+    const el = $('#tipCard');
+    if (!el) return;
+    el.innerHTML = '<b>' + big + '</b><span>' + small + '</span>';
+    el.classList.add('show');
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(() => el.classList.remove('show'), 3400);
+  }
+
+  function flashText(text, cls) {
     const d = document.createElement('div');
-    d.className = 'flash-score';
+    d.className = 'flash-score' + (cls ? ' ' + cls : '');
     d.textContent = text;
     $('#screen-play').appendChild(d);
     setTimeout(() => d.remove(), 900);
@@ -703,14 +879,18 @@
 
   function finishTurn() {
     if (P.done) return;
-    const all = P.mission.every((m) => m.filled);
-    if (all) { setTimeout(stageClear, 260); return; }
-    if (P.tray.filter(Boolean).length === 0) refillTray();
+    if (P.mission.every((m) => m.filled)) { setTimeout(stageClear, 260); return; }
+    if (P.tray.filter(Boolean).length < 3) {
+      for (let i = 0; i < 3; i++) if (!P.tray[i]) refillSlot(i);
+      renderTray();
+    }
     if (!anyTrayFits()) {
       setTimeout(function () {
         if (P.done) return;
         P.over = true;
-        $('#overLine').textContent = '조각 3개를 놓을 자리가 없어요. 이어하기로 보드를 정리할까요?';
+        $('#overLine').textContent = '놓을 자리가 없어요. 보드를 정리하면 계속할 수 있어요.';
+        const cb = $('#ovOver').querySelector('[data-ov="continue"]');
+        if (cb) cb.textContent = P.freeClean ? '🧹 보드 정리 (무료)' : '💎5 보드 정리';
         $('#ovOver').hidden = false;
       }, 300);
     }
@@ -723,7 +903,8 @@
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: buildObstacles(stageNo),
-      mission: buildMission(st), tray: [], score: 0, combo: 0, clears: 0, turn: 0, placed: 0,
+      mission: buildMission(st), tray: [], score: 0, earned: 0, penalty: 0, mistakes: 0,
+      combo: 0, maxCombo: 0, clears: 0, placed: 0, sinceAcc: 0, spawnSlot: -1, freeClean: true,
       history: [], over: false, done: false, startedAt: Date.now()
     };
     SAVE.last = { corner: cornerKey, stage: stageNo }; save();
@@ -732,23 +913,27 @@
     renderMission();
     $('#playScore').textContent = '0';
     const g = $('#missionGoal');
-    if (g) { g.classList.remove('on'); g.textContent = '🎯 한 줄 터뜨리면 +300'; }
+    if (g) { g.classList.remove('on'); g.textContent = '🎯 1줄 +300 · 콤보 보너스'; }
     show('screen-play');
     SOUND.start();
-    if (stageNo <= 2) bubble('색 블록은 어디든! 계정 블록은 차변·대변 제자리에');
+    if (stageNo <= 2) bubble('일반 블록은 어디든! 계정 블록은 차변·대변 제자리에');
   }
 
   function stageClear() {
     if (P.done) return;
     P.done = true;
+    clearTimeout(tipTimer);
+    $('#tipCard').classList.remove('show');
     const sec = Math.max(1, Math.round((Date.now() - P.startedAt) / 1000));
-    const speed = Math.max(0, 500 - Math.max(0, sec - 25) * 8);
+    /* 빨리 풀수록 큰 속도 보너스 (12초까지 만점, 이후 초당 15점씩 감소) */
+    const speed = Math.max(0, 900 - Math.max(0, sec - 12) * 15);
     const filled = P.grid.filter(Boolean).length;
-    const room = Math.max(0, 40 - Math.max(0, filled - 8) * 2);
-    const comboBonus = P.combo * 30;
-    const lineBonus = P.clears > 0 ? 300 : 0;
-    const total = 500 + P.score + speed + room + comboBonus + lineBonus;
-    const stars = total >= 1100 ? 3 : total >= 750 ? 2 : 1;
+    const room = Math.max(0, 60 - Math.max(0, filled - 10) * 3);
+    const comboBonus = (P.maxCombo || 0) * 80;
+    const lineBonus = P.clears * 100;
+    const earned = P.earned || 0;
+    const total = Math.max(0, 500 + earned + speed + room + comboBonus + lineBonus - (P.penalty || 0));
+    const stars = total >= 2000 ? 3 : total >= 1300 ? 2 : 1;
     const gems = 5 + (stars - 1) * 2;
     const id = P.st.id;
     SAVE.stars[id] = Math.max(SAVE.stars[id] || 0, stars);
@@ -763,9 +948,11 @@
     $('#clearTitle').textContent = stars === 3 ? '완벽한 분개!' : '분개 완성!';
     $('#clearScore').textContent = won(total);
     $('#clearBreakdown').innerHTML =
-      '<span>기본 500</span><span>블록 ' + won(P.score) + '</span><span>속도 +' + won(speed) + '</span>' +
+      '<span>기본 500</span><span>블록 ' + won(earned) + '</span><span>속도 +' + won(speed) + '</span>' +
       '<span>여유 +' + won(room) + '</span><span>콤보 +' + won(comboBonus) + '</span>' +
-      (lineBonus ? '<span>줄터짐 +300</span>' : '') + '<span>💎 +' + gems + '</span>';
+      '<span>줄터짐 +' + won(lineBonus) + '</span>' +
+      (P.penalty ? '<span class="minus">실수 −' + won(P.penalty) + '</span>' : '') +
+      '<span>💎 +' + gems + '</span>';
     $('#clearJournal').innerHTML = journalHTML(P.st);
     $('#clearExplain').textContent = P.st.explain || '';
     $('#ovClear').hidden = false;
@@ -1308,6 +1495,27 @@
   }
   function closeScreens() {}
 
+  /* 보드 정리 — 막힘 안전장치. 첫 번째는 무료, 그다음부터 보석 5개 */
+  function cleanBoard(cost) {
+    if (cost > 0) {
+      if (SAVE.gems < cost) { toast('보석이 모자라요 (필요 💎' + cost + ')'); SOUND.play('wrong'); return; }
+      addGems(-cost);
+    }
+    [6, 7].forEach((r) => {
+      for (let c = 0; c < N; c++) {
+        const i = idx(r, c);
+        if (P.grid[i] && !P.grid[i].sealed) P.grid[i] = null;
+      }
+    });
+    let rm = 0;
+    P.obst.forEach((i) => { if (rm < 4) { P.obst.delete(i); rm++; } });
+    P.over = false;
+    P.freeClean = false;
+    renderBoard(); refillTray(); renderMission();
+    SOUND.play('gem');
+    toast(cost > 0 ? '💎' + cost + ' 사용 · 보드를 정리했어요' : '🧹 보드를 정리했어요 (무료 1회)');
+  }
+
   /* ───────── 도감 ───────── */
   function renderBook(filter) {
     $('#bookGems').textContent = SAVE.gems;
@@ -1339,13 +1547,7 @@
       if (k === 'retry') startStage(P.cornerKey, P.stageNo);
       else if (k === 'quit') openStages(P.cornerKey);
       else if (k === 'continue') {
-        if (SAVE.gems < 5) { toast('보석이 모자라요 (필요 💎5)'); return; }
-        addGems(-5);
-        [6, 7].forEach((r) => { for (let c = 0; c < N; c++) { const i = idx(r, c); if (P.grid[i] && !P.grid[i].sealed) P.grid[i] = null; } });
-        let rm = 0; P.obst.forEach((i) => { if (rm < 4) { P.obst.delete(i); rm++; } });
-        P.over = false;
-        renderBoard(); refillTray(); renderMission();
-        toast('💎5 사용 · 보드를 정리했어요');
+        cleanBoard(P.freeClean ? 0 : 5);
       }
     }
   });
@@ -1391,11 +1593,12 @@
   SOUND.set(SAVE.music !== false);
   paintTrack();
 
-  /* 테스트용 읽기 전용 훅 */
+  /* 검수용 훅 (읽기 + 시나리오 재현용 동작) */
   window.__blast = {
     state: function () {
       return P ? {
-        corner: P.cornerKey, stage: P.stageNo, score: P.score, combo: P.combo,
+        corner: P.cornerKey, stage: P.stageNo, score: P.score, earned: P.earned, penalty: P.penalty,
+        combo: P.combo, maxCombo: P.maxCombo, clears: P.clears, sinceAcc: P.sinceAcc,
         mission: P.mission.map((m) => ({ side: m.side, account: m.account, filled: m.filled })),
         tray: P.tray.map((p) => p && { key: p.key, pure: !!p.pure, cells: p.cells, shape: p.shape, side: p.side }),
         obstacles: Array.from(P.obst), gridFilled: P.grid.filter(Boolean).length,
@@ -1413,12 +1616,52 @@
     },
     confetti: function (n) { fx.confetti(n || 120); },
     firework: function () { fx.firework(); },
+    /* 검수용: 트레이 조각을 지정 칸에 놓는다 */
+    place: function (slot, r, c) {
+      if (!P) return false;
+      const pc = P.tray[slot];
+      if (!pc) return false;
+      if (!canPlace(pc, r, c, P.grid, P.obst)) return false;
+      tryPlace(pc, slot, r, c);
+      return true;
+    },
+    /* 검수용: 보드 상태를 글자 표로 */
+    gridText: function () {
+      if (!P) return '';
+      const out = [];
+      for (let r = 0; r < 8; r++) {
+        const row = [];
+        for (let c = 0; c < 8; c++) {
+          const v = P.grid[idx(r, c)];
+          row.push(P.obst.has(idx(r, c)) ? '#' : !v ? '.' : v.pure ? 'o' : String(v.key).slice(0, 2));
+        }
+        out.push(row.join(' '));
+      }
+      return out.join('\n');
+    },
     /* 개발용: 줄 터짐·콤보 확인 */
     testFill: function (row, acc) {
       if (!P) return null;
       for (let c = 0; c < 8; c++) { const i = row * 8 + c; if (!P.grid[i]) P.grid[i] = { key: acc || '현금', cat: 'c-asset', sealed: false }; }
       return P.grid.filter(Boolean).length;
     },
-    testTurn: function () { const r = resolveLines(); if (r.count) afterClear(r); finishTurn(); return r.count; }
+    testTurn: function () { const r = resolveLines(); if (r.count) afterClear(r); finishTurn(); return r.count; },
+    /* 검수용: 현재 트레이를 계정과목 조각으로 강제 교체 */
+    forceAccount: function (slot, key, side) {
+      if (!P) return false;
+      const pc = newAccountPiece(key, side || 'any');
+      if (!pc) return false;
+      P.tray[slot] = pc;
+      renderTray();
+      return true;
+    },
+    forcePure: function (slot, shapeName) {
+      if (!P) return false;
+      const sp = SHAPES.filter((s) => !shapeName || s.n === shapeName)[0];
+      if (!sp) return false;
+      P.tray[slot] = { key: null, pure: true, cat: PURE_CATS[slot % PURE_CATS.length], cells: sp.c, shape: sp.n, side: null, id: rid() };
+      renderTray();
+      return true;
+    }
   };
 })();
