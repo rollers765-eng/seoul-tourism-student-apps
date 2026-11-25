@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>카페 사장님의 장부 미션 | 당좌자산</title>
+  <title>카페 사장님의 장부 미션 | 재고자산</title>
   <style>
     :root {
       --bg: #FFF8EF;
@@ -1217,7 +1217,7 @@
       font-weight: 700;
     }
 
-    /* 27장 연습 결과 막대 */
+    /* 21장 연습 결과 막대 */
     .challenge-bar {
       display: flex;
       flex-wrap: wrap;
@@ -1289,7 +1289,7 @@
     <div class="header-top">
       <div class="header-left">
         <a class="library-link" href="https://rollers765-eng.github.io/seoul-tourism-student-apps/accounting-library/">← 자료실</a>
-        <span class="brand-title">카페 사장님의 장부 미션 | 당좌자산</span>
+        <span class="brand-title">카페 사장님의 장부 미션 | 재고자산</span>
       </div>
       <div class="mode-switcher" role="group" aria-label="학습 모드 선택">
         <button type="button" class="mode-btn" id="btnModeTeacher" data-mode="teacher" aria-pressed="true">수업 모드</button>
@@ -2269,23 +2269,23 @@
     function renderSummarySlide(slide) {
       var stats = getChallenge27Stats();
       var html = '<section class="top-banner">' +
-        '<div class="slide-meta-row"><span class="badge badge-period">4차시 · 마무리</span><span class="badge badge-concept">당좌자산 10개 핵심 개념</span></div>' +
+        '<div class="slide-meta-row"><span class="badge badge-period">2차시 · 마무리</span><span class="badge badge-concept">재고자산 핵심 개념</span></div>' +
         '<h1 class="slide-title">' + escapeHtml(slide.title) + '</h1>' +
         '<p class="concept-note">' + escapeHtml(slide.concept) + '</p>';
 
       if (stats.completed > 0) {
         html += '<div class="challenge-bar" style="margin-top:12px;">' +
-          '<span>27장 연습 결과: 완료 ' + stats.completed + ' / ' + stats.total + '문항 · 맞힌 문항 ' + stats.correct + '문항</span>' +
-          '<button type="button" class="btn btn-primary" data-reset-challenge="1">27장 다시 풀기</button>' +
+          '<span>21장 연습 결과: 완료 ' + stats.completed + ' / ' + stats.total + '문항 · 맞힌 문항 ' + stats.correct + '문항</span>' +
+          '<button type="button" class="btn btn-primary" data-reset-challenge="1">21장 다시 풀기</button>' +
           '</div>';
       } else {
         html += '<div class="action-bar">' +
-          '<button type="button" class="btn btn-primary" data-jump-slide="27">27장 6문항 챌린지 풀러 가기</button>' +
+          '<button type="button" class="btn btn-primary" data-jump-slide="21">21장 5문항 점검 풀러 가기</button>' +
           '</div>';
       }
       html += '</section>';
 
-      html += '<section class="panel-card"><h2 class="panel-title">당좌자산 10개 개념 마감 체크표</h2>' +
+      html += '<section class="panel-card"><h2 class="panel-title">재고자산 개념 마감 체크표</h2>' +
         '<div class="info-table-wrap"><table class="info-table">' +
         '<thead><tr><th style="width:22%;">개념</th><th>기억할 핵심 질문</th><th style="width:18%;">예제 장 이동</th></tr></thead><tbody>';
       (slide.checklist || []).forEach(function (row) {
@@ -2295,7 +2295,7 @@
       });
       html += '</tbody></table></div>';
       if (stats.completed > 0) {
-        html += '<div class="action-bar"><button type="button" class="btn btn-accent" data-reset-challenge="1">27장 연습 초기화 후 다시 풀기</button></div>';
+        html += '<div class="action-bar"><button type="button" class="btn btn-accent" data-reset-challenge="1">21장 연습 초기화 후 다시 풀기</button></div>';
       }
       html += '</section>';
       return html;
