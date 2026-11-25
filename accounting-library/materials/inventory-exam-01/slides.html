@@ -2259,7 +2259,7 @@
     }
 
     /* =========================
-       특수 슬라이드 렌더러 (1장, 28장)
+       특수 슬라이드 렌더러 (1장, 22장)
        ========================= */
     function renderCoverSlide(slide) {
       var html = '<section class="cover-hero">' +
@@ -2350,7 +2350,7 @@
         }
         html += '</section>';
 
-        // 27장 학생 모드 연습 결과 현황판
+        // 21·22장 학생 모드 연습 결과 현황판
         if ((slide.id === 21 || slide.id === 22) && window.APP_STATE.mode === 'student') {
           var st27 = getChallenge27Stats();
           html += '<div class="challenge-bar">' +
@@ -2632,7 +2632,7 @@
           return;
         }
 
-        // 27장 초기화 후 다시 풀기
+        // 21장 초기화 후 다시 풀기
         btn = e.target.closest('[data-reset-challenge]');
         if (btn) {
           resetChallenge27();
