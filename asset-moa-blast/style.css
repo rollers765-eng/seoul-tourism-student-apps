@@ -641,7 +641,12 @@ body{
   text-align:center;letter-spacing:0;
 }
 #screen-play .slot-piece.account-slot{padding-bottom:var(--account-reserve,16px)}
-#screen-play .account-edge{outline:1px solid rgba(255,218,105,.85);outline-offset:-1px;animation:account-edge-glow 2s ease-in-out infinite}
+#screen-play .account-edge{
+  --account-inset:inset 0 0 0 2px #ffe066;
+  box-shadow:var(--account-inset),0 0 8px rgba(255,206,84,.75),0 0 16px rgba(255,170,40,.45);
+  animation:account-edge-glow 2s ease-in-out infinite;
+}
+#screen-play .pcell.account-edge{--account-inset:inset 0 0 0 1.5px rgba(255,255,255,.9)}
 #screen-play .tray-refill .piece,#screen-play .tray-refill .piece-name{animation:tray-refill-pop .24s ease-out}
 #screen-play .tray-refill .piece.sel{animation:selpulse .9s ease-in-out infinite}
 #screen-play .mission-with-tip{position:relative}
@@ -653,7 +658,10 @@ body{
 }
 #screen-play .placement-tip[hidden]{display:none}
 #screen-play .placement-shake{animation:placement-shake .26s ease-out}
-@keyframes account-edge-glow{0%,100%{outline-color:#ffda6999}50%{outline-color:#ffeebd}}
+@keyframes account-edge-glow{
+  0%,100%{box-shadow:var(--account-inset),0 0 8px rgba(255,206,84,.75),0 0 16px rgba(255,170,40,.45)}
+  50%{box-shadow:var(--account-inset),0 0 14px rgba(255,224,120,.95),0 0 26px rgba(255,160,30,.7)}
+}
 @keyframes tray-refill-pop{0%{opacity:.38;scale:.72}64%{opacity:1;scale:1.07}100%{opacity:1;scale:1}}
 @keyframes placement-shake{25%,75%{translate:-3px 0}50%{translate:3px 0}}
 @media(max-width:399px){#screen-play .piece-name.acct{font-size:16px}}

@@ -176,10 +176,13 @@
     const accounts = new Set(held.filter((pc) => !pc.pure).map((pc) => pc.key));
     const open = P.mission.filter((m) => !m.filled && !accounts.has(m.account));
     if (open.length && (!accounts.size || Math.random() < ACCOUNT_RATE)) {
-      const options = shuffle(open).map((m) => ({ m, shapes: playableShapes(ACCOUNT_SHAPES, m.side) }));
-      const { m, shapes } = options.find((option) => option.shapes.length) || options[0];
-      // 판이 꽉 찬 경우에도 필요한 계정은 트레이에 남겨 두고 색 블록으로 판을 열 수 있게 한다.
-      return makePiece(shapeWeighted(shapes.length ? shapes : ACCOUNT_SHAPES), m.account, m.side, catClass(m.account));
+      for (const entry of shuffle(open)) {
+        const shapes = playableShapes(ACCOUNT_SHAPES, entry.side);
+        if (shapes.length) {
+          return makePiece(shapeWeighted(shapes), entry.account, entry.side, catClass(entry.account));
+        }
+      }
+      // 막힌 계정은 미션에 남겨 두고, 빈자리가 생긴 다음 리필에서 다시 검사한다.
     }
     const available = playableShapes(SHAPES, 'any');
     const colors = PURE_CATS.filter((cat) => !held.some((pc) => pc.cat === cat));
@@ -609,7 +612,7 @@
       obst: new Set(P.obst),
       mission: P.mission.map((m) => Object.assign({}, m)),
       tray: P.tray.slice(),
-      earned: P.earned, combo: P.combo, clears: P.clears, placed: P.placed
+      earned: P.earned, penalty: P.penalty, combo: P.combo, clears: P.clears, placed: P.placed
     });
     if (P.history.length > 40) P.history.shift();
 
@@ -846,7 +849,10 @@
     if (name === 'undo') {
       const h = P.history.pop();
       if (!h) { toast('되돌릴 배치가 없어요'); return; }
-      P.grid = h.grid; P.obst = h.obst; P.mission = h.mission; P.tray = h.tray; P.earned = h.earned; P.combo = h.combo; P.clears = h.clears; P.placed = h.placed;
+      Object.assign(P, h);
+      clearTimeout(tipTimer);
+      $('#placementTip').hidden = true;
+      boardEl.classList.remove('placement-shake');
       renderBoard(); renderTray(); renderMission();
     } else if (name === 'clean') {
       let removed = 0;
