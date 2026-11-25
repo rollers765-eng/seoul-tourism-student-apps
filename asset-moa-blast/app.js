@@ -182,6 +182,18 @@
     return { key: key, cat: cat, cells: SHAPES[0].c, shape: '1', side: sideHint || null, id: Math.random().toString(36).slice(2) };
   }
 
+  const CORNER_POOL = {};
+  function cornerAccounts(key) {
+    if (CORNER_POOL[key]) return CORNER_POOL[key];
+    const set = {};
+    (D.STAGES[key] || []).forEach((st) => {
+      (st.entries || []).forEach((e) => { if (e.account) set[e.account] = 1; });
+      (st.picks || []).forEach((p) => { if (isAccount(p.label)) set[p.label] = 1; });
+    });
+    CORNER_POOL[key] = Object.keys(set);
+    return CORNER_POOL[key];
+  }
+
   function decoyKeys(st, n) {
     const used = P.mission.map((m) => m.account);
     let pool;
@@ -189,15 +201,19 @@
       pool = (st.decoys || []).map((x) => x.label);
     } else {
       const sameKind = [];
+      const cp = cornerAccounts(st.corner);
+      const others = [];
       P.mission.forEach((m) => {
         const a = ACCT[m.account];
         if (!a) return;
-        Object.keys(ACCT).forEach((k) => {
-          if (ACCT[k].kind === a.kind && used.indexOf(k) < 0) sameKind.push(k);
+        cp.forEach((k) => {
+          if (ACCT[k] && ACCT[k].kind === a.kind && used.indexOf(k) < 0) sameKind.push(k);
         });
       });
-      pool = sameKind.concat(Object.keys(ACCT).filter((k) => used.indexOf(k) < 0));
-      pool = shuffle(pool);
+      Object.keys(ACCT).forEach((k) => {
+        if (used.indexOf(k) < 0 && sameKind.indexOf(k) < 0) others.push(k);
+      });
+      pool = shuffle(sameKind).concat(shuffle(others));
     }
     const out = [];
     for (const k of shuffle(pool)) {
@@ -344,6 +360,7 @@
 
   /* ───────── 드래그 ───────── */
   let drag = null;
+  let sel = null; // {slot} 탭으로 고른 조각
 
   function metrics() {
     const cells = boardEl.querySelectorAll('.cell');
@@ -373,7 +390,7 @@
     const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
     const offC = Math.min(cols - 1, Math.max(0, Math.floor((e.clientX - rect.left) / (rect.width / cols))));
     const offR = Math.min(rows - 1, Math.max(0, Math.floor((e.clientY - rect.top) / (rect.height / rows))));
-    drag = { piece: pc, slot: si, offR: offR, offC: offC, ghost: null, preview: [] };
+    drag = { piece: pc, slot: si, offR: offR, offC: offC, ghost: null, preview: [], startX: e.clientX, startY: e.clientY, moved: false };
     buildGhost(pc, e.clientX, e.clientY, m);
     pEl.classList.add('gone');
     moveDrag(e.clientX, e.clientY);
@@ -437,6 +454,8 @@
 
   document.addEventListener('pointermove', function (e) {
     if (!drag) return;
+    if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) > 8) drag.moved = true;
+    if (!drag.moved) return;
     e.preventDefault();
     moveDrag(e.clientX, e.clientY);
   }, { passive: false });
@@ -448,8 +467,27 @@
     clearPreview();
     const pieceEl = trayEl.querySelector('.piece[data-slot="' + d.slot + '"]');
     if (pieceEl) pieceEl.classList.remove('gone');
-    if (d.target) tryPlace(d.piece, d.slot, d.target.r, d.target.c);
+    if (d.target && d.moved) { tryPlace(d.piece, d.slot, d.target.r, d.target.c); return; }
+    if (!d.moved) selectPiece(d.slot);
   });
+
+  function selectPiece(slot) {
+    if (!P || P.over || P.done) return;
+    if (sel && sel.slot === slot) { sel = null; }
+    else { sel = { slot: slot }; SOUND.play('place'); }
+    paintSelection();
+    const pc = P.tray[slot];
+    if (sel && pc) {
+      const spots = placements(pc, P.grid, P.obst, 'any');
+      if (!spots.length) toast('이 조각은 지금 놓을 자리가 없어요');
+    }
+  }
+  function paintSelection() {
+    trayEl.querySelectorAll('.piece').forEach((el) => {
+      el.classList.toggle('sel', !!sel && Number(el.dataset.slot) === sel.slot);
+    });
+    boardEl.classList.toggle('pick-mode', !!sel);
+  }
   document.addEventListener('pointercancel', function () {
     if (!drag) return;
     const d = drag; drag = null;
@@ -457,6 +495,30 @@
     clearPreview();
     const pieceEl = trayEl.querySelector('.piece[data-slot="' + d.slot + '"]');
     if (pieceEl) pieceEl.classList.remove('gone');
+  });
+
+  /* 보드 탭 배치 (드래그 보조) */
+  boardEl.addEventListener('click', function (e) {
+    if (!sel || !P || P.over || P.done) return;
+    const cell = e.target.closest('.cell');
+    if (!cell) return;
+    const i = Number(cell.dataset.i);
+    const pc = P.tray[sel.slot];
+    if (!pc) { sel = null; paintSelection(); return; }
+    const tr = Math.floor(i / 8), tc = i % 8;
+    // 누른 칸이 조각의 첫 칸이 되도록, 안 되면 조각 안에서 가장 가까운 칸 기준으로 보정
+    const tries = [[tr, tc]];
+    pc.cells.forEach(([dr, dc]) => tries.push([tr - dr, tc - dc]));
+    for (const [r0, c0] of tries) {
+      if (canPlace(pc, r0, c0, P.grid, P.obst)) {
+        const slot = sel.slot;
+        sel = null; paintSelection();
+        tryPlace(pc, slot, r0, c0);
+        return;
+      }
+    }
+    toast('여기에는 이 조각이 들어가지 않아요');
+    SOUND.play('wrong');
   });
 
   /* ───────── 배치 ───────── */
