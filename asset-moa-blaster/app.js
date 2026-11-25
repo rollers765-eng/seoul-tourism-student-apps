@@ -692,6 +692,12 @@
 
   /* 점검용(수업 준비·자동 점검에서 상태를 읽기만 함) */
   window.BlasterApp = { state: () => P, engine: () => engine };
+  if (location.hash === '#dev') {
+    window.BlasterDev = {
+      start: (key, n) => startStage(key, n),
+      unlock: () => { D.CORNERS.forEach((c) => { prog(c.key).cleared = c.stages; }); save(); renderHome(); }
+    };
+  }
 
   /* ══════════ 시작 ══════════ */
   renderHome();
