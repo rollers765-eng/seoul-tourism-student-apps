@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#4a5cc4">
+<meta name="theme-color" content="#7d63e6">
 <title>자산모아 블럭모아 Blast | 분개를 터뜨리는 회계 블록 퍼즐</title>
-<meta name="description" content="8×8 보드에 계정 블록을 끼워 분개를 완성하는 회계원리 학습 퍼즐. 재고·투자·유형·무형자산 160단계와 보석 챌린지.">
+<meta name="description" content="색 블록을 터뜨리고 계정 블록을 차변·대변에 끼워 분개를 완성하는 회계원리 학습 퍼즐. 재고·투자·유형·무형자산 160단계와 보석 챌린지.">
 <link rel="canonical" href="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="서울관광고등학교 회계원리 자료실">
@@ -23,32 +23,39 @@
 <meta name="twitter:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="style.css?v=31">
+<link rel="stylesheet" href="style.css?v=40">
 </head>
 <body>
+<canvas id="fx" aria-hidden="true"></canvas>
 <div id="app">
-  <canvas id="fx" aria-hidden="true"></canvas>
   <div id="bubbles" aria-hidden="true"></div>
 
   <!-- 홈 -->
   <section class="screen active" id="screen-home">
     <header class="home-top">
-      <button class="chip" id="btnMusic" aria-label="배경음악 켜기/끄기" aria-pressed="true">🎵</button>
-      <div class="gem-chip" id="homeGems"><span>💎</span><b>30</b></div>
+      <a class="nav-back" href="../accounting-library/" aria-label="회계원리 자료실로 돌아가기"><span aria-hidden="true">←</span> 회계원리 자료실</a>
+      <div class="home-top-right">
+        <button class="chip" id="btnMusic" aria-label="배경음악 켜기/끄기" aria-pressed="true">🎵</button>
+        <span class="track-chip" id="musicTrack" title="지금 나오는 배경음악 트랙" aria-live="polite">♪ 1/3</span>
+        <div class="gem-chip" id="homeGems"><span>💎</span><b>30</b></div>
+      </div>
     </header>
-    <div class="logo-wrap">
-      <h1 class="logo">자산모아<span class="logo-sub">블럭모아</span><span class="logo-blast">Blast</span></h1>
-      <p class="tagline">블록을 터뜨리면, 분개가 저절로!</p>
-    </div>
-    <div class="moa-hero">
-      <img src="assets/moa.png" alt="연필과 계산기를 가방에 매단 모아" id="homeMoa">
-      <div class="speech" id="homeSpeech">오늘은 어떤 자산을 모아 볼까?</div>
+    <div class="hero">
+      <div class="hero-left">
+        <h1 class="logo">자산모아<span class="logo-sub">블럭모아</span><span class="logo-blast">Blast</span></h1>
+        <p class="tagline">블록을 터뜨리면, 분개가 저절로!</p>
+        <div class="moa-hero">
+          <img src="assets/moa.png" alt="연필과 계산기를 가방에 매단 모아" id="homeMoa">
+          <div class="speech" id="homeSpeech">오늘은 어떤 자산을 모아 볼까?</div>
+        </div>
+      </div>
+      <aside class="rank-cloud" id="rankCloud" aria-label="실시간 랭킹 1위부터 5위"></aside>
     </div>
     <div class="dday" id="homeDday">3차 서술형 · 기말 대비</div>
     <nav class="home-actions">
       <button class="big-btn" id="btnPlay">▶ 바로 플레이</button>
-      <div class="row">
-        <button class="round-btn" id="btnChallenge">💎<small>보석 챌린지</small></button>
+      <button class="big-btn gem-btn" id="btnChallenge">💎 도전! 보석챌린지</button>
+      <div class="row3">
         <button class="round-btn" id="btnShop">🛍️<small>상점</small></button>
         <button class="round-btn" id="btnRank">🏆<small>랭킹</small></button>
         <button class="round-btn" id="btnBook">📖<small>도감</small></button>
@@ -182,7 +189,7 @@
 </div>
 
 <script src="data.js?v=1"></script>
-<script src="music.js?v=11"></script>
-<script src="app.js?v=31"></script>
+<script src="music.js?v=12"></script>
+<script src="app.js?v=40"></script>
 </body>
 </html>

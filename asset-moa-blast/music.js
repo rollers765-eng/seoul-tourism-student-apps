@@ -1,11 +1,12 @@
-/* 자산모아 블럭모아 Blast — 신나는 업비트 BGM + 효과음 (WebAudio 실시간 합성)
-   126 BPM, C major I–V–vi–IV, 마림바 리드 + 통통 튀는 베이스 + 4분 킥 + 박수 + 하이햇 */
+/* 자산모아 블럭모아 Blast — 신나는 업비트 BGM 3트랙 순환 + 효과음 (WebAudio 실시간 합성)
+   트랙1 선샤인 마림바(126BPM·C) → 트랙2 버블 팝(134BPM·F) → 트랙3 스타 라이트(142BPM·Am)
+   각 트랙 8마디(64스텝)를 끝까지 연주하면 다음 트랙으로 넘어간다. */
 (function () {
   'use strict';
-  const BPM = 126, STEP = 60 / BPM / 2;      // 8분음표
-  const LOOP = 64;                            // 8마디
+  const LOOP = 64;                            // 8마디 × 8스텝
   let ctx = null, master = null, musicGain = null, sfxGain = null;
   let timer = null, nextTime = 0, step = 0, enabled = true, started = false;
+  let trackIdx = 0, cbTrack = null;
 
   const freq = (n) => 440 * Math.pow(2, (n - 69) / 12);
   const nz = (len) => {
@@ -15,31 +16,86 @@
     return b;
   };
 
-  /* 8마디: C - G - Am - F / C - G - F - G */
-  const CHORDS = [
-    { root: 48, notes: [60, 64, 67] }, { root: 43, notes: [59, 62, 67] },
-    { root: 45, notes: [57, 60, 64] }, { root: 41, notes: [57, 60, 65] },
-    { root: 48, notes: [60, 64, 67] }, { root: 43, notes: [59, 62, 67] },
-    { root: 41, notes: [57, 60, 65] }, { root: 43, notes: [59, 62, 67] }
+  /* ───────── 트랙 정의 ───────── */
+  const TRACKS = [
+    {
+      name: '선샤인 마림바', bpm: 126,
+      leadType: 'triangle', leadLvl: 0.085, padType: 'sawtooth', padLvl: 0.028, bassType: 'sine',
+      kick: '10101010', clap: '00100010', hat16: false, openHat: false,
+      /* C – G – Am – F / C – G – F – G */
+      chords: [
+        { root: 36, notes: [60, 64, 67] }, { root: 43, notes: [59, 62, 67] },
+        { root: 45, notes: [57, 60, 64] }, { root: 41, notes: [57, 60, 65] },
+        { root: 36, notes: [60, 64, 67] }, { root: 43, notes: [59, 62, 67] },
+        { root: 41, notes: [57, 60, 65] }, { root: 43, notes: [59, 62, 67] }
+      ],
+      lead: [
+        [72, 0, 76, 79, 0, 76, 79, 84],
+        [83, 0, 79, 74, 0, 79, 83, 86],
+        [81, 0, 76, 72, 0, 76, 81, 84],
+        [77, 0, 81, 84, 0, 81, 77, 72],
+        [72, 0, 76, 79, 0, 84, 88, 84],
+        [83, 0, 86, 79, 0, 83, 86, 91],
+        [89, 0, 84, 81, 0, 77, 81, 84],
+        [83, 0, 86, 79, 0, 74, 78, 83]
+      ],
+      bass: [36, 0, 36, 43, 36, 0, 43, 36]
+    },
+    {
+      name: '버블 팝', bpm: 134,
+      leadType: 'square', leadLvl: 0.05, padType: 'triangle', padLvl: 0.032, bassType: 'triangle',
+      kick: '10010010', clap: '00100010', hat16: true, openHat: false,
+      /* F – C – Dm – Bb / F – C – Bb – C */
+      chords: [
+        { root: 41, notes: [57, 60, 65] }, { root: 36, notes: [60, 64, 67] },
+        { root: 38, notes: [62, 65, 69] }, { root: 34, notes: [58, 62, 65] },
+        { root: 41, notes: [57, 60, 65] }, { root: 36, notes: [60, 64, 67] },
+        { root: 34, notes: [58, 62, 65] }, { root: 36, notes: [60, 64, 67] }
+      ],
+      lead: [
+        [77, 0, 81, 84, 0, 81, 77, 74],
+        [76, 0, 79, 84, 0, 79, 76, 72],
+        [77, 0, 81, 86, 0, 84, 81, 77],
+        [74, 0, 77, 82, 0, 79, 77, 74],
+        [77, 0, 81, 84, 0, 86, 89, 84],
+        [84, 0, 79, 76, 0, 79, 84, 88],
+        [82, 0, 77, 74, 0, 77, 82, 86],
+        [79, 0, 84, 81, 0, 76, 79, 84]
+      ],
+      bass: [41, 0, 41, 48, 41, 0, 46, 41]
+    },
+    {
+      name: '스타 라이트', bpm: 142,
+      leadType: 'sawtooth', leadLvl: 0.042, padType: 'sawtooth', padLvl: 0.026, bassType: 'sine',
+      kick: '10101010', clap: '00100100', hat16: true, openHat: true,
+      /* Am – F – C – G / Am – F – G – Am */
+      chords: [
+        { root: 33, notes: [57, 60, 64] }, { root: 29, notes: [57, 60, 65] },
+        { root: 36, notes: [60, 64, 67] }, { root: 31, notes: [59, 62, 67] },
+        { root: 33, notes: [57, 60, 64] }, { root: 29, notes: [57, 60, 65] },
+        { root: 31, notes: [59, 62, 67] }, { root: 33, notes: [57, 60, 64] }
+      ],
+      lead: [
+        [69, 72, 76, 81, 84, 81, 76, 72],
+        [65, 69, 72, 77, 81, 77, 72, 69],
+        [76, 79, 84, 88, 84, 79, 76, 72],
+        [74, 79, 83, 86, 83, 79, 74, 71],
+        [69, 72, 76, 81, 84, 81, 76, 72],
+        [77, 81, 84, 88, 84, 81, 77, 72],
+        [79, 83, 86, 91, 86, 83, 79, 74],
+        [69, 76, 81, 84, 81, 76, 72, 69]
+      ],
+      bass: [33, 0, 33, 40, 33, 0, 40, 33]
+    }
   ];
-  /* 마림바 리드: 마디마다 8스텝(0=쉼) */
-  const LEAD = [
-    [72, 0, 76, 79, 0, 76, 79, 84],
-    [83, 0, 79, 74, 0, 79, 83, 86],
-    [81, 0, 76, 72, 0, 76, 81, 84],
-    [77, 0, 81, 84, 0, 81, 77, 72],
-    [72, 0, 76, 79, 0, 84, 88, 84],
-    [83, 0, 86, 79, 0, 83, 86, 91],
-    [89, 0, 84, 81, 0, 77, 81, 84],
-    [83, 0, 86, 79, 0, 74, 78, 83]
-  ];
-  const BASS = [36, 0, 36, 43, 36, 0, 43, 36];
+  const track = () => TRACKS[trackIdx];
+  const stepDur = () => 60 / track().bpm / 2;   // 8분음표 길이
 
   function ensure() {
     if (ctx) return ctx;
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
-    ctx = new AC();
+    try { ctx = new AC(); } catch (e) { return null; }
     master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
     musicGain = ctx.createGain(); musicGain.gain.value = 0.0; musicGain.connect(master);
     sfxGain = ctx.createGain(); sfxGain.gain.value = 0.85; sfxGain.connect(master);
@@ -97,48 +153,62 @@
   function hat(at, lvl) { noise({ at: at, dur: 0.035, lvl: lvl || 0.035, freq: 9000 }); }
 
   function playStep(k, at) {
-    const bar = Math.floor(k / 8) % 8, beat = k % 8, ch = CHORDS[bar];
-    // 리드 (마림바 느낌)
-    const n = LEAD[bar][beat];
+    const tr = track();
+    const bar = Math.floor(k / 8) % 8, beat = k % 8, ch = tr.chords[bar];
+    const sd = stepDur();
+    // 리드
+    const n = tr.lead[bar][beat];
     if (n) {
-      tone({ note: n, at: at, dur: Math.min(0.55, STEP * 2.2), lvl: 0.085, type: 'triangle' });
-      tone({ note: n + 12, at: at, dur: 0.3, lvl: 0.026, type: 'sine' });
+      tone({ note: n, at: at, dur: Math.min(0.52, sd * 2.2), lvl: tr.leadLvl, type: tr.leadType });
+      tone({ note: n + 12, at: at, dur: 0.28, lvl: tr.leadLvl * 0.34, type: 'sine' });
     }
     // 베이스
-    const b = BASS[beat];
-    if (b) tone({ note: b, at: at, dur: 0.24, lvl: 0.15, type: 'sine', atk: 0.01 });
+    const b = tr.bass[beat];
+    if (b) tone({ note: b, at: at, dur: 0.23, lvl: 0.15, type: tr.bassType, atk: 0.01 });
     // 리듬
-    if (beat % 2 === 0) kick(at);
-    if (beat === 2 || beat === 6) clap(at, 0.11);
-    hat(at, beat % 2 ? 0.028 : 0.045);
+    if (tr.kick[beat] === '1') kick(at);
+    if (tr.clap[beat] === '1') clap(at, 0.11);
+    hat(at, beat % 2 ? 0.026 : 0.044);
+    if (tr.hat16) hat(at + sd / 2, 0.016);
     // 패드 (마디 첫 박)
     if (beat === 0) {
       ch.notes.forEach(function (m, i) {
-        tone({ note: m, at: at, dur: 0.9, lvl: 0.028, type: 'sawtooth', detune: (i - 1) * 6, atk: 0.05 });
+        tone({ note: m, at: at, dur: 0.9, lvl: tr.padLvl, type: tr.padType, detune: (i - 1) * 6, atk: 0.05 });
       });
     }
     // 반짝이는 필
     if (beat === 5 && bar % 2 === 1) tone({ note: ch.notes[2] + 24, at: at, dur: 0.16, lvl: 0.03, type: 'sine' });
+    if (tr.openHat && beat === 7) noise({ at: at, dur: 0.16, lvl: 0.028, freq: 8200 });
+  }
+
+  function advanceTrack() {
+    trackIdx = (trackIdx + 1) % TRACKS.length;
+    step = 0;
+    if (typeof cbTrack === 'function') {
+      try { cbTrack({ index: trackIdx, name: TRACKS[trackIdx].name, total: TRACKS.length }); } catch (e) {}
+    }
   }
 
   function schedule() {
     if (!ctx || ctx.state !== 'running' || !enabled) return;
     if (nextTime < ctx.currentTime - 0.3) nextTime = ctx.currentTime + 0.03;
     while (nextTime < ctx.currentTime + 0.2) {
+      if (step >= LOOP) advanceTrack();
       playStep(step, nextTime);
-      step = (step + 1) % LOOP;
-      nextTime += STEP;
+      step = (step + 1) % (LOOP + 1);
+      nextTime += stepDur();
     }
   }
 
   function startMusic() {
     if (!ensure() || !enabled) return;
+    if (ctx.state === 'running' && timer) return;
     const go = ctx.state !== 'running' ? ctx.resume() : Promise.resolve();
     go.then(function () {
       if (!enabled || document.hidden) return;
       started = true;
       musicGain.gain.cancelScheduledValues(ctx.currentTime);
-      musicGain.gain.setTargetAtTime(0.5, ctx.currentTime, 0.4);
+      musicGain.gain.setTargetAtTime(0.46, ctx.currentTime, 0.4);
       nextTime = ctx.currentTime + 0.05;
       if (!timer) { schedule(); timer = setInterval(schedule, 70); }
     }).catch(function () {});
@@ -155,7 +225,7 @@
       tone({ note: 91, dur: 0.07, lvl: 0.05, type: 'sine', bus: sfxGain });
     },
     clear: function (lines) {
-      const base = 72 + Math.min(12, (lines - 1) * 4);
+      const base = 72 + Math.min(12, ((lines || 1) - 1) * 4);
       for (let i = 0; i < 6; i++) {
         tone({ note: base + i * 2, at: ctx.currentTime + i * 0.035, dur: 0.22, lvl: 0.11, type: 'triangle', bus: sfxGain });
       }
@@ -163,7 +233,7 @@
     },
     combo: function (n) {
       [0, 4, 7, 12].forEach(function (d, i) {
-        tone({ note: 76 + d + Math.min(7, n), at: ctx.currentTime + i * 0.05, dur: 0.2, lvl: 0.09, type: 'square', bus: sfxGain });
+        tone({ note: 76 + d + Math.min(7, n || 2), at: ctx.currentTime + i * 0.05, dur: 0.2, lvl: 0.09, type: 'square', bus: sfxGain });
       });
     },
     right: function () {
@@ -214,11 +284,12 @@
 
   function play(name, arg) {
     if (!ensure()) return;
-    if (ctx.state !== 'running') { ctx.resume().catch(function () {}); }
+    if (ctx.state !== 'running') { try { ctx.resume(); } catch (e) {} }
     const f = sfx[name];
     if (f) { try { f(arg); } catch (e) {} }
   }
 
+  /* ───── 버튼·UI ───── */
   const btn = document.getElementById('btnMusic');
   function label() {
     if (!btn) return;
@@ -233,12 +304,19 @@
     });
     label();
   }
-  document.addEventListener('pointerdown', function once() {
-    document.removeEventListener('pointerdown', once);
+
+  /* iOS Safari: 첫 사용자 제스처 안에서 AudioContext.resume() 이 불려야 소리가 난다.
+     녹음이 될 때까지 pointerdown·touchend·click 마다 다시 열어 본다. */
+  function unlock() {
+    if (!enabled) return;
+    const c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') { try { c.resume(); } catch (e) {} }
     startMusic();
-    // iOS 대응: 한 번 더 재개
-    setTimeout(function () { if (enabled && started && ctx && ctx.state === 'suspended') startMusic(); }, 600);
-  }, { passive: true });
+  }
+  document.addEventListener('pointerdown', unlock, { passive: true });
+  document.addEventListener('touchend', unlock, { passive: true });
+  document.addEventListener('click', unlock, { passive: true });
   document.addEventListener('visibilitychange', function () {
     if (!ctx) return;
     if (document.hidden) stopMusic();
@@ -250,6 +328,9 @@
     start: startMusic,
     stop: stopMusic,
     isOn: function () { return enabled; },
-    set: function (v) { enabled = !!v; label(); if (enabled) startMusic(); else stopMusic(); }
+    set: function (v) { enabled = !!v; label(); if (enabled) startMusic(); else stopMusic(); },
+    /* 지금 재생 중인 트랙 정보 / 트랙이 바뀔 때 알림 */
+    track: function () { return { index: trackIdx, name: TRACKS[trackIdx].name, total: TRACKS.length }; },
+    setOnTrack: function (fn) { cbTrack = fn; }
   };
 })();
