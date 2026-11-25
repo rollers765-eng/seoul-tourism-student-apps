@@ -1273,6 +1273,11 @@
       border: 0;
     }
 
+    @media (max-width: 640px) {
+      .slide-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+      .slide-pills .slide-pill { flex: 0 0 auto; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html {
         scroll-behavior: auto;
