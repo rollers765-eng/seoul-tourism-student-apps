@@ -1,250 +1,277 @@
 [
-  {
-    "id": "trading-securities-01",
-    "unit": "단기투자자산",
-    "account": "단기매매증권",
-    "lesson": 1,
-    "title": "단기매매증권의 취득·평가·처분",
-    "description": "공정가치 변동 그래프로 흐름을 이해하고, 수수료와 단계별 회계처리를 연습해요.",
-    "pages": "91~93",
-    "tags": [
-      "취득",
-      "기말평가",
-      "처분",
-      "수수료",
-      "분개"
-    ],
-    "slides": "materials/trading-securities-01/slides.html",
-    "worksheetHtml": "materials/trading-securities-01/worksheet.html",
-    "worksheetPdf": "materials/trading-securities-01/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 1,
-    "accountOrder": 1
-  },
-  {
-    "id": "notes-receivable-01",
-    "unit": "매출채권",
-    "account": "받을어음",
-    "lesson": 1,
-    "title": "받을어음의 수취·회수·배서·할인·부도·개서",
-    "description": "어음의 거래 흐름과 회계 처리를 익히고 분개를 연습합니다.",
-    "pages": "99~103",
-    "tags": [
-      "수취",
-      "회수",
-      "배서",
-      "할인",
-      "부도",
-      "개서"
-    ],
-    "slides": "materials/notes-receivable-01/slides.html",
-    "worksheetPdf": "materials/notes-receivable-01/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 2,
-    "accountOrder": 1
-  },
-  {
-    "id": "other-receivables-01",
-    "unit": "기타 채권",
-    "account": "단기대여금·미수금·선급금·가지급금",
-    "lesson": 1,
-    "title": "기타 채권의 발생·회수·정산",
-    "description": "네 가지 기타 채권을 구별하고 분개와 정산을 연습합니다.",
-    "pages": "104~106",
-    "tags": [
-      "단기대여금",
-      "미수금",
-      "선급금",
-      "가지급금",
-      "분개",
-      "정산"
-    ],
-    "slides": "materials/other-receivables-01/slides.html",
-    "worksheetPdf": "materials/other-receivables-01/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 3,
-    "accountOrder": 1
-  },
-  {
-    "id": "cash-over-short-01",
-    "unit": "현금과 예금",
-    "account": "현금·현금과부족",
-    "title": "현금과 현금과부족의 회계 처리",
-    "description": "슬라이드로 회계 처리를 확인하고 활동지로 직접 연습합니다.",
-    "tags": [
-      "현금",
-      "현금과부족",
-      "잡이익",
-      "잡손실",
-      "분개"
-    ],
-    "slides": "materials/cash-over-short-01/slides.html",
-    "worksheetPdf": "materials/cash-over-short-01/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 0,
-    "accountOrder": 1,
-    "lesson": 1
-  },
-  {
-    "id": "checking-overdraft-01",
-    "unit": "현금과 예금",
-    "account": "당좌예금·당좌차월",
-    "title": "당좌예금과 당좌차월의 회계 처리",
-    "description": "슬라이드로 회계 처리를 확인하고 활동지로 직접 연습합니다.",
-    "tags": [
-      "당좌예금",
-      "당좌차월",
-      "수표",
-      "분개",
-      "전기"
-    ],
-    "slides": "materials/checking-overdraft-01/slides.html",
-    "worksheetPdf": "materials/checking-overdraft-01/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 0,
-    "accountOrder": 2,
-    "lesson": 1
-  },
-  {
-    "id": "inventory-methods-01",
-    "unit": "재고자산",
-    "account": "상품 매매의 기장법",
-    "title": "상품 매매의 기장법과 매출원가",
-    "description": "분기법·총기법·3분법과 매출원가를 익힙니다.",
-    "pages": "112~119",
-    "tags": [
-      "분기법",
-      "총기법",
-      "3분법",
-      "매출원가",
-      "매출총이익"
-    ],
-    "slides": "materials/inventory-methods-01/slides.html",
-    "worksheets": [
-      {
-        "label": "분기법·총기법",
-        "path": "materials/inventory-methods-01/worksheet-methods.pdf"
-      },
-      {
-        "label": "3분법",
-        "path": "materials/inventory-methods-01/worksheet-three.pdf"
-      }
-    ],
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 4,
-    "accountOrder": 1,
-    "lesson": 1
-  },
-  {
-    "id": "investment-fixed-assets-01-slides",
-    "unit": "투자자산·유형자산",
-    "account": "투자자산·유형자산 취득",
-    "lesson": 1,
-    "title": "수업 슬라이드 | 카페 사장님의 자산 장부 · 자산 취득 분개 트레이닝",
-    "description": "같은 단원의 슬라이드 두 편입니다. v1(24장)은 카페 거래 장면을 따라가며 학습지 거래를 한 줄로 분개하는 수업 흐름형, v2(50장)는 학습지 A 12문항과 자격증 실전 드릴 30문항을 수업 모드(빈칸 판서·정답 토글)와 혼자 공부 모드(계정·금액 칩 배치·즉시 채점)로 연습하는 트레이닝형입니다.",
-    "pages": "128~131",
-    "tags": [
-      "투자자산",
-      "유형자산",
-      "취득원가",
-      "분개",
-      "슬라이드",
-      "자격증 드릴"
-    ],
-    "slides": [
-      {
-        "label": "슬라이드 v1 ↗",
-        "path": "materials/investment-fixed-assets-01/slides.html"
-      },
-      {
-        "label": "슬라이드 v2 ↗",
-        "path": "materials/investment-fixed-assets-01/slides-v2.html"
-      }
-    ],
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 5,
-    "accountOrder": 1
-  },
-  {
-    "id": "fixed-assets-depreciation-intangible-02",
-    "unit": "유형자산·무형자산",
-    "account": "감가상각·처분·무형자산",
-    "lesson": 2,
-    "title": "학습지 B | 유형자산의 감가상각·처분과 무형자산",
-    "description": "자본적·수익적 지출, 정액법 감가상각, 유형자산 처분손익, 무형자산까지 41장 슬라이드로 익힙니다. 수업 모드(빈칸 판서·정답 토글)와 혼자 공부 모드(계정과목·금액 칩 드래그·터치 배치·직접 입력 채점)를 전환할 수 있습니다.",
-    "pages": "132~137",
-    "tags": [
-      "자본적 지출",
-      "수익적 지출",
-      "감가상각",
-      "정액법",
-      "처분손익",
-      "무형자산",
-      "분개"
-    ],
-    "slides": "materials/fixed-assets-depreciation-intangible-02/slides.html",
-    "worksheetPdf": "materials/fixed-assets-depreciation-intangible-02/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 6,
-    "accountOrder": 1
-  },
-  {
-    "id": "investment-fixed-assets-01",
-    "unit": "투자자산·유형자산",
-    "account": "투자자산·유형자산 취득",
-    "lesson": 1,
-    "title": "학습지 A | 투자자산·유형자산 취득 분개",
-    "description": "교과서 128~131쪽 예제 01~04를 바탕으로 장기금융상품·만기보유증권·매도가능증권·투자부동산과 영업용 유형자산의 취득을 연습합니다. A4 양면 학습지로, 웹에서 열거나 PDF로 내려받아 굿노트·인쇄용으로 쓸 수 있습니다.",
-    "pages": "128~131",
-    "tags": [
-      "투자자산",
-      "만기보유증권",
-      "매도가능증권",
-      "취득원가",
-      "유형자산",
-      "분개"
-    ],
-    "worksheetHtml": "materials/investment-fixed-assets-01/worksheet.html",
-    "worksheetPdf": "materials/investment-fixed-assets-01/worksheet.pdf",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unitOrder": 5,
-    "accountOrder": 1
-  },
-  {
-    "id": "current-assets-exam-01",
-    "chapter": "Ⅱ. 자산의 회계 처리",
-    "chapterOrder": 2,
-    "unit": "당좌자산 종합",
-    "unitOrder": 3.5,
-    "account": "기말 대비",
-    "accountOrder": 1,
-    "lesson": 1,
-    "title": "카페 사장님의 장부 미션 · 당좌자산 기말 대비",
-    "description": "현금·현금성자산부터 단기매매증권, 받을어음, 가지급금·선급금·미수금까지 10개 개념을 28장으로 정리하고 6문항으로 점검해요.",
-    "pages": null,
-    "tags": [
-      "현금성자산",
-      "당좌수표",
-      "현금과부족",
-      "당좌차월",
-      "자기앞수표",
-      "단기매매증권",
-      "받을어음",
-      "가지급금",
-      "선급금",
-      "미수금"
-    ],
-    "slides": "materials/current-assets-exam-01/slides.html",
-    "worksheetHtml": null,
-    "worksheetPdf": null
-  }
+ {
+  "id": "trading-securities-01",
+  "unit": "단기투자자산",
+  "account": "단기매매증권",
+  "lesson": 1,
+  "title": "단기매매증권의 취득·평가·처분",
+  "description": "공정가치 변동 그래프로 흐름을 이해하고, 수수료와 단계별 회계처리를 연습해요.",
+  "pages": "91~93",
+  "tags": [
+   "취득",
+   "기말평가",
+   "처분",
+   "수수료",
+   "분개"
+  ],
+  "slides": "materials/trading-securities-01/slides.html",
+  "worksheetHtml": "materials/trading-securities-01/worksheet.html",
+  "worksheetPdf": "materials/trading-securities-01/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 1,
+  "accountOrder": 1
+ },
+ {
+  "id": "notes-receivable-01",
+  "unit": "매출채권",
+  "account": "받을어음",
+  "lesson": 1,
+  "title": "받을어음의 수취·회수·배서·할인·부도·개서",
+  "description": "어음의 거래 흐름과 회계 처리를 익히고 분개를 연습합니다.",
+  "pages": "99~103",
+  "tags": [
+   "수취",
+   "회수",
+   "배서",
+   "할인",
+   "부도",
+   "개서"
+  ],
+  "slides": "materials/notes-receivable-01/slides.html",
+  "worksheetPdf": "materials/notes-receivable-01/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 2,
+  "accountOrder": 1
+ },
+ {
+  "id": "other-receivables-01",
+  "unit": "기타 채권",
+  "account": "단기대여금·미수금·선급금·가지급금",
+  "lesson": 1,
+  "title": "기타 채권의 발생·회수·정산",
+  "description": "네 가지 기타 채권을 구별하고 분개와 정산을 연습합니다.",
+  "pages": "104~106",
+  "tags": [
+   "단기대여금",
+   "미수금",
+   "선급금",
+   "가지급금",
+   "분개",
+   "정산"
+  ],
+  "slides": "materials/other-receivables-01/slides.html",
+  "worksheetPdf": "materials/other-receivables-01/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 3,
+  "accountOrder": 1
+ },
+ {
+  "id": "cash-over-short-01",
+  "unit": "현금과 예금",
+  "account": "현금·현금과부족",
+  "title": "현금과 현금과부족의 회계 처리",
+  "description": "슬라이드로 회계 처리를 확인하고 활동지로 직접 연습합니다.",
+  "tags": [
+   "현금",
+   "현금과부족",
+   "잡이익",
+   "잡손실",
+   "분개"
+  ],
+  "slides": "materials/cash-over-short-01/slides.html",
+  "worksheetPdf": "materials/cash-over-short-01/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 0,
+  "accountOrder": 1,
+  "lesson": 1
+ },
+ {
+  "id": "checking-overdraft-01",
+  "unit": "현금과 예금",
+  "account": "당좌예금·당좌차월",
+  "title": "당좌예금과 당좌차월의 회계 처리",
+  "description": "슬라이드로 회계 처리를 확인하고 활동지로 직접 연습합니다.",
+  "tags": [
+   "당좌예금",
+   "당좌차월",
+   "수표",
+   "분개",
+   "전기"
+  ],
+  "slides": "materials/checking-overdraft-01/slides.html",
+  "worksheetPdf": "materials/checking-overdraft-01/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 0,
+  "accountOrder": 2,
+  "lesson": 1
+ },
+ {
+  "id": "inventory-methods-01",
+  "unit": "재고자산",
+  "account": "상품 매매의 기장법",
+  "title": "상품 매매의 기장법과 매출원가",
+  "description": "분기법·총기법·3분법과 매출원가를 익힙니다.",
+  "pages": "112~119",
+  "tags": [
+   "분기법",
+   "총기법",
+   "3분법",
+   "매출원가",
+   "매출총이익"
+  ],
+  "slides": "materials/inventory-methods-01/slides.html",
+  "worksheets": [
+   {
+    "label": "분기법·총기법",
+    "path": "materials/inventory-methods-01/worksheet-methods.pdf"
+   },
+   {
+    "label": "3분법",
+    "path": "materials/inventory-methods-01/worksheet-three.pdf"
+   }
+  ],
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 4,
+  "accountOrder": 1,
+  "lesson": 1
+ },
+ {
+  "id": "investment-fixed-assets-01-slides",
+  "unit": "투자자산·유형자산",
+  "account": "투자자산·유형자산 취득",
+  "lesson": 1,
+  "title": "수업 슬라이드 | 카페 사장님의 자산 장부 · 자산 취득 분개 트레이닝",
+  "description": "같은 단원의 슬라이드 두 편입니다. v1(24장)은 카페 거래 장면을 따라가며 학습지 거래를 한 줄로 분개하는 수업 흐름형, v2(50장)는 학습지 A 12문항과 자격증 실전 드릴 30문항을 수업 모드(빈칸 판서·정답 토글)와 혼자 공부 모드(계정·금액 칩 배치·즉시 채점)로 연습하는 트레이닝형입니다.",
+  "pages": "128~131",
+  "tags": [
+   "투자자산",
+   "유형자산",
+   "취득원가",
+   "분개",
+   "슬라이드",
+   "자격증 드릴"
+  ],
+  "slides": [
+   {
+    "label": "슬라이드 v1 ↗",
+    "path": "materials/investment-fixed-assets-01/slides.html"
+   },
+   {
+    "label": "슬라이드 v2 ↗",
+    "path": "materials/investment-fixed-assets-01/slides-v2.html"
+   }
+  ],
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 5,
+  "accountOrder": 1
+ },
+ {
+  "id": "fixed-assets-depreciation-intangible-02",
+  "unit": "유형자산·무형자산",
+  "account": "감가상각·처분·무형자산",
+  "lesson": 2,
+  "title": "학습지 B | 유형자산의 감가상각·처분과 무형자산",
+  "description": "자본적·수익적 지출, 정액법 감가상각, 유형자산 처분손익, 무형자산까지 41장 슬라이드로 익힙니다. 수업 모드(빈칸 판서·정답 토글)와 혼자 공부 모드(계정과목·금액 칩 드래그·터치 배치·직접 입력 채점)를 전환할 수 있습니다.",
+  "pages": "132~137",
+  "tags": [
+   "자본적 지출",
+   "수익적 지출",
+   "감가상각",
+   "정액법",
+   "처분손익",
+   "무형자산",
+   "분개"
+  ],
+  "slides": "materials/fixed-assets-depreciation-intangible-02/slides.html",
+  "worksheetPdf": "materials/fixed-assets-depreciation-intangible-02/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 6,
+  "accountOrder": 1
+ },
+ {
+  "id": "investment-fixed-assets-01",
+  "unit": "투자자산·유형자산",
+  "account": "투자자산·유형자산 취득",
+  "lesson": 1,
+  "title": "학습지 A | 투자자산·유형자산 취득 분개",
+  "description": "교과서 128~131쪽 예제 01~04를 바탕으로 장기금융상품·만기보유증권·매도가능증권·투자부동산과 영업용 유형자산의 취득을 연습합니다. A4 양면 학습지로, 웹에서 열거나 PDF로 내려받아 굿노트·인쇄용으로 쓸 수 있습니다.",
+  "pages": "128~131",
+  "tags": [
+   "투자자산",
+   "만기보유증권",
+   "매도가능증권",
+   "취득원가",
+   "유형자산",
+   "분개"
+  ],
+  "worksheetHtml": "materials/investment-fixed-assets-01/worksheet.html",
+  "worksheetPdf": "materials/investment-fixed-assets-01/worksheet.pdf",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unitOrder": 5,
+  "accountOrder": 1
+ },
+ {
+  "id": "current-assets-exam-01",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unit": "당좌자산 종합",
+  "unitOrder": 3.5,
+  "account": "기말 대비",
+  "accountOrder": 1,
+  "lesson": 1,
+  "title": "카페 사장님의 장부 미션 · 당좌자산 기말 대비",
+  "description": "현금·현금성자산부터 단기매매증권, 받을어음, 가지급금·선급금·미수금까지 10개 개념을 28장으로 정리하고 6문항으로 점검해요.",
+  "pages": null,
+  "tags": [
+   "현금성자산",
+   "당좌수표",
+   "현금과부족",
+   "당좌차월",
+   "자기앞수표",
+   "단기매매증권",
+   "받을어음",
+   "가지급금",
+   "선급금",
+   "미수금"
+  ],
+  "slides": "materials/current-assets-exam-01/slides.html",
+  "worksheetHtml": null,
+  "worksheetPdf": null
+ },
+ {
+  "id": "inventory-exam-01",
+  "chapter": "Ⅱ. 자산의 회계 처리",
+  "chapterOrder": 2,
+  "unit": "재고자산",
+  "unitOrder": 4,
+  "account": "기말 대비",
+  "accountOrder": 2,
+  "lesson": 1,
+  "title": "카페 사장님의 장부 미션 · 재고자산 기말 대비",
+  "description": "재고자산의 뜻과 분기법·총기법·3분법, 매입운임·매출환입, 매출원가까지 22장으로 정리하고 5문항으로 점검해요.",
+  "pages": null,
+  "tags": [
+   "재고자산",
+   "분기법",
+   "총기법",
+   "3분법",
+   "매입운임",
+   "매출환입",
+   "매출원가",
+   "매출총이익",
+   "분개"
+  ],
+  "slides": "materials/inventory-exam-01/slides.html",
+  "worksheetHtml": null,
+  "worksheetPdf": null
+ }
 ]
