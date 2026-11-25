@@ -700,7 +700,7 @@
     const room = Math.max(0, 40 - Math.max(0, filled - 8) * 2);
     const comboBonus = P.combo * 30;
     const total = 500 + P.score + speed + room + comboBonus;
-    const stars = total >= 1400 ? 3 : total >= 900 ? 2 : 1;
+    const stars = total >= 1100 ? 3 : total >= 750 ? 2 : 1;
     const gems = 5 + (stars - 1) * 2;
     const id = P.st.id;
     SAVE.stars[id] = Math.max(SAVE.stars[id] || 0, stars);
@@ -711,7 +711,7 @@
     SAVE.gems += gems;
     save(); paintGems();
 
-    $('#clearStars').textContent = '★★★'.slice(0, stars) + '☆☆☆'.slice(0, 3 - stars);
+    $('#clearStars').innerHTML = '<b>' + '★'.repeat(stars) + '</b><span>' + '★'.repeat(3 - stars) + '</span>';
     $('#clearTitle').textContent = stars === 3 ? '완벽한 분개!' : '분개 완성!';
     $('#clearScore').textContent = won(total);
     $('#clearBreakdown').innerHTML =
@@ -1201,6 +1201,13 @@
       } : { gems: SAVE.gems, stars: Object.keys(SAVE.stars).length };
     },
     start: startStage,
-    challenge: makeChallenge
+    challenge: makeChallenge,
+    /* 개발용: 줄 터짐·콤보 확인 */
+    testFill: function (row, acc) {
+      if (!P) return null;
+      for (let c = 0; c < 8; c++) { const i = row * 8 + c; if (!P.grid[i]) P.grid[i] = { key: acc || '현금', cat: 'c-asset', sealed: false }; }
+      return P.grid.filter(Boolean).length;
+    },
+    testTurn: function () { const r = resolveLines(); if (r.count) afterClear(r); finishTurn(); return r.count; }
   };
 })();
