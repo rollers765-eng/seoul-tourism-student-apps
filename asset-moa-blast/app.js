@@ -640,7 +640,10 @@
 
   function afterClear(res) {
     const pts = [0, 100, 300, 600, 1000, 1400, 1800, 2200][Math.min(7, res.count)] + res.obstCleared * 50;
+    P.clears += res.count;
     P.score += pts;
+    const goalEl = $('#missionGoal');
+    if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림! +300'; }
     P.combo = Math.min(9, P.combo + 1);
     if (P.combo >= 2) {
       P.score += (P.combo - 1) * 50;
@@ -689,7 +692,7 @@
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: buildObstacles(stageNo),
-      mission: buildMission(st), tray: [], score: 0, combo: 0,
+      mission: buildMission(st), tray: [], score: 0, combo: 0, clears: 0,
       history: [], over: false, done: false, startedAt: Date.now()
     };
     SAVE.last = { corner: cornerKey, stage: stageNo }; save();
@@ -697,6 +700,8 @@
     refillTray();
     renderMission();
     $('#playScore').textContent = '0';
+    const g = $('#missionGoal');
+    if (g) { g.classList.remove('on'); g.textContent = '🎯 한 줄 터뜨리면 +300'; }
     show('screen-play');
     SOUND.start();
   }
@@ -709,7 +714,8 @@
     const filled = P.grid.filter(Boolean).length;
     const room = Math.max(0, 40 - Math.max(0, filled - 8) * 2);
     const comboBonus = P.combo * 30;
-    const total = 500 + P.score + speed + room + comboBonus;
+    const lineBonus = P.clears > 0 ? 300 : 0;
+    const total = 500 + P.score + speed + room + comboBonus + lineBonus;
     const stars = total >= 1100 ? 3 : total >= 750 ? 2 : 1;
     const gems = 5 + (stars - 1) * 2;
     const id = P.st.id;
@@ -726,7 +732,8 @@
     $('#clearScore').textContent = won(total);
     $('#clearBreakdown').innerHTML =
       '<span>기본 500</span><span>블록 ' + won(P.score) + '</span><span>속도 +' + won(speed) + '</span>' +
-      '<span>여유 +' + won(room) + '</span><span>콤보 +' + won(comboBonus) + '</span><span>💎 +' + gems + '</span>';
+      '<span>여유 +' + won(room) + '</span><span>콤보 +' + won(comboBonus) + '</span>' +
+      (lineBonus ? '<span>줄터짐 +300</span>' : '') + '<span>💎 +' + gems + '</span>';
     $('#clearJournal').innerHTML = journalHTML(P.st);
     $('#clearExplain').textContent = P.st.explain || '';
     $('#ovClear').hidden = false;

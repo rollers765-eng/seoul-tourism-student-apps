@@ -189,7 +189,10 @@ body{
 .jcol.credit .jslot .amt{color:#b3243d}
 .jslot.pop{animation:slotpop .45s ease}
 @keyframes slotpop{0%{transform:scale(1)}40%{transform:scale(1.12);background:#fff8c9}100%{transform:scale(1)}}
-.mission-progress{display:flex;gap:3px;margin-top:6px;justify-content:center}
+.mission-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px}
+.mission-goal{font-size:10px;font-weight:900;color:#2b7a5a;background:#e3fbef;border-radius:99px;padding:2px 8px;white-space:nowrap}
+.mission-goal.on{background:linear-gradient(180deg,#8ef0c4,#3fc99a);color:#04382a}
+.mission-progress{display:flex;gap:3px}
 .mission-progress i{width:7px;height:7px;border-radius:99px;background:#d6dcf0}
 .mission-progress i.on{background:linear-gradient(180deg,#63e6be,#28b487)}
 .board-wrap{position:relative;margin:0 auto;width:100%;max-width:392px}
