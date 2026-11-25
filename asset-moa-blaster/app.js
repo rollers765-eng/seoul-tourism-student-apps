@@ -432,7 +432,8 @@
       group.bar.max = max;
       group.bar.value = Math.min(max, value);
     }
-    hud.combo.textContent = '🔥 콤보 ' + state.streak;
+    hud.combo.hidden = state.streak < 2;
+    hud.combo.textContent = state.streak >= 2 ? '🔥 COMBO ×' + state.streak : '';
     hud.bomb.textContent = '💣 선물 폭탄 ×' + state.bombs;
     hud.bomb.disabled = !state.bombs || state.status !== 'playing' || !!modal;
   }
@@ -598,9 +599,8 @@
     shell.append(panel);
     root.append(shell);
     modal = shell;
-    const puzzle = root.querySelector('.play-stage');
-    if (puzzle) puzzle.inert = true;
-    if (kind === 'review') for (const child of root.children) if (child !== shell && child.tagName !== 'HEADER') child.inert = true;
+    const background = [...root.children].filter(child => child !== shell);
+    for (const child of background) child.inert = true;
     if (game) updateHud(game.state());
     view?.react('mission');
     audio.sync();
@@ -609,7 +609,15 @@
     h.tabIndex = -1;
     const cue = el('p', 'moa-cue', p.mode === 'journal' ? '모아 · 차변부터 볼까?' : '모아 · 조건을 함께 읽어 볼까?');
     const task = el('div', 'mission-task');
-    panel.append(h, cue, el('p', 'question', promptText(p)), task);
+    panel.append(h);
+    if (kind === 'mission' && run.revivals > 0) {
+      panel.append(el('p', 'mission-retry', '한 번 더! 미션 다시 도전'));
+    }
+    panel.append(cue, el('p', 'question', promptText(p)), task);
+    panel.append(button(kind === 'review' ? '복습 목록으로' : '단계 목록으로', () => {
+      if (kind === 'review') show('notes', { corner: route.corner, back: route.back });
+      else goBack();
+    }, 'quest-exit'));
     h.focus({ preventScroll: true });
     let done = false;
 
@@ -639,7 +647,7 @@
         task.append(button('퍼즐 계속하기', () => {
           modal.remove();
           modal = null;
-          if (puzzle) puzzle.inert = false;
+          for (const child of background) child.inert = false;
           updateHud(game.state());
           audio.sync();
         }, 'primary'));
