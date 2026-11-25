@@ -9,7 +9,7 @@
 
   /* ───────── 저장 ───────── */
   const KEY = 'moaBlast.v1';
-  const DEF = { gems: 30, stars: {}, best: 0, wrong: [], last: { corner: 'inv', stage: 1 }, scores: [], music: true };
+  const DEF = { gems: 30, stars: {}, best: 0, wrong: [], last: { corner: 'inv', stage: 1 }, scores: [], music: true, queue: [], recent: [], lastQid: null };
   let SAVE = load();
   function load() {
     try {
@@ -17,7 +17,9 @@
       return Object.assign({}, DEF, raw, {
         stars: Object.assign({}, raw.stars || {}),
         wrong: Array.isArray(raw.wrong) ? raw.wrong : [],
-        scores: Array.isArray(raw.scores) ? raw.scores : []
+        scores: Array.isArray(raw.scores) ? raw.scores : [],
+        queue: Array.isArray(raw.queue) ? raw.queue : [],
+        recent: Array.isArray(raw.recent) ? raw.recent : []
       });
     } catch (e) { return Object.assign({}, DEF); }
   }
@@ -1022,12 +1024,52 @@
 
   /* ───────── 보석 챌린지 ───────── */
   let CH = null;
+
+  /* 문제 풀(challenge.js) 로테이션 큐 — 최근에 푼 문제는 뒤로 보내 연속 중복을 막는다 */
+  function buildQueue(pool) {
+    const recent = SAVE.recent || [];
+    const fresh = shuffle(pool.filter((x) => recent.indexOf(x.id) < 0).map((x) => x.id));
+    const old = shuffle(pool.filter((x) => recent.indexOf(x.id) >= 0).map((x) => x.id));
+    return fresh.concat(old);
+  }
+  function nextPoolItem() {
+    const pool = (window.BlastChallenge || []).filter((x) => x && x.id && x.answer);
+    if (!pool.length) return null;
+    const byId = {};
+    pool.forEach((x) => { byId[x.id] = x; });
+    if (!Array.isArray(SAVE.queue) || !SAVE.queue.length) SAVE.queue = buildQueue(pool);
+    let qid = SAVE.queue.shift();
+    let guard = 0;
+    while (qid && SAVE.lastQid === qid && SAVE.queue.length && guard++ < 6) {
+      SAVE.queue.push(qid); qid = SAVE.queue.shift();
+    }
+    const item = byId[qid] || pool[Math.floor(Math.random() * pool.length)];
+    SAVE.lastQid = item.id;
+    SAVE.recent = ((SAVE.recent || []).concat(item.id)).slice(-20);
+    save();
+    return {
+      id: item.id,
+      type: item.type,
+      q: item.q,
+      opts: item.type === 'choice' ? shuffle(item.opts.slice()).map((label) => ({ label: label, ok: label === item.answer })) : null,
+      answer: String(item.answer),
+      hint: item.hint,
+      tag: item.tag || item.area,
+      unit: item.area,
+      level: item.level,
+      explain: item.explain,
+      st: null
+    };
+  }
+
   function challengeStage() {
     if (P && P.st) return P.st;
     const last = SAVE.last || { corner: 'inv', stage: 1 };
     return D.STAGES[last.corner][Math.min(last.stage, D.STAGES[last.corner].length) - 1];
   }
   function makeChallenge() {
+    const pooled = nextPoolItem();
+    if (pooled) return pooled;
     const st = challengeStage();
     const kindRoll = Math.random();
     if (st.mode === 'pick') {
@@ -1101,7 +1143,7 @@
     card.innerHTML = '';
     const tag = document.createElement('div');
     tag.className = 'ch-tag';
-    tag.textContent = '#' + CH.tag + ' · ' + cornerName(CH.st.corner) + ' ' + CH.st.stage + '단계';
+    tag.textContent = '#' + (CH.tag || '개념') + ' · ' + (CH.unit ? CH.unit + ' · ' + CH.level : cornerName(CH.st.corner) + ' ' + CH.st.stage + '단계');
     card.appendChild(tag);
     const q = document.createElement('p');
     q.className = 'ch-q';
@@ -1128,8 +1170,8 @@
       const inp = document.createElement('input');
       inp.className = 'ch-input';
       inp.id = 'chInput';
-      inp.placeholder = CH.type === 'type-amount' ? '예: 300000' : '계정과목 입력';
-      inp.inputMode = CH.type === 'type-amount' ? 'numeric' : 'text';
+      inp.placeholder = (CH.type === 'type-amount' || CH.type === 'amount') ? '예: 300000' : '계정과목 입력';
+      inp.inputMode = (CH.type === 'type-amount' || CH.type === 'amount') ? 'numeric' : 'text';
       inp.autocomplete = 'off';
       const send = document.createElement('button');
       send.className = 'ch-send';
@@ -1171,13 +1213,13 @@
       save(); paintGems();
       $('#chGems').textContent = SAVE.gems;
       res.className = 'ch-result ok';
-      res.innerHTML = '🎉 정답! +' + won(score) + '점 · 💎 +' + gems + ' (남은 ' + left + '초 보너스)<br><b>' + CH.answer + '</b>' + (CH.st.explain ? '<br>' + CH.st.explain : '');
+      res.innerHTML = '🎉 정답! +' + won(score) + '점 · 💎 +' + gems + ' (남은 ' + left + '초 보너스)<br><b>' + CH.answer + '</b>' + (CH.explain ? '<br>' + CH.explain : '');
       fx.confetti(220); fx.fireworks(3);
       SOUND.play('right'); SOUND.play('applause'); SOUND.play('whistle');
     } else {
       res.className = 'ch-result no';
       res.innerHTML = (given == null ? '⏰ 시간 초과! ' : '') + '정답은 <b>' + CH.answer + '</b>예요.' +
-        (CH.st.explain ? '<br>' + CH.st.explain : '');
+        (CH.explain ? '<br>' + CH.explain : '');
       SOUND.play('wrong');
     }
     const again = document.createElement('div');
@@ -1191,8 +1233,8 @@
     again.appendChild(b1); again.appendChild(b2);
     res.appendChild(again);
     if (given != null && !correct) {
-      const id = CH.st.id;
-      if (SAVE.wrong.indexOf(id) < 0) { SAVE.wrong.push(id); save(); }
+      const id = CH.id || (CH.st && CH.st.id);
+      if (id && SAVE.wrong.indexOf(id) < 0) { SAVE.wrong.push(id); save(); }
     }
   }
 
