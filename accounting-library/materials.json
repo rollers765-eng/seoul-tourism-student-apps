@@ -300,5 +300,33 @@
   "slides": "materials/liabilities-equity-exam-01/slides.html",
   "worksheetHtml": null,
   "worksheetPdf": null
+ },
+ {
+  "id": "accounting-basics-exam-01",
+  "chapter": "Ⅰ. 회계의 기초",
+  "chapterOrder": 1,
+  "unit": "회계의 기초",
+  "unitOrder": 1,
+  "account": "기말 대비",
+  "accountOrder": 1,
+  "lesson": 1,
+  "title": "카페 사장님의 장부 미션 · 회계의 기초 기말 대비",
+  "description": "제좌 전기와 T계정 역추정, K-IFRS·일반기업회계기준, 회계부정·분식회계까지 20장으로 정리하고 6문항으로 점검해요.",
+  "pages": null,
+  "tags": [
+   "제좌",
+   "전기",
+   "총계정원장",
+   "역추정",
+   "잔액",
+   "K-IFRS",
+   "일반기업회계기준",
+   "회계부정",
+   "분식회계",
+   "내부통제"
+  ],
+  "slides": "materials/accounting-basics-exam-01/slides.html",
+  "worksheetHtml": null,
+  "worksheetPdf": null
  }
 ]
