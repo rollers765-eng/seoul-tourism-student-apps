@@ -690,6 +690,9 @@
     document.addEventListener('pointerdown', wake);
   }
 
+  /* 점검용(수업 준비·자동 점검에서 상태를 읽기만 함) */
+  window.BlasterApp = { state: () => P, engine: () => engine };
+
   /* ══════════ 시작 ══════════ */
   renderHome();
   wire();
