@@ -356,8 +356,8 @@ body{
 /* 계정과목 이름표 — 블록 위에 크게, 넘치지 않게(글자 크기는 스크립트가 맞춘다) */
 .acc-tag{
   position:absolute;display:flex;align-items:center;justify-content:center;
-  padding:0 2px;overflow:hidden;pointer-events:none;z-index:4;
-  font-weight:900;color:#fff;line-height:1;letter-spacing:-.6px;white-space:nowrap;text-align:center;
+  padding:0 2px;overflow:hidden;pointer-events:none;z-index:4;text-align:center;
+  font-weight:900;color:#fff;line-height:1.02;letter-spacing:-.6px;
   text-shadow:0 1.5px 0 rgba(70,26,0,.5),0 1px 3px rgba(0,0,0,.6),0 0 10px rgba(255,190,60,.85);
 }
 /* 줄이 터질 때 지나가는 빛줄기 */
@@ -450,7 +450,7 @@ body{
 @keyframes spawnIn{0%{transform:scale(.55) translateY(10px);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
 .piece-name.acct{
   background:linear-gradient(180deg,#fffdf2,#ffeec2);color:#6a3d00;
-  border:2px solid #ffc02e;font-size:19px;padding:2px 9px;
+  border:2px solid #ffc02e;font-size:19px;padding:2px 6px;
   box-shadow:0 3px 8px rgba(20,8,54,.32),0 0 12px rgba(255,196,60,.75);
 }
 .piece.sel{animation:selpulse .9s ease-in-out infinite}
@@ -496,7 +496,8 @@ body{
 .panel p{margin:0 0 10px;font-size:13px;color:var(--ink-soft);line-height:1.5;font-weight:700}
 .row-btns{display:flex;gap:8px;margin-top:12px}
 .row-btns .big-btn{flex:1.3}
-.row-btns .ghost-btn{flex:1;background:#efe9ff;color:#453075;box-shadow:inset 0 0 0 1.5px #ded2ff}
+.row-btns .ghost-btn{flex:1;background:#efe9ff;color:#453075;box-shadow:inset 0 0 0 1.5px #ded2ff;padding:13px 8px;font-size:14px;white-space:nowrap}
+.row-btns .ghost-btn.compact{font-size:13px;padding:13px 6px}
 .stars{font-size:34px;letter-spacing:2px;color:#ffc93c;text-shadow:0 3px 0 #e39b00,0 0 16px rgba(255,220,120,.8);margin-bottom:2px}
 .stars b{font-weight:900;color:#ffc93c}
 .stars span{color:#ded2f5;text-shadow:none}

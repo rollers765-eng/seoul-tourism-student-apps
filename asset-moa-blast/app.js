@@ -286,18 +286,29 @@
   /* ───────── 렌더 ───────── */
   /* 글자를 주어진 상자 안에 꼭 맞게 줄여 넣는다(잘림 없이 최대한 크게) */
   const measureCtx = document.createElement('canvas').getContext('2d');
+  /* 한 줄로 안 들어가면 두 줄로 접어서라도 글자를 크게 유지한다 */
   function fitFontSize(text, maxW, maxH, base, min) {
+    const t = String(text || '');
     let s = base;
     while (s > min) {
       measureCtx.font = '900 ' + s + 'px Pretendard,system-ui,-apple-system,sans-serif';
-      const w = measureCtx.measureText(text).width;
-      if (w <= maxW - 2 && s * 1.06 <= maxH) break;
+      const w = measureCtx.measureText(t).width;
+      const perLine = Math.max(1, Math.floor((maxW - 2) / s));
+      const lines = Math.max(1, Math.ceil(t.length / perLine));
+      if (w <= (maxW - 2) * lines && s * 1.08 * lines <= maxH) break;
       s -= 0.5;
     }
     return Math.max(min, s);
   }
   function fitText(el, text, maxW, maxH, base, min) {
-    el.style.fontSize = fitFontSize(text, maxW, maxH, base, min) + 'px';
+    const size = fitFontSize(text, maxW, maxH, base, min);
+    const oneLine = (function () {
+      measureCtx.font = '900 ' + size + 'px Pretendard,system-ui,-apple-system,sans-serif';
+      return measureCtx.measureText(String(text || '')).width <= maxW - 2;
+    })();
+    el.style.whiteSpace = oneLine ? 'nowrap' : 'normal';
+    el.style.wordBreak = oneLine ? 'normal' : 'break-all';
+    el.style.fontSize = size + 'px';
   }
 
   function renderBoard(animSet) {
@@ -403,7 +414,7 @@
         nm.className = 'piece-name acct';
         nm.textContent = pc.key;
         wrap.appendChild(nm);
-        fitText(nm, pc.key, tm.slotW - 24, 34, nameBase, 12);
+        fitText(nm, pc.key, tm.slotW - 18, 34, nameBase, 12);
       }
       trayEl.appendChild(wrap);
     });
@@ -923,7 +934,7 @@
         P.over = true;
         $('#overLine').textContent = '놓을 자리가 없어요. 보드를 정리하면 계속할 수 있어요.';
         const cb = $('#ovOver').querySelector('[data-ov="continue"]');
-        if (cb) cb.textContent = P.freeClean ? '🧹 보드 정리 (무료)' : '💎5 보드 정리';
+        if (cb) cb.textContent = P.freeClean ? '🧹 정리 (무료)' : '🧹 정리 💎5';
         $('#ovOver').hidden = false;
       }, 300);
     }
