@@ -127,10 +127,10 @@ button { font-family: inherit; color: inherit; cursor: pointer; }
 }
 .stage-chip .stars { font-size: 8px; letter-spacing: -1px; margin-top: 2px; color: #ffd76a; height: 9px; }
 .stage-chip.open { background: #22305a; color: var(--ink); border-color: #0a0d1c; }
-.stage-chip.next { background: var(--mint); color: #10261f; border-color: #0a2d24; box-shadow: 0 4px 0 #0a2d24; animation: pulse 1.4s infinite; }
+.stage-chip.next { background: var(--mint); color: #10261f; border-color: #0a2d24; box-shadow: 0 4px 0 #0a2d24, 0 0 0 0 rgba(124,231,200,.45); animation: pulse 1.6s infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 4px 0 #0a2d24, 0 0 0 0 rgba(124,231,200,.45); } 50% { box-shadow: 0 4px 0 #0a2d24, 0 0 0 5px rgba(124,231,200,.12); } }
 .stage-chip.done { background: #1c4a44; color: var(--mint); }
 .stage-chip:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
-@keyframes pulse { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
 /* ── 플레이 ── */
 .play-top .hearts { display: flex; gap: 3px; }
