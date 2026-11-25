@@ -307,7 +307,8 @@
       return measureCtx.measureText(String(text || '')).width <= maxW - 2;
     })();
     el.style.whiteSpace = oneLine ? 'nowrap' : 'normal';
-    el.style.wordBreak = oneLine ? 'normal' : 'break-all';
+    el.style.wordBreak = 'normal';
+    el.style.overflowWrap = 'anywhere';
     el.style.fontSize = size + 'px';
   }
 
@@ -348,13 +349,14 @@
     const h = b.offsetTop + b.offsetHeight - y;
     const tag = document.createElement('div');
     tag.className = 'acc-tag';
-    tag.textContent = g.key;
+    const label = String(g.key).replace(/원$/, '\u200b원');
+    tag.textContent = label;
     tag.style.left = x + 'px';
     tag.style.top = y + 'px';
     tag.style.width = w + 'px';
     tag.style.height = h + 'px';
     boardEl.appendChild(tag);
-    fitText(tag, g.key, w - 4, h - 4, 24, 9);
+    fitText(tag, label, w - 4, h - 4, 24, 9);
   }
 
   function trayMetrics() {
