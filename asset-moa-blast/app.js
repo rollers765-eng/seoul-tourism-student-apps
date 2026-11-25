@@ -279,6 +279,12 @@
       const el = document.createElement('div');
       el.className = 'piece';
       el.style.gap = '3px';
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label', pc.key + ' 조각 · 끌어 놓거나 눌러서 고르기');
+      el.tabIndex = 0;
+      el.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selectPiece(si); }
+      });
       el.dataset.slot = String(si);
       const rows = Math.max.apply(null, pc.cells.map((x) => x[0])) + 1;
       const cols = Math.max.apply(null, pc.cells.map((x) => x[1])) + 1;
