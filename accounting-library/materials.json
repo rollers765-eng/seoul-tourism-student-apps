@@ -245,7 +245,13 @@
   ],
   "slides": "materials/current-assets-exam-01/slides.html",
   "worksheetHtml": null,
-  "worksheetPdf": null
+  "worksheetPdf": null,
+  "worksheets": [
+   {
+    "path": "materials/exam-e-current-assets-01/worksheet.pdf",
+    "label": "학습지 E(당좌자산 집중)"
+   }
+  ]
  },
  {
   "id": "inventory-exam-01",
@@ -337,6 +343,12 @@
   ],
   "slides": "materials/accounting-basics-exam-01/slides.html",
   "worksheetHtml": null,
-  "worksheetPdf": null
+  "worksheetPdf": null,
+  "worksheets": [
+   {
+    "path": "materials/exam-f-basics-01/worksheet.pdf",
+    "label": "학습지 F(회계의 기초)"
+   }
+  ]
  }
 ]
