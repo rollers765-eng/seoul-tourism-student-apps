@@ -847,19 +847,26 @@
     window.addEventListener('resize', resize);
     window.addEventListener('orientationchange', function () { setTimeout(resize, 150); });
     resize();
-    function loop() {
+    let lastT = 0;
+    function loop(ts) {
       const W = window.innerWidth, H = window.innerHeight;
+      const now = ts || (window.performance && performance.now ? performance.now() : Date.now());
+      let dt = lastT ? (now - lastT) / 16.667 : 1;
+      lastT = now;
+      if (!(dt > 0)) dt = 1;
+      dt = Math.max(0.2, Math.min(3, dt));
       ctx2.clearRect(0, 0, W + 4, H + 4);
       parts = parts.filter((p) => p.life > 0 && p.y < H + 140);
       parts.forEach((p) => {
-        p.life -= 1;
-        p.vy += p.g;
-        p.x += p.vx; p.y += p.vy;
-        p.vx *= p.drag; p.vy *= p.drag;
+        p.life -= dt;
+        p.vy += p.g * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        const dg = Math.pow(p.drag, dt);
+        p.vx *= dg; p.vy *= dg;
         ctx2.globalAlpha = Math.max(0, Math.min(1, p.life / 45));
         ctx2.save();
         ctx2.translate(p.x, p.y);
-        ctx2.rotate(p.rot += p.vr);
+        ctx2.rotate(p.rot += p.vr * dt);
         if (p.type === 'c') {
           ctx2.fillStyle = p.color;
           ctx2.fillRect(-p.s / 2, -p.s * 0.32, p.s, p.s * 0.64);
@@ -882,7 +889,7 @@
       });
       ctx2.globalAlpha = 1;
       if (parts.length) raf = requestAnimationFrame(loop);
-      else { raf = null; ctx2.clearRect(0, 0, W + 4, H + 4); }
+      else { raf = null; lastT = 0; ctx2.clearRect(0, 0, W + 4, H + 4); }
     }
     function kick() { if (!raf) raf = requestAnimationFrame(loop); }
     const COLORS = ['#ffe066', '#ff6f91', '#4be3b0', '#5ec2ff', '#b98cff', '#ffb020', '#ff9ede', '#8affd8'];
