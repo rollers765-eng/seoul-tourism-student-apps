@@ -50,7 +50,9 @@
   function won(n) { return Number(n).toLocaleString('ko-KR'); }
   function paintGems() {
     ['#homeGems', '#stagesGems', '#playGems', '#chGems', '#shopGems', '#rankGems', '#bookGems'].forEach((s) => {
-      const el = $(s + ' b'); if (el) el.textContent = SAVE.gems;
+      const el = $(s); if (!el) return;
+      const target = el.tagName === 'B' ? el : el.querySelector('b');
+      if (target) target.textContent = SAVE.gems;
     });
   }
 
