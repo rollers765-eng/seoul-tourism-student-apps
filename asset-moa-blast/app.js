@@ -954,10 +954,22 @@
         answer: pickEntry.account, tag: st.tag || '서술형 대비', hint: st.prompt
       };
     }
+    if (st.amountPhase) {
+      const dSum = entries.filter((e) => e.side === 'd').reduce((a, b) => a + b.amount, 0);
+      return {
+        st: st, type: 'type-amount',
+        q: '차변 합계 금액은 얼마일까요? (원)',
+        answer: String(dSum), tag: st.tag || '금액 계산',
+        hint: '거래 문장의 숫자를 더해 보세요. 콤마 없이 입력해도 돼요.'
+      };
+    }
+    // 금액이 문장에 그대로 보이는 단계는 계정 문제로 돌린다
+    const target2 = pickOne(entries);
     return {
-      st: st, type: 'type-amount',
-      q: '‘' + pickEntry.account + '’의 금액은 얼마일까요? (원)',
-      answer: String(pickEntry.amount), tag: st.tag || '금액 계산', hint: st.prompt
+      st: st, type: 'choice',
+      q: (target2.side === 'd' ? '차변' : '대변') + '에 올 계정과목은 무엇일까요?',
+      opts: shuffle([{ label: target2.account, ok: true }].concat(accountOptions(target2.account, 3).map((a) => ({ label: a, ok: false })))),
+      answer: target2.account, tag: st.tag || '분개', hint: st.prompt
     };
   }
   function accountOptions(correct, n) {
