@@ -331,6 +331,10 @@
     set: function (v) { enabled = !!v; label(); if (enabled) startMusic(); else stopMusic(); },
     /* 지금 재생 중인 트랙 정보 / 트랙이 바뀔 때 알림 */
     track: function () { return { index: trackIdx, name: TRACKS[trackIdx].name, total: TRACKS.length }; },
-    setOnTrack: function (fn) { cbTrack = fn; }
+    setOnTrack: function (fn) { cbTrack = fn; },
+    /* 점검용: 오디오 상태와 진행 상황 */
+    status: function () {
+      return { enabled: enabled, started: started, state: ctx ? ctx.state : 'none', track: trackIdx, step: step, timer: !!timer };
+    }
   };
 })();
