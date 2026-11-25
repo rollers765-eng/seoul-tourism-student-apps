@@ -1,719 +1,907 @@
-/* 자산모아 블럭모아 Blaster — 화면·진행·사운드 */
-(function () {
+/* PART B · data.js → engine.js → board-config.js → app.js 순서로 defer 로드.
+ * 필요한 HTML: <main id="app"></main>. 플레이·메뉴·모달은 여기서 생성합니다.
+ */
+(() => {
   'use strict';
+  const root = document.querySelector('#app');
+  if (!root) return;
   const D = window.BlasterData;
-  const Engine = window.BlasterEngine;
-  const KEY = 'blaster.v1';
-  const $ = (id) => document.getElementById(id);
-  const won = (n) => Number(n).toLocaleString('ko-KR') + '원';
-
-  /* ══════════ 저장 ══════════ */
-  function fresh() {
-    return {
-      progress: {},           // corner -> {cleared, stars:{}, best:{}}
-      notes: [],              // 오답 노트
-      stats: { hit: 0, wrong: 0, side: 0, byCorner: {}, wrongAccounts: {} },
-      settings: { sfx: true, bgm: true }
-    };
+  const E = window.BlockPuzzle;
+  if (!D || !E) {
+    root.textContent = 'data.js와 engine.js를 불러오지 못했어요.';
+    return;
   }
-  let S = fresh();
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-      const o = JSON.parse(raw);
-      S = Object.assign(fresh(), o);
-      S.settings = Object.assign({ sfx: true, bgm: true }, o.settings || {});
-      S.stats = Object.assign({ hit: 0, wrong: 0, side: 0, byCorner: {}, wrongAccounts: {} }, o.stats || {});
-    }
-  } catch (e) { /* 저장소를 못 쓰면 그냥 진행 */ }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
-  function prog(key) {
-    if (!S.progress[key]) S.progress[key] = { cleared: 0, stars: {}, best: {} };
-    return S.progress[key];
+  const all = Object.values(D.STAGES).flat();
+  const byId = new Map(all.map(p => [p.id, p]));
+  const key = 'blaster.v2';
+  const format = n => Number(n).toLocaleString('ko-KR');
+  const clean = value => String(value ?? '').trim().normalize('NFC').replace(/\s+/g, ' ');
+  const nicknameOk = value => [...value].length >= 2 && [...value].length <= 10 &&
+    /^[\p{L}\p{N}_ -]+$/u.test(value);
+  const fresh = () => ({
+    version: 2, levels: {}, nickname: '', profiles: {}, gems: 0, run: null,
+    settings: { muted: true, effects: true, music: true, speech: true }
+  });
+
+  function read(which) {
+    try { return JSON.parse(localStorage.getItem(which)); } catch { return null; }
   }
 
-  /* ══════════ 사운드 (WebAudio 칩튠) ══════════ */
-  const A = {
-    ctx: null, step: 0, timer: null,
-    init() {
-      if (!this.ctx) {
-        const C = window.AudioContext || window.webkitAudioContext;
-        if (!C) return;
-        this.ctx = new C();
+  function load() {
+    const current = read(key);
+    if (current?.version === 2) return { ...fresh(), ...current, settings: { ...fresh().settings, ...current.settings } };
+    const state = fresh();
+    const old = read('blaster.v1');
+    for (const corner of D.CORNERS) {
+      const track = old?.progress?.[corner.key];
+      if (!track) continue;
+      for (let stage = 1; stage <= Math.min(corner.stages, Number(track.cleared) || 0); stage++) {
+        const p = D.STAGES[corner.key][stage - 1];
+        state.levels[p.id] = { clear: true, stars: Math.max(1, Math.min(3, Number(track.stars?.[stage]) || 1)),
+          best: 0, combo: 0 };
       }
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-    },
-    tone(freq, dur, type, vol, when, slide) {
-      if (!this.ctx || !S.settings.sfx) return;
-      const t0 = this.ctx.currentTime + (when || 0);
-      const o = this.ctx.createOscillator();
-      const g = this.ctx.createGain();
-      o.type = type || 'square';
-      o.frequency.setValueAtTime(freq, t0);
-      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t0 + dur);
-      g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(vol || 0.06, t0 + 0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-      o.connect(g); g.connect(this.ctx.destination);
-      o.start(t0); o.stop(t0 + dur + 0.02);
-    },
-    shoot(side) { this.tone(side === 'c' ? 620 : 520, 0.07, 'square', 0.045, 0, 300); },
-    hit(combo) {
-      const f = 440 * Math.pow(1.06, Math.min(12, combo || 1));
-      this.tone(f, 0.11, 'triangle', 0.075);
-      this.tone(f * 2, 0.07, 'square', 0.03, 0.02);
-    },
-    sideErr() { this.tone(300, 0.1, 'square', 0.05, 0, 200); },
-    bad() { this.tone(150, 0.3, 'sawtooth', 0.07, 0, 60); this.tone(110, 0.3, 'square', 0.04, 0.05, 50); },
-    clear() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.16, 'square', 0.06, i * 0.09)); },
-    fail() { [440, 372, 311, 233].forEach((f, i) => this.tone(f, 0.2, 'triangle', 0.06, i * 0.11)); },
-    music(on) {
-      if (this.timer) { clearInterval(this.timer); this.timer = null; }
-      if (!on || !S.settings.bgm) return;
-      const bass = [131, 131, 165, 196, 131, 147, 175, 196];
-      const arp = [392, 494, 587, 494, 440, 523, 659, 523];
-      this.timer = setInterval(() => {
-        if (!this.ctx || !S.settings.bgm) return;
-        const s = this.step++ % 8;
-        if (s % 2 === 0) this.tone(bass[s], 0.24, 'triangle', 0.028);
-        this.tone(arp[s], 0.09, 'square', 0.012, 0.03);
-      }, 260);
     }
-  };
-
-  /* ══════════ 화면 전환 ══════════ */
-  const SCREENS = ['home', 'stages', 'play', 'note', 'codex', 'report'];
-  function show(name) {
-    SCREENS.forEach((n) => $('screen-' + n).classList.toggle('is-active', n === name));
-    window.scrollTo({ top: 0 });
-  }
-  function toast(msg, ms) {
-    const t = $('toast');
-    t.textContent = msg;
-    t.classList.remove('hidden');
-    clearTimeout(t._tm);
-    t._tm = setTimeout(() => t.classList.add('hidden'), ms || 1500);
+    return state;
   }
 
-  /* ══════════ 홈 ══════════ */
-  function totalCleared() {
-    return D.CORNERS.reduce((s, c) => s + Math.min(c.stages, prog(c.key).cleared), 0);
+  let store = load();
+  let saveFailed = false;
+  let game;
+  let view;
+  let route;
+  let generation = 0;
+  let transition = 0;
+  let hud;
+  let modal;
+  let run;
+  let audio;
+  let audioButton;
+
+  function save() {
+    try {
+      localStorage.setItem(key, JSON.stringify(store));
+      saveFailed = false;
+    } catch { saveFailed = true; }
   }
-  function totalStars() {
-    return D.CORNERS.reduce((s, c) => s + Object.values(prog(c.key).stars).reduce((a, b) => a + b, 0), 0);
+  save();
+
+  function el(tag, cls = '', text = '') {
+    const item = document.createElement(tag);
+    if (cls) item.className = cls;
+    if (text) item.textContent = text;
+    return item;
   }
-  function dday(target) {
-    const now = new Date();
-    const t = new Date(target + 'T00:00:00+09:00');
-    const d = Math.ceil((t - now) / 86400000);
-    return d;
-  }
-  function renderHome() {
-    const d1 = dday('2026-11-30'), d2 = dday('2026-12-14');
-    const dd = $('home-dday');
-    if (d1 > 0) dd.textContent = '3차 서술형 D-' + d1;
-    else if (d2 > 0) dd.textContent = '기말고사 D-' + d2;
-    else dd.classList.add('hidden');
-    $('home-total').textContent = totalCleared() + ' / 160 클리어';
-    $('home-stars').textContent = '★ ' + totalStars();
-    $('home-notes').textContent = '오답 ' + S.notes.length;
-    const list = $('corner-list');
-    list.innerHTML = '';
-    D.CORNERS.forEach((c) => {
-      const p = prog(c.key);
-      const cleared = Math.min(c.stages, p.cleared);
-      const next = Math.min(c.stages, cleared + 1);
-      const btn = document.createElement('button');
-      btn.className = 'corner-card';
-      btn.type = 'button';
-      btn.innerHTML =
-        '<span class="corner-emoji">' + c.emoji + '</span>' +
-        '<span class="corner-body"><span class="corner-name">' + c.name + ' 코너</span>' +
-        '<span class="corner-desc">' + c.desc + '</span>' +
-        '<span class="mini-bar"><i style="width:' + Math.round((cleared / c.stages) * 100) + '%;background:' + c.color + '"></i></span></span>' +
-        '<span class="corner-side"><span class="corner-count">' + cleared + '/' + c.stages + '</span><span class="corner-go">' + (cleared ? next + '단계' : '시작') + '</span></span>';
-      btn.addEventListener('click', () => openStages(c.key));
-      list.appendChild(btn);
+
+  function button(label, callback, cls = '') {
+    const node = el('button', cls, label);
+    node.type = 'button';
+    node.addEventListener('click', event => {
+      void audio.unlock();
+      audio.play('tap');
+      callback(event);
     });
+    return node;
   }
 
-  /* ══════════ 단계 선택 ══════════ */
-  let curCorner = null;
-  function openStages(key) {
-    curCorner = D.CORNERS.find((c) => c.key === key);
-    const p = prog(key);
-    $('stages-title').textContent = curCorner.name + ' 코너';
-    $('stages-desc').textContent = curCorner.desc;
-    $('stages-bar').style.width = Math.round((Math.min(curCorner.stages, p.cleared) / curCorner.stages) * 100) + '%';
-    const grid = $('stage-grid');
-    grid.innerHTML = '';
-    // 3차 대비 단계 안내
-    const examStages = D.STAGES[key].filter((st) => D.EXAM && D.EXAM[st.gen] && st.stage <= Math.min(curCorner.stages, p.cleared + 1));
-    $('stages-hint').innerHTML = examStages.length
-      ? '앞 단계를 클리어하면 다음 단계가 열려요. <b>3차</b> 표시는 11/30 서술형평가와 같은 유형이에요.'
-      : '앞 단계를 클리어하면 다음 단계가 열려요.';
-    const noteBar = $('note-bar');
-    const cornerNotes = S.notes.filter((n) => n.corner === key);
-    noteBar.classList.toggle('hidden', !cornerNotes.length);
-    if (cornerNotes.length) {
-      noteBar.textContent = '📕 이 코너 오답 ' + cornerNotes.length + '개 다시 풀기';
-      noteBar.onclick = () => { renderNotes(key); show('note'); };
-    }
-    for (let i = 1; i <= curCorner.stages; i++) {
-      const cleared = p.cleared;
-      const isDone = i <= cleared;
-      const isNext = i === cleared + 1;
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'stage-chip ' + (isDone ? 'done' : isNext ? 'next' : '');
-      const stars = p.stars[i] || 0;
-      const isExam = D.EXAM && D.EXAM[D.STAGES[key][i - 1].gen];
-      el.innerHTML = i + '<span class="stars">' + (stars ? '★'.repeat(stars) : (isDone ? '☆' : '')) + '</span>' +
-        (isExam ? '<span class="exam-dot">3차</span>' : '');
-      if (isDone || isNext) el.addEventListener('click', () => startStage(key, i));
-      else el.setAttribute('aria-disabled', 'true');
-      grid.appendChild(el);
-    }
-    show('stages');
+  function levelRecord(p) {
+    return store.levels[p.id] ??= { stars: 0, best: 0, combo: 0 };
   }
 
-  /* ══════════ 플레이 ══════════ */
-  let P = null;
-  let engine = null;
-  let tick = null;
+  function unlocked(p) {
+    return p.stage === 1 || store.levels[D.STAGES[p.corner][p.stage - 2].id]?.clear === true;
+  }
 
-  function startStage(key, stageNo) {
-    A.init();
-    const corner = D.CORNERS.find((c) => c.key === key);
-    const stage = D.STAGES[key][stageNo - 1];
-    P = {
-      corner, stage, stageNo,
-      phase: stage.mode === 'pick' ? 'pick' : 'account',
-      filledA: {}, filledM: {}, picksFound: {},
-      lives: 3, score: 0, combo: 0, maxCombo: 0,
-      timeLimit: stage.timeLimit, timeLeft: stage.timeLimit,
-      hintLeft: 1, hits: 0, wrong: 0, sideErr: 0, wrongAccounts: {}, ended: false
+  function totals() {
+    const items = Object.values(store.levels);
+    return {
+      best_score: Math.max(0, ...items.map(r => r.best || 0)),
+      cleared_stages: items.filter(r => r.clear).length,
+      best_combo: Math.max(0, ...items.map(r => r.combo || 0)),
+      stars: items.reduce((sum, r) => sum + (r.stars || 0), 0),
+      notes: items.filter(r => r.note).length
     };
-    $('overlay').classList.add('hidden');
-    $('play-corner').textContent = corner.name + ' 코너';
-    $('play-stage').textContent = stageNo + ' / ' + corner.stages + '단계';
-    $('play-tag').textContent = stage.tag || corner.name;
-    $('prompt-text').textContent = stage.prompt;
-    $('hud-score').textContent = '0';
-    $('hud-combo').textContent = 'x1';
-    $('btn-hint').classList.remove('hidden');
-    $('btn-hint').disabled = false;
-
-    const isPick = stage.mode === 'pick';
-    $('journal').classList.toggle('hidden', isPick);
-    $('pickbar').classList.toggle('hidden', !isPick);
-    $('canon-d').classList.toggle('hidden', isPick);
-    $('canon-c').classList.toggle('hidden', isPick);
-    $('canon-p').classList.toggle('hidden', !isPick);
-    document.querySelector('.cannons').classList.toggle('with-pick', isPick);
-    setSideUI(isPick ? 'p' : 'd');
-
-    renderJournal();
-    renderHearts();
-    updateRoundLabel();
-
-    if (!engine) engine = new Engine($('canvas'));
-    engine.resize();
-    engine.setStage(stage, {
-      resolve: resolveBlock,
-      onBreak: onBreak,
-      onSideError: onSideError,
-      onBad: onBad,
-      onShoot: (b, side) => A.shoot(side),
-      onRoundEmpty: () => {}
-    });
-    if (isPick) setSideUI('p');
-
-    clearInterval(tick);
-    tick = setInterval(() => {
-      if (!P || P.ended) return;
-      P.timeLeft -= 0.2;
-      if (P.timeLeft <= 0) { P.timeLeft = 0; updateHUD(); endStage(false, '시간이 다 됐어요'); return; }
-      updateHUD();
-    }, 200);
-
-    show('play');
-    drawMascot();
-    setTimeout(() => engine.resize(), 60);
   }
 
-  function updateRoundLabel() {
-    if (!P) return;
-    if (P.stage.mode === 'pick') $('play-round').textContent = '정답 ' + P.stage.picks.length + '개';
-    else if (P.stage.amountPhase) $('play-round').textContent = P.phase === 'account' ? '1/2 계정 블록' : '2/2 금액 블록';
-    else $('play-round').textContent = '계정 블록';
+  function profile() {
+    const { best_score, cleared_stages, best_combo } = totals();
+    return { nickname: store.nickname, best_score, cleared_stages, best_combo };
   }
 
-  function renderHearts() {
-    const h = $('hearts');
-    h.innerHTML = '';
-    for (let i = 0; i < 3; i++) {
-      const s = document.createElement('i');
-      s.className = 'heart' + (i < P.lives ? '' : ' lost');
-      h.appendChild(s);
+  function updateProfile() {
+    if (!store.nickname) return;
+    const list = new Map(Object.values(store.profiles).map(row => [row.nickname, row]));
+    list.set(store.nickname, profile());
+    store.profiles = Object.fromEntries([...list].slice(-30));
+  }
+
+  function createAudio() {
+    let ctx;
+    let bus;
+    let timer;
+    let musicIndex = 0;
+    const active = () => ctx?.state === 'running' && !store.settings.muted && !document.hidden;
+    const melody = [523, 659, 784, 659, 587, 698, 880, 698, 659, 784, 988, 784, 587, 698, 784, 0];
+
+    async function unlock() {
+      if (store.settings.muted || document.hidden) return;
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return;
+      try {
+        if (!ctx) {
+          ctx = new Audio();
+          bus = ctx.createGain();
+          bus.gain.value = 0.55;
+          bus.connect(ctx.destination);
+        }
+        if (ctx.state !== 'running') await ctx.resume();
+        sync();
+      } catch { /* 소리를 재생할 수 없으면 화면으로 피드백을 전달 */ }
     }
-  }
 
-  function updateHUD() {
-    if (!P) return;
-    $('hud-score').textContent = P.score.toLocaleString('ko-KR');
-    $('hud-combo').textContent = 'x' + Math.max(1, P.combo);
-    $('hud-time').textContent = Math.ceil(P.timeLeft);
-    const pct = Math.max(0, Math.min(100, (P.timeLeft / P.timeLimit) * 100));
-    $('timer-bar').style.width = pct + '%';
-    $('timer-bar').parentElement.classList.toggle('low', pct < 30);
-  }
+    function tone(freq, offset, duration, type = 'triangle', end = freq, volume = 0.10) {
+      const time = ctx.currentTime + offset;
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(freq, time);
+      oscillator.frequency.exponentialRampToValueAtTime(Math.max(25, end), time + duration);
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(volume, time + 0.009);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+      oscillator.connect(gain).connect(bus);
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+      oscillator.start(time);
+      oscillator.stop(time + duration);
+    }
 
-  function journalLines(side) {
-    const out = [];
-    P.stage.entries.forEach((e, i) => {
-      if (e.side !== side) return;
-      out.push({ i, e });
-    });
-    return out;
-  }
+    function noise(offset, duration) {
+      const time = ctx.currentTime + offset;
+      const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+      const source = ctx.createBufferSource();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+      source.buffer = buffer;
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1800, time);
+      filter.frequency.exponentialRampToValueAtTime(130, time + duration);
+      gain.gain.setValueAtTime(0.23, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+      source.connect(filter).connect(gain).connect(bus);
+      source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
+      source.start(time);
+    }
 
-  function renderJournal() {
-    if (!P) return;
-    if (P.stage.mode === 'pick') {
-      const wrap = $('pick-slots');
-      wrap.innerHTML = '';
-      P.stage.picks.forEach((p, i) => {
-        const el = document.createElement('i');
-        el.textContent = P.picksFound[i] ? '★' : '?';
-        if (P.picksFound[i]) el.className = 'on';
-        wrap.appendChild(el);
+    function arp(root, notes, offset = 0, step = 0.061) {
+      notes.forEach((semitones, index) => {
+        const pitch = root * 2 ** (semitones / 12);
+        tone(pitch, offset + index * step, 0.17, 'triangle', pitch * 1.015, 0.15);
+        tone(pitch * 2, offset + index * step, 0.085, 'square', pitch * 2, 0.024);
       });
-      return;
     }
-    ['d', 'c'].forEach((side) => {
-      const ul = $(side === 'd' ? 'journal-d' : 'journal-c');
-      ul.innerHTML = '';
-      const lines = journalLines(side);
-      if (!lines.length) {
-        ul.innerHTML = '<li class="empty">—</li>';
+
+    function speak() {
+      if (store.settings.muted || !store.settings.speech || document.hidden ||
+          !window.speechSynthesis || !window.SpeechSynthesisUtterance) return false;
+      const voice = speechSynthesis.getVoices().find(item => /^ko(?:[-_]|$)/i.test(item.lang));
+      if (!voice) return false;
+      try {
+        const words = new SpeechSynthesisUtterance('분개하기!');
+        words.voice = voice;
+        words.lang = 'ko-KR';
+        words.rate = 1.16;
+        words.volume = 0.55;
+        words.onerror = () => play('speech-fallback');
+        speechSynthesis.cancel();
+        speechSynthesis.speak(words);
+        return true;
+      } catch { return false; }
+    }
+
+    function play(type, event = {}) {
+      const spoken = type === 'lines' && speak();
+      if (!active() || !store.settings.effects) return;
+      switch (type) {
+        case 'tap': tone(480, 0, .045, 'triangle', 340, .06); break;
+        case 'pick': tone(285, 0, .11, 'triangle', 790); break;
+        case 'place': tone(240, 0, .078, 'triangle', 92); break;
+        case 'invalid': tone(310, 0, .14, 'sine', 125); break;
+        case 'lines': {
+          const pitch = 330 * 2 ** (Math.min(7, (event.streak || 1) - 1) / 12);
+          const count = event.count || 1;
+          arp(pitch, count >= 3 ? [0, 4, 7, 12, 16, 19] : count === 2 ? [0, 7, 12, 16] : [0, 4, 7]);
+          tone(260, .12, .14, 'sine', 880, .075); // 공중제비
+          tone(1175, .24, .17, 'triangle', 1397, .075);
+          if (count > 1) {
+            [0, 4, 7].forEach(n => tone(pitch * 2 ** (n / 12), .16, .19, 'triangle', pitch * 2 ** (n / 12), .045));
+            noise(.12, .13);
+          }
+          if (!spoken) arp(523, [0, 7, 12], .23, .043);
+          break;
+        }
+        case 'speech-fallback': arp(523, [0, 7, 12], 0, .043); break;
+        case 'bomb':
+        case 'revive':
+          tone(168, 0, .22, 'sawtooth', 850, .065);
+          tone(108, .16, .27, 'sine', 34, .23);
+          noise(.17, .26);
+          arp(294, [0, 7, 12], .23);
+          break;
+        case 'correct': arp(494, [0, 4, 7, 12, 16]); break;
+        case 'wrong': tone(360, 0, .16, 'sine', 310); tone(260, .12, .21, 'sine', 190); break;
+        case 'clear': arp(392, [0, 4, 7, 12, 7, 12, 16, 19]); break;
+        case 'new-best': arp(440, [0, 7, 12], .08, .052); break;
+      }
+    }
+
+    function sync() {
+      if (bus) bus.gain.value = active() ? 0.55 : 0;
+      if (store.settings.muted || document.hidden) window.speechSynthesis?.cancel();
+      const playing = active() && store.settings.music && route?.name === 'play' && !modal;
+      if (!playing) { clearInterval(timer); timer = undefined; return; }
+      if (timer !== undefined) return;
+      timer = setInterval(() => {
+        const n = musicIndex++ % melody.length;
+        if (melody[n]) tone(melody[n], 0, .14, 'triangle', melody[n], .052);
+        if (n % 4 === 0) tone(melody[n] / 4, 0, .21, 'sine', melody[n] / 4, .044);
+      }, 192);
+    }
+
+    return { unlock, play, sync };
+  }
+
+  audio = createAudio();
+  document.addEventListener('visibilitychange', audio.sync);
+  document.addEventListener('pointerdown', () => { void audio.unlock(); }, { passive: true });
+
+  const routes = { home, stages, play, notes, codex, report, settings, scoreboard };
+  function show(name, params = {}) {
+    generation++;
+    clearTimeout(transition);
+    view?.destroy();
+    game?.destroy();
+    view = game = modal = hud = null;
+    route = { ...params, name };
+    root.replaceChildren();
+    root.dataset.screen = name;
+    const top = el('header', 'app-bar');
+    if (name !== 'home') top.append(button('← 뒤로', () => goBack()));
+    top.append(el('span', 'brand', '자산모아'));
+    audioButton = button(store.settings.muted ? '소리 켜기' : '음소거', () => {
+      store.settings.muted = !store.settings.muted;
+      audioButton.textContent = store.settings.muted ? '소리 켜기' : '음소거';
+      audioButton.setAttribute('aria-pressed', String(!store.settings.muted));
+      save();
+      void audio.unlock();
+      audio.sync();
+    }, 'audio-toggle');
+    audioButton.setAttribute('aria-pressed', String(!store.settings.muted));
+    top.append(audioButton);
+    root.append(top);
+    routes[name]();
+    audio.sync();
+    window.scrollTo(0, 0);
+  }
+
+  function goBack() {
+    if (route.name === 'play') show('stages', { corner: route.problem.corner });
+    else if (route.back) show(route.back.name, route.back);
+    else show('home');
+  }
+
+  function heading(title, subtitle = '') {
+    const area = el('section', 'heading');
+    area.append(el('h1', '', title));
+    if (subtitle) area.append(el('p', 'muted', subtitle));
+    root.append(area);
+  }
+
+  function examDay() {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'numeric', day: 'numeric' })
+      .formatToParts(new Date());
+    const date = Object.fromEntries(parts.map(part => [part.type, Number(part.value)]));
+    const gap = (Date.UTC(2026, 10, 30) - Date.UTC(date.year, date.month - 1, date.day)) / 86400000;
+    return gap > 0 ? 'D−' + gap : gap === 0 ? 'D-DAY' : '평가일 11.30';
+  }
+
+  function nicknameForm() {
+    const form = el('form', 'nickname-form panel');
+    const label = el('label', '', '별명 2~10자 (실명 대신)');
+    const input = el('input');
+    input.name = 'nickname';
+    input.autocomplete = 'off';
+    input.maxLength = 20;
+    input.value = store.nickname;
+    label.append(input);
+    const submit = el('button', 'primary', '별명 저장');
+    submit.type = 'submit';
+    const error = el('p', 'warning');
+    error.setAttribute('role', 'status');
+    form.append(label, submit, error);
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const name = clean(input.value);
+      if (!nicknameOk(name)) {
+        error.textContent = '한글·문자·숫자로 2~10자 별명을 입력해 주세요.';
         return;
       }
-      lines.forEach(({ i, e }) => {
-        const li = document.createElement('li');
-        const known = P.filledA[i];
-        const amtKnown = P.filledM[i] || !P.stage.amountPhase || P.phase === 'done';
-        li.className = known ? 'filled' : 'empty';
-        li.innerHTML = '<span>' + (known ? e.account : '？？？') + '</span>' +
-          '<span class="amt">' + (amtKnown ? won(e.amount) : '?') + '</span>';
-        ul.appendChild(li);
-      });
+      store.nickname = name;
+      updateProfile();
+      save();
+      show(route.name, route);
     });
+    return form;
   }
 
-  function setSideUI(side) {
-    document.querySelectorAll('.canon').forEach((b) => b.classList.remove('is-active'));
-    document.querySelectorAll('.canon').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-    const el = $(side === 'd' ? 'canon-d' : side === 'c' ? 'canon-c' : 'canon-p');
-    el.classList.add('is-active');
-    el.setAttribute('aria-pressed', 'true');
-    if (engine) engine.setSide(side);
+  function home() {
+    heading('자산모아 블럭모아 Blaster', '블록을 놓고 줄을 지워 회계 미션에 도전하세요.');
+    const stat = totals();
+    root.append(el('p', 'summary', '3차 서술형 ' + examDay() + ' · ★ ' + stat.stars + ' · 보석 ' + store.gems + ' · 오답 ' + stat.notes));
+    if (!store.nickname) root.append(nicknameForm());
+    else root.append(el('p', 'summary', store.nickname + '의 별명 챌린지'));
+    const deck = el('section', 'corner-grid');
+    for (const c of D.CORNERS) {
+      const count = D.STAGES[c.key].filter(p => store.levels[p.id]?.clear).length;
+      const tile = button(c.emoji + ' ' + c.name, () => show('stages', { corner: c.key }), 'corner');
+      tile.style.setProperty('--accent', c.color);
+      tile.append(el('small', '', count + ' / ' + c.stages + ' 완료'));
+      deck.append(tile);
+    }
+    root.append(deck);
+    const nav = el('nav', 'actions');
+    for (const [name, label] of Object.entries({ notes: '오답 노트', codex: '계정과목 도감', report: '학습 리포트', scoreboard: '별명 점수판', settings: '설정' })) {
+      nav.append(button(label, () => show(name)));
+    }
+    root.append(nav);
+    if (saveFailed) root.append(el('p', 'warning', '이 브라우저는 기록 저장을 제한하고 있어요.'));
   }
 
-  /* ── 타격 판정 ── */
-  function resolveBlock(block, side) {
-    const st = P.stage;
-    if (st.mode === 'pick') {
-      const idx = st.picks.findIndex((p, i) => p.label === block.label && !P.picksFound[i]);
-      if (idx >= 0) return { result: 'ok', side, points: 120, color: '#c59bff', text: '+120' };
-      return { result: 'bad', color: '#ff8fa3' };
+  function stages() {
+    const c = D.CORNERS.find(c => c.key === route.corner);
+    heading(c.name, c.desc);
+    const saved = byId.get(store.run?.id);
+    if (saved?.corner === c.key) root.append(button(saved.stage + '단계 이어하기', () => start(saved, true), 'primary'));
+    root.append(button('이 코너 오답만 다시 풀기', () => show('notes', { corner: c.key, back: route })));
+    const deck = el('section', 'stage-grid');
+    for (const p of D.STAGES[c.key]) {
+      const rec = store.levels[p.id];
+      const tile = button(p.stage + '단계', () => start(p), 'stage');
+      tile.disabled = !unlocked(p);
+      tile.append(el('small', '', tile.disabled ? '잠금' : rec?.clear ? '★'.repeat(rec.stars) : '도전'));
+      if (D.EXAM[p.gen]) tile.append(el('span', 'badge', '3차 대비'));
+      deck.append(tile);
     }
-    if (P.phase === 'account') {
-      const idx = st.entries.findIndex((e, i) => !P.filledA[i] && e.account === block.label && e.side === side);
-      if (idx >= 0) return { result: 'ok', idx, side, points: 100, color: side === 'c' ? '#ff8fa3' : '#7ce7c8' };
-      const other = st.entries.some((e, i) => !P.filledA[i] && e.account === block.label);
-      if (other) return { result: 'side' };
-      return { result: 'bad' };
-    }
-    // 금액 라운드
-    const amt = block.amount;
-    const idx = st.entries.findIndex((e, i) => !P.filledM[i] && e.amount === amt && e.side === side);
-    if (idx >= 0) return { result: 'ok', idx, side, points: 70, color: side === 'c' ? '#ff8fa3' : '#7ce7c8' };
-    const other = st.entries.some((e, i) => !P.filledM[i] && e.amount === amt);
-    if (other) return { result: 'side' };
-    return { result: 'bad' };
+    root.append(deck);
   }
 
-  function onBreak(block, res) {
-    if (!P || P.ended) return;
-    P.hits++;
-    S.stats.hit++;
-    const byc = S.stats.byCorner[P.corner.key] || (S.stats.byCorner[P.corner.key] = { hit: 0, wrong: 0 });
-    byc.hit++;
-    P.combo = Math.min(9, P.combo + 1);
-    P.maxCombo = Math.max(P.maxCombo, P.combo);
-    const base = res.points || 100;
-    const gained = base * Math.min(9, P.combo);
-    P.score += gained;
-    if (P.stage.mode === 'pick') {
-      const idx = P.stage.picks.findIndex((p, i) => p.label === block.label);
-      if (idx >= 0) P.picksFound[idx] = true;
-      renderJournal();
-      A.hit(P.combo);
-      updateHUD();
-      if (P.stage.picks.every((p, i) => P.picksFound[i])) endStage(true);
-      return;
+  function start(problem, resume = false) {
+    if (!unlocked(problem)) return;
+    run = resume && store.run?.id === problem.id ? store.run :
+      { id: problem.id, misses: 0, revivals: 0, phase: 'playing' };
+    show('play', { problem });
+  }
+
+  function persist(state = game.state()) {
+    run.snapshot = game.snapshot();
+    store.run = run;
+    const record = levelRecord(route.problem);
+    record.best = Math.max(record.best || 0, state.best);
+    record.combo = Math.max(record.combo || 0, state.peakCombo);
+    updateProfile();
+    save();
+  }
+
+  function updateHud(state) {
+    hud.score.textContent = 'SCORE ' + format(state.score);
+    hud.best.textContent = 'BEST ' + format(state.best);
+    hud.goal.textContent = '줄 ' + state.lines + '/' + state.goal.lines + ' · 목표 ' + format(state.goal.score) + '점';
+    hud.combo.textContent = '콤보 ' + state.streak;
+    hud.bomb.textContent = '💣 선물 폭탄 ×' + state.bombs;
+    hud.bomb.disabled = !state.bombs || state.status !== 'playing' || !!modal;
+  }
+
+  function openMission(phase) {
+    clearTimeout(transition);
+    run.phase = phase;
+    persist();
+    missionPanel(phase === 'revival' ? revivalProblem(route.problem) : route.problem, phase);
+  }
+
+  function play() {
+    const p = route.problem;
+    const stage = el('section', 'play-stage');
+    const strip = el('div', 'play-hud');
+    const mascot = el('canvas', 'moa');
+    mascot.setAttribute('aria-hidden', 'true');
+    const board = el('canvas', 'puzzle-canvas');
+    board.setAttribute('aria-label', '8×8 퍼즐 보드와 조각 세 개. 아래 조각을 끌어 빈칸에 놓으세요.');
+    const header = el('div', 'hud-info');
+    header.append(el('h1', '', D.CORNERS.find(c => c.key === p.corner).name + ' ' + p.stage + '단계'));
+    if (D.EXAM[p.gen]) header.append(el('span', 'badge', '3차 대비'));
+    const scores = el('div', 'scores');
+    hud = { score: el('strong'), best: el('strong'), goal: el('span'), combo: el('span') };
+    scores.append(hud.score, hud.best);
+    header.append(scores, hud.goal, hud.combo);
+    strip.append(mascot, header);
+    hud.bomb = button('선물 폭탄', () => {
+      const isArmed = hud.bomb.getAttribute('aria-pressed') === 'true';
+      const active = view.armBomb(!isArmed);
+      hud.bomb.setAttribute('aria-pressed', String(active));
+      hint.textContent = active ? '폭탄을 터뜨릴 보드의 칸을 탭하세요.' : '조각을 끌어서 놓으세요.';
+    }, 'bomb-button');
+    hud.bomb.setAttribute('aria-pressed', 'false');
+    const hint = el('p', 'play-hint', '조각을 끌어서 놓으세요.');
+    const foot = el('div', 'play-actions');
+    foot.append(hud.bomb, hint);
+    stage.append(strip, board, foot);
+    root.append(stage);
+    game = E.createGame({ corner: p.corner, level: p.stage, bestScore: levelRecord(p).best, snapshot: run.snapshot });
+    view = E.mount({ canvas: board, mascot, game });
+    game.subscribe((event, state) => {
+      audio.play(event.type, event);
+      updateHud(state);
+      if (['place', 'bomb', 'revive'].includes(event.type)) persist(state);
+      if (event.type === 'bomb') {
+        hud.bomb.setAttribute('aria-pressed', 'false');
+        hint.textContent = '조각을 끌어서 놓으세요.';
+      }
+      if (event.type === 'goal' || event.type === 'no-moves') {
+        run.phase = event.type === 'goal' ? 'mission' : 'revival';
+        persist(state);
+        stage.classList.add('quest-flash');
+        transition = setTimeout(() => {
+          stage.classList.remove('quest-flash');
+          openMission(run.phase);
+        }, event.type === 'goal' ? 220 : 100);
+      }
+    });
+    updateHud(game.state());
+    if (run.phase === 'mission' || run.phase === 'revival') openMission(run.phase);
+    else if (game.state().status !== 'playing') openMission(game.state().status === 'goal' ? 'mission' : 'revival');
+    else persist();
+  }
+
+  function revivalProblem(original) {
+    const list = D.STAGES[original.corner];
+    const index = (original.stage + run.revivals + run.misses) % list.length;
+    return list[index === original.stage - 1 ? (index + 1) % list.length : index];
+  }
+
+  function promptText(p) {
+    return p.prompt.replace(/블록을 골라 부수세요\./g, '알맞은 칩을 고르세요.')
+      .replace(/골라 모두 부수세요\./g, '고르세요.').replace(/블록을 부수세요\./g, '칩을 고르세요.');
+  }
+
+  function answer(p) {
+    if (p.mode === 'pick') return p.picks.map(x => x.label).join(' · ');
+    return [['d', '(차)'], ['c', '(대)']].map(([side, label]) => label + ' ' +
+      p.entries.filter(e => e.side === side).map(e => e.account + ' ' + format(e.amount)).join(' / ')).join('　');
+  }
+
+  function shuffle(items) {
+    const list = [...items];
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
     }
-    if (P.phase === 'account') {
-      // 같은 계정이 두 줄에 있어도 한 번에 채워 준다
-      P.stage.entries.forEach((e, i) => { if (e.account === block.label && e.side === res.side) P.filledA[i] = true; });
-      P.filledA[res.idx] = true;
-      renderJournal();
-      A.hit(P.combo);
-      updateHUD();
-      if (P.stage.entries.every((e, i) => P.filledA[i])) {
-        if (P.stage.amountPhase) {
-          toast('계정 완성! 이제 금액 블록을 부숴요');
-          P.phase = 'amount';
-          updateRoundLabel();
-          setTimeout(() => { if (P && !P.ended) engine.buildRound('amount'); }, 420);
-        } else {
-          endStage(true);
+    return list;
+  }
+
+  function sameAnswers(placed, expected) {
+    if (placed.length !== expected.length) return false;
+    const sorted = [...expected].sort();
+    return [...placed].sort().every((value, index) => value === sorted[index]);
+  }
+
+  function missionGroups(p) {
+    if (p.mode === 'pick') return [{ side: 'p', expected: p.picks.map(item => item.label) }];
+    return ['d', 'c'].map(side => ({
+      side, expected: p.entries.filter(item => item.side === side).map(item => item.account)
+    }));
+  }
+
+  function amountChoices(p, value) {
+    const candidates = [...new Set([value, ...p.decoys.map(d => d.amount), ...p.entries.map(e => e.amount),
+      value + 1000, value + 10000, Math.floor(value * 1.1)])].filter(Number.isSafeInteger);
+    return shuffle(candidates.slice(0, 4));
+  }
+
+  function markAnswer(p, ok) {
+    const record = levelRecord(p);
+    record.attempts = (record.attempts || 0) + 1;
+    if (ok) {
+      record.correct = (record.correct || 0) + 1;
+      record.note = false;
+      if (!record.rewarded) {
+        record.rewarded = true;
+        store.gems += p.amountPhase ? 3 : 2;
+      }
+    } else {
+      record.note = true;
+    }
+    save();
+  }
+
+  function missionPanel(p, kind, review) {
+    modal?.remove();
+    const shell = el('div', 'quest-overlay');
+    const panel = el('section', 'quest-panel');
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-label', kind === 'revival' ? '회계 부활 찬스' : '회계 미션');
+    shell.append(panel);
+    root.append(shell);
+    modal = shell;
+    const puzzle = root.querySelector('.play-stage');
+    if (puzzle) puzzle.inert = true;
+    if (kind === 'review') for (const child of root.children) if (child !== shell && child.tagName !== 'HEADER') child.inert = true;
+    if (game) updateHud(game.state());
+    view?.react('mission');
+    audio.sync();
+    const title = kind === 'revival' ? '회계 부활 찬스' : kind === 'review' ? '오답 다시 풀기' : '보스 관문 · 회계 미션';
+    const h = el('h2', '', title);
+    h.tabIndex = -1;
+    const cue = el('p', 'moa-cue', p.mode === 'journal' ? '모아 · 차변부터 볼까?' : '모아 · 조건을 함께 읽어 볼까?');
+    const task = el('div', 'mission-task');
+    panel.append(h, cue, el('p', 'question', promptText(p)), task);
+    h.focus({ preventScroll: true });
+    let done = false;
+
+    function finish(ok) {
+      if (done) return;
+      done = true;
+      markAnswer(p, ok);
+      audio.play(ok ? 'correct' : 'wrong');
+      view?.react(ok ? 'correct' : 'wrong');
+      task.replaceChildren();
+      task.classList.add(ok ? 'gentle-correct' : 'gentle-warning');
+      task.append(el('p', 'feedback', ok ? '정답!' : '🌼 괜찮아요, 함께 다시 살펴봐요!'),
+        el('p', 'answer-line', answer(p)), el('p', 'explain', p.explain));
+      if (kind === 'review') {
+        task.append(button(review.index + 1 < review.items.length ? '다음 복습' : '오답 노트로',
+          () => review.index + 1 < review.items.length ? reviewAt(review.items, review.index + 1) : show('notes', { corner: route.corner }), 'primary'));
+      } else if (kind === 'revival') {
+        if (!ok) {
+          store.run = null;
+          save();
+          task.append(button('다시 도전', () => start(route.problem), 'primary'), button('단계 목록', goBack));
+          return;
+        }
+        run.revivals++;
+        run.phase = 'playing';
+        game.revive();
+        task.append(button('퍼즐 계속하기', () => {
+          modal.remove();
+          modal = null;
+          if (puzzle) puzzle.inert = false;
+          updateHud(game.state());
+          audio.sync();
+        }, 'primary'));
+      } else if (!ok) {
+        run.misses++;
+        run.phase = 'revival';
+        persist();
+        task.append(button('부활 문제 도전', () => openMission('revival'), 'primary'));
+      } else {
+        complete(task);
+      }
+    }
+
+    function takeAmounts(index = 0) {
+      if (index >= p.entries.length) { finish(true); return; }
+      const entry = p.entries[index];
+      const pool = el('div', 'chip-bank');
+      task.replaceChildren(el('p', 'instruction',
+        (entry.side === 'd' ? '차변' : '대변') + ' · ' + entry.account + ' 금액 (' + (index + 1) + '/' + p.entries.length + ')'), pool);
+      for (const value of amountChoices(p, entry.amount)) {
+        pool.append(button(format(value) + '원', () => value === entry.amount ? takeAmounts(index + 1) : finish(false), 'chip'));
+      }
+    }
+
+    const groups = missionGroups(p);
+    function groupAt(index) {
+      if (index === groups.length) {
+        if (p.mode === 'journal' && p.amountPhase) takeAmounts();
+        else finish(true);
+        return;
+      }
+      const group = groups[index];
+      const label = { d: '차변', c: '대변', p: '정답' }[group.side];
+      const distractors = p.mode === 'journal'
+        ? [...p.entries.filter(e => e.side !== group.side).map(e => e.account), ...p.decoys.map(e => e.account)]
+        : p.decoys.map(e => e.label);
+      const wrong = shuffle([...new Set(distractors)].filter(v => v && !group.expected.includes(v)));
+      const choices = shuffle([...group.expected, ...wrong.slice(0, 4 - group.expected.length)]);
+      const slots = group.expected.map(() => null);
+      let selected = -1;
+      let scored = false;
+      const slotsNode = el('div', 'slot-bank');
+      const bank = el('div', 'chip-bank');
+      task.replaceChildren(el('p', 'instruction', p.mode === 'journal'
+        ? label + ' 계정과목을 골라 아래 칸을 누르거나 끌어 놓으세요.' : group.expected.length + '개 칩을 골라 배치하세요.'),
+        slotsNode, bank);
+
+      function put(index, choice) {
+        if (scored || slots[index] !== null || slots.includes(choice)) return;
+        slots[index] = choice;
+        selected = -1;
+        draw();
+        if (slots.every(value => value !== null)) {
+          scored = true;
+          const placed = slots.map(value => choices[value]);
+          if (sameAnswers(placed, group.expected)) {
+            audio.play('correct');
+            groupAt(indexGroup + 1);
+          } else finish(false);
         }
       }
-      return;
-    }
-    // 금액 라운드
-    P.stage.entries.forEach((e, i) => { if (e.amount === block.amount && e.side === res.side) P.filledM[i] = true; });
-    P.filledM[res.idx] = true;
-    renderJournal();
-    A.hit(P.combo);
-    updateHUD();
-    if (P.stage.entries.every((e, i) => P.filledM[i])) endStage(true);
-  }
 
-  function onSideError(block) {
-    if (!P || P.ended) return;
-    P.combo = 0;
-    P.sideErr++;
-    S.stats.side++;
-    A.sideErr();
-    if (navigator.vibrate) navigator.vibrate(20);
-    updateHUD();
-    toast('차변/대변을 다시 확인해 봐요!');
-  }
-
-  function onBad(block) {
-    if (!P || P.ended) return;
-    P.lives--;
-    P.combo = 0;
-    P.wrong++;
-    S.stats.wrong++;
-    const label = block.label;
-    S.stats.wrongAccounts[label] = (S.stats.wrongAccounts[label] || 0) + 1;
-    P.wrongAccounts[label] = (P.wrongAccounts[label] || 0) + 1;
-    const byc = S.stats.byCorner[P.corner.key] || (S.stats.byCorner[P.corner.key] = { hit: 0, wrong: 0 });
-    byc.wrong++;
-    A.bad();
-    if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
-    if (P.wrong === 1) setTimeout(() => { if (P && !P.ended) toast('단서: 그 계정이 늘어나는지 줄어드는지 먼저 생각해 봐요. 힌트 버튼도 있어요', 3000); }, 700);
-    renderHearts();
-    updateHUD();
-    if (P.lives <= 0) endStage(false, '목숨을 모두 잃었어요');
-  }
-
-  /* ── 단계 종료 ── */
-  function endStage(success, reason) {
-    if (!P || P.ended) return;
-    P.ended = true;
-    clearInterval(tick);
-    engine.stop();
-    const st = P.stage;
-    let stars = 0, bonus = 0;
-    if (success) {
-      stars = P.lives === 3 ? 3 : P.lives === 2 ? 2 : 1;
-      bonus = Math.round(P.timeLeft) * 5 + P.lives * 200;
-      P.score += bonus;
-      const p = prog(P.corner.key);
-      p.cleared = Math.max(p.cleared, P.stageNo);
-      p.stars[P.stageNo] = Math.max(p.stars[P.stageNo] || 0, stars);
-      p.best[P.stageNo] = Math.max(p.best[P.stageNo] || 0, P.score);
-      // 오답 노트에서 지우기 (다시 풀어 성공)
-      S.notes = S.notes.filter((n) => !(n.corner === P.corner.key && n.stage === P.stageNo));
-      A.clear();
-    } else {
-      addNote(reason);
-      A.fail();
-    }
-    save();
-    showResult(success, stars, bonus, reason);
-  }
-
-  function addNote(reason) {
-    const st = P.stage;
-    S.notes = S.notes.filter((n) => !(n.corner === P.corner.key && n.stage === P.stageNo));
-    S.notes.unshift({
-      corner: P.corner.key, cornerName: P.corner.name, stage: P.stageNo,
-      tag: st.tag, prompt: st.prompt, mode: st.mode,
-      entries: st.entries, picks: st.picks, explain: st.explain,
-      wrongAccounts: P.wrongAccounts, reason: reason || '',
-      at: Date.now()
-    });
-    S.notes = S.notes.slice(0, 60);
-    save();
-  }
-
-  function answerHTML(st) {
-    if (st.mode === 'pick') {
-      return '<div class="answer-box">' + st.picks.map((p) => '<div class="ans-row"><b>정답</b><span>' + p.label + '</span></div>').join('') + '</div>';
-    }
-    const row = (e) => '<div class="ans-row' + (e.side === 'c' ? ' c' : '') + '"><b>' + (e.side === 'd' ? '차변' : '대변') + '</b><span>' + e.account + '</span><span class="amt">' + won(e.amount) + '</span></div>';
-    return '<div class="answer-box">' + st.entries.map(row).join('') + '</div>';
-  }
-
-  function showResult(success, stars, bonus, reason) {
-    const st = P.stage;
-    const ov = $('overlay');
-    const card = $('overlay-card');
-    const isLast = P.stageNo >= P.corner.stages;
-    const starHTML = success
-      ? '<div class="stars">' + [1, 2, 3].map((i) => '<span class="' + (i <= stars ? '' : 'off') + '">★</span>').join('') + '</div>'
-      : '<div class="stars"><span class="off">★</span><span class="off">★</span><span class="off">★</span></div>';
-    const title = success ? (isLast ? '코너 완주!' : '단계 클리어!') : (reason || '다시 도전!');
-    card.innerHTML =
-      '<h2>' + title + '</h2>' +
-      starHTML +
-      '<p class="result-line">점수 <b>' + P.score.toLocaleString('ko-KR') + '</b> · 최고 콤보 x' + Math.max(1, P.maxCombo) +
-      (success ? ' · 보너스 +' + bonus : '') + '</p>' +
-      answerHTML(st) +
-      '<div class="explain-box"><b>왜 이렇게 기록할까?</b>' + st.explain + '</div>' +
-      '<div class="overlay-actions">' +
-      (success
-        ? (isLast
-          ? '<button class="pxbtn primary wide" data-act="list">목록으로</button>'
-          : '<button class="pxbtn primary" data-act="next">다음 단계 →</button><button class="pxbtn ghost" data-act="retry">한 번 더</button>')
-        : '<button class="pxbtn primary" data-act="retry">다시 도전</button><button class="pxbtn ghost" data-act="list">목록으로</button>') +
-      '</div>';
-    ov.classList.remove('hidden');
-    card.querySelectorAll('button').forEach((b) => {
-      b.addEventListener('click', () => {
-        const act = b.getAttribute('data-act');
-        ov.classList.add('hidden');
-        if (act === 'next') startStage(P.corner.key, Math.min(P.corner.stages, P.stageNo + 1));
-        else if (act === 'retry') startStage(P.corner.key, P.stageNo);
-        else { openStages(P.corner.key); renderHome(); }
-      });
-    });
-  }
-
-  /* ── 힌트 ── */
-  function useHint() {
-    if (!P || P.ended || P.hintLeft <= 0) return;
-    P.hintLeft--;
-    P.score = Math.max(0, P.score - 150);
-    updateHUD();
-    const st = P.stage;
-    let msg = '';
-    if (st.mode === 'pick') {
-      const idx = st.picks.findIndex((p, i) => !P.picksFound[i]);
-      msg = '정답 중 하나: ' + st.picks[idx].label;
-    } else if (P.phase === 'account') {
-      const idx = st.entries.findIndex((e, i) => !P.filledA[i]);
-      const e = st.entries[idx];
-      msg = (e.side === 'd' ? '차변' : '대변') + '에 「' + e.account + '」';
-    } else {
-      const idx = st.entries.findIndex((e, i) => !P.filledM[i]);
-      const e = st.entries[idx];
-      msg = (e.side === 'd' ? '차변' : '대변') + ' 금액 ' + won(e.amount);
-    }
-    toast('힌트: ' + msg, 3200);
-    $('btn-hint').disabled = true;
-  }
-
-  /* ══════════ 오답 노트 ══════════ */
-  let noteFilter = null;
-  function renderNotes(cornerKey) {
-    noteFilter = cornerKey || null;
-    const wrap = $('note-list');
-    const list = noteFilter ? S.notes.filter((n) => n.corner === noteFilter) : S.notes;
-    if (!list.length) {
-      wrap.innerHTML = '<p class="empty-state">아직 오답이 없어요.<br>단계를 풀다가 틀리면 여기에 모여요.</p>';
-      return;
-    }
-    wrap.innerHTML = '';
-    list.forEach((n) => {
-      const el = document.createElement('div');
-      el.className = 'note-card';
-      const ans = n.mode === 'pick'
-        ? '<div class="note-answer"><div>정답: ' + n.picks.map((p) => p.label).join(', ') + '</div></div>'
-        : '<div class="note-answer">' + n.entries.map((e) => '<div>' + (e.side === 'd' ? '차변 ' : '대변 ') + e.account + ' <span class="amt">' + won(e.amount) + '</span></div>').join('') + '</div>';
-      el.innerHTML = '<h3>' + n.cornerName + ' ' + n.stage + '단계 · ' + (n.tag || '') + '</h3>' +
-        '<p>' + n.prompt + '</p>' + ans +
-        '<div class="note-explain">' + n.explain + '</div>' +
-        '<div class="row"><button class="pxbtn primary" data-id="' + n.corner + ',' + n.stage + '">다시 풀기</button></div>';
-      wrap.appendChild(el);
-    });
-    wrap.querySelectorAll('button[data-id]').forEach((b) => {
-      b.addEventListener('click', () => {
-        const parts = b.getAttribute('data-id').split(',');
-        startStage(parts[0], Number(parts[1]));
-      });
-    });
-  }
-
-  /* ══════════ 도감 ══════════ */
-  let codexFilter = '전체';
-  function renderCodex() {
-    const q = ($('codex-search').value || '').trim();
-    const filters = ['전체', '자산', '투자자산', '유형자산', '무형자산', '비용', '수익', '부채'];
-    const fwrap = $('codex-filters');
-    if (!fwrap.dataset.done) {
-      filters.forEach((f) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.textContent = f;
-        b.setAttribute('aria-pressed', f === codexFilter ? 'true' : 'false');
-        b.addEventListener('click', () => { codexFilter = f; renderCodex(); });
-        fwrap.appendChild(b);
-      });
-      fwrap.dataset.done = '1';
-    }
-    fwrap.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.textContent === codexFilter ? 'true' : 'false'));
-    const list = $('codex-list');
-    list.innerHTML = '';
-    const keys = Object.keys(D.ACCOUNTS).filter((k) => {
-      const a = D.ACCOUNTS[k];
-      if (codexFilter !== '전체' && a.kind.indexOf(codexFilter) < 0 && !(codexFilter === '자산' && a.kind.indexOf('자산') >= 0)) return false;
-      if (q && k.indexOf(q) < 0 && a.desc.indexOf(q) < 0) return false;
-      return true;
-    });
-    if (!keys.length) { list.innerHTML = '<p class="empty-state">찾는 계정과목이 없어요.</p>'; return; }
-    keys.forEach((k) => {
-      const a = D.ACCOUNTS[k];
-      const el = document.createElement('div');
-      el.className = 'codex-item';
-      el.innerHTML = '<h3>' + k + '<em>' + a.kind + '</em><em>' + a.inc + ' 증가</em></h3>' +
-        '<p>' + a.desc + '</p><p class="ex">' + a.ex + '</p>';
-      list.appendChild(el);
-    });
-  }
-
-  /* ══════════ 리포트 ══════════ */
-  function renderReport() {
-    const wrap = $('report-body');
-    const totalHit = S.stats.hit, totalWrong = S.stats.wrong;
-    const acc = totalHit + totalWrong ? Math.round((totalHit / (totalHit + totalWrong)) * 100) : 0;
-    let html = '<div class="report-grid">';
-    html += '<div class="report-card"><div class="big-stat"><b>' + totalCleared() + '</b><span>/ 160 단계 클리어</span></div>' +
-      '<div class="report-row"><span>총 별</span><b>★ ' + totalStars() + '</b></div>' +
-      '<div class="report-row"><span>판정 정확도</span><b>' + acc + '%</b></div>' +
-      '<div class="report-row"><span>차/대 혼동</span><b>' + S.stats.side + '회</b></div>' +
-      '<div class="report-row"><span>오답 노트</span><b>' + S.notes.length + '개</b></div></div>';
-    D.CORNERS.forEach((c) => {
-      const p = prog(c.key);
-      const b = S.stats.byCorner[c.key] || { hit: 0, wrong: 0 };
-      const a = b.hit + b.wrong ? Math.round((b.hit / (b.hit + b.wrong)) * 100) : 0;
-      const stars = Object.values(p.stars).reduce((x, y) => x + y, 0);
-      html += '<div class="report-card"><h3>' + c.emoji + ' ' + c.name + '</h3>' +
-        '<div class="report-row"><span>클리어</span><b>' + Math.min(c.stages, p.cleared) + ' / ' + c.stages + '</b></div>' +
-        '<div class="report-row"><span>별</span><b>★ ' + stars + '</b></div>' +
-        '<div class="report-row"><span>정확도</span><b>' + a + '%</b></div></div>';
-    });
-    const wrongs = Object.keys(S.stats.wrongAccounts).sort((a, b) => S.stats.wrongAccounts[b] - S.stats.wrongAccounts[a]).slice(0, 5);
-    html += '<div class="report-card"><h3>자주 틀린 계정과목</h3>' +
-      (wrongs.length ? '<div class="wrong-tags">' + wrongs.map((w) => '<span>' + w + ' ×' + S.stats.wrongAccounts[w] + '</span>').join('') + '</div>'
-        : '<p class="empty-state" style="padding:12px 0">아직 기록이 없어요.</p>') + '</div>';
-    html += '</div>';
-    wrap.innerHTML = html;
-  }
-
-  /* ══════════ 설정 ══════════ */
-  function openSettings() {
-    const card = $('overlay-card');
-    card.innerHTML = '<h2>설정</h2>' +
-      '<div class="setting-row"><span>효과음</span><button class="switch' + (S.settings.sfx ? ' on' : '') + '" id="sw-sfx"><i></i></button></div>' +
-      '<div class="setting-row"><span>배경음악</span><button class="switch' + (S.settings.bgm ? ' on' : '') + '" id="sw-bgm"><i></i></button></div>' +
-      '<div class="setting-row"><span>진행 초기화</span><button class="pxbtn pink" id="btn-reset" style="min-height:36px;font-size:11px;padding:6px 10px">모두 지우기</button></div>' +
-      '<p style="font-size:11px;color:#9aa5cc;line-height:1.6;margin:12px 0">이 게임은 로그인 없이 이 기기에만 진행을 저장해요. 개인정보를 서버로 보내지 않아요.</p>' +
-      '<div class="overlay-actions"><button class="pxbtn wide" id="sw-close">닫기</button></div>';
-    $('overlay').classList.remove('hidden');
-    $('sw-sfx').addEventListener('click', () => { S.settings.sfx = !S.settings.sfx; save(); openSettings(); });
-    $('sw-bgm').addEventListener('click', () => {
-      S.settings.bgm = !S.settings.bgm; save();
-      A.init(); A.music(S.settings.bgm); openSettings();
-    });
-    $('btn-reset').addEventListener('click', () => {
-      if (confirm('저장한 진행·오답을 모두 지울까요? 되돌릴 수 없어요.')) {
-        S = fresh(); save(); renderHome(); $('overlay').classList.add('hidden'); toast('진행을 초기화했어요');
+      const indexGroup = index;
+      function draw() {
+        slotsNode.replaceChildren();
+        bank.replaceChildren();
+        slots.forEach((choice, slot) => {
+          const target = button(choice === null ? label + ' ' + (slot + 1) : choices[choice], () => {
+            if (choice !== null) { slots[slot] = null; draw(); }
+            else if (selected >= 0) put(slot, selected);
+          }, 'slot');
+          target.dataset.slot = slot;
+          slotsNode.append(target);
+        });
+        choices.forEach((choice, i) => {
+          if (slots.includes(i)) return;
+          const chip = button(choice, () => {
+            if (p.mode === 'pick') put(slots.indexOf(null), i);
+            else {
+              selected = selected === i ? -1 : i;
+              [...bank.children].forEach(node => node.setAttribute('aria-pressed', String(Number(node.dataset.choice) === selected)));
+            }
+          }, 'chip');
+          chip.dataset.choice = i;
+          chip.setAttribute('aria-pressed', String(selected === i));
+          bindChipDrag(chip, slot => put(slot, i));
+          bank.append(chip);
+        });
       }
-    });
-    $('sw-close').addEventListener('click', () => $('overlay').classList.add('hidden'));
+      draw();
+    }
+    groupAt(0);
   }
 
-  /* ══════════ 모아 스프라이트 ══════════ */
-  function drawMascot() {
-    const c = $('mascot');
-    if (!c) return;
-    const ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
-    Engine.drawSprite(ctx, 2, 0, 0);
+  function bindChipDrag(chip, drop) {
+    let start;
+    let ghost;
+    let ignoreClick = false;
+    chip.style.touchAction = 'none';
+    chip.addEventListener('click', event => {
+      if (ignoreClick) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        ignoreClick = false;
+      }
+    }, true);
+    chip.addEventListener('pointerdown', event => {
+      if (!event.isPrimary || event.button !== 0 || start) return;
+      ignoreClick = false;
+      start = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      chip.setPointerCapture(start.id);
+    });
+    chip.addEventListener('pointermove', event => {
+      if (start?.id !== event.pointerId) return;
+      if (!ghost && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) {
+        ghost = el('span', 'chip chip-ghost', chip.textContent);
+        ghost.style.cssText = 'position:fixed;pointer-events:none;z-index:20;transform:translate(-50%,-115%)';
+        document.body.append(ghost);
+      }
+      if (ghost) { ghost.style.left = event.clientX + 'px'; ghost.style.top = event.clientY + 'px'; }
+    });
+    function stop(event) {
+      if (start?.id !== event.pointerId) return;
+      start = null;
+      if (!ghost) return;
+      ghost.remove();
+      ghost = null;
+      ignoreClick = true;
+      if (event.type !== 'pointerup') return;
+      const slot = document.elementFromPoint(event.clientX, event.clientY)?.closest('[data-slot]');
+      if (slot) drop(Number(slot.dataset.slot));
+    }
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => chip.addEventListener(type, stop));
   }
 
-  /* ══════════ 이벤트 연결 ══════════ */
-  function wire() {
-    $('btn-notes').addEventListener('click', () => { renderNotes(); show('note'); });
-    $('btn-codex').addEventListener('click', () => { renderCodex(); show('codex'); });
-    $('btn-report').addEventListener('click', () => { renderReport(); show('report'); });
-    $('btn-settings').addEventListener('click', openSettings);
-    $('btn-stages-back').addEventListener('click', () => { renderHome(); show('home'); });
-    $('btn-stages-codex').addEventListener('click', () => { renderCodex(); show('codex'); });
-    $('btn-note-back').addEventListener('click', () => { renderHome(); show('home'); });
-    $('btn-note-clear').addEventListener('click', () => {
-      if (!S.notes.length) return;
-      if (confirm('오답 노트를 비울까요?')) { S.notes = []; save(); renderNotes(); renderHome(); }
-    });
-    $('btn-codex-back').addEventListener('click', () => { renderHome(); show('home'); });
-    $('btn-report-back').addEventListener('click', () => { renderHome(); show('home'); });
-    $('codex-search').addEventListener('input', renderCodex);
-
-    $('btn-play-back').addEventListener('click', () => {
-      if (!P) { openStages(curCorner.key); return; }
-      if (P.ended) { openStages(P.corner.key); return; }
-      if (!confirm('이 단계를 그만둘까요? 지금까지의 점수는 사라져요.')) return;
-      P.ended = true; clearInterval(tick); if (engine) engine.stop(); openStages(P.corner.key);
-    });
-    $('btn-hint').addEventListener('click', useHint);
-
-    $('canon-d').addEventListener('click', () => { setSideUI('d'); A.init(); });
-    $('canon-c').addEventListener('click', () => { setSideUI('c'); A.init(); });
-    $('canon-p').addEventListener('click', () => { setSideUI('p'); A.init(); });
-
-    document.addEventListener('keydown', (e) => {
-      if (!$('screen-play').classList.contains('is-active')) return;
-      if (e.key === '1' || e.key === 'ArrowLeft') setSideUI('d');
-      else if (e.key === '2' || e.key === 'ArrowRight') setSideUI('c');
-      else if (e.key === '3') setSideUI('p');
-      else if (e.key === 'h' || e.key === 'H') useHint();
-    });
-
-    window.addEventListener('resize', () => { if (engine) engine.resize(); });
-    // 첫 터치에 오디오 깨우기
-    const wake = () => { A.init(); A.music(S.settings.bgm); document.removeEventListener('pointerdown', wake); };
-    document.addEventListener('pointerdown', wake);
+  function complete(task) {
+    const p = route.problem;
+    const record = levelRecord(p);
+    const stars = Math.max(1, 3 - Math.max(run.misses, run.revivals));
+    if (!record.clear) store.gems += 2;
+    record.clear = true;
+    record.stars = Math.max(record.stars || 0, stars);
+    updateProfile();
+    store.run = null;
+    save();
+    audio.play('clear');
+    void sendScore();
+    task.append(el('strong', 'stars', '★'.repeat(stars) + ' 단계 클리어'));
+    const next = D.STAGES[p.corner][p.stage];
+    if (next) task.append(button('다음 단계', () => start(next), 'primary'));
+    task.append(button('단계 목록', goBack));
   }
 
-  /* 점검용(수업 준비·자동 점검에서 상태를 읽기만 함) */
-  window.BlasterApp = { state: () => P, engine: () => engine };
-  if (location.hash === '#dev') {
-    window.BlasterDev = {
-      start: (key, n) => startStage(key, n),
-      unlock: () => { D.CORNERS.forEach((c) => { prog(c.key).cleared = c.stages; }); save(); renderHome(); }
+  function notes() {
+    heading('오답 노트', '틀린 문제를 다시 풀어 정리하세요.');
+    const list = all.filter(p => store.levels[p.id]?.note && (!route.corner || route.corner === p.corner));
+    if (!list.length) { root.append(el('p', 'panel', '현재 남은 오답이 없어요.')); return; }
+    for (const corner of D.CORNERS) {
+      const items = list.filter(p => p.corner === corner.key);
+      if (!items.length) continue;
+      const deck = el('section', 'panel');
+      deck.append(el('h2', '', corner.name), button('오답만 다시 풀기', () => reviewAt(items, 0), 'primary'));
+      items.forEach((p, index) => {
+        const entry = el('details', 'note');
+        entry.append(el('summary', '', p.stage + '단계 · ' + p.tag), el('p', '', promptText(p)),
+          el('p', 'answer-line', answer(p)), el('p', '', p.explain), button('이 문제 풀기', () => reviewAt(items, index)));
+        deck.append(entry);
+      });
+      root.append(deck);
+    }
+  }
+
+  function reviewAt(items, index) {
+    missionPanel(items[index], 'review', { items, index });
+  }
+
+  function codex() {
+    heading('계정과목 도감');
+    const search = el('input', 'search');
+    search.type = 'search';
+    search.placeholder = '계정과목 검색';
+    search.setAttribute('aria-label', '계정과목 검색');
+    const select = el('select');
+    select.setAttribute('aria-label', '계정 분류');
+    select.append(new Option('전체 분류', ''));
+    for (const kind of new Set(Object.values(D.ACCOUNTS).map(item => item.kind))) select.append(new Option(kind, kind));
+    const list = el('section', 'panel');
+    const draw = () => {
+      const q = clean(search.value).replace(/\s/g, '');
+      list.replaceChildren();
+      for (const [name, item] of Object.entries(D.ACCOUNTS)) {
+        if (!name.includes(q) || (select.value && select.value !== item.kind)) continue;
+        const line = el('details', 'note');
+        line.append(el('summary', '', name), el('p', '', item.kind + ' · 증가 ' + item.inc),
+          el('p', '', item.desc), el('p', 'muted', item.ex));
+        list.append(line);
+      }
+      if (!list.children.length) list.append(el('p', '', '검색 결과가 없어요.'));
     };
+    search.addEventListener('input', draw);
+    select.addEventListener('change', draw);
+    root.append(search, select, list);
+    draw();
   }
 
-  /* ══════════ 시작 ══════════ */
-  renderHome();
-  wire();
-  drawMascot();
-  if (location.hash === '#codex') { renderCodex(); show('codex'); }
+  function report() {
+    heading('학습 리포트', '회계 미션과 오답 복습의 정답률을 표시합니다.');
+    const weak = new Map();
+    for (const p of all) {
+      const record = store.levels[p.id];
+      const count = (record?.attempts || 0) - (record?.correct || 0);
+      if (count > 0) weak.set(p.tag, (weak.get(p.tag) || 0) + count);
+    }
+    for (const corner of D.CORNERS) {
+      const records = D.STAGES[corner.key].map(p => store.levels[p.id]).filter(Boolean);
+      const attempted = records.reduce((sum, r) => sum + (r.attempts || 0), 0);
+      const correct = records.reduce((sum, r) => sum + (r.correct || 0), 0);
+      root.append(el('p', 'panel', corner.name + ' · ' + (attempted ? Math.round(correct / attempted * 100) + '% (' + correct + '/' + attempted + ')' : '미션 기록 없음')));
+    }
+    if (weak.size) {
+      const list = el('section', 'panel');
+      list.append(el('h2', '', '자주 틀린 유형'));
+      [...weak].sort((a, b) => b[1] - a[1]).slice(0, 5)
+        .forEach(([tag, count]) => list.append(el('p', '', tag + ' · ' + count + '회')));
+      root.append(list);
+    }
+  }
+
+  function settings() {
+    heading('설정');
+    root.append(nicknameForm());
+    const panel = el('div', 'panel settings');
+    for (const [field, label] of [['effects', '효과음'], ['music', '배경음'], ['speech', '분개하기 음성']]) {
+      const line = el('label', '', label);
+      const checkbox = el('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = !!store.settings[field];
+      checkbox.addEventListener('change', () => {
+        store.settings[field] = checkbox.checked;
+        if (field === 'speech' && !checkbox.checked) window.speechSynthesis?.cancel();
+        save();
+        audio.sync();
+      });
+      line.append(checkbox);
+      panel.append(line);
+    }
+    panel.append(button('이 기기 진행 초기화', () => {
+      if (!window.confirm('이 기기의 단계, 별, 진행 중인 보드, 오답 기록을 초기화할까요?')) return;
+      const { nickname, settings } = store;
+      store = { ...fresh(), nickname, settings };
+      save();
+      show('home');
+    }, 'danger'));
+    root.append(panel);
+  }
+
+  function boardConfig() {
+    const config = window.BLASTER_BOARD;
+    try {
+      const url = new URL(config.url);
+      if (url.protocol !== 'https:' || !config.key || url.username || url.password || url.search || url.hash ||
+          config.submit !== 'moa_blaster_submit' || config.board !== 'moa_blaster_leaderboard' ||
+          String(config.key).startsWith('sb_secret_')) return null;
+      const middle = config.key.split('.')[1];
+      if (middle && JSON.parse(atob(middle.replace(/-/g, '+').replace(/_/g, '/'))).role === 'service_role') return null;
+      return { ...config, url: url.origin };
+    } catch { return null; }
+  }
+
+  async function rpc(config, method, payload) {
+    const signal = new AbortController();
+    const timeout = setTimeout(() => signal.abort(), 4500);
+    try {
+      const headers = { apikey: config.key, 'Content-Type': 'application/json' };
+      if (config.key.split('.').length === 3) headers.Authorization = 'Bearer ' + config.key;
+      const response = await fetch(config.url + '/rest/v1/rpc/' + method,
+        { method: 'POST', headers, body: JSON.stringify(payload), signal: signal.signal });
+      if (!response.ok) throw new Error('RPC failed');
+      if (response.status === 204) return null;
+      const body = await response.text();
+      return body ? JSON.parse(body) : null;
+    } finally { clearTimeout(timeout); }
+  }
+
+  async function sendScore() {
+    const config = boardConfig();
+    if (!config || !store.nickname) return false;
+    const { nickname, best_score, cleared_stages, best_combo } = profile();
+    try {
+      await rpc(config, config.submit, { p_nickname: nickname, p_best_score: best_score,
+        p_cleared_stages: cleared_stages, p_best_combo: best_combo });
+      return true;
+    } catch { return false; }
+  }
+
+  function scoreboard() {
+    heading('별명 챌린지 점수판');
+    const token = generation;
+    const state = el('p', 'summary', '이 기기 기록');
+    const list = el('section', 'scoreboard panel');
+    const draw = rows => {
+      list.replaceChildren();
+      const sorted = rows.filter(r => nicknameOk(clean(r.nickname)) &&
+        [r.best_score, r.cleared_stages, r.best_combo].every(n => Number.isSafeInteger(Number(n)) && Number(n) >= 0))
+        .sort((a, b) => b.best_score - a.best_score || b.cleared_stages - a.cleared_stages || b.best_combo - a.best_combo);
+      if (!sorted.length) list.append(el('p', '', '점수 기록이 아직 없어요.'));
+      sorted.slice(0, 30).forEach((entry, index) => list.append(el('p', 'rank-row',
+        (index + 1) + '. ' + entry.nickname + ' · ' + format(entry.best_score) + '점 · ' +
+        entry.cleared_stages + '단계 · 콤보 ' + entry.best_combo)));
+    };
+    updateProfile();
+    save();
+    draw(Object.values(store.profiles));
+    root.append(state, list);
+    if (!store.nickname) root.append(nicknameForm());
+    const config = boardConfig();
+    if (!config) return;
+    void (async () => {
+      if (store.nickname && !await sendScore()) return;
+      try {
+        const remote = await rpc(config, config.board, {});
+        if (generation !== token || !Array.isArray(remote)) return;
+        state.textContent = '온라인 점수판';
+        draw(remote);
+      } catch { /* 기기 기록 사용 */ }
+    })();
+  }
+
+  show('home');
 })();

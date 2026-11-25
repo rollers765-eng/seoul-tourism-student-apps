@@ -1,471 +1,693 @@
-/* 자산모아 블럭모아 Blaster — 2D 픽셀 블록 블라스터 엔진 (canvas) */
-(function (root) {
+/* 자산모아 블럭모아 Blaster v2 · 8×8 퍼즐 엔진
+ *
+ * const game = BlockPuzzle.createGame({ corner: 'inventory', level: 1,
+ *   onEvent(event, state) { … }, snapshot: optionalSavedState });
+ * const view = BlockPuzzle.mount({ canvas, mascot: optionalCanvas, game });
+ * game.snapshot() → JSON 저장용 상태. game.revive() → 중앙 두 행 폭파.
+ * game.setPaused(true/false), game.place(index, col, row), game.destroy().
+ * view.react('correct'|'wrong'|'mission'), view.destroy().
+ *
+ * 이벤트: pick, place, lines, goal, no-moves, revive.
+ * lines 이벤트 한 번에 rows, cols, cleared, count, streak, multiplier를 전달.
+ * game의 onEvent는 이동 전체가 반영된 뒤 호출된다.
+ */
+(() => {
   'use strict';
-  const W = 480;                 // 논리 가로 폭
-  const rnd = (a, b) => a + Math.random() * (b - a);
 
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+  const SIZE = 8;
+  const PALETTE = ['#58c9e8', '#a491ff', '#ed83b9', '#f8c66a', '#7bdba3', '#f99c80'];
+  const SHAPES = [
+    ['#'], ['##'], ['###'], ['####'], ['#####'],
+    ['#','#'], ['#','#','#'], ['#','#','#','#'],
+    ['##','##'], ['###','###'], ['##','##','##'], ['###','###','###'],
+    ['#.', '##'], ['.#','##'], ['##','#.'], ['##','.#'],
+    ['#..','###'], ['..#','###'], ['###','.#.'], ['.#.','###'],
+    ['.##','##.'], ['##.','.##'], ['#..','#..','###']
+  ].map((rows, id) => Object.freeze({
+    id, width: rows[0].length, height: rows.length,
+    cells: Object.freeze(rows.flatMap((row, y) => [...row].flatMap((cell, x) =>
+      cell === '#' ? [Object.freeze([x, y])] : [])))
+  }));
+  Object.freeze(SHAPES);
+
+  function goalFor(level) {
+    const lines = 2 + Math.floor(Math.max(0, level - 3) / 6);
+    return { lines, score: 180 + lines * 100 + Math.max(0, level - 3) * 12 };
   }
 
-  /* 16×16 픽셀 모아 스프라이트 */
+  function seedFor(corner, level) {
+    let seed = 2166136261;
+    for (const char of String(corner) + ':' + level) {
+      seed = Math.imul(seed ^ char.charCodeAt(0), 16777619);
+    }
+    return (seed >>> 0) || 1;
+  }
+
+  function accepts(board, shape, x, y) {
+    return Number.isInteger(x) && Number.isInteger(y) &&
+      x >= 0 && y >= 0 && x + shape.width <= SIZE && y + shape.height <= SIZE &&
+      shape.cells.every(([dx, dy]) => board[y + dy][x + dx] === 0);
+  }
+
+  function fitsAnywhere(board, shape) {
+    for (let y = 0; y <= SIZE - shape.height; y++) {
+      for (let x = 0; x <= SIZE - shape.width; x++) {
+        if (accepts(board, shape, x, y)) return true;
+      }
+    }
+    return false;
+  }
+
+  function completed(board) {
+    const rows = [];
+    const cols = [];
+    for (let index = 0; index < SIZE; index++) {
+      if (board[index].every(Boolean)) rows.push(index);
+      if (board.every(row => row[index])) cols.push(index);
+    }
+    return { rows, cols };
+  }
+
+  function erase(board, rows, cols) {
+    const cells = [];
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        if (board[y][x] && (rows.includes(y) || cols.includes(x))) {
+          cells.push({ x, y, color: board[y][x] });
+          board[y][x] = 0;
+        }
+      }
+    }
+    return cells;
+  }
+
+  function numberIn(value, min, max) {
+    return Number.isSafeInteger(value) && value >= min && value <= max;
+  }
+
+  function createGame({ corner, level, bestScore = 0, snapshot: saved, onEvent = () => {} }) {
+    if (!numberIn(level, 1, 50)) throw new RangeError('Invalid puzzle level');
+    const goal = goalFor(level);
+    const listeners = new Set([onEvent]);
+    let randomState = seedFor(corner, level);
+    let board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+    let tray = [];
+    let lines = 0;
+    let score = 0;
+    let streak = 0;
+    let peakCombo = 0;
+    let bombs = 0;
+    let best = Number.isSafeInteger(bestScore) ? Math.max(0, bestScore) : 0;
+    let announcedBest = false;
+    let status = 'playing';
+    let paused = false;
+    let destroyed = false;
+
+    function random() {
+      randomState ^= randomState << 13;
+      randomState ^= randomState >>> 17;
+      randomState ^= randomState << 5;
+      randomState >>>= 0;
+      return randomState / 4294967296;
+    }
+
+    function pick(items) {
+      return items[Math.floor(random() * items.length)];
+    }
+
+    function drawPiece(ids) {
+      return { shape: pick(ids), color: 1 + Math.floor(random() * PALETTE.length) };
+    }
+
+    function deal(rescue = false) {
+      if (rescue) return [[3], [3], [2, 3]].map(drawPiece);
+      if (level <= 3) return [[3], [3], [1, 2, 5, 8, 12]].map(drawPiece);
+      const ids = SHAPES.slice(1, level < 12 ? 16 : SHAPES.length).map(shape => shape.id);
+      return [drawPiece(ids), drawPiece(ids), drawPiece(level < 8 ? [0, 1, 2, 5, 12] : ids)];
+    }
+
+    function seedBoard() {
+      const amount = Math.min(20, Math.max(0, Math.ceil((level - 3) * 0.48)));
+      const positions = Array.from({ length: SIZE * SIZE }, (_, i) => i);
+      let placed = 0;
+      while (placed < amount && positions.length) {
+        const index = positions.splice(Math.floor(random() * positions.length), 1)[0];
+        const y = Math.floor(index / SIZE);
+        const x = index % SIZE;
+        board[y][x] = Math.floor(random() * PALETTE.length) + 1;
+        const { rows, cols } = completed(board);
+        if (rows.length || cols.length) board[y][x] = 0;
+        else placed++;
+      }
+    }
+
+    function restore(previous) {
+      if (!previous || previous.version !== 1 || previous.corner !== corner || previous.level !== level ||
+          !numberIn(previous.randomState, 1, 0xffffffff) ||
+          !Array.isArray(previous.board) || previous.board.length !== SIZE ||
+          !previous.board.every(row => Array.isArray(row) && row.length === SIZE && row.every(color => numberIn(color, 0, PALETTE.length))) ||
+          !Array.isArray(previous.tray) || previous.tray.length !== 3 ||
+          !previous.tray.some(Boolean) ||
+          !previous.tray.every(piece => piece === null || (piece && numberIn(piece.shape, 0, SHAPES.length - 1) && numberIn(piece.color, 1, PALETTE.length))) ||
+          ![previous.lines, previous.score, previous.streak].every(value => numberIn(value, 0, Number.MAX_SAFE_INTEGER)) ||
+          !['playing', 'goal', 'no-moves'].includes(previous.status)) return false;
+      board = previous.board.map(row => [...row]);
+      tray = previous.tray.map(piece => piece && { ...piece });
+      ({ lines, score, streak, status, randomState } = previous);
+      bombs = numberIn(previous.bombs, 0, 3) ? previous.bombs : 0;
+      peakCombo = Math.max(streak, numberIn(previous.peakCombo, 0, Number.MAX_SAFE_INTEGER) ? previous.peakCombo : 0);
+      best = Math.max(best, score, numberIn(previous.best, 0, Number.MAX_SAFE_INTEGER) ? previous.best : 0);
+      announcedBest = previous.announcedBest === true;
+      return true;
+    }
+
+    if (!restore(saved)) {
+      seedBoard();
+      tray = deal();
+      if (!tray.some(piece => fitsAnywhere(board, SHAPES[piece.shape]))) tray[2] = drawPiece([0]);
+    }
+
+    function snapshot() {
+      return {
+        version: 1, corner, level, board: board.map(row => [...row]),
+        tray: tray.map(piece => piece && { ...piece }), lines, score, streak, status, randomState, bombs, peakCombo, best, announcedBest
+      };
+    }
+
+    function state() { return { ...snapshot(), goal: { ...goal }, paused }; }
+
+    function emit(event) {
+      if (!listeners.size) return;
+      const current = state();
+      for (const listener of [...listeners]) listener(event, current);
+    }
+
+    function subscribe(listener) {
+      if (destroyed) return () => {};
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    }
+
+    function canPlay() { return !destroyed && !paused && status === 'playing'; }
+
+    function canPlace(index, x, y) {
+      const piece = tray[index];
+      return canPlay() && !!piece && accepts(board, SHAPES[piece.shape], x, y);
+    }
+
+    function notifyPick(index) {
+      if (canPlay() && tray[index]) emit({ type: 'pick', index });
+    }
+
+    function assess() {
+      if (lines >= goal.lines && score >= goal.score) status = 'goal';
+      else if (!bombs && !tray.some(item => item && fitsAnywhere(board, SHAPES[item.shape]))) status = 'no-moves';
+    }
+
+    function updateBest() {
+      if (score <= best) return false;
+      best = score;
+      if (announcedBest) return false;
+      announcedBest = true;
+      return true;
+    }
+
+    function blastCells(x, y) {
+      if (!game.canPlay() || !bombs || !numberIn(x, 0, 7) || !numberIn(y, 0, 7)) return [];
+      const cells = [];
+      for (let row = Math.max(0, y - 1); row <= Math.min(7, y + 1); row++) {
+        for (let col = Math.max(0, x - 1); col <= Math.min(7, x + 1); col++) {
+          cells.push({ x: col, y: row, color: board[row][col] });
+        }
+      }
+      return cells;
+    }
+
+    function useBomb(x, y) {
+      const area = blastCells(x, y);
+      const cleared = area.filter(cell => cell.color);
+      if (!cleared.length) return false;
+      for (const cell of cleared) board[cell.y][cell.x] = 0;
+      bombs--;
+      streak = 0;
+      score += cleared.length * 15;
+      const newBest = updateBest();
+      assess();
+      emit({ type: 'bomb', area, cleared });
+      if (newBest) emit({ type: 'new-best' });
+      if (status !== 'playing') emit({ type: status });
+      return true;
+    }
+
+    function place(index, x, y) {
+      if (!canPlace(index, x, y)) return false;
+      const piece = tray[index];
+      const placed = SHAPES[piece.shape].cells.map(([dx, dy]) => ({
+        x: x + dx, y: y + dy, color: piece.color
+      }));
+      for (const cell of placed) board[cell.y][cell.x] = cell.color;
+      tray[index] = null;
+      score += placed.length * 10;
+      const full = completed(board);
+      const count = full.rows.length + full.cols.length;
+      let cleared = [];
+      let multiplier = 1;
+      let gift = false;
+      if (count) {
+        streak++;
+        peakCombo = Math.max(peakCombo, streak);
+        multiplier = 2 ** Math.min(10, streak - 1);
+        if ((count >= 2 || streak === 3) && bombs < 3) {
+          bombs++;
+          gift = true;
+        }
+        score += 100 * count * multiplier + 50 * (count - 1);
+        lines += count;
+        cleared = erase(board, full.rows, full.cols);
+      } else {
+        streak = 0;
+      }
+      if (!tray.some(Boolean)) tray = deal();
+      const newBest = updateBest();
+      assess();
+      emit({ type: 'place', index, placed });
+      if (count) emit({ type: 'lines', ...full, count, cleared, streak, multiplier, gift });
+      if (newBest) emit({ type: 'new-best' });
+      if (status !== 'playing') emit({ type: status });
+      return true;
+    }
+
+    function revive() {
+      if (destroyed || status === 'playing') return false;
+      const cleared = erase(board, [3, 4], []);
+      tray = deal(true);
+      streak = 0;
+      paused = false;
+      status = 'playing';
+      emit({ type: 'revive', rows: [3, 4], cleared });
+      return true;
+    }
+
+    function setPaused(value) { paused = Boolean(value); }
+
+    function destroy() {
+      destroyed = true;
+      listeners.clear();
+    }
+
+    const game = Object.freeze({ state, snapshot, subscribe, canPlay, canPlace, notifyPick,
+      place, blastCells, useBomb, revive, signalInvalid: () => emit({ type: 'invalid' }), setPaused, destroy });
+    return game;
+  }
+
   const MOA = [
-    '................',
-    '.....222222.....',
-    '....23333332....',
-    '...2333333332...',
-    '...2311111132...',
-    '...2311111132...',
-    '...2311111132...',
-    '...2333333332...',
-    '....23344332....',
-    '.....222222.....',
-    '...2222222222...',
-    '..25555555552...',
-    '..25555555552...',
-    '..25555555552...',
-    '...22222222.....',
-    '................'
+    '......OO........', '.....OLLO.OO....', '......OLLOLO....', '.......OLOO.....',
+    '....OOOMMOOO.Y..', '...OMLMMMMMMYY..', '..OMMMMMMMMMYMO.',
+    '..OMWOKMMKOWMMO.', '..OMPOKMMKOPMCOR', '.OOMMMMMMMMMCHO.',
+    '.OTOMMMKKMMMCHOR', '.OTPOMMMMMMCCHOR', '.OGGOMMMMMMCCRO.',
+    '..OGOOMMMMMMOO..', '...OMMOOOOOMMO..', '....OO.....OO...'
   ];
-  const MOA_COLORS = { '1': '#2a1a35', '2': '#2a1a35', '3': '#ffd9a0', '4': '#ff8fa3', '5': '#7ce7c8' };
+  const INK = { O:'#315846', M:'#99dfae', L:'#d2f3bc', K:'#26313a', W:'#fffef7',
+    P:'#f3a794', Y:'#ffe274', C:'#fff0ce', H:'#ddc18f', R:'#f6775e', T:'#669a92', G:'#95bdc6' };
 
-  class Engine {
-    constructor(canvas) {
-      this.canvas = canvas;
-      this.ctx = canvas.getContext('2d');
-      this.blocks = [];
-      this.particles = [];
-      this.shots = [];
-      this.pops = [];
-      this.side = 'd';
-      this.phase = 'account';
-      this.shake = 0;
-      this.t = 0;
-      this.running = false;
-      this.hoverIdx = -1;
-      this.stars = [];
-      this.flashTimer = 0;
-      this.flashColor = '#fff';
-      this.bindPointer();
-      this.resize();
-      window.addEventListener('resize', () => this.resize());
-    }
-
-    resize() {
-      const rect = this.canvas.getBoundingClientRect();
-      const cssW = rect.width || 360;
-      const cssH = rect.height || 320;
-      this.W = W;
-      this.H = Math.max(240, Math.min(560, W * (cssH / cssW)));
-      const dpr = Math.min(2.5, window.devicePixelRatio || 1);
-      this.canvas.width = Math.round(this.W * dpr);
-      this.canvas.height = Math.round(this.H * dpr);
-      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (this.stage) this.layout();
-    }
-
-    /* ── 단계 세팅 ── */
-    setStage(stage, hooks) {
-      this.stage = stage;
-      this.hooks = hooks || {};
-      this.side = stage.mode === 'pick' ? 'p' : 'd';
-      this.phase = 'account';
-      this.particles = []; this.shots = []; this.pops = [];
-      this.shake = 0;
-      this.buildRound('account');
-      this.start();
-    }
-
-    buildRound(phase) {
-      const st = this.stage;
-      this.phase = phase;
-      let items = [];
-      if (st.mode === 'pick') {
-        items = st.picks.map((p) => ({ label: p.label, kind: 'pick', key: 'pick:' + p.label }))
-          .concat(st.decoys.map((p) => ({ label: p.label, kind: 'pick', key: 'bad:' + p.label })));
-      } else if (phase === 'account') {
-        const seen = {};
-        st.entries.forEach((e, i) => {
-          if (seen[e.account]) return; seen[e.account] = 1;
-          items.push({ label: e.account, kind: 'account', key: 'acct:' + e.account });
-        });
-        st.decoys.forEach((d) => items.push({ label: d.account, kind: 'bad', key: 'bad:' + d.account }));
-      } else {
-        st.entries.forEach((e, i) => items.push({ label: Engine.won(e.amount), kind: 'amount', key: 'amt:' + i, amount: e.amount, side: e.side }));
-        (st.amountDecoys || []).forEach((v, i) => items.push({ label: Engine.won(v), kind: 'bad', key: 'badamt:' + i, amount: -1 }));
-      }
-      items = this.shuffle(items);
-      this.blocks = items.map((it, i) => Object.assign(it, { id: i, alive: true, breaking: 0, shakeT: 0, delay: i * 45 }));
-      this.layout();
-    }
-
-    shuffle(a) {
-      const arr = a.slice();
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
-      }
-      return arr;
-    }
-
-    layout() {
-      const n = this.blocks.length || 1;
-      const cols = n <= 4 ? 2 : n <= 9 ? 3 : 4;
-      const rows = Math.ceil(n / cols);
-      const padX = 14, gap = 8;
-      const areaTop = 8;
-      const areaH = this.H - 8 - 58;   // 아래쪽 캐논 자리
-      const bw = Math.floor((this.W - padX * 2 - gap * (cols - 1)) / cols);
-      let bh = Math.floor((areaH - gap * (rows - 1)) / rows);
-      bh = Math.max(38, Math.min(72, bh));
-      const totalH = rows * bh + (rows - 1) * gap;
-      const y0 = areaTop + Math.max(0, (areaH - totalH) / 2);
-      this.blocks.forEach((b, i) => {
-        const c = i % cols, r = Math.floor(i / cols);
-        b.w = bw; b.h = bh;
-        b.x = padX + c * (bw + gap);
-        b.y = y0 + r * (bh + gap);
-      });
-      this.cols = cols;
-      this.muzzle = {
-        d: { x: this.W * 0.24, y: this.H - 30 },
-        c: { x: this.W * 0.76, y: this.H - 30 },
-        p: { x: this.W * 0.5, y: this.H - 30 }
-      };
-    }
-
-    start() { if (!this.running) { this.running = true; this.last = performance.now(); requestAnimationFrame((t) => this.loop(t)); } }
-    stop() { this.running = false; }
-
-    setSide(side) {
-      if (this.side === side) return;
-      this.side = side;
-      this.hooks.onSide && this.hooks.onSide(side);
-    }
-
-    bindPointer() {
-      const pos = (ev) => {
-        const r = this.canvas.getBoundingClientRect();
-        const x = ((ev.clientX - r.left) / r.width) * this.W;
-        const y = ((ev.clientY - r.top) / r.height) * this.H;
-        return { x, y };
-      };
-      this.canvas.addEventListener('pointerdown', (ev) => {
-        ev.preventDefault();
-        const p = pos(ev);
-        this.tap(p.x, p.y);
-      });
-    }
-
-    blockAt(x, y) {
-      for (let i = this.blocks.length - 1; i >= 0; i--) {
-        const b = this.blocks[i];
-        if (!b.alive) continue;
-        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) return b;
-      }
-      return null;
-    }
-
-    tap(x, y) {
-      if (!this.running) return;
-      const b = this.blockAt(x, y);
-      if (!b) return;
-      if (this.shots.length) return;
-      this.fire(b);
-    }
-
-    fire(b) {
-      const side = this.side === 'p' ? 'p' : this.side;
-      const from = this.side === 'p' ? { x: this.W / 2, y: this.H - 30 } : this.muzzle[this.side];
-      this.shots.push({ x: from.x, y: from.y, tx: b.x + b.w / 2, ty: b.y + b.h / 2, t: 0, dur: 0.12, target: b, side });
-      this.hooks.onShoot && this.hooks.onShoot(b, side);
-    }
-
-    resolveShot(shot) {
-      const b = shot.target;
-      if (!b || !b.alive) return;
-      const res = (this.hooks.resolve && this.hooks.resolve(b, shot.side)) || { result: 'bad' };
-      if (res.result === 'ok') {
-        b.alive = false;
-        b.breaking = 0.28;
-        this.burst(b, res.color || '#7ce7c8');
-        this.pops.push({ x: b.x + b.w / 2, y: b.y + b.h / 2, text: res.text || '+100', life: 0.9, color: res.color || '#fff8b0' });
-        this.shake = Math.min(12, 3 + (res.combo || 1) * 0.8);
-        this.flash('#ffffff', 0.06);
-        if (this.hooks.onBreak) this.hooks.onBreak(b, res);
-      } else if (res.result === 'side') {
-        b.shakeT = 0.36;
-        this.shake = 3;
-        this.flash('#ffc24b', 0.08);
-        this.pops.push({ x: b.x + b.w / 2, y: b.y + b.h / 2, text: '차/대 확인!', life: 0.8, color: '#ffc24b' });
-        if (this.hooks.onSideError) this.hooks.onSideError(b, res);
-      } else {
-        b.alive = false;
-        b.breaking = 0.28;
-        this.burst(b, '#ff6b81');
-        this.shake = 8;
-        this.flash('#ff4d6d', 0.12);
-        if (this.hooks.onBad) this.hooks.onBad(b, res);
-      }
-      // 남은 블록 확인
-      const left = this.blocks.filter((x) => x.alive).length;
-      if (left === 0 && this.hooks.onRoundEmpty) this.hooks.onRoundEmpty();
-    }
-
-    burst(b, color) {
-      const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
-      for (let i = 0; i < 16; i++) {
-        this.particles.push({
-          x: cx + rnd(-b.w / 4, b.w / 4), y: cy + rnd(-b.h / 4, b.h / 4),
-          vx: rnd(-160, 160), vy: rnd(-230, -30), life: rnd(0.35, 0.75), max: 0.75,
-          size: rnd(3, 7), color: i % 3 === 0 ? '#ffffff' : color
-        });
-      }
-    }
-
-    flash(color, amount) { this.flashColor = color; this.flashTimer = amount; }
-
-    loop(now) {
-      if (!this.running) return;
-      const dt = Math.min(0.05, (now - this.last) / 1000);
-      this.last = now;
-      this.t += dt;
-      try {
-        this.update(dt);
-        this.draw();
-      } catch (err) {
-        if (typeof console !== 'undefined') console.error('blaster frame', err);
-      }
-      requestAnimationFrame((t) => this.loop(t));
-    }
-
-    update(dt) {
-      // 발사체
-      for (let i = this.shots.length - 1; i >= 0; i--) {
-        const s = this.shots[i];
-        s.t += dt;
-        s.x += (s.tx - s.x) * Math.min(1, dt / (s.dur * 0.7 + 0.0001));
-        s.y += (s.ty - s.y) * Math.min(1, dt / (s.dur * 0.7 + 0.0001));
-        if (s.t >= s.dur) { this.shots.splice(i, 1); this.resolveShot(s); }
-      }
-      for (let i = this.particles.length - 1; i >= 0; i--) {
-        const p = this.particles[i];
-        p.life -= dt;
-        p.vy += 620 * dt;
-        p.x += p.vx * dt; p.y += p.vy * dt;
-        if (p.life <= 0) this.particles.splice(i, 1);
-      }
-      for (let i = this.pops.length - 1; i >= 0; i--) {
-        const p = this.pops[i];
-        p.life -= dt; p.y -= 34 * dt;
-        if (p.life <= 0) this.pops.splice(i, 1);
-      }
-      this.blocks.forEach((b) => {
-        if (b.breaking > 0) b.breaking = Math.max(0, b.breaking - dt);
-        if (b.shakeT > 0) b.shakeT = Math.max(0, b.shakeT - dt);
-      });
-      this.shake = Math.max(0, this.shake - dt * 34);
-      this.flashTimer = Math.max(0, this.flashTimer - dt);
-    }
-
-    /* ── 그리기 ── */
-    draw() {
-      const ctx = this.ctx, W = this.W, H = this.H;
-      ctx.save();
-      if (this.shake > 0.2) {
-        ctx.translate(rnd(-this.shake, this.shake) * 0.6, rnd(-this.shake, this.shake) * 0.6);
-      }
-      // 배경
-      const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, '#151a3d'); g.addColorStop(0.55, '#1d2450'); g.addColorStop(1, '#261a3d');
-      ctx.fillStyle = g; ctx.fillRect(-20, -20, W + 40, H + 40);
-      this.drawStars(ctx);
-      // 격자
-      ctx.strokeStyle = 'rgba(124,231,200,0.07)'; ctx.lineWidth = 1;
-      for (let x = 0; x < W; x += 24) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-      for (let y = 0; y < H; y += 24) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-
-      this.blocks.forEach((b) => { if (b.alive) this.drawBlock(ctx, b); });
-      this.drawCannons(ctx);
-      // 발사체
-      this.shots.forEach((s) => {
-        ctx.fillStyle = s.side === 'c' ? '#ff8fa3' : s.side === 'p' ? '#ffe066' : '#7ce7c8';
-        ctx.fillRect(s.x - 6, s.y - 6, 12, 12);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(s.x - 2, s.y - 2, 4, 4);
-      });
-      // 파티클
-      this.particles.forEach((p) => {
-        const a = Math.max(0, p.life / p.max);
-        ctx.globalAlpha = a;
-        ctx.fillStyle = p.color;
-        ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
-        ctx.globalAlpha = 1;
-      });
-      // 점수 팝업
-      ctx.textAlign = 'center';
-      this.pops.forEach((p) => {
-        ctx.globalAlpha = Math.min(1, p.life * 1.6);
-        ctx.font = 'bold 15px "Galmuri11","Malgun Gothic",sans-serif';
-        ctx.fillStyle = '#101426';
-        ctx.fillText(p.text, p.x + 1, p.y - 1);
-        ctx.fillStyle = p.color;
-        ctx.fillText(p.text, p.x, p.y);
-        ctx.globalAlpha = 1;
-      });
-      ctx.restore();
-
-      if (this.flashTimer > 0) {
-        ctx.globalAlpha = Math.min(0.5, this.flashTimer * 4);
-        ctx.fillStyle = this.flashColor;
-        ctx.fillRect(0, 0, W, H);
-        ctx.globalAlpha = 1;
-      }
-    }
-
-    drawStars(ctx) {
-      ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      for (let i = 0; i < 26; i++) {
-        const x = (i * 137.5) % this.W;
-        const y = (i * 89.3 + this.t * (8 + (i % 5) * 4)) % this.H;
-        const s = i % 4 === 0 ? 3 : 2;
-        ctx.globalAlpha = 0.15 + ((i % 5) / 10);
-        ctx.fillRect(Math.round(x), Math.round(y), s, s);
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    drawBlock(ctx, b) {
-      const bob = Math.sin(this.t * 2 + b.id) * 1.2;
-      let x = b.x, y = b.y + bob;
-      if (b.shakeT > 0) x += Math.sin(b.shakeT * 90) * 5;
-      const w = b.w, h = b.h;
-      const isPick = b.kind === 'pick';
-      const isAmount = b.kind === 'amount';
-      // 색으로 정답을 알 수 없도록, 같은 라운드의 블록은 모두 같은 색을 쓴다
-      const palette = isPick
-        ? { base: '#4d4290', light: '#6e60c4', dark: '#2c2456', border: '#1d1740' }
-        : isAmount
-          ? { base: '#2f5a86', light: '#4a7fbc', dark: '#1b3552', border: '#122539' }
-          : { base: '#2c6a72', light: '#4c9aa0', dark: '#173f46', border: '#0f2b30' };
-      const base = palette.base, light = palette.light, dark = palette.dark, border = palette.border;
-
-      ctx.fillStyle = 'rgba(0,0,0,0.35)';
-      ctx.fillRect(Math.round(x) + 3, Math.round(y) + 4, w, h);
-      ctx.fillStyle = border;
-      ctx.fillRect(Math.round(x) - 2, Math.round(y) - 2, w + 4, h + 4);
-      ctx.fillStyle = base;
-      ctx.fillRect(Math.round(x), Math.round(y), w, h);
-      // 베벨
-      ctx.fillStyle = light;
-      ctx.fillRect(Math.round(x), Math.round(y), w, 3);
-      ctx.fillRect(Math.round(x), Math.round(y), 3, h);
-      ctx.fillStyle = dark;
-      ctx.fillRect(Math.round(x), Math.round(y) + h - 3, w, 3);
-      ctx.fillRect(Math.round(x) + w - 3, Math.round(y), 3, h);
-      // 도트 텍스처
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
-      for (let i = 6; i < w - 6; i += 8) for (let j = 8; j < h - 8; j += 8) ctx.fillRect(Math.round(x) + i, Math.round(y) + j, 2, 2);
-
-      // 글자
-      const label = b.label;
-      const maxW = w - 10;
-      let size = label.length > 8 ? 12 : label.length > 6 ? 13 : 15;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      let lines = [label];
-      if (label.length > 5 && !isAmount) {
-        const mid = Math.ceil(label.length / 2);
-        lines = [label.slice(0, mid), label.slice(mid)];
-      }
-      if (isAmount) { lines = [label]; size = label.length > 8 ? 13 : 15; }
-      while (size > 9) {
-        ctx.font = 'bold ' + size + 'px "Galmuri11","Malgun Gothic",sans-serif';
-        const widest = Math.max.apply(null, lines.map((l) => ctx.measureText(l).width));
-        if (widest <= maxW) break;
-        size -= 1;
-      }
-      ctx.font = 'bold ' + size + 'px "Galmuri11","Malgun Gothic",sans-serif';
-      const lh = size + 2;
-      lines.forEach((ln, i) => {
-        const ty = y + h / 2 + (i - (lines.length - 1) / 2) * lh;
-        ctx.fillStyle = 'rgba(0,0,0,0.55)';
-        ctx.fillText(ln, x + w / 2 + 1, ty + 1);
-        ctx.fillStyle = '#f4fbff';
-        ctx.fillText(ln, x + w / 2, ty);
-      });
-    }
-
-    drawCannons(ctx) {
-      const H = this.H, W = this.W;
-      // 바닥
-      ctx.fillStyle = '#0f1226';
-      ctx.fillRect(0, H - 52, W, 52);
-      ctx.fillStyle = 'rgba(124,231,200,0.14)';
-      ctx.fillRect(0, H - 52, W, 2);
-      const sides = [{ k: 'd', c: '#7ce7c8', l: '차변' }, { k: 'c', c: '#ff8fa3', l: '대변' }];
-      if (this.stage && this.stage.mode === 'pick') sides.push({ k: 'p', c: '#ffe066', l: '정답' });
-      sides.forEach((s) => {
-        const active = this.side === s.k;
-        const m = this.muzzle[s.k] || { x: W / 2, y: H - 30 };
-        const bx = m.x, by = H - 34;
-        ctx.save();
-        ctx.translate(bx, by);
-        // 포신
-        ctx.fillStyle = '#0a0d1c';
-        ctx.fillRect(-13, -30, 26, 34);
-        ctx.fillStyle = active ? s.c : '#4b5170';
-        ctx.fillRect(-10, -27, 20, 28);
-        ctx.fillStyle = active ? '#ffffff' : '#787f9e';
-        ctx.fillRect(-10, -27, 20, 3);
-        ctx.fillRect(-4, -34, 8, 8);
-        // 받침
-        ctx.fillStyle = '#0a0d1c';
-        ctx.fillRect(-20, 2, 40, 12);
-        ctx.fillStyle = active ? s.c : '#3a3f5c';
-        ctx.fillRect(-17, 4, 34, 8);
-        if (active) {
-          ctx.globalAlpha = 0.35 + Math.sin(this.t * 8) * 0.15;
-          ctx.fillStyle = s.c;
-          ctx.fillRect(-24, -40, 48, 46);
-          ctx.globalAlpha = 1;
-        }
-        ctx.restore();
-        // 라벨
-        ctx.font = 'bold 11px "Galmuri11","Malgun Gothic",sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillStyle = active ? s.c : '#6b7290';
-        ctx.fillText(s.l, bx, H - 8);
-      });
-      // 조준선
-      if (this.side !== 'p') {
-        const m = this.muzzle[this.side];
-        ctx.strokeStyle = this.side === 'c' ? 'rgba(255,143,163,0.18)' : 'rgba(124,231,200,0.18)';
-        ctx.lineWidth = 2; ctx.setLineDash([4, 6]);
-        ctx.beginPath(); ctx.moveTo(m.x, H - 62); ctx.lineTo(m.x, 10); ctx.stroke();
-        ctx.setLineDash([]);
-      }
-    }
-
-    /* 모아 스프라이트 그리기 (DOM 캔버스용 정적 헬퍼) */
-    static drawSprite(ctx, scale, x, y, colors) {
-      const c = colors || MOA_COLORS;
-      for (let row = 0; row < MOA.length; row++) {
-        for (let col = 0; col < MOA[row].length; col++) {
-          const k = MOA[row][col];
-          if (k === '.') continue;
-          ctx.fillStyle = c[k] || '#000';
-          ctx.fillRect(x + col * scale, y + row * scale, scale, scale);
-        }
-      }
+  function drawMoa(context, time, mood = 'idle', reduced = false, flip = 0, turns = 1) {
+    const phase = reduced ? 0 : time / 135;
+    const jump = flip > 0 && !reduced ? Math.sin(flip * Math.PI) * 12 : 0;
+    const dance = mood === 'correct' ? Math.sin(phase) * 0.18 : 0;
+    const tilt = mood === 'wrong' && !reduced ? 0.15 : 0;
+    const blink = !reduced && time % 3500 > 3350;
+    context.save();
+    context.translate(36, 37 - jump + Math.sin(phase * 0.33));
+    context.rotate(flip * Math.PI * 2 * turns + dance + tilt);
+    MOA.forEach((row, y) => [...row].forEach((ink, x) => {
+      if (!INK[ink]) return;
+      context.fillStyle = blink && (y === 7 || y === 8) && 'WK'.includes(ink) ? INK.M : INK[ink];
+      context.fillRect((x - 8) * 3, (y - 8) * 3, 3, 3);
+    }));
+    context.restore();
+    if (mood === 'cheer' || mood === 'correct' || mood === 'wrong') {
+      context.fillStyle = mood === 'wrong' ? INK.P : INK.Y;
+      context.fillRect(60, 6, 3, 11);
+      context.fillRect(56, 10, 11, 3);
     }
   }
 
-  Engine.won = (n) => Number(n).toLocaleString('ko-KR') + '원';
-  root.BlasterEngine = Engine;
-})(typeof window !== 'undefined' ? window : globalThis);
+  function mount({ canvas, mascot, game }) {
+    const context = canvas.getContext('2d');
+    const mascotContext = mascot?.getContext('2d');
+    const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+    const originalTouch = canvas.style.touchAction;
+    const originalOverscroll = canvas.style.overscrollBehavior;
+    canvas.style.touchAction = 'none';
+    canvas.style.overscrollBehavior = 'contain';
+    let state = game.state();
+    let geometry;
+    let drag;
+    let returning;
+    let frame;
+    let previousTime = 0;
+    let shakeUntil = 0;
+    let mood = 'idle';
+    let moodUntil = 0;
+    let flipStart = 0;
+    let flipTurns = 1;
+    let bombArmed = false;
+    let bombTarget = null;
+    const particles = [];
+    const captions = [];
+    const pops = new Map();
+    const listeners = new AbortController();
+    const opts = { signal: listeners.signal };
+
+    function resize() {
+      const bounds = canvas.getBoundingClientRect();
+      const width = bounds.width;
+      const height = bounds.height;
+      if (!width || !height) return;
+      const dpr = Math.min(2.5, globalThis.devicePixelRatio || 1);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      context.imageSmoothingEnabled = false;
+      const cell = Math.max(1, Math.min((width - 16) / SIZE, (height - 105) / SIZE));
+      geometry = { width, height, cell, x: (width - cell * SIZE) / 2, y: 6, trayY: cell * SIZE + 14 };
+      if (drag) updateDrag(drag.clientX, drag.clientY);
+    }
+
+    function trayBox(index) {
+      const boardWidth = geometry.cell * SIZE;
+      const width = (boardWidth - 12) / 3;
+      return { x: geometry.x + index * (width + 6), y: geometry.trayY,
+        width, height: Math.max(44, geometry.height - geometry.trayY - 4) };
+    }
+
+    function trayPose(index, shape) {
+      const box = trayBox(index);
+      const cell = Math.min(geometry.cell * 0.52, (box.width - 8) / 5, (box.height - 8) / 4);
+      return { cell, x: box.x + (box.width - shape.width * cell) / 2,
+        y: box.y + (box.height - shape.height * cell) / 2 };
+    }
+
+    function tile(x, y, size, color, opacity = 1, scale = 1) {
+      const pad = (1 - scale) * size / 2;
+      x += pad + 1;
+      y += pad + 1;
+      const edge = Math.max(2, size * scale - 2);
+      context.globalAlpha = opacity;
+      context.fillStyle = color;
+      context.fillRect(x, y, edge, edge);
+      context.fillStyle = '#ffffff4d';
+      context.fillRect(x + 2, y + 2, edge - 4, 2);
+      context.fillRect(x + 2, y + 4, 2, Math.max(0, edge - 8));
+      context.fillStyle = '#18283e4d';
+      context.fillRect(x + 2, y + edge - 4, edge - 4, 2);
+      context.fillRect(x + edge - 4, y + 4, 2, Math.max(0, edge - 8));
+      if (edge > 12) {
+        context.fillStyle = '#fff9';
+        context.fillRect(x + edge - 8, y + 5, 1, 1);
+      }
+      context.globalAlpha = 1;
+    }
+
+    function paintPiece(piece, pose, color = PALETTE[piece.color - 1], opacity = 1) {
+      for (const [x, y] of SHAPES[piece.shape].cells) {
+        tile(pose.x + x * pose.cell, pose.y + y * pose.cell, pose.cell, color, opacity);
+      }
+    }
+
+    function local(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function updateDrag(clientX, clientY) {
+      if (!drag || !geometry) return;
+      Object.assign(drag, { clientX, clientY });
+      const point = local(clientX, clientY);
+      const { cell, x, y } = geometry;
+      const shape = SHAPES[drag.piece.shape];
+      const left = point.x - drag.anchorX * cell;
+      const top = point.y - drag.lift - drag.anchorY * cell;
+      const rawCol = (left - x) / cell;
+      const rawRow = (top - y) / cell;
+      const col = Math.max(0, Math.min(SIZE - shape.width, Math.round(rawCol)));
+      const row = Math.max(0, Math.min(SIZE - shape.height, Math.round(rawRow)));
+      const near = Math.abs(rawCol - col) <= 0.7 && Math.abs(rawRow - row) <= 0.7;
+      drag.pose = { x: left, y: top, cell };
+      drag.target = near ? { col, row, ok: game.canPlace(drag.index, col, row) } : null;
+    }
+
+    function pointerDown(event) {
+      if (drag || !geometry || !game.canPlay() || event.button !== 0 || !event.isPrimary) return;
+      const point = local(event.clientX, event.clientY);
+      if (bombArmed) {
+        event.preventDefault();
+        aimBomb(point);
+        if (bombTarget && game.useBomb(bombTarget.x, bombTarget.y)) armBomb(false);
+        else game.signalInvalid();
+        return;
+      }
+      const index = state.tray.findIndex((piece, i) => {
+        if (!piece) return false;
+        const box = trayBox(i);
+        return point.x >= box.x && point.x <= box.x + box.width &&
+          point.y >= box.y && point.y <= box.y + box.height;
+      });
+      if (index < 0) return;
+      event.preventDefault();
+      const piece = state.tray[index];
+      const shape = SHAPES[piece.shape];
+      const preview = trayPose(index, shape);
+      const anchored = (value, max) => Math.max(0.15, Math.min(max - 0.15, value));
+      const mouse = event.pointerType === 'mouse';
+      drag = {
+        index, piece, id: event.pointerId, lift: mouse ? 0 : 60,
+        anchorX: mouse ? anchored((point.x - preview.x) / preview.cell, shape.width) : shape.width / 2,
+        anchorY: mouse ? anchored((point.y - preview.y) / preview.cell, shape.height) : shape.height / 2
+      };
+      returning = null;
+      canvas.setPointerCapture(event.pointerId);
+      updateDrag(event.clientX, event.clientY);
+      game.notifyPick(index);
+    }
+
+    function armBomb(value = true) {
+      bombArmed = Boolean(value && state.bombs && game.canPlay() && !drag);
+      if (!bombArmed) bombTarget = null;
+      return bombArmed;
+    }
+
+    function aimBomb(point) {
+      const x = Math.floor((point.x - geometry.x) / geometry.cell);
+      const y = Math.floor((point.y - geometry.y) / geometry.cell);
+      bombTarget = x >= 0 && x < SIZE && y >= 0 && y < SIZE ? { x, y } : null;
+    }
+
+    function pointerMove(event) {
+      if (bombArmed && event.isPrimary) aimBomb(local(event.clientX, event.clientY));
+      if (drag?.id !== event.pointerId) return;
+      event.preventDefault();
+      updateDrag(event.clientX, event.clientY);
+    }
+
+    function pointerEnd(event) {
+      if (drag?.id !== event.pointerId) return;
+      const dropped = event.type === 'pointerup';
+      if (dropped) updateDrag(event.clientX, event.clientY);
+      const item = drag;
+      drag = null;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      if (dropped && item.target?.ok && game.place(item.index, item.target.col, item.target.row)) return;
+      if (dropped) game.signalInvalid();
+      if (!reduced) returning = { ...item, started: performance.now() };
+    }
+
+    function burst(cell, now, power) {
+      const count = reduced ? 3 : 8 + Math.floor(Math.random() * 7);
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const force = (0.9 + Math.random() * 2.7) * power;
+        particles.push({
+          x: cell.x + 0.5, y: cell.y + 0.5, vx: Math.cos(angle) * force,
+          vy: Math.sin(angle) * force - 1.3, size: 2 + Math.random() * 4,
+          color: PALETTE[cell.color - 1] || '#ffe393', expires: now + 330 + Math.random() * 280
+        });
+      }
+    }
+
+    function react(next) {
+      mood = next;
+      moodUntil = next === 'mission' ? Infinity : performance.now() + 1100;
+    }
+
+    const unsubscribe = game.subscribe((event, next) => {
+      state = next;
+      const now = performance.now();
+      if (event.type === 'place') {
+        for (const cell of event.placed) pops.set(cell.y * SIZE + cell.x, now + 180);
+      }
+      if (event.type === 'new-best' || event.type === 'bomb') {
+        if (event.type === 'bomb') {
+          shakeUntil = now + 260;
+          for (const cell of event.area) burst(cell, now, 2.5);
+        }
+        captions.push({ label: event.type === 'bomb' ? '슈웅–펑!' : 'NEW BEST!', index: captions.length, started: now });
+      }
+      if (event.type === 'lines' || event.type === 'revive') {
+        const revival = event.type === 'revive';
+        if (revival || event.count >= 2) shakeUntil = now + 220;
+        const effects = revival ? [3, 4].flatMap(y => Array.from({ length: SIZE }, (_, x) => (
+          event.cleared.find(cell => cell.x === x && cell.y === y) || { x, y, color: (x + y) % PALETTE.length + 1 }
+        ))) : event.cleared;
+        for (const cell of effects) burst(cell, now, revival || event.count >= 2 ? 1.5 : 1);
+        const praise = ['','', 'GREAT!', 'AMAZING!'][event.count] || (event.count >= 4 ? 'UNBELIEVABLE!' : '');
+        const labels = revival ? ['부활!'] : [
+          '분개하기!', praise, event.gift ? '선물 폭탄!' : '', event.streak > 1 ? 'COMBO x' + event.multiplier + '!' : ''
+        ].filter(Boolean);
+        captions.length = 0;
+        labels.forEach((label, index) => captions.push({ label, index, started: now }));
+        react('cheer');
+        flipStart = now;
+        flipTurns = Math.min(3, event.streak || 1);
+      }
+    });
+
+    function paintEffects(now, dt) {
+      const { x, y, cell } = geometry;
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (p.expires <= now) {
+          particles.splice(i, 1);
+          continue;
+        }
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= 0.16 ** dt;
+        p.vy += 7.2 * dt;
+        context.fillStyle = p.color;
+        context.globalAlpha = Math.min(1, (p.expires - now) / 180);
+        context.fillRect(x + p.x * cell, y + p.y * cell, p.size, p.size);
+      }
+      context.globalAlpha = 1;
+      for (let i = captions.length - 1; i >= 0; i--) {
+        const caption = captions[i];
+        const age = now - caption.started;
+        if (age > 850) {
+          captions.splice(i, 1);
+          continue;
+        }
+        const scale = reduced ? 1 : 1 + Math.sin(Math.min(1, age / 280) * Math.PI) * 0.19;
+        const baseline = y + cell * (2.7 + caption.index * 0.8) - (reduced ? 0 : age / 85);
+        context.font = 'bold ' + Math.round(Math.min(cell * 0.68, 30) * scale) + 'px Galmuri11, monospace';
+        context.textAlign = 'center';
+        context.lineJoin = 'round';
+        context.lineWidth = 6;
+        context.strokeStyle = '#9a355d';
+        context.fillStyle = '#ffe48a';
+        context.globalAlpha = Math.min(1, (850 - age) / 220);
+        context.strokeText(caption.label, geometry.width / 2, baseline);
+        context.fillText(caption.label, geometry.width / 2, baseline);
+      }
+      context.globalAlpha = 1;
+    }
+
+    function draw(now) {
+      frame = requestAnimationFrame(draw);
+      const dt = Math.min(0.033, (now - previousTime) / 1000);
+      previousTime = now;
+      if (!geometry) return;
+      const { x, y, cell, width, height } = geometry;
+      context.clearRect(0, 0, width, height);
+      context.save();
+      if (!reduced && now < shakeUntil) {
+        const strength = (shakeUntil - now) / 220 * 4;
+        context.translate(Math.cos(now * 0.16) * strength, Math.sin(now * 0.2) * strength / 2);
+      }
+      context.fillStyle = '#101a30';
+      context.fillRect(x - 3, y - 3, SIZE * cell + 6, SIZE * cell + 6);
+      state.board.forEach((row, r) => row.forEach((color, c) => {
+        const left = x + c * cell;
+        const top = y + r * cell;
+        context.fillStyle = (r + c) % 2 ? '#202c48' : '#24324f';
+        context.fillRect(left + 1, top + 1, cell - 2, cell - 2);
+        const key = r * SIZE + c;
+        const pop = pops.get(key) || 0;
+        if (pop <= now) pops.delete(key);
+        const scale = !reduced && pop > now ? 1 + Math.sin((pop - now) / 180 * Math.PI) * 0.13 : 1;
+        if (color) tile(left, top, cell, PALETTE[color - 1], 1, scale);
+      }));
+      if (drag?.target && game.canPlay()) {
+        const { col, row, ok } = drag.target;
+        paintPiece(drag.piece, { x: x + col * cell, y: y + row * cell, cell },
+          ok ? '#63ee9d' : '#ff687e', ok ? 0.52 + 0.13 * Math.sin(now / 95) : 0.64);
+      }
+      if (bombArmed && bombTarget) {
+        const area = game.blastCells(bombTarget.x, bombTarget.y);
+        for (const square of area) tile(x + square.x * cell, y + square.y * cell, cell,
+          area.some(target => target.color) ? '#ffc575' : '#ff7585', 0.68);
+      }
+      paintEffects(now, dt);
+      context.restore();
+
+      state.tray.forEach((piece, index) => {
+        const box = trayBox(index);
+        context.fillStyle = '#202b44';
+        context.fillRect(box.x, box.y, box.width, box.height);
+        if (piece && drag?.index !== index && returning?.index !== index) {
+          paintPiece(piece, trayPose(index, SHAPES[piece.shape]));
+        }
+      });
+      if (returning) {
+        const progress = Math.min(1, (now - returning.started) / 180);
+        const end = trayPose(returning.index, SHAPES[returning.piece.shape]);
+        const ease = 1 - (1 - progress) ** 3;
+        const pose = Object.fromEntries(['x', 'y', 'cell'].map(key =>
+          [key, returning.pose[key] + (end[key] - returning.pose[key]) * ease]));
+        paintPiece(returning.piece, pose);
+        if (progress === 1) returning = null;
+      }
+      if (drag?.pose && game.canPlay()) paintPiece(drag.piece, drag.pose, undefined, drag.target?.ok ? 0.7 : 0.95);
+      if (mascotContext) {
+        mascotContext.clearRect(0, 0, 72, 72);
+        const elapsed = now - flipStart;
+        const flight = 360 + (flipTurns - 1) * 120;
+        const flip = !reduced && flipStart && elapsed < flight ? elapsed / flight : 0;
+        drawMoa(mascotContext, now, now < moodUntil ? mood : 'idle', reduced, flip, flipTurns);
+      }
+    }
+
+    const observer = globalThis.ResizeObserver ? new ResizeObserver(resize) : null;
+    observer?.observe(canvas);
+    globalThis.addEventListener('resize', resize, opts);
+    canvas.addEventListener('pointerdown', pointerDown, opts);
+    canvas.addEventListener('pointermove', pointerMove, opts);
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, pointerEnd, opts);
+    canvas.addEventListener('contextmenu', event => event.preventDefault(), opts);
+    for (const event of ['gesturestart', 'gesturechange']) {
+      canvas.addEventListener(event, gesture => gesture.preventDefault(), { ...opts, passive: false });
+    }
+    if (mascot) {
+      mascot.width = 72;
+      mascot.height = 72;
+      mascotContext.imageSmoothingEnabled = false;
+    }
+    resize();
+    frame = requestAnimationFrame(draw);
+
+    function destroy() {
+      listeners.abort();
+      observer?.disconnect();
+      unsubscribe();
+      cancelAnimationFrame(frame);
+      if (drag && canvas.hasPointerCapture(drag.id)) canvas.releasePointerCapture(drag.id);
+      canvas.style.touchAction = originalTouch;
+      canvas.style.overscrollBehavior = originalOverscroll;
+    }
+
+    return Object.freeze({ react, resize, armBomb, destroy });
+  }
+
+  const api = Object.freeze({ SIZE, shapes: SHAPES, goalFor, fitsAnywhere, createGame, mount, drawMoa });
+  globalThis.BlockPuzzle = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})();
