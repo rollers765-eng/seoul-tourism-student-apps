@@ -131,10 +131,13 @@
         b.w = bw; b.h = bh;
         b.x = padX + c * (bw + gap);
         b.y = y0 + r * (bh + gap);
-        b.alive = true; b.breaking = 0;
       });
       this.cols = cols;
-      this.muzzle = { d: { x: this.W * 0.24, y: this.H - 30 }, c: { x: this.W * 0.76, y: this.H - 30 } };
+      this.muzzle = {
+        d: { x: this.W * 0.24, y: this.H - 30 },
+        c: { x: this.W * 0.76, y: this.H - 30 },
+        p: { x: this.W * 0.5, y: this.H - 30 }
+      };
     }
 
     start() { if (!this.running) { this.running = true; this.last = performance.now(); requestAnimationFrame((t) => this.loop(t)); } }
@@ -233,8 +236,12 @@
       const dt = Math.min(0.05, (now - this.last) / 1000);
       this.last = now;
       this.t += dt;
-      this.update(dt);
-      this.draw();
+      try {
+        this.update(dt);
+        this.draw();
+      } catch (err) {
+        if (typeof console !== 'undefined') console.error('blaster frame', err);
+      }
       requestAnimationFrame((t) => this.loop(t));
     }
 
@@ -405,7 +412,7 @@
       if (this.stage && this.stage.mode === 'pick') sides.push({ k: 'p', c: '#ffe066', l: '정답' });
       sides.forEach((s) => {
         const active = this.side === s.k;
-        const m = this.muzzle[s.k];
+        const m = this.muzzle[s.k] || { x: W / 2, y: H - 30 };
         const bx = m.x, by = H - 34;
         ctx.save();
         ctx.translate(bx, by);

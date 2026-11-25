@@ -183,6 +183,7 @@
       timeLimit: stage.timeLimit, timeLeft: stage.timeLimit,
       hintLeft: 1, hits: 0, wrong: 0, sideErr: 0, wrongAccounts: {}, ended: false
     };
+    $('overlay').classList.add('hidden');
     $('play-corner').textContent = corner.name + ' 코너';
     $('play-stage').textContent = stageNo + ' / ' + corner.stages + '단계';
     $('play-tag').textContent = stage.tag || corner.name;
