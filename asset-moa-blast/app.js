@@ -353,13 +353,13 @@
   }
   /* 조각마다 칸 크기를 줄여 트레이 밖으로 절대 넘치지 않게 */
   function pieceCellSize(pc) {
-    const tm = trayMetrics();
+    const avail = Math.min(112, (trayEl.clientHeight || 130) - 18);
     const box = shapeBox({ c: pc.cells });
     const base = window.innerWidth <= 350 ? 23 : window.innerWidth <= 400 ? 27 : 30;
     const gap = 3;
-    const badge = pc.pure ? 2 : 32;
-    const byH = Math.floor((tm.slotH - badge - (box.rows - 1) * gap) / box.rows);
-    const byW = Math.floor((tm.slotW - (box.cols - 1) * gap) / box.cols);
+    const badge = pc.pure ? 4 : 30;
+    const byH = Math.floor((avail - badge - (box.rows - 1) * gap) / box.rows);
+    const byW = Math.floor((trayMetrics().slotW - (box.cols - 1) * gap) / box.cols);
     return Math.max(13, Math.min(base, byH, byW));
   }
 
@@ -678,7 +678,8 @@
     shakeBoard();
     highlightSide(miss.side);
     const why = a.ex || a.desc || (piece.key + ' 계정의 자리를 다시 확인해 보세요.');
-    showTip('❌ ' + piece.key + '은(는) ' + need + ' 칸!  −' + drop + '점', why);
+    const floorNote = ((P.earned || 0) - P.penalty) < 0 ? ' (점수는 0에서 멈춰요)' : '';
+    showTip('❌ ' + piece.key + '은(는) ' + need + ' 칸!  −' + drop + '점', why + floorNote);
   }
 
   function tryPlace(piece, slot, r0, c0) {
@@ -864,6 +865,11 @@
     const el = $('#tipCard');
     if (!el) return;
     el.innerHTML = '<b>' + big + '</b><span>' + small + '</span>';
+    const m = $('#mission');
+    if (m) {
+      const r = m.getBoundingClientRect();
+      el.style.top = Math.max(6, Math.round(r.top) - 2) + 'px';
+    }
     el.classList.add('show');
     clearTimeout(tipTimer);
     tipTimer = setTimeout(() => el.classList.remove('show'), 3400);
