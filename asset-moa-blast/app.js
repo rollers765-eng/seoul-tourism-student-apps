@@ -1089,8 +1089,7 @@
   const SHOP = [
     { k: 'undo', ico: '↩️', nm: '다시하기', ds: '마지막 배치를 되돌려요 (게임 중)', cost: 3 },
     { k: 'clean', ico: '🧹', nm: '보드 정리', ds: '잠금 상자 3개 제거 + 아래 2줄 정리', cost: 8 },
-    { k: 'hint', ico: '💡', nm: '힌트', ds: '정답 조각과 놓을 자리를 알려 줘요', cost: 2 },
-    { k: 'gems', ico: '💎', nm: '보석 10개', ds: '챌린지를 풀면 더 빨리 모여요', cost: 0 }
+    { k: 'hint', ico: '💡', nm: '힌트', ds: '정답 조각과 놓을 자리를 알려 줘요', cost: 2 }
   ];
   function renderShop() {
     $('#shopGems').textContent = SAVE.gems;
@@ -1102,10 +1101,10 @@
       row.innerHTML = '<span class="ico">' + it.ico + '</span><span class="meta"><span class="nm">' + it.nm + '</span><span class="ds">' + it.ds + '</span></span>';
       const b = document.createElement('button');
       b.className = 'buy';
-      b.textContent = it.k === 'gems' ? '무료 안내' : '💎 ' + it.cost;
+      b.textContent = '💎 ' + it.cost;
+      b.disabled = SAVE.gems < it.cost;
       b.addEventListener('click', () => {
-        if (it.k === 'gems') { toast('보석은 스테이지 클리어와 챌린지 정답으로 모아요'); return; }
-        if (!P || P.done) { toast('게임 중에만 쓸 수 있어요'); return; }
+        if (!P || P.done) { toast('게임 중에만 쓸 수 있어요. 먼저 스테이지를 시작해요'); return; }
         closeScreens();
         show('screen-play');
         useItem(it.k);
