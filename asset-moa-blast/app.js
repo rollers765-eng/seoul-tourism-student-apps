@@ -586,6 +586,8 @@
       anim.add(i);
     });
     P.tray[slot] = null;
+    const usedSlot = trayEl.querySelector('.piece[data-slot="' + slot + '"]');
+    if (usedSlot && usedSlot.parentNode) usedSlot.parentNode.innerHTML = '';
     SOUND.play('place');
 
     // 미션 채움
@@ -1193,10 +1195,14 @@
     return String(s == null ? '' : s).replace(/\s+/g, '').replace(/[(),원₩,]/g, '').replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xFEE0));
   }
 
+  function answerText() {
+    if ((CH.type === 'amount' || CH.type === 'type-amount') && /^\d+$/.test(CH.answer)) return won(Number(CH.answer)) + '원';
+    return CH.answer;
+  }
+
   function answerChallenge(given) {
     if (CH.answered) return;
-    CH.answered = true;
-    if (CH.tick) { clearInterval(CH.tick); CH.tick = null; }
+    CH.answered = true;    if (CH.tick) { clearInterval(CH.tick); CH.tick = null; }
     const left = Math.max(0, Math.round(CH.timer));
     const correct = given != null && normalize(given) === normalize(CH.answer);
     const res = $('#chResult');
@@ -1215,12 +1221,12 @@
       save(); paintGems();
       $('#chGems').textContent = SAVE.gems;
       res.className = 'ch-result ok';
-      res.innerHTML = '🎉 정답! +' + won(score) + '점 · 💎 +' + gems + ' (남은 ' + left + '초 보너스)<br><b>' + CH.answer + '</b>' + (CH.explain ? '<br>' + CH.explain : '');
+      res.innerHTML = '🎉 정답! +' + won(score) + '점 · 💎 +' + gems + ' (남은 ' + left + '초 보너스)<br><b>' + answerText() + '</b>' + (CH.explain ? '<br>' + CH.explain : '');
       fx.confetti(220); fx.fireworks(3);
       SOUND.play('right'); SOUND.play('applause'); SOUND.play('whistle');
     } else {
       res.className = 'ch-result no';
-      res.innerHTML = (given == null ? '⏰ 시간 초과! ' : '') + '정답은 <b>' + CH.answer + '</b>예요.' +
+      res.innerHTML = (given == null ? '⏰ 시간 초과! ' : '') + '정답은 <b>' + answerText() + '</b>예요.' +
         (CH.explain ? '<br>' + CH.explain : '');
       SOUND.play('wrong');
     }
