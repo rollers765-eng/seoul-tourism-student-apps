@@ -57,14 +57,22 @@
   }
 
   /* ───────── 계정 색/분류 ───────── */
+  const KIND_STYLES = {
+    '자산': ['c-asset', 'c-asset2', 'c-asset3'],
+    '투자자산': ['c-asset2', 'c-asset3', 'c-asset'],
+    '유형자산': ['c-asset', 'c-asset3', 'c-asset2'],
+    '무형자산': ['c-asset3', 'c-asset2', 'c-asset'],
+    '부채': ['c-liab', 'c-liab2'],
+    '비용': ['c-cost', 'c-cost2'],
+    '수익': ['c-rev', 'c-rev2']
+  };
+  function hashOf(str) { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0; return h; }
   function catClass(name) {
     const a = ACCT[name];
     if (!a) return 'c-pick';
     if (String(a.kind).indexOf('차감') >= 0) return 'c-assetchi';
-    if (a.kind === '부채') return 'c-liab';
-    if (a.kind === '비용') return 'c-cost';
-    if (a.kind === '수익') return 'c-rev';
-    return 'c-asset';
+    const list = KIND_STYLES[a.kind] || ['c-asset'];
+    return list[hashOf(name) % list.length];
   }
   function isAccount(name) { return !!ACCT[name]; }
   function sideOf(name) { return ACCT[name] ? (ACCT[name].inc === '대변' ? 'c' : 'd') : null; }
