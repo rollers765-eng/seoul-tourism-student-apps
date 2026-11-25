@@ -1077,7 +1077,7 @@
       SOUND.play('right'); SOUND.play('applause'); SOUND.play('whistle');
     } else {
       res.className = 'ch-result no';
-      res.innerHTML = (given == null ? '⏰ 시간 초과!' : '정답은 <b>' + CH.answer + '</b>예요.') +
+      res.innerHTML = (given == null ? '⏰ 시간 초과! ' : '') + '정답은 <b>' + CH.answer + '</b>예요.' +
         (CH.st.explain ? '<br>' + CH.st.explain : '');
       SOUND.play('wrong');
     }
