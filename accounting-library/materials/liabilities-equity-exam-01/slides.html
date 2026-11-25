@@ -1,0 +1,4139 @@
+<!doctype html>
+<!-- PART 1/5 -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카페 사장님의 장부 미션 | 부채·자본</title>
+  <style>
+    :root {
+      --bg: #FFF8EF;
+      --surface: #FFFFFF;
+      --surface-soft: #FDF3E4;
+      --surface-warm: #F9EBD4;
+      --ink: #2B211B;
+      --ink-muted: #5C493E;
+      --primary: #176047;
+      --primary-hover: #114A36;
+      --primary-soft: #E6F3ED;
+      --accent: #F4D58D;
+      --accent-soft: #FFF4D4;
+      --accent-ink: #5A3E00;
+      --border: #DECBB7;
+      --border-strong: #B99D82;
+      --ok-bg: #E7F6EF;
+      --ok-border: #176047;
+      --ok-ink: #0F4734;
+      --err-bg: #FDECEC;
+      --err-border: #B3261E;
+      --err-ink: #8C1D18;
+      --warn-bg: #FFF3D1;
+      --warn-border: #A86B00;
+      --warn-ink: #6A4300;
+      --debit-bg: #EEF4FA;
+      --debit-ink: #1D4B7A;
+      --credit-bg: #F9EFE8;
+      --credit-ink: #7D3C12;
+      --shadow: 0 2px 10px rgba(43, 33, 27, 0.06);
+      --radius: 14px;
+      --radius-sm: 9px;
+      --font-body: clamp(16px, 1.35vw, 23px);
+      --font-small: clamp(14px, 1.05vw, 18px);
+      --font-h1: clamp(22px, 2.2vw, 34px);
+      --font-h2: clamp(19px, 1.75vw, 28px);
+      --font-h3: clamp(17px, 1.4vw, 23px);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+      line-height: 1.55;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-size: var(--font-body);
+      min-height: 100vh;
+    }
+
+    a {
+      color: var(--primary);
+    }
+
+    button, input {
+      font: inherit;
+      color: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* 상단 고정 헤더 */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: rgba(255, 248, 239, 0.97);
+      border-bottom: 2px solid var(--border);
+      backdrop-filter: blur(4px);
+    }
+
+    .header-top {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .library-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 2px solid var(--primary);
+      background-color: var(--surface);
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: var(--font-small);
+      white-space: nowrap;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .library-link:hover {
+      background-color: var(--primary);
+      color: #FFFFFF;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: clamp(16px, 1.3vw, 21px);
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .mode-switcher {
+      display: inline-flex;
+      background-color: var(--surface-warm);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 4px;
+      max-width: 100%;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--ink);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: var(--font-small);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .mode-btn[aria-pressed="true"] {
+      background-color: var(--primary);
+      color: #FFFFFF;
+    }
+
+    /* 탐색 줄 */
+    .app-nav {
+      background-color: var(--surface-soft);
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-counter {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background-color: var(--ink);
+      color: #FFF8EF;
+      font-weight: 800;
+      font-size: var(--font-small);
+      white-space: nowrap;
+    }
+
+    .period-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .period-btn {
+      border: 1.5px solid var(--border-strong);
+      background-color: var(--surface);
+      color: var(--ink);
+      padding: 5px 11px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: var(--font-small);
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .period-btn.is-active {
+      background-color: var(--accent);
+      border-color: var(--accent-ink);
+      color: var(--ink);
+    }
+
+    .slide-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .slide-pill {
+      border: 1.5px solid var(--border);
+      background-color: var(--surface);
+      color: var(--ink);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: clamp(13px, 0.95vw, 16px);
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 40px;
+      text-align: center;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .slide-pill.is-active {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: #FFFFFF;
+    }
+
+    /* 메인 슬라이드 컨테이너 */
+    .slide-main {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 18px 14px 44px;
+      scroll-margin-top: 120px;
+    }
+
+    .slide-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* 상단 개념 + 거래 카드 */
+    .top-banner {
+      background-color: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(16px, 2vw, 24px);
+      box-shadow: var(--shadow);
+    }
+
+    .slide-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: var(--font-small);
+      font-weight: 800;
+    }
+
+    .badge-period {
+      background-color: var(--accent-soft);
+      border: 1px solid var(--accent-ink);
+      color: var(--accent-ink);
+    }
+
+    .badge-concept {
+      background-color: var(--primary-soft);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .slide-title {
+      margin: 0 0 10px;
+      font-size: var(--font-h1);
+      line-height: 1.28;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .concept-note {
+      margin: 0 0 10px;
+      color: var(--ink-muted);
+      font-size: var(--font-body);
+    }
+
+    .story-box {
+      background-color: var(--surface-soft);
+      border-left: 5px solid var(--primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+
+    .story-box p {
+      margin: 4px 0;
+    }
+
+    .story-tag {
+      font-weight: 800;
+      color: var(--primary);
+      margin-right: 6px;
+    }
+
+    /* 중간 2열(도식 + 장부/비교) */
+    .mid-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 920px) {
+      .mid-grid.is-two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+      }
+    }
+
+    .panel-card {
+      background-color: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(14px, 1.8vw, 22px);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: var(--font-h3);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .svg-frame {
+      width: 100%;
+      overflow: hidden;
+      border-radius: var(--radius-sm);
+      background-color: #FFFDF9;
+      border: 1px solid var(--border);
+      padding: 10px;
+    }
+
+    .svg-frame svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+    }
+
+    /* 비교 표 & 미니 카드 */
+    .info-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-small);
+    }
+
+    .info-table th,
+    .info-table td {
+      border: 1.5px solid var(--border);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .info-table th {
+      background-color: var(--surface-warm);
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .callout-tip {
+      margin-top: 10px;
+      padding: 10px 13px;
+      border-radius: var(--radius-sm);
+      background-color: var(--accent-soft);
+      border: 1.5px solid #D7B45A;
+      color: var(--ink);
+      font-size: var(--font-small);
+    }
+
+    /* 하단 활동 / 문제 영역 */
+    .tasks-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .task-card {
+      background-color: var(--surface);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: clamp(14px, 1.8vw, 22px);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .task-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .task-label {
+      font-weight: 800;
+      font-size: var(--font-h3);
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .task-prompt {
+      margin: 0 0 12px;
+      color: var(--ink);
+    }
+
+    /* 아코디언형 그룹(20장 등) */
+    .task-details {
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius);
+      background-color: var(--surface);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .task-details > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 18px;
+      background-color: var(--surface-soft);
+      font-weight: 800;
+      font-size: var(--font-h3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1.5px solid transparent;
+    }
+
+    .task-details[open] > summary {
+      border-bottom-color: var(--border);
+    }
+
+    .task-details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .task-details-body {
+      padding: clamp(14px, 1.8vw, 22px);
+    }
+
+    /* 버튼 공통 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      font-weight: 800;
+      font-size: var(--font-small);
+      cursor: pointer;
+      min-height: 44px;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface-soft);
+      border-color: var(--border-strong);
+      color: var(--ink);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--surface-warm);
+    }
+
+    .btn-accent {
+      background-color: var(--accent);
+      border-color: var(--accent-ink);
+      color: var(--ink);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    /* 전자칠판 수업 모드 판서용 빈칸 */
+    .board-blank {
+      border: 2.5px dashed var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: #FFFDF9;
+      padding: 16px;
+      margin: 10px 0;
+    }
+
+    .board-journal-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 760px) {
+      .board-journal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .board-side {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background-color: var(--surface);
+    }
+
+    .board-side-title {
+      font-weight: 800;
+      font-size: var(--font-small);
+      margin-bottom: 10px;
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+
+    .side-debit {
+      background-color: var(--debit-bg);
+      color: var(--debit-ink);
+    }
+
+    .side-credit {
+      background-color: var(--credit-bg);
+      color: var(--credit-ink);
+    }
+
+    .board-write-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .board-write-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .board-cell {
+      min-height: 54px;
+      border-bottom: 2px solid var(--border-strong);
+      background-color: #FFFEFC;
+      border-radius: 6px 6px 0 0;
+      padding: 6px 8px;
+      font-size: clamp(13px, 0.95vw, 15px);
+      color: var(--ink-muted);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    /* 한 줄 분개 정답 출력 (모바일 가로 스크롤 격리) */
+    .journal-answer-line {
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      background-color: var(--surface);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin: 10px 0 8px;
+      font-weight: 800;
+      font-size: clamp(16px, 1.35vw, 22px);
+      color: var(--ink);
+    }
+
+    .j-tag {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 5px;
+      margin-right: 4px;
+      font-weight: 800;
+    }
+
+    .j-gap {
+      display: inline-block;
+      width: 2.2em;
+    }
+
+    /* 피드백 박스 */
+    .feedback-box {
+      margin-top: 12px;
+      padding: 12px 15px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      font-size: var(--font-small);
+    }
+
+    .feedback-box p {
+      margin: 4px 0;
+    }
+
+    .feedback-ok {
+      background-color: var(--ok-bg);
+      border-color: var(--ok-border);
+      color: var(--ok-ink);
+    }
+
+    .feedback-err {
+      background-color: var(--err-bg);
+      border-color: var(--err-border);
+      color: var(--err-ink);
+    }
+
+    .feedback-warn {
+      background-color: var(--warn-bg);
+      border-color: var(--warn-border);
+      color: var(--warn-ink);
+    }
+
+    .feedback-info {
+      background-color: var(--surface-soft);
+      border-color: var(--primary);
+      color: var(--ink);
+    }
+
+    .status-pill {
+      display: inline-block;
+      font-weight: 800;
+      margin-right: 6px;
+    }
+
+    /* 선택형 버튼 */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    @media (min-width: 640px) {
+      .choice-grid.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .choice-grid.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .choice-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--surface);
+      color: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-height: 48px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .choice-btn:hover {
+      background-color: var(--surface-soft);
+      border-color: var(--primary);
+    }
+
+    .choice-btn.is-selected {
+      background-color: var(--accent-soft);
+      border-color: var(--accent-ink);
+    }
+
+    .choice-btn.is-correct {
+      background-color: var(--ok-bg);
+      border-color: var(--ok-border);
+      color: var(--ok-ink);
+    }
+
+    .choice-btn.is-wrong {
+      background-color: var(--err-bg);
+      border-color: var(--err-border);
+      color: var(--err-ink);
+    }
+
+    .choice-num {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background-color: var(--surface-warm);
+      color: var(--ink);
+      font-size: 0.9em;
+      font-weight: 800;
+    }
+
+    .choice-text {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow-x: auto;
+    }
+
+    /* 칩 뱅크 & 드래그/탭 분류 */
+    .chip-bank-wrap {
+      background-color: var(--surface-soft);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .chip-bank-help {
+      margin: 0 0 8px;
+      font-size: var(--font-small);
+      color: var(--ink-muted);
+    }
+
+    .chip-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 2px solid var(--primary);
+      background-color: var(--surface);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: var(--font-small);
+      cursor: pointer;
+      text-align: left;
+      max-width: 100%;
+      touch-action: manipulation;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .chip-btn.is-selected {
+      background-color: var(--accent);
+      border-color: var(--accent-ink);
+      box-shadow: 0 0 0 2px var(--accent-ink);
+    }
+
+    .chip-btn.is-placed {
+      background-color: var(--primary-soft);
+      border-color: var(--primary);
+      border-radius: var(--radius-sm);
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .chip-drag-handle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 5px;
+      border-radius: 6px;
+      background-color: var(--surface-warm);
+      color: var(--ink-muted);
+      font-weight: 800;
+      letter-spacing: -1px;
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+      flex: 0 0 auto;
+    }
+
+    .chip-selected-tag {
+      font-size: 0.8em;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background-color: var(--ink);
+      color: #FFF8EF;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+
+    .drop-buckets {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 760px) {
+      .drop-buckets.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .drop-buckets.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: #FFFDF9;
+      padding: 12px;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .drop-zone.is-ready {
+      border-color: var(--primary);
+      background-color: var(--primary-soft);
+    }
+
+    .drop-zone.is-drag-over {
+      border-style: solid;
+      border-color: var(--accent-ink);
+      background-color: var(--accent-soft);
+    }
+
+    .drop-zone-head {
+      width: 100%;
+      border: none;
+      background: var(--surface-warm);
+      color: var(--ink);
+      font-weight: 800;
+      font-size: var(--font-small);
+      padding: 7px 10px;
+      border-radius: 7px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .drop-zone-items {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1 1 auto;
+    }
+
+    .drop-placeholder {
+      font-size: var(--font-small);
+      color: var(--ink-muted);
+      padding: 6px 2px;
+    }
+
+    /* 슬롯형 카드 */
+    .slot-card {
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--surface);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slot-target-btn {
+      width: 100%;
+      min-height: 48px;
+      padding: 8px 12px;
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: #FFFDF9;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: var(--font-small);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .slot-target-btn.is-filled {
+      border-style: solid;
+      border-color: var(--primary);
+      background-color: var(--primary-soft);
+    }
+
+    .slot-target-btn.is-ready {
+      border-color: var(--accent-ink);
+      background-color: var(--accent-soft);
+    }
+
+    /* 분개 학생 입력 UI */
+    .journal-editor {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 860px) {
+      .journal-editor {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .journal-side-box {
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background-color: #FFFDF9;
+    }
+
+    .journal-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    @media (max-width: 420px) {
+      .journal-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .text-input {
+      width: 100%;
+      min-height: 44px;
+      padding: 8px 32px 8px 11px;
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--surface);
+      color: var(--ink);
+      font-size: var(--font-small);
+      font-weight: 700;
+    }
+
+    .text-input.amount-input {
+      padding-right: 11px;
+      text-align: right;
+    }
+
+    .text-input.is-drop-ready {
+      border-color: var(--primary);
+      background-color: var(--accent-soft);
+    }
+
+    .text-input.is-drag-over {
+      border-color: var(--accent-ink);
+      background-color: var(--accent);
+    }
+
+    .input-clear-btn {
+      position: absolute;
+      right: 6px;
+      border: none;
+      background: transparent;
+      color: var(--ink-muted);
+      font-weight: 800;
+      cursor: pointer;
+      padding: 4px 6px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* 계산 단계 입력(8, 12, 15, 16, 17장) */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 10px 0;
+    }
+
+    @media (min-width: 640px) {
+      .calc-grid.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .calc-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background-color: var(--surface-soft);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+
+    .calc-field label {
+      font-weight: 800;
+      font-size: var(--font-small);
+    }
+
+    .seg-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .seg-btn {
+      flex: 1 1 100px;
+      min-height: 42px;
+      padding: 6px 12px;
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--surface);
+      color: var(--ink);
+      font-weight: 800;
+      font-size: var(--font-small);
+      cursor: pointer;
+    }
+
+    .seg-btn.is-selected {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: #FFFFFF;
+    }
+
+    /* 총계정원장 T형 표 (14장, 18장) */
+    .t-account-wrap {
+      margin: 10px 0;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-sm);
+      background-color: var(--surface);
+      overflow-x: auto;
+    }
+
+    .t-account-title {
+      text-align: center;
+      font-weight: 900;
+      font-size: var(--font-h3);
+      padding: 8px 12px;
+      background-color: var(--surface-warm);
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .t-account-table {
+      width: 100%;
+      min-width: 480px;
+      border-collapse: collapse;
+      font-size: var(--font-small);
+      table-layout: fixed;
+    }
+
+    .t-account-table th,
+    .t-account-table td {
+      padding: 8px 7px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+      word-break: keep-all;
+    }
+
+    .t-account-table th {
+      background-color: var(--surface-soft);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .t-account-table td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .t-account-table .t-center-divider {
+      border-right: 3px solid var(--ink);
+    }
+
+    .t-account-table th:last-child,
+    .t-account-table td:last-child {
+      border-right: none;
+    }
+
+    /* 커버 슬라이드 (1장) */
+    .cover-hero {
+      background-color: var(--surface);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: clamp(18px, 2.5vw, 30px);
+      box-shadow: var(--shadow);
+    }
+
+    .cover-periods {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 680px) {
+      .cover-periods {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .period-card-btn {
+      text-align: left;
+      background-color: var(--surface-soft);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .period-card-btn:hover {
+      background-color: var(--accent-soft);
+      border-color: var(--primary);
+    }
+
+    .period-card-tag {
+      font-size: var(--font-small);
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .period-card-title {
+      font-size: var(--font-h3);
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .period-card-desc {
+      font-size: var(--font-small);
+      color: var(--ink-muted);
+    }
+
+    /* 7장 출구 미션 3단계 카드 */
+    .flow-card-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: var(--font-small);
+    }
+
+    .flow-pill {
+      padding: 4px 10px;
+      border-radius: 8px;
+      background-color: var(--surface-warm);
+      border: 1px solid var(--border-strong);
+      font-weight: 700;
+    }
+
+    /* 누적 점검 결과 막대 */
+    .challenge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background-color: var(--accent-soft);
+      border: 2px solid var(--accent-ink);
+      font-weight: 800;
+      font-size: var(--font-small);
+    }
+
+    /* 하단 이전/다음 탐색 */
+    .slide-footer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 2px solid var(--border);
+    }
+
+    .drag-ghost {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background-color: var(--primary);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 15px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+      transform: translate(-50%, -50%);
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 640px) {
+      .slide-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+      .slide-pills .slide-pill { flex: 0 0 auto; }
+    }
+
+    @media (max-width: 480px) {
+      .brand-title { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-left">
+        <a class="library-link" href="https://rollers765-eng.github.io/seoul-tourism-student-apps/accounting-library/">← 자료실</a>
+        <span class="brand-title">카페 사장님의 장부 미션 | 부채·자본</span>
+      </div>
+      <div class="mode-switcher" role="group" aria-label="학습 모드 선택">
+        <button type="button" class="mode-btn" id="btnModeTeacher" data-mode="teacher" aria-pressed="true">수업 모드</button>
+        <button type="button" class="mode-btn" id="btnModeStudent" data-mode="student" aria-pressed="false">혼자 공부 모드</button>
+      </div>
+    </div>
+    <nav class="app-nav" aria-label="차시 및 슬라이드 탐색">
+      <div class="nav-inner">
+        <div class="nav-row">
+          <span class="slide-counter" id="slideCounter">1 / 20장</span>
+          <div class="period-tabs" id="periodTabs"></div>
+        </div>
+        <div class="slide-pills" id="slidePills" aria-label="현재 차시 슬라이드 선택"></div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="slide-main" id="slideMain" tabindex="-1">
+    <noscript>
+      <div class="panel-card">
+        <p><strong>자바스크립트가 꺼져 있습니다.</strong> 상단의 ‘← 자료실’ 링크는 그대로 이용할 수 있으며, 인터랙티브 분개 실습을 이용하려면 자바스크립트를 켜 주세요.</p>
+      </div>
+    </noscript>
+    <div id="slideRoot" class="slide-stage"></div>
+  </main>
+
+  <script>
+    window.APP_CONFIG = {
+      libraryUrl: 'https://rollers765-eng.github.io/seoul-tourism-student-apps/accounting-library/',
+      title: '카페 사장님의 장부 미션 | 부채·자본',
+      coverBadges: ['서울관광고등학교 카페경영과 1학년', '부채·자본 20장 미션'],
+      summaryBadges: ['2차시 · 마무리', '부채·자본 핵심 개념'],
+      challengeSlideId: 19,
+      summarySlideId: 20,
+      totalSlides: 20,
+      challengeLabel: '19장',
+      summaryTableTitle: '부채·자본 개념 마감 체크표',
+      periods: [
+        { id: 1, label: '1차시 · 갚을 돈 (예수금·지급어음·단기차입금)', shortLabel: '1차시', start: 1, end: 10, desc: '예수금의 수납·정산, 지급어음 발행·만기, 단기차입금과 월할 이자' },
+        { id: 2, label: '2차시 · 사장이 넣고 가져간 돈 (자본)', shortLabel: '2차시', start: 11, end: 20, desc: '개인기업 추가 출자·인출금, 전기, 6문항 누적 점검' }
+      ]
+    };
+
+    window.SLIDES = [];
+
+    window.APP_STATE = {
+      currentSlideId: 1,
+      mode: 'teacher', // 기본값: 수업 모드
+      revealedTasks: {}, // 장/모드 이동 시 초기화
+      student: {
+        choices: {},   // taskId -> { selectedIndex, checked, showExplain }
+        classify: {},  // taskId -> { placements: { itemId: targetId }, checked, showExplain }
+        calc: {},      // taskId -> { values: { fieldKey: val }, checked, showExplain }
+        journal: {},   // taskId -> { debit: [{account, amount}], credit: [{account, amount}], checked, showExplain }
+        ledger: {},    // taskId -> { values: {}, checked, showExplain }
+        challenge27: {} // qId -> { selectedIndex, isCorrect }
+      },
+      selectedChip: null, // { taskId, value, label, kind: 'classify'|'journal' }
+      drag: null
+    };
+
+    /* =========================
+       공통 유틸리티 및 정규화
+       ========================= */
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatWon(num) {
+      if (typeof num !== 'number' || !Number.isFinite(num)) return '';
+      return num.toLocaleString('ko-KR');
+    }
+
+    function normalizeAccount(str) {
+      return String(str == null ? '' : str).trim().replace(/\s+/g, '');
+    }
+
+    function parseAmount(raw) {
+      if (raw == null) return null;
+      var s = String(raw).trim();
+      if (!s) return null;
+      s = s.replace(/\s+/g, '').replace(/,/g, '').replace(/원$/, '');
+      if (!/^\d+$/.test(s)) return null;
+      var n = parseInt(s, 10);
+      return Number.isSafeInteger(n) ? n : null;
+    }
+
+    function formatJournalOneLineHtml(entry) {
+      var left = entry.debit.map(function (it) {
+        return escapeHtml(it.account) + ' ' + formatWon(it.amount);
+      }).join(', ');
+      var right = entry.credit.map(function (it) {
+        return escapeHtml(it.account) + ' ' + formatWon(it.amount);
+      }).join(', ');
+      return '<div class="journal-answer-line" tabindex="0" aria-label="정답 분개">' +
+        '<span class="j-tag side-debit">(차)</span> ' + left +
+        '<span class="j-gap" aria-hidden="true"></span>' +
+        '<span class="j-tag side-credit">(대)</span> ' + right +
+        '</div>';
+    }
+
+    function getSlideById(id) {
+      for (var i = 0; i < window.SLIDES.length; i++) {
+        if (window.SLIDES[i].id === id) return window.SLIDES[i];
+      }
+      return window.SLIDES[0] || null;
+    }
+
+    function getPeriodForSlide(slideId) {
+      var list = window.APP_CONFIG.periods;
+      for (var i = 0; i < list.length; i++) {
+        if (slideId >= list[i].start && slideId <= list[i].end) return list[i];
+      }
+      return list[0];
+    }
+
+    /* =========================
+       분개 채점 로직
+       ========================= */
+    function gradeJournalEntry(expected, userDebit, userCredit) {
+      var dExpected = expected.debit || [];
+      var cExpected = expected.credit || [];
+
+      var dRows = (userDebit || []).filter(function (r) {
+        return normalizeAccount(r.account) !== '' || String(r.amount || '').trim() !== '';
+      });
+      var cRows = (userCredit || []).filter(function (r) {
+        return normalizeAccount(r.account) !== '' || String(r.amount || '').trim() !== '';
+      });
+
+      // 미완성 여부 확인
+      if (dRows.length < dExpected.length || cRows.length < cExpected.length) {
+        return {
+          status: 'incomplete',
+          message: '차변과 대변의 계정과목 및 금액 빈칸을 모두 채워 주세요.'
+        };
+      }
+
+      var allRows = dRows.concat(cRows);
+      for (var i = 0; i < allRows.length; i++) {
+        if (!normalizeAccount(allRows[i].account) || String(allRows[i].amount || '').trim() === '') {
+          return {
+            status: 'incomplete',
+            message: '계정과목과 금액 중 비어 있는 칸이 있습니다.'
+          };
+        }
+      }
+
+      // 금액 유효성 확인 (공란·문자·0원 방지)
+      var parsedD = [];
+      var parsedC = [];
+      for (var j = 0; j < dRows.length; j++) {
+        var amtD = parseAmount(dRows[j].amount);
+        if (amtD === null || amtD <= 0) {
+          return {
+            status: 'wrong',
+            message: '차변 금액을 올바른 숫자(원 단위)로 입력해 주세요. 예: 180,000'
+          };
+        }
+        parsedD.push({ account: normalizeAccount(dRows[j].account), amount: amtD });
+      }
+      for (var k = 0; k < cRows.length; k++) {
+        var amtC = parseAmount(cRows[k].amount);
+        if (amtC === null || amtC <= 0) {
+          return {
+            status: 'wrong',
+            message: '대변 금액을 올바른 숫자(원 단위)로 입력해 주세요. 예: 180,000'
+          };
+        }
+        parsedC.push({ account: normalizeAccount(cRows[k].account), amount: amtC });
+      }
+
+      // 같은 계정 좌우 중복 입력 차단
+      var debitAccSet = {};
+      for (var a = 0; a < parsedD.length; a++) {
+        if (debitAccSet[parsedD[a].account]) {
+          return {
+            status: 'wrong',
+            message: '차변에 같은 계정과목을 중복 입력했습니다. 계정과목을 다시 확인해 보세요.'
+          };
+        }
+        debitAccSet[parsedD[a].account] = true;
+      }
+      var creditAccSet = {};
+      for (var b = 0; b < parsedC.length; b++) {
+        if (debitAccSet[parsedC[b].account]) {
+          return {
+            status: 'wrong',
+            message: '같은 계정과목을 차변과 대변에 동시에 넣을 수 없습니다. 증가·감소 방향을 다시 살펴보세요.'
+          };
+        }
+        if (creditAccSet[parsedC[b].account]) {
+          return {
+            status: 'wrong',
+            message: '대변에 같은 계정과목을 중복 입력했습니다. 계정과목을 다시 확인해 보세요.'
+          };
+        }
+        creditAccSet[parsedC[b].account] = true;
+      }
+
+      // 차대 합계 검사
+      var sumD = parsedD.reduce(function (s, x) { return s + x.amount; }, 0);
+      var sumC = parsedC.reduce(function (s, x) { return s + x.amount; }, 0);
+      if (sumD !== sumC) {
+        return {
+          status: 'wrong',
+          message: '차변 합계(' + formatWon(sumD) + '원)와 대변 합계(' + formatWon(sumC) + '원)가 일치하지 않습니다.'
+        };
+      }
+
+      // 순서 무관 매칭 (같은 쪽 내 계정+금액 짝 비교)
+      function sideMatches(expList, usrList) {
+        if (expList.length !== usrList.length) return false;
+        var expKeys = expList.map(function (x) { return normalizeAccount(x.account) + '|' + x.amount; }).sort();
+        var usrKeys = usrList.map(function (x) { return x.account + '|' + x.amount; }).sort();
+        for (var idx = 0; idx < expKeys.length; idx++) {
+          if (expKeys[idx] !== usrKeys[idx]) return false;
+        }
+        return true;
+      }
+
+      var okD = sideMatches(dExpected, parsedD);
+      var okC = sideMatches(cExpected, parsedC);
+
+      if (okD && okC) {
+        return { status: 'correct', message: '' };
+      }
+
+      var wrongParts = [];
+      if (!okD) wrongParts.push('차변(왼쪽)');
+      if (!okC) wrongParts.push('대변(오른쪽)');
+      return {
+        status: 'wrong',
+        message: wrongParts.join('과 ') + '의 계정과목 또는 금액을 다시 확인해 보세요.'
+      };
+    }
+
+    /* =========================
+       학생 상태 초기화 헬퍼
+       ========================= */
+    function ensureJournalState(task) {
+      if (!window.APP_STATE.student.journal[task.id]) {
+        var dLen = task.answer.debit.length;
+        var cLen = task.answer.credit.length;
+        var dArr = [];
+        var cArr = [];
+        for (var i = 0; i < dLen; i++) dArr.push({ account: '', amount: '' });
+        for (var j = 0; j < cLen; j++) cArr.push({ account: '', amount: '' });
+        window.APP_STATE.student.journal[task.id] = {
+          debit: dArr,
+          credit: cArr,
+          checked: null,
+          showExplain: false
+        };
+      }
+      return window.APP_STATE.student.journal[task.id];
+    }
+
+    function ensureClassifyState(task) {
+      if (!window.APP_STATE.student.classify[task.id]) {
+        window.APP_STATE.student.classify[task.id] = {
+          placements: {},
+          checked: null,
+          showExplain: false
+        };
+      }
+      return window.APP_STATE.student.classify[task.id];
+    }
+
+    function ensureCalcState(task) {
+      if (!window.APP_STATE.student.calc[task.id]) {
+        window.APP_STATE.student.calc[task.id] = {
+          values: {},
+          checked: null,
+          showExplain: false
+        };
+      }
+      return window.APP_STATE.student.calc[task.id];
+    }
+
+    function ensureLedgerState(task) {
+      if (!window.APP_STATE.student.ledger[task.id]) {
+        window.APP_STATE.student.ledger[task.id] = {
+          values: {},
+          checked: null,
+          showExplain: false
+        };
+      }
+      return window.APP_STATE.student.ledger[task.id];
+    }
+
+    function ensureChoiceState(task) {
+      if (!window.APP_STATE.student.choices[task.id]) {
+        window.APP_STATE.student.choices[task.id] = {
+          selectedIndex: null,
+          checked: null,
+          showExplain: false
+        };
+      }
+      return window.APP_STATE.student.choices[task.id];
+    }
+
+    /* =========================
+       네비게이션 및 모드 전환
+       ========================= */
+    function setMode(newMode) {
+      if (newMode !== 'teacher' && newMode !== 'student') return;
+      window.APP_STATE.mode = newMode;
+      window.APP_STATE.revealedTasks = {}; // 모드 이동 시 수업 모드 정답 숨김
+      window.APP_STATE.selectedChip = null;
+      renderAll();
+    }
+
+    function goToSlide(slideId, shouldScroll) {
+      var target = getSlideById(slideId);
+      if (!target) return;
+      window.APP_STATE.currentSlideId = target.id;
+      window.APP_STATE.revealedTasks = {}; // 다른 장 이동 시 정답 다시 숨김
+      window.APP_STATE.selectedChip = null;
+      renderAll();
+      if (shouldScroll !== false) {
+        var mainEl = document.getElementById('slideMain');
+        if (mainEl) {
+          mainEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+        } else {
+          window.scrollTo(0, 0);
+        }
+      }
+    }
+
+    function resetChallenge27() {
+      window.APP_STATE.student.challenge27 = {};
+      var s27 = getSlideById(21);
+      if (s27 && s27.tasks) {
+        s27.tasks.forEach(function (t) {
+          delete window.APP_STATE.student.choices[t.id];
+        });
+      }
+      goToSlide(21, true);
+    }
+
+    function getChallenge27Stats() {
+      var map = window.APP_STATE.student.challenge27 || {};
+      var keys = Object.keys(map);
+      var completed = keys.length;
+      var correct = 0;
+      for (var i = 0; i < keys.length; i++) {
+        if (map[keys[i]] && map[keys[i]].isCorrect) correct++;
+      }
+      var total = 0;
+      (window.SLIDES || []).forEach(function (sl) {
+        (sl.tasks || []).forEach(function (t) { if (t.isChallenge27) total++; });
+      });
+      return { completed: completed, correct: correct, total: total };
+    }
+
+    /* =========================
+       상단 UI 렌더링
+       ========================= */
+    function renderHeaderAndNav() {
+      var st = window.APP_STATE;
+      var btnT = document.getElementById('btnModeTeacher');
+      var btnS = document.getElementById('btnModeStudent');
+      if (btnT && btnS) {
+        btnT.setAttribute('aria-pressed', st.mode === 'teacher' ? 'true' : 'false');
+        btnS.setAttribute('aria-pressed', st.mode === 'student' ? 'true' : 'false');
+      }
+
+      var counter = document.getElementById('slideCounter');
+      if (counter) {
+        counter.textContent = st.currentSlideId + ' / ' + window.SLIDES.length + '장';
+      }
+
+      var activePeriod = getPeriodForSlide(st.currentSlideId);
+      var pTabs = document.getElementById('periodTabs');
+      if (pTabs) {
+        pTabs.innerHTML = window.APP_CONFIG.periods.map(function (p) {
+          var active = p.id === activePeriod.id ? ' is-active' : '';
+          return '<button type="button" class="period-btn' + active + '" data-jump-slide="' + p.start + '">' +
+            escapeHtml(p.shortLabel) + ' (' + p.start + '~' + p.end + '장)</button>';
+        }).join('');
+      }
+
+      var pills = document.getElementById('slidePills');
+      if (pills) {
+        var html = '';
+        for (var n = activePeriod.start; n <= activePeriod.end; n++) {
+          var sl = getSlideById(n);
+          if (!sl) continue;
+          var cls = n === st.currentSlideId ? ' is-active' : '';
+          html += '<button type="button" class="slide-pill' + cls + '" data-jump-slide="' + n + '" aria-label="' + n + '장 ' + escapeHtml(sl.title) + '">' + n + '장</button>';
+        }
+        pills.innerHTML = html;
+      }
+    }
+
+    /* =========================
+       태스크별 렌더러
+       ========================= */
+    function renderChoiceTask(task) {
+      var mode = window.APP_STATE.mode;
+      var isRevealed = !!window.APP_STATE.revealedTasks[task.id];
+      var html = '';
+
+      if (task.flowBadges && task.flowBadges.length) {
+        html += '<div class="flow-card-strip">' + task.flowBadges.map(function (b, idx) {
+          return (idx > 0 ? '<span aria-hidden="true">→</span>' : '') + '<span class="flow-pill">' + escapeHtml(b) + '</span>';
+        }).join('') + '</div>';
+      }
+
+      html += '<p class="task-prompt">' + escapeHtml(task.prompt) + '</p>';
+
+      if (mode === 'teacher') {
+        html += '<div class="choice-grid ' + (task.options.length === 3 ? 'cols-3' : 'cols-2') + '">';
+        task.options.forEach(function (opt, idx) {
+          var mark = isRevealed && idx === task.answerIndex ? ' is-correct' : '';
+          html += '<div class="choice-btn' + mark + '" role="presentation">' +
+            '<span class="choice-num">' + (idx + 1) + '</span>' +
+            '<span class="choice-text">' + escapeHtml(opt) + '</span></div>';
+        });
+        html += '</div>';
+
+        html += '<div class="action-bar">' +
+          '<button type="button" class="btn btn-primary" data-toggle-reveal="' + task.id + '">' +
+          (isRevealed ? '정답 숨기기' : '정답 보기') + '</button></div>';
+
+        if (isRevealed) {
+          html += '<div class="feedback-box feedback-ok">' +
+            '<p><span class="status-pill">[정답]</span>' + escapeHtml(task.options[task.answerIndex]) + '</p>' +
+            '<p>' + escapeHtml(task.reason) + '</p></div>';
+        }
+        return html;
+      }
+
+      // 학생 모드
+      var cState = ensureChoiceState(task);
+      html += '<div class="choice-grid ' + (task.options.length === 3 ? 'cols-3' : 'cols-2') + '">';
+      task.options.forEach(function (opt, idx) {
+        var cls = 'choice-btn';
+        if (cState.selectedIndex === idx) {
+          if (cState.checked === 'correct') cls += ' is-correct';
+          else if (cState.checked === 'wrong') cls += ' is-wrong';
+          else cls += ' is-selected';
+        }
+        html += '<button type="button" class="' + cls + '" data-choice-task="' + task.id + '" data-choice-index="' + idx + '">' +
+          '<span class="choice-num">' + (idx + 1) + '</span>' +
+          '<span class="choice-text">' + escapeHtml(opt) + '</span></button>';
+      });
+      html += '</div>';
+
+      if (cState.checked === 'correct') {
+        html += '<div class="feedback-box feedback-ok">' +
+          '<p><span class="status-pill">[정답]</span>정확합니다!</p>' +
+          '<p>' + escapeHtml(task.reason) + '</p></div>';
+      } else if (cState.checked === 'wrong') {
+        html += '<div class="feedback-box feedback-err">' +
+          '<p><span class="status-pill">[오답]</span>선택한 답을 다시 확인해 보세요.</p>' +
+          '<p>힌트: ' + escapeHtml(task.hint || '거래의 주체와 자산·부채의 변동을 먼저 따져 보세요.') + '</p>' +
+          '<div class="action-bar">' +
+          '<button type="button" class="btn btn-secondary" data-show-explain="' + task.id + '" data-explain-kind="choice">' +
+          (cState.showExplain ? '해설 숨기기' : '해설 보기') + '</button></div>';
+        if (cState.showExplain) {
+          html += '<div class="feedback-box feedback-info">' +
+            '<p><strong>정답:</strong> ' + escapeHtml(task.options[task.answerIndex]) + '</p>' +
+            '<p>' + escapeHtml(task.reason) + '</p></div>';
+        }
+        html += '</div>';
+      }
+      return html;
+    }
+
+    function renderClassifyTask(task) {
+      var mode = window.APP_STATE.mode;
+      var isRevealed = !!window.APP_STATE.revealedTasks[task.id];
+      var html = '<p class="task-prompt">' + escapeHtml(task.prompt) + '</p>';
+
+      if (mode === 'teacher') {
+        if (task.layout === 'buckets') {
+          html += '<div class="chip-bank-wrap"><p class="chip-bank-help">분류할 항목</p><div class="chip-bank">';
+          task.items.forEach(function (it) {
+            html += '<span class="chip-btn" style="cursor:default;">' + escapeHtml(it.label) + '</span>';
+          });
+          html += '</div></div>';
+          html += '<div class="drop-buckets cols-' + task.targets.length + '">';
+          task.targets.forEach(function (tg) {
+            html += '<div class="drop-zone"><div class="drop-zone-head">' + escapeHtml(tg.label) + '</div><div class="drop-zone-items">';
+            if (isRevealed) {
+              var matched = task.items.filter(function (it) { return it.answer === tg.id; });
+              matched.forEach(function (m) {
+                html += '<div class="chip-btn is-placed">' + escapeHtml(m.label) + '</div>';
+              });
+            } else {
+              html += '<div class="drop-placeholder">판서로 분류해 보세요.</div>';
+            }
+            html += '</div></div>';
+          });
+          html += '</div>';
+        } else {
+          // slots layout
+          html += '<div class="chip-bank-wrap"><p class="chip-bank-help">보기 계정과목</p><div class="chip-bank">';
+          task.chips.forEach(function (ch) {
+            html += '<span class="chip-btn" style="cursor:default;">' + escapeHtml(ch.label) + '</span>';
+          });
+          html += '</div></div>';
+          html += '<div class="drop-buckets cols-2">';
+          task.slots.forEach(function (sl) {
+            var ansChip = task.chips.filter(function (c) { return c.id === sl.answer; })[0];
+            html += '<div class="slot-card"><div>' + escapeHtml(sl.prompt) + '</div>';
+            if (isRevealed && ansChip) {
+              html += '<div class="feedback-box feedback-ok" style="margin-top:0;"><p><span class="status-pill">[정답]</span>' +
+                escapeHtml(ansChip.label) + '</p><p>' + escapeHtml(sl.reason) + '</p></div>';
+            } else {
+              html += '<div class="board-cell">계정과목 판서 칸</div>';
+            }
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        html += '<div class="action-bar">' +
+          '<button type="button" class="btn btn-primary" data-toggle-reveal="' + task.id + '">' +
+          (isRevealed ? '정답 숨기기' : '정답 보기') + '</button></div>';
+
+        if (isRevealed && task.reason) {
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[정답 기준]</span>' + escapeHtml(task.reason) + '</p></div>';
+        }
+        return html;
+      }
+
+      // 학생 모드
+      var st = ensureClassifyState(task);
+      var sel = window.APP_STATE.selectedChip;
+      var isSelForTask = sel && sel.taskId === task.id && sel.kind === 'classify';
+
+      if (task.layout === 'buckets') {
+        var unplaced = task.items.filter(function (it) { return !st.placements[it.id]; });
+        html += '<div class="chip-bank-wrap">' +
+          '<p class="chip-bank-help">칩의 손잡이(⋮⋮)를 끌어 놓거나, <strong>칩 탭 → 분류 칸 탭</strong>(키보드 Enter/Space 가능)으로 배치하세요.</p>' +
+          '<div class="chip-bank">';
+        if (unplaced.length === 0) {
+          html += '<span class="drop-placeholder">모든 칩을 배치했습니다. 배치된 칩을 누르면 다시 뺄 수 있습니다.</span>';
+        } else {
+          unplaced.forEach(function (it) {
+            var isSelected = isSelForTask && sel.value === it.id;
+            html += '<button type="button" class="chip-btn' + (isSelected ? ' is-selected' : '') + '"' +
+              ' data-chip-kind="classify" data-task-id="' + task.id + '" data-chip-value="' + it.id + '" data-chip-label="' + escapeHtml(it.label) + '"' +
+              ' aria-pressed="' + (isSelected ? 'true' : 'false') + '">' +
+              '<span class="chip-drag-handle" aria-hidden="true">⋮⋮</span>' +
+              '<span>' + escapeHtml(it.label) + '</span>' +
+              (isSelected ? '<span class="chip-selected-tag">선택됨</span>' : '') +
+              '</button>';
+          });
+        }
+        html += '</div></div>';
+
+        html += '<div class="drop-buckets cols-' + task.targets.length + '">';
+        task.targets.forEach(function (tg) {
+          var placedHere = task.items.filter(function (it) { return st.placements[it.id] === tg.id; });
+          html += '<div class="drop-zone' + (isSelForTask ? ' is-ready' : '') + '" data-drop-target="bucket" data-task-id="' + task.id + '" data-target-id="' + tg.id + '">' +
+            '<button type="button" class="drop-zone-head" data-drop-click="bucket" data-task-id="' + task.id + '" data-target-id="' + tg.id + '">' +
+            '<span>' + escapeHtml(tg.label) + '</span>' +
+            '<span>' + (isSelForTask ? '여기에 놓기' : placedHere.length + '개') + '</span></button>' +
+            '<div class="drop-zone-items">';
+          if (placedHere.length === 0) {
+            html += '<div class="drop-placeholder">칩을 여기에 놓으세요.</div>';
+          } else {
+            placedHere.forEach(function (it) {
+              html += '<button type="button" class="chip-btn is-placed" data-remove-chip="' + task.id + '" data-item-id="' + it.id + '" aria-label="' + escapeHtml(it.label) + ' 빼기">' +
+                '<span>' + escapeHtml(it.label) + '</span><span aria-hidden="true">×</span></button>';
+            });
+          }
+          html += '</div></div>';
+        });
+        html += '</div>';
+      } else {
+        // slots layout
+        html += '<div class="chip-bank-wrap">' +
+          '<p class="chip-bank-help">계정 칩을 끌어 넣거나, <strong>칩 탭 → 카드 빈칸 탭</strong>으로 채우세요. (채운 칸을 누르면 제거·교체됩니다)</p>' +
+          '<div class="chip-bank">';
+        task.chips.forEach(function (ch) {
+          var isSelected = isSelForTask && sel.value === ch.id;
+          html += '<button type="button" class="chip-btn' + (isSelected ? ' is-selected' : '') + '"' +
+            ' data-chip-kind="classify" data-task-id="' + task.id + '" data-chip-value="' + ch.id + '" data-chip-label="' + escapeHtml(ch.label) + '"' +
+            ' aria-pressed="' + (isSelected ? 'true' : 'false') + '">' +
+            '<span class="chip-drag-handle" aria-hidden="true">⋮⋮</span>' +
+            '<span>' + escapeHtml(ch.label) + '</span>' +
+            (isSelected ? '<span class="chip-selected-tag">선택됨</span>' : '') +
+            '</button>';
+        });
+        html += '</div></div>';
+
+        html += '<div class="drop-buckets cols-2">';
+        task.slots.forEach(function (sl) {
+          var chosenId = st.placements[sl.id];
+          var chosenChip = task.chips.filter(function (c) { return c.id === chosenId; })[0];
+          var btnCls = 'slot-target-btn' + (chosenChip ? ' is-filled' : '') + (isSelForTask ? ' is-ready' : '');
+          html += '<div class="slot-card" data-drop-target="slot" data-task-id="' + task.id + '" data-target-id="' + sl.id + '">' +
+            '<div><strong>' + escapeHtml(sl.title || '') + '</strong> ' + escapeHtml(sl.prompt) + '</div>' +
+            '<button type="button" class="' + btnCls + '" data-drop-click="slot" data-task-id="' + task.id + '" data-target-id="' + sl.id + '">' +
+            '<span>' + (chosenChip ? escapeHtml(chosenChip.label) : (isSelForTask ? '여기에 선택한 칩 넣기' : '계정 칩을 선택해 넣으세요')) + '</span>' +
+            '<span>' + (chosenChip ? '교체/제거 ×' : '빈칸') + '</span></button>';
+          if (st.checked && st.checked.status === 'correct' && sl.reason) {
+            html += '<div style="font-size:var(--font-small); color:var(--ok-ink);">기준: ' + escapeHtml(sl.reason) + '</div>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      html += '<div class="action-bar">' +
+        '<button type="button" class="btn btn-primary" data-grade-classify="' + task.id + '">채점하기</button>' +
+        '<button type="button" class="btn btn-secondary" data-reset-classify="' + task.id + '">다시 배치</button>' +
+        '</div>';
+
+      if (st.checked) {
+        if (st.checked.status === 'incomplete') {
+          html += '<div class="feedback-box feedback-warn"><p><span class="status-pill">[미완성]</span>' + escapeHtml(st.checked.message) + '</p></div>';
+        } else if (st.checked.status === 'correct') {
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[정답]</span>모든 항목을 정확하게 분류했습니다!</p>' +
+            (task.reason ? '<p>' + escapeHtml(task.reason) + '</p>' : '') + '</div>';
+        } else {
+          html += '<div class="feedback-box feedback-err"><p><span class="status-pill">[오답]</span>' + escapeHtml(st.checked.message) + '</p>' +
+            '<p>힌트: ' + escapeHtml(task.hint || '각 기준을 다시 읽어 보고 칩을 옮겨 보세요.') + '</p>' +
+            '<div class="action-bar"><button type="button" class="btn btn-secondary" data-show-explain="' + task.id + '" data-explain-kind="classify">' +
+            (st.showExplain ? '해설 숨기기' : '해설 보기') + '</button></div>';
+          if (st.showExplain) {
+            html += '<div class="feedback-box feedback-info"><p><strong>정답 확인</strong></p><ul>';
+            if (task.layout === 'buckets') {
+              task.items.forEach(function (it) {
+                var tg = task.targets.filter(function (t) { return t.id === it.answer; })[0];
+                html += '<li>' + escapeHtml(it.label) + ' → <strong>' + escapeHtml(tg ? tg.label : '') + '</strong></li>';
+              });
+            } else {
+              task.slots.forEach(function (sl) {
+                var ch = task.chips.filter(function (c) { return c.id === sl.answer; })[0];
+                html += '<li>' + escapeHtml(sl.prompt) + ' → <strong>' + escapeHtml(ch ? ch.label : '') + '</strong> (' + escapeHtml(sl.reason || '') + ')</li>';
+              });
+            }
+            html += '</ul>' + (task.reason ? '<p>' + escapeHtml(task.reason) + '</p>' : '') + '</div>';
+          }
+          html += '</div>';
+        }
+      }
+      return html;
+    }
+
+    function renderCalcTask(task) {
+      var mode = window.APP_STATE.mode;
+      var isRevealed = !!window.APP_STATE.revealedTasks[task.id];
+      var html = '<p class="task-prompt">' + escapeHtml(task.prompt) + '</p>';
+
+      if (mode === 'teacher') {
+        html += '<div class="calc-grid cols-2">';
+        task.fields.forEach(function (f) {
+          html += '<div class="calc-field"><label>' + escapeHtml(f.label) + '</label>';
+          if (isRevealed) {
+            var disp = f.kind === 'number' ? formatWon(f.answer) + (f.unit || '원') : f.answer;
+            html += '<div style="font-weight:900; color:var(--ok-ink);">' + escapeHtml(disp) + '</div>';
+          } else {
+            html += '<div class="board-cell">판서 칸</div>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '<div class="action-bar">' +
+          '<button type="button" class="btn btn-primary" data-toggle-reveal="' + task.id + '">' +
+          (isRevealed ? '정답 숨기기' : '정답 보기') + '</button></div>';
+        if (isRevealed) {
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[정답]</span>' + escapeHtml(task.reason) + '</p></div>';
+        }
+        return html;
+      }
+
+      var st = ensureCalcState(task);
+      html += '<div class="calc-grid cols-2">';
+      task.fields.forEach(function (f) {
+        var val = st.values[f.key] != null ? st.values[f.key] : '';
+        html += '<div class="calc-field"><label for="calc-' + task.id + '-' + f.key + '">' + escapeHtml(f.label) + '</label>';
+        if (f.kind === 'select') {
+          html += '<div class="seg-group">';
+          f.options.forEach(function (opt) {
+            var selCls = val === opt ? ' is-selected' : '';
+            html += '<button type="button" class="seg-btn' + selCls + '" data-calc-seg="' + task.id + '" data-field-key="' + f.key + '" data-seg-val="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</button>';
+          });
+          html += '</div>';
+        } else {
+          html += '<input type="text" inputmode="numeric" class="text-input amount-input" id="calc-' + task.id + '-' + f.key + '"' +
+            ' data-calc-input="' + task.id + '" data-field-key="' + f.key + '"' +
+            ' value="' + escapeHtml(val) + '" placeholder="' + escapeHtml(f.placeholder || '숫자 입력 (예: 25,000)') + '">';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+
+      html += '<div class="action-bar"><button type="button" class="btn btn-primary" data-grade-calc="' + task.id + '">채점하기</button></div>';
+
+      if (st.checked) {
+        if (st.checked.status === 'incomplete') {
+          html += '<div class="feedback-box feedback-warn"><p><span class="status-pill">[미완성]</span>' + escapeHtml(st.checked.message) + '</p></div>';
+        } else if (st.checked.status === 'correct') {
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[정답]</span>정확하게 구했습니다!</p><p>' + escapeHtml(task.reason) + '</p></div>';
+        } else {
+          html += '<div class="feedback-box feedback-err"><p><span class="status-pill">[오답]</span>' + escapeHtml(st.checked.message) + '</p>' +
+            '<p>힌트: ' + escapeHtml(task.hint || '주어진 금액의 차이를 다시 계산해 보세요.') + '</p>' +
+            '<div class="action-bar"><button type="button" class="btn btn-secondary" data-show-explain="' + task.id + '" data-explain-kind="calc">' +
+            (st.showExplain ? '해설 숨기기' : '해설 보기') + '</button></div>';
+          if (st.showExplain) {
+            var ansText = task.fields.map(function (f) {
+              var disp = f.kind === 'number' ? formatWon(f.answer) + (f.unit || '원') : f.answer;
+              return f.label + ': ' + disp;
+            }).join(' / ');
+            html += '<div class="feedback-box feedback-info"><p><strong>정답:</strong> ' + escapeHtml(ansText) + '</p><p>' + escapeHtml(task.reason) + '</p></div>';
+          }
+          html += '</div>';
+        }
+      }
+      return html;
+    }
+
+    function renderJournalTask(task) {
+      var mode = window.APP_STATE.mode;
+      var isRevealed = !!window.APP_STATE.revealedTasks[task.id];
+      var html = '<p class="task-prompt">' + escapeHtml(task.prompt) + '</p>';
+
+      if (mode === 'teacher') {
+        if (!isRevealed) {
+          html += '<div class="board-blank"><div class="board-journal-grid">';
+          html += '<div class="board-side"><span class="board-side-title side-debit">(차) 차변</span>';
+          for (var i = 0; i < task.answer.debit.length; i++) {
+            html += '<div class="board-write-row"><div class="board-cell">계정과목</div><div class="board-cell">금액(원)</div></div>';
+          }
+          html += '</div>';
+          html += '<div class="board-side"><span class="board-side-title side-credit">(대) 대변</span>';
+          for (var j = 0; j < task.answer.credit.length; j++) {
+            html += '<div class="board-write-row"><div class="board-cell">계정과목</div><div class="board-cell">금액(원)</div></div>';
+          }
+          html += '</div></div></div>';
+        }
+
+        html += '<div class="action-bar">' +
+          '<button type="button" class="btn btn-primary" data-toggle-reveal="' + task.id + '">' +
+          (isRevealed ? '정답 숨기기' : '정답 보기') + '</button></div>';
+
+        if (isRevealed) {
+          html += formatJournalOneLineHtml(task.answer);
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[이유]</span>' + escapeHtml(task.reason) + '</p></div>';
+        }
+        return html;
+      }
+
+      // 학생 모드
+      var st = ensureJournalState(task);
+      var sel = window.APP_STATE.selectedChip;
+      var isSelForTask = sel && sel.taskId === task.id && sel.kind === 'journal';
+
+      if (task.chips && task.chips.length) {
+        html += '<div class="chip-bank-wrap">' +
+          '<p class="chip-bank-help">계정 칩을 끌어 넣거나 <strong>칩 탭 → 계정 칸 탭</strong>으로 넣을 수 있고, 직접 입력도 가능합니다.</p>' +
+          '<div class="chip-bank">';
+        task.chips.forEach(function (ch) {
+          var isSelected = isSelForTask && sel.value === ch;
+          html += '<button type="button" class="chip-btn' + (isSelected ? ' is-selected' : '') + '"' +
+            ' data-chip-kind="journal" data-task-id="' + task.id + '" data-chip-value="' + escapeHtml(ch) + '" data-chip-label="' + escapeHtml(ch) + '"' +
+            ' aria-pressed="' + (isSelected ? 'true' : 'false') + '">' +
+            '<span class="chip-drag-handle" aria-hidden="true">⋮⋮</span>' +
+            '<span>' + escapeHtml(ch) + '</span>' +
+            (isSelected ? '<span class="chip-selected-tag">선택됨</span>' : '') +
+            '</button>';
+        });
+        html += '</div></div>';
+      }
+
+      html += '<div class="journal-editor">';
+      // 차변
+      html += '<div class="journal-side-box"><span class="board-side-title side-debit">(차) 차변</span>';
+      st.debit.forEach(function (row, idx) {
+        html += '<div class="journal-row">' +
+          '<div class="input-wrap">' +
+          '<input type="text" class="text-input' + (isSelForTask ? ' is-drop-ready' : '') + '"' +
+          ' data-journal-input="' + task.id + '" data-side="debit" data-row="' + idx + '" data-part="account"' +
+          ' data-drop-target="journal-acc" data-task-id="' + task.id + '"' +
+          ' value="' + escapeHtml(row.account) + '" placeholder="차변 계정과목" aria-label="차변 ' + (idx + 1) + ' 계정과목">' +
+          (row.account ? '<button type="button" class="input-clear-btn" data-clear-journal="' + task.id + '" data-side="debit" data-row="' + idx + '" aria-label="계정 지우기">×</button>' : '') +
+          '</div>' +
+          '<input type="text" inputmode="numeric" class="text-input amount-input"' +
+          ' data-journal-input="' + task.id + '" data-side="debit" data-row="' + idx + '" data-part="amount"' +
+          ' value="' + escapeHtml(row.amount) + '" placeholder="금액(원)" aria-label="차변 ' + (idx + 1) + ' 금액">' +
+          '</div>';
+      });
+      html += '</div>';
+
+      // 대변
+      html += '<div class="journal-side-box"><span class="board-side-title side-credit">(대) 대변</span>';
+      st.credit.forEach(function (row, idx) {
+        html += '<div class="journal-row">' +
+          '<div class="input-wrap">' +
+          '<input type="text" class="text-input' + (isSelForTask ? ' is-drop-ready' : '') + '"' +
+          ' data-journal-input="' + task.id + '" data-side="credit" data-row="' + idx + '" data-part="account"' +
+          ' data-drop-target="journal-acc" data-task-id="' + task.id + '"' +
+          ' value="' + escapeHtml(row.account) + '" placeholder="대변 계정과목" aria-label="대변 ' + (idx + 1) + ' 계정과목">' +
+          (row.account ? '<button type="button" class="input-clear-btn" data-clear-journal="' + task.id + '" data-side="credit" data-row="' + idx + '" aria-label="계정 지우기">×</button>' : '') +
+          '</div>' +
+          '<input type="text" inputmode="numeric" class="text-input amount-input"' +
+          ' data-journal-input="' + task.id + '" data-side="credit" data-row="' + idx + '" data-part="amount"' +
+          ' value="' + escapeHtml(row.amount) + '" placeholder="금액(원)" aria-label="대변 ' + (idx + 1) + ' 금액">' +
+          '</div>';
+      });
+      html += '</div></div>';
+
+      html += '<div class="action-bar">' +
+        '<button type="button" class="btn btn-primary" data-grade-journal="' + task.id + '">채점하기</button>' +
+        '<button type="button" class="btn btn-secondary" data-reset-journal="' + task.id + '">입력 지우기</button>' +
+        '</div>';
+
+      if (st.checked) {
+        if (st.checked.status === 'incomplete') {
+          html += '<div class="feedback-box feedback-warn"><p><span class="status-pill">[미완성]</span>' + escapeHtml(st.checked.message) + '</p></div>';
+        } else if (st.checked.status === 'correct') {
+          html += '<div class="feedback-box feedback-ok">' +
+            '<p><span class="status-pill">[정답]</span>분개가 정확합니다!</p>' +
+            formatJournalOneLineHtml(task.answer) +
+            '<p>' + escapeHtml(task.reason) + '</p></div>';
+        } else {
+          html += '<div class="feedback-box feedback-err">' +
+            '<p><span class="status-pill">[오답]</span>' + escapeHtml(st.checked.message) + '</p>' +
+            '<p>힌트: ' + escapeHtml(task.hint || '거래에서 늘어난 항목과 줄어든 항목을 각각 차변과 대변에 적어 보세요.') + '</p>' +
+            '<div class="action-bar"><button type="button" class="btn btn-secondary" data-show-explain="' + task.id + '" data-explain-kind="journal">' +
+            (st.showExplain ? '해설 숨기기' : '해설 보기') + '</button></div>';
+          if (st.showExplain) {
+            html += '<div class="feedback-box feedback-info">' +
+              formatJournalOneLineHtml(task.answer) +
+              '<p>' + escapeHtml(task.reason) + '</p></div>';
+          }
+          html += '</div>';
+        }
+      }
+      return html;
+    }
+
+    /* 총계정원장 T형 표 렌더러 (14장, 18장) */
+    function renderTAccountTable(accountTitle, leftRows, rightRows, hideMask) {
+      var maxLen = Math.max(leftRows.length, rightRows.length, 2);
+      var html = '<div class="t-account-wrap">' +
+        '<div class="t-account-title">' + escapeHtml(accountTitle) + '</div>' +
+        '<table class="t-account-table">' +
+        '<colgroup><col style="width:12%"><col style="width:22%"><col style="width:16%">' +
+        '<col style="width:12%"><col style="width:22%"><col style="width:16%"></colgroup>' +
+        '<thead><tr>' +
+        '<th>일자</th><th>적요</th><th class="t-center-divider">금액</th>' +
+        '<th>일자</th><th>적요</th><th>금액</th>' +
+        '</tr></thead><tbody>';
+
+      for (var i = 0; i < maxLen; i++) {
+        var l = leftRows[i] || null;
+        var r = rightRows[i] || null;
+        var hideL = hideMask && l && l.hiddenInBlank;
+        var hideR = hideMask && r && r.hiddenInBlank;
+        html += '<tr>' +
+          '<td>' + (l && !hideL ? escapeHtml(l.date) : '&nbsp;') + '</td>' +
+          '<td>' + (l && !hideL ? escapeHtml(l.summary) : (hideL ? '<span style="color:var(--ink-muted)">(판서 칸)</span>' : '&nbsp;')) + '</td>' +
+          '<td class="num t-center-divider">' + (l && !hideL ? formatWon(l.amount) : '&nbsp;') + '</td>' +
+          '<td>' + (r && !hideR ? escapeHtml(r.date) : '&nbsp;') + '</td>' +
+          '<td>' + (r && !hideR ? escapeHtml(r.summary) : (hideR ? '<span style="color:var(--ink-muted)">(판서 칸)</span>' : '&nbsp;')) + '</td>' +
+          '<td class="num">' + (r && !hideR ? formatWon(r.amount) : '&nbsp;') + '</td>' +
+          '</tr>';
+      }
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    function renderLedgerTask(task) {
+      var mode = window.APP_STATE.mode;
+      var isRevealed = !!window.APP_STATE.revealedTasks[task.id];
+      var html = '<p class="task-prompt">' + escapeHtml(task.prompt) + '</p>';
+
+      if (mode === 'teacher') {
+        task.accounts.forEach(function (acc) {
+          html += renderTAccountTable(acc.title, acc.leftRows, acc.rightRows, !isRevealed);
+          if (isRevealed && acc.balanceText) {
+            html += '<div style="font-size:var(--font-small); font-weight:800; color:var(--primary); margin:-4px 0 12px;">' + escapeHtml(acc.balanceText) + '</div>';
+          }
+        });
+        html += '<div class="action-bar">' +
+          '<button type="button" class="btn btn-primary" data-toggle-reveal="' + task.id + '">' +
+          (isRevealed ? '정답 숨기기' : '정답 보기') + '</button></div>';
+        if (isRevealed) {
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[정답]</span>' + escapeHtml(task.reason) + '</p></div>';
+        }
+        return html;
+      }
+
+      // 학생 모드
+      var st = ensureLedgerState(task);
+      var showFilled = st.checked && st.checked.status === 'correct';
+      task.accounts.forEach(function (acc) {
+        html += renderTAccountTable(acc.title, acc.leftRows, acc.rightRows, !showFilled);
+      });
+
+      html += '<div class="calc-grid cols-2">';
+      task.fields.forEach(function (f) {
+        var val = st.values[f.key] != null ? st.values[f.key] : '';
+        html += '<div class="calc-field"><label for="led-' + task.id + '-' + f.key + '">' + escapeHtml(f.label) + '</label>';
+        if (f.kind === 'select') {
+          html += '<div class="seg-group">';
+          f.options.forEach(function (opt) {
+            var selCls = val === opt ? ' is-selected' : '';
+            html += '<button type="button" class="seg-btn' + selCls + '" data-ledger-seg="' + task.id + '" data-field-key="' + f.key + '" data-seg-val="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</button>';
+          });
+          html += '</div>';
+        } else {
+          html += '<input type="text" inputmode="numeric" class="text-input amount-input" id="led-' + task.id + '-' + f.key + '"' +
+            ' data-ledger-input="' + task.id + '" data-field-key="' + f.key + '"' +
+            ' value="' + escapeHtml(val) + '" placeholder="' + escapeHtml(f.placeholder || '금액 입력(원)') + '">';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+
+      html += '<div class="action-bar"><button type="button" class="btn btn-primary" data-grade-ledger="' + task.id + '">전기 채점하기</button></div>';
+
+      if (st.checked) {
+        if (st.checked.status === 'incomplete') {
+          html += '<div class="feedback-box feedback-warn"><p><span class="status-pill">[미완성]</span>' + escapeHtml(st.checked.message) + '</p></div>';
+        } else if (st.checked.status === 'correct') {
+          html += '<div class="feedback-box feedback-ok"><p><span class="status-pill">[정답]</span>총계정원장 전기를 정확하게 마쳤습니다!</p><p>' + escapeHtml(task.reason) + '</p></div>';
+        } else {
+          html += '<div class="feedback-box feedback-err"><p><span class="status-pill">[오답]</span>' + escapeHtml(st.checked.message) + '</p>' +
+            '<p>힌트: ' + escapeHtml(task.hint || '분개에서 해당 계정이 차변(왼쪽)인지 대변(오른쪽)인지 그대로 옮겨 적습니다.') + '</p>' +
+            '<div class="action-bar"><button type="button" class="btn btn-secondary" data-show-explain="' + task.id + '" data-explain-kind="ledger">' +
+            (st.showExplain ? '해설 숨기기' : '해설 보기') + '</button></div>';
+          if (st.showExplain) {
+            var ansSummary = task.fields.map(function (f) {
+              var disp = f.kind === 'number' ? formatWon(f.answer) + '원' : f.answer;
+              return f.label + ': ' + disp;
+            }).join(' / ');
+            html += '<div class="feedback-box feedback-info"><p><strong>정답:</strong> ' + escapeHtml(ansSummary) + '</p><p>' + escapeHtml(task.reason) + '</p></div>';
+          }
+          html += '</div>';
+        }
+      }
+      return html;
+    }
+
+    function renderTaskWrapper(task, isAccordion) {
+      var body = '';
+      if (task.type === 'choice') body = renderChoiceTask(task);
+      else if (task.type === 'classify') body = renderClassifyTask(task);
+      else if (task.type === 'calc') body = renderCalcTask(task);
+      else if (task.type === 'journal') body = renderJournalTask(task);
+      else if (task.type === 'ledger') body = renderLedgerTask(task);
+
+      if (isAccordion) {
+        return '<details class="task-details" open>' +
+          '<summary><span>' + escapeHtml(task.title) + '</span><span style="font-size:var(--font-small); color:var(--primary);">펼치기 / 접기</span></summary>' +
+          '<div class="task-details-body">' + body + '</div></details>';
+      }
+
+      return '<section class="task-card" aria-label="' + escapeHtml(task.title) + '">' +
+        '<div class="task-header"><h3 class="task-label">' + escapeHtml(task.title) + '</h3></div>' +
+        body + '</section>';
+    }
+
+    /* =========================
+       특수 슬라이드 렌더러 (표지·마감)
+       ========================= */
+    function renderCoverSlide(slide) {
+      var html = '<section class="cover-hero">' +
+        '<div class="slide-meta-row"><span class="badge badge-period">' + escapeHtml(window.APP_CONFIG.coverBadges[0]) + '</span><span class="badge badge-concept">' + escapeHtml(window.APP_CONFIG.coverBadges[1]) + '</span></div>' +
+        '<h1 class="slide-title">' + escapeHtml(slide.title) + '</h1>' +
+        '<p class="concept-note">' + escapeHtml(slide.concept) + '</p>' +
+        '<div class="svg-frame" style="margin:14px 0;">' + slide.diagramHtml + '</div>' +
+        '<div class="story-box"><p><span class="story-tag">이용 안내</span>' + escapeHtml(slide.guideText) + '</p></div>' +
+        '<div class="cover-periods">';
+      window.APP_CONFIG.periods.forEach(function (p) {
+        html += '<button type="button" class="period-card-btn" data-jump-slide="' + p.start + '">' +
+          '<span class="period-card-tag">' + escapeHtml(p.shortLabel) + ' · ' + p.start + '~' + p.end + '장</span>' +
+          '<span class="period-card-title">' + escapeHtml(p.label.replace(/^\d차시 · /, '')) + '</span>' +
+          '<span class="period-card-desc">' + escapeHtml(p.desc) + '</span></button>';
+      });
+      html += '</div></section>';
+      return html;
+    }
+
+    function renderSummarySlide(slide) {
+      var stats = getChallenge27Stats();
+      var html = '<section class="top-banner">' +
+        '<div class="slide-meta-row"><span class="badge badge-period">' + escapeHtml(window.APP_CONFIG.summaryBadges[0]) + '</span><span class="badge badge-concept">' + escapeHtml(window.APP_CONFIG.summaryBadges[1]) + '</span></div>' +
+        '<h1 class="slide-title">' + escapeHtml(slide.title) + '</h1>' +
+        '<p class="concept-note">' + escapeHtml(slide.concept) + '</p>';
+
+      if (stats.completed > 0) {
+        html += '<div class="challenge-bar" style="margin-top:12px;">' +
+          '<span>' + escapeHtml(window.APP_CONFIG.challengeLabel) + ' 연습 결과: 완료 ' + stats.completed + ' / ' + stats.total + '문항 · 맞힌 문항 ' + stats.correct + '문항</span>' +
+          '<button type="button" class="btn btn-primary" data-reset-challenge="1">' + escapeHtml(window.APP_CONFIG.challengeLabel) + ' 다시 풀기</button>' +
+          '</div>';
+      } else {
+        html += '<div class="action-bar">' +
+          '<button type="button" class="btn btn-primary" data-jump-slide="' + window.APP_CONFIG.challengeSlideId + '">' + escapeHtml(window.APP_CONFIG.challengeLabel) + ' 점검 풀러 가기</button>' +
+          '</div>';
+      }
+      html += '</section>';
+
+      html += '<section class="panel-card"><h2 class="panel-title">' + escapeHtml(window.APP_CONFIG.summaryTableTitle) + '</h2>' +
+        '<div class="info-table-wrap"><table class="info-table">' +
+        '<thead><tr><th style="width:22%;">개념</th><th>기억할 핵심 질문</th><th style="width:18%;">예제 장 이동</th></tr></thead><tbody>';
+      (slide.checklist || []).forEach(function (row) {
+        html += '<tr><td><strong>' + escapeHtml(row.name) + '</strong></td>' +
+          '<td>' + escapeHtml(row.question) + '</td>' +
+          '<td><button type="button" class="btn btn-secondary" style="padding:6px 12px; min-height:38px;" data-jump-slide="' + row.jump + '">' + escapeHtml(row.label) + '</button></td></tr>';
+      });
+      html += '</tbody></table></div>';
+      if (stats.completed > 0) {
+        html += '<div class="action-bar"><button type="button" class="btn btn-accent" data-reset-challenge="1">' + escapeHtml(window.APP_CONFIG.challengeLabel) + ' 연습 초기화 후 다시 풀기</button></div>';
+      }
+      html += '</section>';
+      return html;
+    }
+
+    /* =========================
+       메인 슬라이드 전체 렌더링
+       ========================= */
+    function renderCurrentSlide() {
+      var root = document.getElementById('slideRoot');
+      if (!root) return;
+      var slide = getSlideById(window.APP_STATE.currentSlideId);
+      if (!slide) {
+        root.innerHTML = '<div class="panel-card"><p>슬라이드 데이터를 불러오는 중입니다.</p></div>';
+        return;
+      }
+
+      var html = '';
+      if (slide.kind === 'cover') {
+        html = renderCoverSlide(slide);
+      } else if (slide.kind === 'summary') {
+        html = renderSummarySlide(slide);
+      } else {
+        var period = getPeriodForSlide(slide.id);
+        html += '<section class="top-banner">' +
+          '<div class="slide-meta-row">' +
+          '<span class="badge badge-period">' + escapeHtml(period.shortLabel) + ' · ' + slide.id + '장</span>' +
+          '<span class="badge badge-concept">' + escapeHtml(slide.conceptTag) + '</span>' +
+          '</div>' +
+          '<h1 class="slide-title">' + escapeHtml(slide.title) + '</h1>' +
+          (slide.concept ? '<p class="concept-note">' + escapeHtml(slide.concept) + '</p>' : '');
+
+        if (slide.story && slide.story.length) {
+          html += '<div class="story-box">';
+          slide.story.forEach(function (line) {
+            html += '<p>' + line + '</p>';
+          });
+          html += '</div>';
+        }
+        html += '</section>';
+
+        // 점검·마감 장의 학생 모드 연습 결과 현황판
+        if ((slide.id === window.APP_CONFIG.challengeSlideId || slide.id === window.APP_CONFIG.summarySlideId) && window.APP_STATE.mode === 'student') {
+          var st27 = getChallenge27Stats();
+          html += '<div class="challenge-bar">' +
+            '<span>연습 결과 · 완료한 문항: ' + st27.completed + ' / ' + st27.total + ' · 맞힌 문항: ' + st27.correct + '문항</span>' +
+            '<button type="button" class="btn btn-secondary" style="min-height:36px; padding:5px 12px;" data-reset-challenge="1">다시 풀기</button>' +
+            '</div>';
+        }
+
+        // 중간 도식 + 장부/비교 영역
+        var hasDiagram = !!slide.diagramHtml;
+        var hasLedgerPanel = !!slide.sidePanelHtml;
+        if (hasDiagram || hasLedgerPanel) {
+          html += '<div class="mid-grid' + (hasDiagram && hasLedgerPanel ? ' is-two-col' : '') + '">';
+          if (hasDiagram) {
+            html += '<section class="panel-card">' +
+              '<h2 class="panel-title">' + escapeHtml(slide.diagramTitle || '거래 흐름 도식') + '</h2>' +
+              '<div class="svg-frame">' + slide.diagramHtml + '</div>' +
+              (slide.diagramNote ? '<div class="callout-tip">' + escapeHtml(slide.diagramNote) + '</div>' : '') +
+              '</section>';
+          }
+          if (hasLedgerPanel) {
+            html += '<section class="panel-card">' +
+              '<h2 class="panel-title">' + escapeHtml(slide.sidePanelTitle || '장부 포인트') + '</h2>' +
+              slide.sidePanelHtml +
+              '</section>';
+          }
+          html += '</div>';
+        }
+
+        // 하단 과제 영역
+        if (slide.tasks && slide.tasks.length) {
+          html += '<div class="tasks-stack">';
+          slide.tasks.forEach(function (t) {
+            html += renderTaskWrapper(t, !!slide.accordionTasks);
+          });
+          html += '</div>';
+        }
+      }
+
+      // 슬라이드 끝 이전/다음 버튼
+      var isFirst = slide.id <= 1;
+      var isLast = slide.id >= window.SLIDES.length;
+      html += '<nav class="slide-footer-nav" aria-label="이전 및 다음 슬라이드">' +
+        '<button type="button" class="btn btn-secondary" data-nav-step="-1"' + (isFirst ? ' disabled' : '') + '>← 이전 장</button>' +
+        '<span style="font-size:var(--font-small); font-weight:800; color:var(--ink-muted);">' + slide.id + ' / ' + window.SLIDES.length + '장</span>' +
+        '<button type="button" class="btn btn-primary" data-nav-step="1"' + (isLast ? ' disabled' : '') + '>다음 장 →</button>' +
+        '</nav>';
+
+      root.innerHTML = html;
+    }
+
+    function renderAll() {
+      renderHeaderAndNav();
+      renderCurrentSlide();
+    }
+
+    /* =========================
+       태스크 찾기 및 채점 트리거
+       ========================= */
+    function findTaskById(taskId) {
+      for (var i = 0; i < window.SLIDES.length; i++) {
+        var tasks = window.SLIDES[i].tasks || [];
+        for (var j = 0; j < tasks.length; j++) {
+          if (tasks[j].id === taskId) return tasks[j];
+        }
+      }
+      return null;
+    }
+
+    function handleGradeClassify(taskId, silentIfIncomplete) {
+      var task = findTaskById(taskId);
+      if (!task) return;
+      var st = ensureClassifyState(task);
+
+      if (task.layout === 'buckets') {
+        var missing = task.items.filter(function (it) { return !st.placements[it.id]; });
+        if (missing.length > 0) {
+          if (silentIfIncomplete) return;
+          st.checked = { status: 'incomplete', message: '아직 배치하지 않은 항목이 ' + missing.length + '개 있습니다.' };
+          renderCurrentSlide();
+          return;
+        }
+        var wrongItems = task.items.filter(function (it) { return st.placements[it.id] !== it.answer; });
+        if (wrongItems.length === 0) {
+          st.checked = { status: 'correct', message: '' };
+          st.showExplain = false;
+        } else {
+          st.checked = {
+            status: 'wrong',
+            message: wrongItems.length + '개 항목의 위치가 다릅니다: ' + wrongItems.map(function (w) { return '「' + w.label + '」'; }).join(', ')
+          };
+        }
+      } else {
+        var emptySlots = task.slots.filter(function (sl) { return !st.placements[sl.id]; });
+        if (emptySlots.length > 0) {
+          if (silentIfIncomplete) return;
+          st.checked = { status: 'incomplete', message: '비어 있는 카드가 ' + emptySlots.length + '개 있습니다.' };
+          renderCurrentSlide();
+          return;
+        }
+        var wrongSlots = task.slots.filter(function (sl) { return st.placements[sl.id] !== sl.answer; });
+        if (wrongSlots.length === 0) {
+          st.checked = { status: 'correct', message: '' };
+          st.showExplain = false;
+        } else {
+          st.checked = {
+            status: 'wrong',
+            message: wrongSlots.length + '개 카드의 계정을 다시 확인해 보세요: ' + wrongSlots.map(function (w) { return w.title || w.prompt.slice(0, 14); }).join(', ')
+          };
+        }
+      }
+      renderCurrentSlide();
+    }
+
+    function handleGradeCalc(taskId) {
+      var task = findTaskById(taskId);
+      if (!task) return;
+      var st = ensureCalcState(task);
+      var emptyLabels = [];
+      var wrongLabels = [];
+
+      for (var i = 0; i < task.fields.length; i++) {
+        var f = task.fields[i];
+        var raw = st.values[f.key];
+        if (raw == null || String(raw).trim() === '') {
+          emptyLabels.push(f.label);
+          continue;
+        }
+        if (f.kind === 'number') {
+          var parsed = parseAmount(raw);
+          if (parsed === null || parsed !== f.answer) {
+            wrongLabels.push(f.label);
+          }
+        } else {
+          if (String(raw).trim() !== String(f.answer).trim()) {
+            wrongLabels.push(f.label);
+          }
+        }
+      }
+
+      if (emptyLabels.length > 0) {
+        st.checked = { status: 'incomplete', message: '비어 있는 칸을 채워 주세요: ' + emptyLabels.join(', ') };
+      } else if (wrongLabels.length > 0) {
+        st.checked = { status: 'wrong', message: '다음 항목을 다시 확인해 보세요: ' + wrongLabels.join(', ') };
+      } else {
+        st.checked = { status: 'correct', message: '' };
+        st.showExplain = false;
+      }
+      renderCurrentSlide();
+    }
+
+    function handleGradeLedger(taskId) {
+      var task = findTaskById(taskId);
+      if (!task) return;
+      var st = ensureLedgerState(task);
+      var emptyLabels = [];
+      var wrongLabels = [];
+
+      for (var i = 0; i < task.fields.length; i++) {
+        var f = task.fields[i];
+        var raw = st.values[f.key];
+        if (raw == null || String(raw).trim() === '') {
+          emptyLabels.push(f.label);
+          continue;
+        }
+        if (f.kind === 'number') {
+          var parsed = parseAmount(raw);
+          if (parsed === null || parsed !== f.answer) {
+            wrongLabels.push(f.label);
+          }
+        } else {
+          if (String(raw).trim() !== String(f.answer).trim()) {
+            wrongLabels.push(f.label);
+          }
+        }
+      }
+
+      if (emptyLabels.length > 0) {
+        st.checked = { status: 'incomplete', message: '비어 있는 전기 항목을 채워 주세요: ' + emptyLabels.join(', ') };
+      } else if (wrongLabels.length > 0) {
+        st.checked = { status: 'wrong', message: '다시 확인할 항목: ' + wrongLabels.join(', ') };
+      } else {
+        st.checked = { status: 'correct', message: '' };
+        st.showExplain = false;
+      }
+      renderCurrentSlide();
+    }
+
+    function handleGradeJournal(taskId) {
+      var task = findTaskById(taskId);
+      if (!task) return;
+      var st = ensureJournalState(task);
+      st.checked = gradeJournalEntry(task.answer, st.debit, st.credit);
+      if (st.checked.status === 'correct') st.showExplain = false;
+      renderCurrentSlide();
+    }
+
+    function placeChipIntoTarget(taskId, chipKind, chipValue, targetType, targetEl) {
+      var task = findTaskById(taskId);
+      if (!task) return;
+
+      if (chipKind === 'classify' && task.type === 'classify') {
+        var st = ensureClassifyState(task);
+        var targetId = targetEl.getAttribute('data-target-id');
+        if (targetType === 'bucket') {
+          st.placements[chipValue] = targetId;
+        } else if (targetType === 'slot') {
+          st.placements[targetId] = chipValue;
+        }
+        st.checked = null;
+        window.APP_STATE.selectedChip = null;
+        // 모든 빈칸이 채워지면 자동 채점
+        renderCurrentSlide();
+        handleGradeClassify(taskId, true);
+      } else if (chipKind === 'journal' && task.type === 'journal') {
+        var jSt = ensureJournalState(task);
+        var side = targetEl.getAttribute('data-side');
+        var rowIdx = parseInt(targetEl.getAttribute('data-row'), 10);
+        if (side && !isNaN(rowIdx) && jSt[side] && jSt[side][rowIdx]) {
+          jSt[side][rowIdx].account = chipValue;
+          jSt.checked = null;
+          window.APP_STATE.selectedChip = null;
+          renderCurrentSlide();
+        }
+      }
+    }
+
+    /* =========================
+       Pointer Events 드래그 처리
+       ========================= */
+    function cleanupDrag() {
+      var d = window.APP_STATE.drag;
+      if (d && d.ghostEl && d.ghostEl.parentNode) {
+        d.ghostEl.parentNode.removeChild(d.ghostEl);
+      }
+      var overs = document.querySelectorAll('.is-drag-over');
+      for (var i = 0; i < overs.length; i++) overs[i].classList.remove('is-drag-over');
+      window.APP_STATE.drag = null;
+    }
+
+    function findDropTargetAt(x, y, dragInfo) {
+      var el = document.elementFromPoint(x, y);
+      if (!el) return null;
+      var target = el.closest('[data-drop-target]');
+      if (!target) return null;
+      if (target.getAttribute('data-task-id') !== dragInfo.taskId) return null;
+      var tType = target.getAttribute('data-drop-target');
+      if (dragInfo.kind === 'classify' && (tType === 'bucket' || tType === 'slot')) return target;
+      if (dragInfo.kind === 'journal' && tType === 'journal-acc') return target;
+      return null;
+    }
+
+    /* =========================
+       전역 이벤트 위임 바인딩
+       ========================= */
+    function bindGlobalEvents() {
+      document.addEventListener('click', function (e) {
+        var btn;
+
+        // 모드 전환
+        btn = e.target.closest('[data-mode]');
+        if (btn) {
+          setMode(btn.getAttribute('data-mode'));
+          return;
+        }
+
+        // 슬라이드 이동
+        btn = e.target.closest('[data-jump-slide]');
+        if (btn) {
+          goToSlide(parseInt(btn.getAttribute('data-jump-slide'), 10), true);
+          return;
+        }
+
+        // 이전/다음 장
+        btn = e.target.closest('[data-nav-step]');
+        if (btn) {
+          var step = parseInt(btn.getAttribute('data-nav-step'), 10);
+          goToSlide(window.APP_STATE.currentSlideId + step, true);
+          return;
+        }
+
+        // 누적 점검 초기화 후 다시 풀기
+        btn = e.target.closest('[data-reset-challenge]');
+        if (btn) {
+          resetChallenge27();
+          return;
+        }
+
+        // 수업 모드 정답 보기/숨기기
+        btn = e.target.closest('[data-toggle-reveal]');
+        if (btn) {
+          var rId = btn.getAttribute('data-toggle-reveal');
+          window.APP_STATE.revealedTasks[rId] = !window.APP_STATE.revealedTasks[rId];
+          renderCurrentSlide();
+          return;
+        }
+
+        // 해설 보기/숨기기
+        btn = e.target.closest('[data-show-explain]');
+        if (btn) {
+          var eId = btn.getAttribute('data-show-explain');
+          var eKind = btn.getAttribute('data-explain-kind');
+          var mapName = eKind === 'choice' ? 'choices' : eKind;
+          if (window.APP_STATE.student[mapName] && window.APP_STATE.student[mapName][eId]) {
+            window.APP_STATE.student[mapName][eId].showExplain = !window.APP_STATE.student[mapName][eId].showExplain;
+            renderCurrentSlide();
+          }
+          return;
+        }
+
+        // 선택형 클릭 -> 즉시 채점
+        btn = e.target.closest('[data-choice-task]');
+        if (btn) {
+          var cTaskId = btn.getAttribute('data-choice-task');
+          var cIdx = parseInt(btn.getAttribute('data-choice-index'), 10);
+          var cTask = findTaskById(cTaskId);
+          if (!cTask) return;
+          var cState = ensureChoiceState(cTask);
+          cState.selectedIndex = cIdx;
+          cState.checked = cIdx === cTask.answerIndex ? 'correct' : 'wrong';
+          if (cState.checked === 'correct') cState.showExplain = false;
+          if (cTask.isChallenge27) {
+            window.APP_STATE.student.challenge27[cTask.id] = {
+              selectedIndex: cIdx,
+              isCorrect: cIdx === cTask.answerIndex
+            };
+          }
+          renderCurrentSlide();
+          return;
+        }
+
+        // 칩 선택 (탭 / Enter / Space)
+        btn = e.target.closest('[data-chip-kind]');
+        if (btn) {
+          var kind = btn.getAttribute('data-chip-kind');
+          var tId = btn.getAttribute('data-task-id');
+          var val = btn.getAttribute('data-chip-value');
+          var lbl = btn.getAttribute('data-chip-label');
+          var cur = window.APP_STATE.selectedChip;
+          if (cur && cur.taskId === tId && cur.value === val && cur.kind === kind) {
+            window.APP_STATE.selectedChip = null;
+          } else {
+            window.APP_STATE.selectedChip = { taskId: tId, kind: kind, value: val, label: lbl };
+          }
+          renderCurrentSlide();
+          return;
+        }
+
+        // 분류 버킷/슬롯 탭 배치 또는 제거
+        btn = e.target.closest('[data-drop-click]');
+        if (btn) {
+          var dType = btn.getAttribute('data-drop-click');
+          var dTaskId = btn.getAttribute('data-task-id');
+          var dTargetId = btn.getAttribute('data-target-id');
+          var sel = window.APP_STATE.selectedChip;
+          if (sel && sel.kind === 'classify' && sel.taskId === dTaskId) {
+            placeChipIntoTarget(dTaskId, 'classify', sel.value, dType, btn);
+          } else if (dType === 'slot') {
+            var slTask = findTaskById(dTaskId);
+            if (slTask) {
+              var slSt = ensureClassifyState(slTask);
+              if (slSt.placements[dTargetId]) {
+                delete slSt.placements[dTargetId];
+                slSt.checked = null;
+                renderCurrentSlide();
+              }
+            }
+          }
+          return;
+        }
+
+        // 버킷에 들어간 칩 빼기
+        btn = e.target.closest('[data-remove-chip]');
+        if (btn) {
+          var rmTaskId = btn.getAttribute('data-remove-chip');
+          var rmItemId = btn.getAttribute('data-item-id');
+          var rmTask = findTaskById(rmTaskId);
+          if (rmTask) {
+            var rmSt = ensureClassifyState(rmTask);
+            delete rmSt.placements[rmItemId];
+            rmSt.checked = null;
+            renderCurrentSlide();
+          }
+          return;
+        }
+
+        // 분류 채점/초기화
+        btn = e.target.closest('[data-grade-classify]');
+        if (btn) {
+          handleGradeClassify(btn.getAttribute('data-grade-classify'), false);
+          return;
+        }
+        btn = e.target.closest('[data-reset-classify]');
+        if (btn) {
+          var rcId = btn.getAttribute('data-reset-classify');
+          window.APP_STATE.student.classify[rcId] = { placements: {}, checked: null, showExplain: false };
+          window.APP_STATE.selectedChip = null;
+          renderCurrentSlide();
+          return;
+        }
+
+        // 계산 단계 세그먼트 & 채점
+        btn = e.target.closest('[data-calc-seg]');
+        if (btn) {
+          var csTaskId = btn.getAttribute('data-calc-seg');
+          var csTask = findTaskById(csTaskId);
+          if (csTask) {
+            var csSt = ensureCalcState(csTask);
+            csSt.values[btn.getAttribute('data-field-key')] = btn.getAttribute('data-seg-val');
+            csSt.checked = null;
+            renderCurrentSlide();
+          }
+          return;
+        }
+        btn = e.target.closest('[data-grade-calc]');
+        if (btn) {
+          handleGradeCalc(btn.getAttribute('data-grade-calc'));
+          return;
+        }
+
+        // 원장 세그먼트 & 채점
+        btn = e.target.closest('[data-ledger-seg]');
+        if (btn) {
+          var lsTaskId = btn.getAttribute('data-ledger-seg');
+          var lsTask = findTaskById(lsTaskId);
+          if (lsTask) {
+            var lsSt = ensureLedgerState(lsTask);
+            lsSt.values[btn.getAttribute('data-field-key')] = btn.getAttribute('data-seg-val');
+            lsSt.checked = null;
+            renderCurrentSlide();
+          }
+          return;
+        }
+        btn = e.target.closest('[data-grade-ledger]');
+        if (btn) {
+          handleGradeLedger(btn.getAttribute('data-grade-ledger'));
+          return;
+        }
+
+        // 분개 계정 칸 클릭 시 선택된 칩 넣기
+        var jInput = e.target.closest('[data-journal-input][data-part="account"]');
+        if (jInput) {
+          var selJ = window.APP_STATE.selectedChip;
+          var jTId = jInput.getAttribute('data-journal-input');
+          if (selJ && selJ.kind === 'journal' && selJ.taskId === jTId) {
+            placeChipIntoTarget(jTId, 'journal', selJ.value, 'journal-acc', jInput);
+            return;
+          }
+        }
+
+        // 분개 계정 지우기
+        btn = e.target.closest('[data-clear-journal]');
+        if (btn) {
+          var cjId = btn.getAttribute('data-clear-journal');
+          var cjTask = findTaskById(cjId);
+          if (cjTask) {
+            var cjSt = ensureJournalState(cjTask);
+            var side = btn.getAttribute('data-side');
+            var row = parseInt(btn.getAttribute('data-row'), 10);
+            if (cjSt[side] && cjSt[side][row]) {
+              cjSt[side][row].account = '';
+              cjSt.checked = null;
+              renderCurrentSlide();
+            }
+          }
+          return;
+        }
+
+        // 분개 채점/지우기
+        btn = e.target.closest('[data-grade-journal]');
+        if (btn) {
+          handleGradeJournal(btn.getAttribute('data-grade-journal'));
+          return;
+        }
+        btn = e.target.closest('[data-reset-journal]');
+        if (btn) {
+          var rjId = btn.getAttribute('data-reset-journal');
+          delete window.APP_STATE.student.journal[rjId];
+          window.APP_STATE.selectedChip = null;
+          renderCurrentSlide();
+          return;
+        }
+      });
+
+      // 텍스트/숫자 입력 동기화
+      document.addEventListener('input', function (e) {
+        var el = e.target;
+        if (el.hasAttribute('data-journal-input')) {
+          var jId = el.getAttribute('data-journal-input');
+          var task = findTaskById(jId);
+          if (!task) return;
+          var st = ensureJournalState(task);
+          var side = el.getAttribute('data-side');
+          var row = parseInt(el.getAttribute('data-row'), 10);
+          var part = el.getAttribute('data-part');
+          if (st[side] && st[side][row]) {
+            st[side][row][part] = el.value;
+          }
+        } else if (el.hasAttribute('data-calc-input')) {
+          var cId = el.getAttribute('data-calc-input');
+          var cTask = findTaskById(cId);
+          if (!cTask) return;
+          var cSt = ensureCalcState(cTask);
+          cSt.values[el.getAttribute('data-field-key')] = el.value;
+        } else if (el.hasAttribute('data-ledger-input')) {
+          var lId = el.getAttribute('data-ledger-input');
+          var lTask = findTaskById(lId);
+          if (!lTask) return;
+          var lSt = ensureLedgerState(lTask);
+          lSt.values[el.getAttribute('data-field-key')] = el.value;
+        }
+      });
+
+      // Enter 키 즉시 채점
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        var el = e.target;
+        if (el.hasAttribute('data-journal-input')) {
+          e.preventDefault();
+          handleGradeJournal(el.getAttribute('data-journal-input'));
+        } else if (el.hasAttribute('data-calc-input')) {
+          e.preventDefault();
+          handleGradeCalc(el.getAttribute('data-calc-input'));
+        } else if (el.hasAttribute('data-ledger-input')) {
+          e.preventDefault();
+          handleGradeLedger(el.getAttribute('data-ledger-input'));
+        }
+      });
+
+      // Pointer Events 드래그 (터치에서는 .chip-drag-handle에서만 드래그 시작해 페이지 세로 스크롤 보장)
+      document.addEventListener('pointerdown', function (e) {
+        var chip = e.target.closest('[data-chip-kind]');
+        if (!chip) return;
+        var isHandle = !!e.target.closest('.chip-drag-handle');
+        if (e.pointerType !== 'mouse' && !isHandle) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+        window.APP_STATE.drag = {
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          active: false,
+          taskId: chip.getAttribute('data-task-id'),
+          kind: chip.getAttribute('data-chip-kind'),
+          value: chip.getAttribute('data-chip-value'),
+          label: chip.getAttribute('data-chip-label'),
+          ghostEl: null
+        };
+      });
+
+      document.addEventListener('pointermove', function (e) {
+        var d = window.APP_STATE.drag;
+        if (!d || d.pointerId !== e.pointerId) return;
+        var dx = e.clientX - d.startX;
+        var dy = e.clientY - d.startY;
+        if (!d.active) {
+          if (Math.hypot(dx, dy) < 7) return;
+          d.active = true;
+          var ghost = document.createElement('div');
+          ghost.className = 'drag-ghost';
+          ghost.textContent = d.label;
+          document.body.appendChild(ghost);
+          d.ghostEl = ghost;
+        }
+        if (d.ghostEl) {
+          d.ghostEl.style.left = e.clientX + 'px';
+          d.ghostEl.style.top = e.clientY + 'px';
+        }
+        var overs = document.querySelectorAll('.is-drag-over');
+        for (var i = 0; i < overs.length; i++) overs[i].classList.remove('is-drag-over');
+        var target = findDropTargetAt(e.clientX, e.clientY, d);
+        if (target) target.classList.add('is-drag-over');
+      });
+
+      document.addEventListener('pointerup', function (e) {
+        var d = window.APP_STATE.drag;
+        if (!d || d.pointerId !== e.pointerId) return;
+        if (d.active) {
+          var target = findDropTargetAt(e.clientX, e.clientY, d);
+          var taskId = d.taskId;
+          var kind = d.kind;
+          var value = d.value;
+          cleanupDrag();
+          if (target) {
+            placeChipIntoTarget(taskId, kind, value, target.getAttribute('data-drop-target'), target);
+          }
+        } else {
+          cleanupDrag();
+        }
+      });
+
+      document.addEventListener('pointercancel', function () {
+        cleanupDrag();
+      });
+    }
+
+    /* =========================
+       데이터 무결성 검사 (PART 5에서 호출)
+       ========================= */
+    function validateSlidesData() {
+      var errors = [];
+      var seenIds = {};
+      if (window.SLIDES.length !== window.APP_CONFIG.totalSlides) {
+        errors.push('슬라이드 수 오류: ' + window.SLIDES.length + '장 (기대값 ' + window.APP_CONFIG.totalSlides + '장)');
+      }
+      for (var i = 0; i < window.SLIDES.length; i++) {
+        var sl = window.SLIDES[i];
+        var expectedId = i + 1;
+        if (sl.id !== expectedId) {
+          errors.push('장 번호 불일치: 인덱스 ' + i + '의 id=' + sl.id + ' (기대값 ' + expectedId + ')');
+        }
+        if (seenIds[sl.id]) {
+          errors.push('중복 장 번호: ' + sl.id);
+        }
+        seenIds[sl.id] = true;
+
+        var tasks = sl.tasks || [];
+        for (var j = 0; j < tasks.length; j++) {
+          var t = tasks[j];
+          if (t.type === 'journal' && t.answer) {
+            var dSum = (t.answer.debit || []).reduce(function (s, x) { return s + x.amount; }, 0);
+            var cSum = (t.answer.credit || []).reduce(function (s, x) { return s + x.amount; }, 0);
+            if (dSum <= 0 || dSum !== cSum) {
+              errors.push(sl.id + '장 분개(' + t.id + ') 대차 불일치: 차변 ' + dSum + ', 대변 ' + cSum);
+            }
+          }
+          if (t.type === 'choice') {
+            if (!t.options || t.answerIndex < 0 || t.answerIndex >= t.options.length) {
+              errors.push(sl.id + '장 선택형(' + t.id + ') 정답 인덱스 오류');
+            }
+          }
+        }
+      }
+      if (errors.length > 0 && window.console && console.warn) {
+        console.warn('[데이터 무결성 점검 경고]', errors);
+      }
+      return errors;
+    }
+
+    function initApp() {
+      validateSlidesData();
+      bindGlobalEvents();
+      renderAll();
+    }
+
+        window.SLIDES.push(
+      {
+        id: 1,
+        kind: 'cover',
+        title: '카페 사장님의 장부 미션 | 부채·자본',
+        concept: '손님에게 받아 둔 돈, 어음으로 갚기로 한 돈, 은행에서 빌린 돈, 그리고 사장님이 사업에 넣고 가져간 돈까지 — 20장으로 정리합니다.',
+        guideText: '오른쪽 위에서 ‘수업 모드’(전자칠판 판서용)와 ‘혼자 공부 모드’(칩 배치·직접 입력·즉시 채점)를 바꿀 수 있습니다. 아래 2개 차시 중 오늘 배울 차시를 눌러 시작하세요. 왼쪽 위 ‘← 자료실’을 누르면 회계원리 자료실로 돌아갑니다.',
+        diagramHtml: `<svg viewBox="0 0 640 250" role="img" aria-label="보관 봉투, 약속어음, 은행 대출 카드 세 가지 갚을 일">
+          <rect x="0" y="0" width="640" height="250" rx="18" fill="#FFFDF9"/>
+          <rect x="14" y="14" width="612" height="222" rx="14" fill="#FFF8EF" stroke="#E2D1BC" stroke-width="2"/>
+          <g transform="translate(40,40)">
+            <rect x="0" y="0" width="160" height="150" rx="14" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <rect x="34" y="26" width="92" height="60" rx="8" fill="#FFFFFF" stroke="#176047" stroke-width="2.5"/>
+            <path d="M34 26 L80 60 L126 26" fill="none" stroke="#176047" stroke-width="2.5"/>
+            <text x="80" y="112" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">보관 봉투</text>
+            <text x="80" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">손님 돈 90,000원</text>
+          </g>
+          <g transform="translate(240,40)">
+            <rect x="0" y="0" width="160" height="150" rx="14" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2.5"/>
+            <rect x="30" y="24" width="100" height="64" rx="8" fill="#FFFFFF" stroke="#B7791F" stroke-width="2.5"/>
+            <path d="M42 44 H118 M42 58 H104 M42 72 H92" stroke="#DFB24D" stroke-width="3" stroke-linecap="round"/>
+            <text x="80" y="112" text-anchor="middle" font-size="14" font-weight="900" fill="#7A4E00">약속어음</text>
+            <text x="80" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">420,000원</text>
+          </g>
+          <g transform="translate(440,40)">
+            <rect x="0" y="0" width="160" height="150" rx="14" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2.5"/>
+            <rect x="34" y="26" width="92" height="58" rx="8" fill="#FFFFFF" stroke="#1D4B7A" stroke-width="2.5"/>
+            <text x="80" y="64" text-anchor="middle" font-size="18" font-weight="900" fill="#1D4B7A">₩ 1,200,000</text>
+            <text x="80" y="112" text-anchor="middle" font-size="14" font-weight="900" fill="#1D4B7A">은행 대출</text>
+            <text x="80" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">3개월 뒤 갚기로</text>
+          </g>
+        </svg>`
+      },
+
+      {
+        id: 2,
+        conceptTag: '① 부채의 세 가지 얼굴',
+        title: '돈은 들어왔는데 누구의 돈일까?',
+        concept: '부채는 앞으로 갚거나 지급해야 할 의무입니다. 그런데 똑같이 돈을 받아도 ‘내 물건을 팔면서 미리 받은 돈’과 ‘남의 돈을 대신 보관한 돈’은 계정이 다릅니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>손님 두 분이 각각 50,000원을 냈습니다. <strong>한 분은 달빛 카페 케이크</strong>를 다음 주에 받기로 했고, <strong>다른 한 분은 제휴 제과점 선물세트</strong>를 다음 주에 받기로 했습니다. 카페가 나중에 줄 물건이 자기 것이냐, 남의 것이냐가 다릅니다.'
+        ],
+        diagramTitle: '같은 50,000원, 다른 주인',
+        diagramHtml: `<svg viewBox="0 0 600 210" role="img" aria-label="내 상품 예약금은 선수금, 제휴점 상품 예약금은 예수금">
+          <rect x="0" y="0" width="600" height="210" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(16,20)">
+            <rect x="0" y="0" width="268" height="170" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="134" y="28" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">카페가 파는 케이크 예약금</text>
+            <rect x="34" y="48" width="200" height="44" rx="8" fill="#FFFFFF" stroke="#176047" stroke-width="2"/>
+            <text x="134" y="76" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">50,000원 · 내 물건</text>
+            <text x="134" y="118" text-anchor="middle" font-size="15" font-weight="900" fill="#0F4734">선수금</text>
+            <text x="134" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">내 상품 대금을 미리 받은 것</text>
+          </g>
+          <g transform="translate(316,20)">
+            <rect x="0" y="0" width="268" height="170" rx="12" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2"/>
+            <text x="134" y="28" text-anchor="middle" font-size="14" font-weight="900" fill="#7A4E00">제휴점 선물세트 예약금</text>
+            <rect x="34" y="48" width="200" height="44" rx="8" fill="#FFFFFF" stroke="#B7791F" stroke-width="2"/>
+            <text x="134" y="76" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">50,000원 · 남의 물건</text>
+            <text x="134" y="118" text-anchor="middle" font-size="15" font-weight="900" fill="#7A4E00">예수금</text>
+            <text x="134" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">제휴점에 넘겨야 할 돈</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '예약금이라고 다 같은 계정이 아니에요',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>누가 팔았나</th><th>나중에 줄 것</th><th>계정</th></tr></thead><tbody>' +
+          '<tr><td>달빛 카페</td><td>내 상품(케이크)</td><td><strong>선수금</strong></td></tr>' +
+          '<tr><td>제휴 제과점</td><td>남의 상품(선물세트)</td><td><strong>예수금</strong></td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">이번 단원의 주인공은 <strong>예수금</strong>입니다. 남의 돈을 잠시 맡아 두었다가 그대로 넘겨주는 돈이지요.</div>',
+        tasks: [
+          {
+            id: 'L2T1',
+            type: 'classify',
+            title: '분류 ① 누구의 돈인가',
+            layout: 'buckets',
+            prompt: '두 손님이 낸 예약금을 알맞은 계정 칸으로 옮겨 보세요.',
+            items: [
+              { id: 'a', label: '내 케이크 예약금 50,000원', answer: 'seon' },
+              { id: 'b', label: '제휴점 선물세트 예약금 50,000원', answer: 'ye' }
+            ],
+            targets: [
+              { id: 'seon', label: '선수금 (내 상품 대금)' },
+              { id: 'ye', label: '예수금 (남의 돈 보관)' }
+            ],
+            hint: '나중에 물건을 줄 사람이 카페인지, 제휴점인지 먼저 확인해 보세요.',
+            reason: '내 상품 대금을 미리 받으면 선수금, 제휴점에 넘길 돈을 대신 받으면 예수금입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 3,
+        conceptTag: '② 예수금 받기',
+        title: '예수금 받기 — 손님 돈을 맡다',
+        concept: '제휴 제과점이 파는 선물세트 예약금을 달빛 카페가 대신 받았습니다. 현금이 늘어난 것은 맞지만, 카페의 매출이 아니라 나중에 제과점에 줄 돈(부채)이 함께 늘어납니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>제휴 제과점의 선물세트 예약금 <strong>90,000원을 현금으로</strong> 대신 받았습니다. 상품은 다음 주에 제과점이 준비하고, 카페는 그 돈을 보관했다가 전달합니다.'
+        ],
+        diagramTitle: '손님 → 카페 보관 봉투',
+        diagramHtml: `<svg viewBox="0 0 560 190" role="img" aria-label="손님이 낸 예약금 90,000원이 카페 보관 봉투에 들어가는 그림">
+          <rect x="0" y="0" width="560" height="190" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(20,40)">
+            <circle cx="52" cy="34" r="24" fill="#FDF3E4" stroke="#C9B195" stroke-width="2.5"/>
+            <path d="M28 96 Q52 66 76 96" fill="#FDF3E4" stroke="#C9B195" stroke-width="2.5"/>
+            <text x="52" y="130" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">손님</text>
+          </g>
+          <g transform="translate(140,60)">
+            <line x1="0" y1="30" x2="120" y2="30" stroke="#176047" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="118,20 138,30 118,40" fill="#176047"/>
+            <text x="66" y="16" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">현금 90,000원</text>
+          </g>
+          <g transform="translate(320,26)">
+            <rect x="0" y="0" width="200" height="140" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <rect x="34" y="22" width="132" height="56" rx="8" fill="#FFFFFF" stroke="#176047" stroke-width="2.5"/>
+            <path d="M34 22 L100 62 L166 22" fill="none" stroke="#176047" stroke-width="2.5"/>
+            <text x="100" y="100" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">카페 보관 봉투</text>
+            <text x="100" y="122" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">아직 내 돈이 아님</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '왜 매출이 아닐까?',
+        sidePanelHtml: '<ul class="tip-list">' +
+          '<li>카페가 <strong>판 상품이 없습니다.</strong> 물건은 제휴점이 줍니다.</li>' +
+          '<li>그래서 현금이 늘어난 만큼 <strong>예수금(부채)</strong>도 늘어납니다.</li>' +
+          '<li>1차시의 결론: 부채는 <strong>나중에 갚거나 넘겨줄 의무</strong>입니다.</li>' +
+          '</ul>' +
+          '<div class="callout-tip">현금이 들어왔다고 무조건 수익이 아닙니다. 누구의 돈인지 먼저 확인하세요.</div>',
+        tasks: [
+          {
+            id: 'L3T1',
+            type: 'journal',
+            title: '분개 ① 예약금 90,000원을 현금으로 받다',
+            prompt: '제휴 제과점의 선물세트 예약금 90,000원을 현금으로 대신 받았다. 분개를 완성하세요.',
+            chips: ['현금', '보통예금', '예수금', '선수금', '매출'],
+            answer: { debit: [{ account: '현금', amount: 90000 }], credit: [{ account: '예수금', amount: 90000 }] },
+            hint: '늘어난 것은 현금(자산)과 예수금(부채) 두 가지입니다. 자산은 차변, 부채는 대변에 적습니다.',
+            reason: '현금이 90,000원 늘고, 제휴점에 넘겨줄 예수금이 90,000원 늘었습니다.'
+          }
+        ]
+      },
+
+      {
+        id: 4,
+        conceptTag: '③ 예수금 정산',
+        title: '상품을 건네고 예약금을 넘기다',
+        concept: '상품이 손님에게 전달되고, 보관하던 돈이 제휴점으로 넘어가면 카페의 예수금은 사라집니다. 물건이 움직이는 길과 돈이 움직이는 길이 다르다는 점을 기억하세요.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>다음 주, 제휴점이 선물세트를 손님에게 전달했습니다. 카페는 <strong>보관하던 현금 90,000원을 제휴점에 그대로 전달</strong>했습니다.'
+        ],
+        diagramTitle: '물건은 손님에게, 돈은 제휴점에게',
+        diagramHtml: `<svg viewBox="0 0 580 210" role="img" aria-label="상품은 손님에게, 돈은 제휴점으로 이동하는 두 갈래 길">
+          <rect x="0" y="0" width="580" height="210" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(222,60)">
+            <rect x="0" y="0" width="136" height="90" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="68" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">달빛 카페</text>
+            <text x="68" y="64" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">예수금 90,000</text>
+          </g>
+          <g transform="translate(370,26)">
+            <line x1="0" y1="20" x2="130" y2="20" stroke="#B7791F" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="128,10 148,20 128,30" fill="#B7791F"/>
+            <text x="70" y="8" text-anchor="middle" font-size="12" font-weight="900" fill="#7A4E00">상품(선물세트)</text>
+            <text x="150" y="46" text-anchor="middle" font-size="12" font-weight="800" fill="#2B211B">→ 손님</text>
+          </g>
+          <g transform="translate(80,120)">
+            <line x1="150" y1="20" x2="10" y2="20" stroke="#176047" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="12,10 -8,20 12,30" fill="#176047"/>
+            <text x="76" y="8" text-anchor="middle" font-size="12" font-weight="900" fill="#0F4734">현금 90,000원</text>
+            <text x="76" y="42" text-anchor="middle" font-size="12" font-weight="800" fill="#2B211B">제휴점 ←</text>
+          </g>
+          <text x="290" y="188" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">분개는 ‘돈이 움직인 거래’로 합니다.</text>
+        </svg>`,
+        sidePanelTitle: '예수금이 줄어드는 순간',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>시점</th><th>카페가 할 일</th><th>예수금</th></tr></thead><tbody>' +
+          '<tr><td>예약금을 받았을 때</td><td>현금 늘고 예수금 늘고</td><td>증가</td></tr>' +
+          '<tr><td>상품이 인도될 때</td><td>카페 분개 없음(제휴점이 판매)</td><td>그대로</td></tr>' +
+          '<tr><td><strong>돈을 넘겼을 때</strong></td><td>예수금 줄고 현금 줄고</td><td><strong>감소</strong></td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">“물건을 줬다”가 아니라 <strong>“돈을 넘겼다”</strong>가 분개 시점입니다.</div>',
+        tasks: [
+          {
+            id: 'L4T1',
+            type: 'journal',
+            title: '분개 ② 보관하던 90,000원을 제휴점에 전달',
+            prompt: '보관하던 현금 90,000원을 제휴점에 전달했다. 분개를 완성하세요.',
+            chips: ['현금', '보통예금', '예수금', '선수금', '외상매입금'],
+            answer: { debit: [{ account: '예수금', amount: 90000 }], credit: [{ account: '현금', amount: 90000 }] },
+            hint: '넘겨줄 의무가 사라졌으니 부채(예수금)가 줄고, 보관하던 현금도 줄어듭니다.',
+            reason: '부채의 감소는 차변, 자산의 감소는 대변입니다. 예수금 90,000원이 사라졌습니다.'
+          }
+        ]
+      },
+
+      {
+        id: 5,
+        conceptTag: '④ 지급어음 발행',
+        title: '지급어음 — 어음으로 갚기로 약속하다',
+        concept: '약속어음은 정해진 날에 돈을 지급하겠다는 증서입니다. 카페가 어음을 발행하면 이미 있던 외상매입금이 지급어음으로 바뀝니다. 부채의 종류만 달라지고 총액은 그대로입니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>6월 1일, 상품을 외상으로 사면서 생긴 <strong>외상매입금 420,000원</strong>을 정리하기 위해 같은 금액의 <strong>자기 회사 약속어음</strong>을 발행해 거래처에 건넸습니다. 만기는 7월 1일입니다.'
+        ],
+        diagramTitle: '부채 카드가 바뀐다',
+        diagramHtml: `<svg viewBox="0 0 580 200" role="img" aria-label="외상매입금 부채 카드가 지급어음 카드로 바뀌는 그림">
+          <rect x="0" y="0" width="580" height="200" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(24,34)">
+            <rect x="0" y="0" width="190" height="120" rx="12" fill="#FDF3E4" stroke="#C9B195" stroke-width="2.5"/>
+            <text x="95" y="34" text-anchor="middle" font-size="15" font-weight="900" fill="#5C493E">외상매입금</text>
+            <text x="95" y="62" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">420,000원</text>
+            <text x="95" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">나중에 현금으로 지급</text>
+            <text x="95" y="112" text-anchor="middle" font-size="12" font-weight="900" fill="#8C1D18">→ 사라짐</text>
+          </g>
+          <g transform="translate(232,74)">
+            <line x1="0" y1="20" x2="80" y2="20" stroke="#176047" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="78,10 98,20 78,30" fill="#176047"/>
+            <text x="49" y="8" text-anchor="middle" font-size="12" font-weight="900" fill="#0F4734">어음 발행</text>
+          </g>
+          <g transform="translate(350,34)">
+            <rect x="0" y="0" width="196" height="120" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="98" y="34" text-anchor="middle" font-size="15" font-weight="900" fill="#0F4734">지급어음</text>
+            <text x="98" y="62" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">420,000원</text>
+            <text x="98" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">7/1에 지급하겠다는 약속</text>
+            <text x="98" y="112" text-anchor="middle" font-size="12" font-weight="900" fill="#0F4734">→ 새로 생김</text>
+          </g>
+          <text x="290" y="184" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">부채 총액은 그대로, 이름만 바뀝니다.</text>
+        </svg>`,
+        sidePanelTitle: '어음 용어 풀이',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>용어</th><th>뜻</th></tr></thead><tbody>' +
+          '<tr><td>약속어음</td><td>“정해진 날에 갚겠습니다”라고 <strong>내가 쓰는 증서</strong></td></tr>' +
+          '<tr><td>지급어음</td><td>내가 발행해서 <strong>갚아야 할</strong> 어음 (부채)</td></tr>' +
+          '<tr><td>받을어음</td><td>다른 사람이 나에게 준 어음 (자산) — 헷갈리지 마세요</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">내가 <strong>준</strong> 어음은 지급어음, 내가 <strong>받은</strong> 어음은 받을어음입니다.</div>',
+        tasks: [
+          {
+            id: 'L5T1',
+            type: 'journal',
+            title: '분개 ③ 외상매입금 420,000원을 어음으로 바꾸다',
+            prompt: '외상매입금 420,000원을 정리하기 위해 같은 금액의 약속어음을 발행해 건넸다.',
+            chips: ['외상매입금', '지급어음', '받을어음', '보통예금', '현금'],
+            answer: { debit: [{ account: '외상매입금', amount: 420000 }], credit: [{ account: '지급어음', amount: 420000 }] },
+            hint: '사라지는 부채(외상매입금)는 차변, 새로 생기는 부채(지급어음)는 대변입니다.',
+            reason: '외상매입금이 줄고 지급어음이 늘었습니다. 부채 총액은 420,000원 그대로입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 6,
+        conceptTag: '⑤ 지급어음 만기',
+        title: '지급어음 — 만기에 갚는 날',
+        concept: '만기가 되면 약속대로 돈을 지급합니다. 이때 지급어음(부채)이 줄고, 보통예금(자산)도 줄어듭니다. 발행한 날과 갚은 날의 분개를 짝으로 기억하세요.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>7월 1일, 5장에서 발행한 약속어음 <strong>420,000원</strong>이 만기가 되어 카페의 <strong>보통예금에서 전액 지급</strong>했습니다.'
+        ],
+        diagramTitle: '발행일 → 만기일',
+        diagramHtml: `<svg viewBox="0 0 580 180" role="img" aria-label="6월 1일 발행에서 7월 1일 만기까지의 타임라인">
+          <rect x="0" y="0" width="580" height="180" rx="14" fill="#FFFDF9"/>
+          <line x1="60" y1="92" x2="520" y2="92" stroke="#DECBB7" stroke-width="4"/>
+          <circle cx="120" cy="92" r="12" fill="#176047"/>
+          <circle cx="430" cy="92" r="12" fill="#B7791F"/>
+          <text x="120" y="60" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">6월 1일</text>
+          <text x="120" y="126" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">어음 발행</text>
+          <text x="120" y="146" text-anchor="middle" font-size="12" font-weight="800" fill="#0F4734">지급어음 420,000 ↑</text>
+          <text x="430" y="60" text-anchor="middle" font-size="14" font-weight="900" fill="#7A4E00">7월 1일</text>
+          <text x="430" y="126" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">만기 지급</text>
+          <text x="430" y="146" text-anchor="middle" font-size="12" font-weight="800" fill="#7A4E00">지급어음 420,000 ↓</text>
+          <text x="275" y="80" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">한 달 동안 부채로 남아 있음</text>
+        </svg>`,
+        sidePanelTitle: '두 분개를 나란히',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>시점</th><th>차변</th><th>대변</th></tr></thead><tbody>' +
+          '<tr><td>발행(6/1)</td><td>외상매입금</td><td>지급어음</td></tr>' +
+          '<tr><td>만기(7/1)</td><td>지급어음</td><td>보통예금</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">지급어음은 <strong>대변에 생기고 차변에서 사라집니다.</strong> 부채의 기본 규칙 그대로입니다.</div>',
+        tasks: [
+          {
+            id: 'L6T1',
+            type: 'journal',
+            title: '분개 ④ 만기 어음 420,000원을 보통예금에서 지급',
+            prompt: '만기가 된 지급어음 420,000원을 보통예금에서 지급했다.',
+            chips: ['지급어음', '받을어음', '보통예금', '현금', '외상매입금'],
+            answer: { debit: [{ account: '지급어음', amount: 420000 }], credit: [{ account: '보통예금', amount: 420000 }] },
+            hint: '갚았으니 부채(지급어음)가 줄고, 예금도 줄어듭니다.',
+            reason: '부채의 감소는 차변, 자산의 감소는 대변입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 7,
+        conceptTag: '⑥ 단기차입금',
+        title: '은행에서 운영자금 빌리기',
+        concept: '은행에서 돈을 빌리면 보통예금이 늘고, 갚아야 할 단기차입금이 늘어납니다. 빌린 돈은 수익이 아니라 부채입니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>4월 1일, 은행에서 <strong>1,200,000원을 3개월 만기</strong>로 빌렸고 사업용 보통예금에 입금되었습니다. 연이율 8%이고, 원금과 이자는 만기에 함께 지급하기로 했습니다.'
+        ],
+        diagramTitle: '은행 → 카페 계좌',
+        diagramHtml: `<svg viewBox="0 0 560 190" role="img" aria-label="은행에서 카페 보통예금으로 1,200,000원이 들어오는 그림">
+          <rect x="0" y="0" width="560" height="190" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(30,36)">
+            <path d="M0 60 L70 10 L140 60 Z" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2.5"/>
+            <rect x="16" y="60" width="108" height="60" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2.5"/>
+            <text x="70" y="98" text-anchor="middle" font-size="14" font-weight="900" fill="#1D4B7A">은행</text>
+          </g>
+          <g transform="translate(190,66)">
+            <line x1="0" y1="30" x2="130" y2="30" stroke="#176047" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="128,20 148,30 128,40" fill="#176047"/>
+            <text x="70" y="16" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">1,200,000원</text>
+          </g>
+          <g transform="translate(356,36)">
+            <rect x="0" y="0" width="176" height="120" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="88" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">카페 보통예금</text>
+            <text x="88" y="66" text-anchor="middle" font-size="14" font-weight="800" fill="#2B211B">+1,200,000</text>
+            <text x="88" y="98" text-anchor="middle" font-size="12" font-weight="800" fill="#8C1D18">단기차입금 +1,200,000</text>
+          </g>
+          <text x="280" y="176" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">‘원금’은 빌린 금액, 갚을 의무가 생깁니다.</text>
+        </svg>`,
+        sidePanelTitle: '빌린 돈은 수익이 아니다',
+        sidePanelHtml: '<ul class="tip-list">' +
+          '<li>보통예금(자산) <strong>+1,200,000</strong></li>' +
+          '<li>단기차입금(부채) <strong>+1,200,000</strong></li>' +
+          '<li>“1년 안에 갚을 빌린 돈”이라 <strong>단기</strong>차입금입니다.</li>' +
+          '</ul>' +
+          '<div class="callout-tip">돈이 들어와도 <strong>갚아야 하면 부채</strong>입니다. 매출로 착각하지 마세요.</div>',
+        tasks: [
+          {
+            id: 'L7T1',
+            type: 'journal',
+            title: '분개 ⑤ 1,200,000원 차입',
+            prompt: '은행에서 1,200,000원을 3개월 만기로 빌려 보통예금에 입금받았다.',
+            chips: ['보통예금', '현금', '단기차입금', '매출', '자본금'],
+            answer: { debit: [{ account: '보통예금', amount: 1200000 }], credit: [{ account: '단기차입금', amount: 1200000 }] },
+            hint: '늘어난 자산(보통예금)은 차변, 늘어난 부채(단기차입금)는 대변입니다.',
+            reason: '자산과 부채가 같은 금액만큼 늘어났습니다.'
+          }
+        ]
+      },
+
+      {
+        id: 8,
+        conceptTag: '⑦ 이자 계산',
+        title: '이자는 빌린 기간만큼',
+        concept: '이자는 “연이율 × 빌린 금액 × 빌린 기간(월/12)”로 계산합니다. 1년치 이자를 12개월로 나누어 쓰는 기간만큼만 내는 것이 월할 계산입니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>7장의 대출 조건입니다. <strong>원금 1,200,000원, 연이율 8%, 사용 기간 3개월.</strong> 12개월 중 3개월만 썼으니 이자도 3개월치만 냅니다.'
+        ],
+        diagramTitle: '12개월 중 3개월',
+        diagramHtml: `<svg viewBox="0 0 600 200" role="img" aria-label="12개월 띠에서 3개월만 강조한 그림">
+          <rect x="0" y="0" width="600" height="200" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(40,54)">
+            ${[0,1,2,3,4,5,6,7,8,9,10,11].map((i) => `<rect x="${i*43}" y="0" width="39" height="56" rx="6" fill="${i<3?'#176047':'#F1E6D7'}" stroke="#C9B195" stroke-width="1.5"/><text x="${i*43+19.5}" y="36" text-anchor="middle" font-size="14" font-weight="900" fill="${i<3?'#FFFFFF':'#8A7565'}">${i+1}</text>`).join('')}
+          </g>
+          <text x="300" y="36" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">4월 · 5월 · 6월 = 3개월 사용</text>
+          <text x="300" y="150" text-anchor="middle" font-size="14" font-weight="800" fill="#2B211B">1,200,000 × 0.08 × 3/12 = 24,000원</text>
+          <text x="300" y="176" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">연이율 8%는 1년 기준, 그래서 12로 나눕니다.</text>
+        </svg>`,
+        sidePanelTitle: '계산 순서 세 단계',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>순서</th><th>계산</th><th>값</th></tr></thead><tbody>' +
+          '<tr><td>① 1년 이자</td><td>1,200,000 × 0.08</td><td>96,000원</td></tr>' +
+          '<tr><td>② 한 달 이자</td><td>96,000 ÷ 12</td><td>8,000원</td></tr>' +
+          '<tr><td>③ 3개월 이자</td><td>8,000 × 3</td><td><strong>24,000원</strong></td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">시험에서는 <strong>월수</strong>가 주어집니다. 일(日) 단위 계산은 하지 않습니다.</div>',
+        tasks: [
+          {
+            id: 'L8T1',
+            type: 'calc',
+            title: '계산 ① 이자 구하기',
+            prompt: '원금 1,200,000원, 연이율 8%, 빌린 기간 3개월일 때 이자비용은 얼마인가?',
+            fields: [
+              { key: 'months', label: '빌린 기간(월수)', kind: 'number', answer: 3, unit: '개월', placeholder: '숫자 입력' },
+              { key: 'interest', label: '이자비용', kind: 'number', answer: 24000, unit: '원' }
+            ],
+            hint: '1년 이자를 먼저 구하고, 12로 나눈 뒤 3을 곱해 보세요.',
+            reason: '1,200,000 × 0.08 × 3/12 = 24,000원입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 9,
+        conceptTag: '⑧ 원금과 이자 상환',
+        title: '원금과 이자를 함께 갚다',
+        concept: '만기에는 원금(빌린 금액)과 이자(빌린 대가)를 함께 갚습니다. 원금은 부채를 줄이는 것이고, 이자는 비용이 발생하는 것입니다. 한 줄 분개에 두 가지가 함께 들어갑니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>7월 1일 만기에 <strong>원금 1,200,000원과 이자 24,000원</strong>을 보통예금에서 전액 지급했습니다. 이자는 그 전에 지급하거나 장부에 기록한 적이 없습니다.'
+        ],
+        diagramTitle: '계좌에서 빠진 돈의 구성',
+        diagramHtml: `<svg viewBox="0 0 580 190" role="img" aria-label="보통예금에서 나간 1,224,000원이 원금과 이자로 나뉘는 그림">
+          <rect x="0" y="0" width="580" height="190" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(24,34)">
+            <rect x="0" y="0" width="180" height="120" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="90" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">단기차입금</text>
+            <text x="90" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">1,200,000</text>
+            <text x="90" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">빌린 원금 · 갚으면 사라짐</text>
+          </g>
+          <text x="228" y="100" text-anchor="middle" font-size="22" font-weight="900" fill="#176047">+</text>
+          <g transform="translate(252,34)">
+            <rect x="0" y="0" width="150" height="120" rx="12" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2.5"/>
+            <text x="75" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#7A4E00">이자비용</text>
+            <text x="75" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">24,000</text>
+            <text x="75" y="94" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">빌린 대가 · 비용</text>
+          </g>
+          <text x="422" y="100" text-anchor="middle" font-size="22" font-weight="900" fill="#176047">=</text>
+          <g transform="translate(444,34)">
+            <rect x="0" y="0" width="112" height="120" rx="12" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2.5"/>
+            <text x="56" y="34" text-anchor="middle" font-size="13" font-weight="900" fill="#1D4B7A">보통예금</text>
+            <text x="56" y="64" text-anchor="middle" font-size="12" font-weight="800" fill="#2B211B">1,224,000</text>
+            <text x="56" y="94" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5C493E">계좌에서 나감</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '복합분개 읽는 법',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>구분</th><th>계정</th><th>금액</th></tr></thead><tbody>' +
+          '<tr><td>차변</td><td>단기차입금</td><td>1,200,000</td></tr>' +
+          '<tr><td>차변</td><td>이자비용</td><td>24,000</td></tr>' +
+          '<tr><td>대변</td><td>보통예금</td><td>1,224,000</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">차변 합계 1,224,000 = 대변 1,224,000. <strong>한쪽에 두 줄</strong>이어도 규칙은 같습니다.</div>',
+        tasks: [
+          {
+            id: 'L9T1',
+            type: 'journal',
+            title: '분개 ⑥ 원금 1,200,000 + 이자 24,000 상환',
+            prompt: '만기에 원금 1,200,000원과 이자 24,000원을 보통예금에서 함께 지급했다.',
+            chips: ['단기차입금', '이자비용', '보통예금', '현금', '단기대여금'],
+            answer: { debit: [{ account: '단기차입금', amount: 1200000 }, { account: '이자비용', amount: 24000 }], credit: [{ account: '보통예금', amount: 1224000 }] },
+            hint: '차변에 두 줄(단기차입금, 이자비용)을 쓰고 대변은 보통예금 한 줄입니다. 금액 합계를 맞춰 보세요.',
+            reason: '원금은 부채 감소(차변), 이자는 비용 발생(차변), 계좌에서 나간 돈은 자산 감소(대변)입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 10,
+        conceptTag: '⑨ 1차시 출구 미션',
+        title: '부채 3종 출구 미션',
+        concept: '1차시에 배운 예수금·지급어음·단기차입금을 새 숫자로 한 번 더 확인합니다. 세 문제는 서로 독립적입니다.',
+        story: [
+          '<span class="story-tag">1차시 마무리</span>세 가지 거래를 각각 분개·계산해 봅시다. 정답은 문제마다 따로 열립니다.'
+        ],
+        diagramTitle: '오늘의 세 가지 부채',
+        diagramHtml: `<svg viewBox="0 0 560 170" role="img" aria-label="예수금, 지급어음, 단기차입금 세 부채 카드">
+          <rect x="0" y="0" width="560" height="170" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(20,26)">
+            <rect x="0" y="0" width="164" height="116" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="82" y="38" text-anchor="middle" font-size="15" font-weight="900" fill="#0F4734">예수금</text>
+            <text x="82" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">대신 받아 둔 돈</text>
+            <text x="82" y="94" text-anchor="middle" font-size="12" font-weight="800" fill="#0F4734">넘기면 줄어듦</text>
+          </g>
+          <g transform="translate(198,26)">
+            <rect x="0" y="0" width="164" height="116" rx="12" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2.5"/>
+            <text x="82" y="38" text-anchor="middle" font-size="15" font-weight="900" fill="#7A4E00">지급어음</text>
+            <text x="82" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">어음으로 갚기로</text>
+            <text x="82" y="94" text-anchor="middle" font-size="12" font-weight="800" fill="#7A4E00">만기에 줄어듦</text>
+          </g>
+          <g transform="translate(376,26)">
+            <rect x="0" y="0" width="164" height="116" rx="12" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2.5"/>
+            <text x="82" y="38" text-anchor="middle" font-size="15" font-weight="900" fill="#1D4B7A">단기차입금</text>
+            <text x="82" y="66" text-anchor="middle" font-size="12" font-weight="700" fill="#2B211B">은행에서 빌린 돈</text>
+            <text x="82" y="94" text-anchor="middle" font-size="12" font-weight="800" fill="#1D4B7A">갚으면 줄어듦</text>
+          </g>
+        </svg>`,
+        tasks: [
+          {
+            id: 'L10T1',
+            type: 'choice',
+            title: '미션 ① 어음 만기 — 차변 계정',
+            prompt: '만기 지급어음 70,000원을 보통예금에서 지급했다. 이 거래의 차변에 오는 계정은?',
+            options: ['지급어음', '보통예금', '외상매입금'],
+            answerIndex: 0,
+            hint: '갚으면서 사라지는 부채가 차변에 옵니다.',
+            reason: '지급어음(부채)이 줄어 차변, 보통예금(자산)이 줄어 대변입니다.'
+          },
+          {
+            id: 'L10T2',
+            type: 'calc',
+            title: '미션 ② 이자 계산 — 600,000원, 연 6%, 2개월',
+            prompt: '원금 600,000원, 연이율 6%, 빌린 기간 2개월일 때 이자비용은?',
+            fields: [{ key: 'interest10', label: '이자비용', kind: 'number', answer: 6000, unit: '원' }],
+            hint: '600,000 × 0.06 = 1년 이자, 12로 나누고 2를 곱합니다.',
+            reason: '600,000 × 0.06 × 2/12 = 6,000원입니다.'
+          },
+          {
+            id: 'L10T3',
+            type: 'journal',
+            title: '미션 ③ 예수금 정산 — 30,000원 송금',
+            prompt: '보관하던 제휴점 예약금 30,000원을 현금으로 전달했다.',
+            chips: ['예수금', '현금', '보통예금', '선수금'],
+            answer: { debit: [{ account: '예수금', amount: 30000 }], credit: [{ account: '현금', amount: 30000 }] },
+            hint: '넘겨줄 의무가 사라졌으니 예수금이 줄고, 보관하던 현금도 줄어듭니다.',
+            reason: '예수금(부채) 감소는 차변, 현금(자산) 감소는 대변입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 11,
+        conceptTag: '⑩ 빌린 돈 vs 넣은 돈',
+        title: '빌린 돈과 사장이 넣은 돈',
+        concept: '똑같이 보통예금이 늘어도, 은행이 넣은 돈은 갚아야 할 부채(단기차입금)이고 사업주가 넣은 돈은 갚지 않아도 되는 자본(자본금)입니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>두 번의 입금 알림이 떴습니다. <strong>A: 은행에서 3개월 만기로 빌린 500,000원</strong>, <strong>B: 사장님이 개인 돈 500,000원을 사업 계좌에 넣은 것</strong>. 금액은 같지만 대변 계정이 다릅니다.'
+        ],
+        diagramTitle: '같은 입금, 다른 출처',
+        diagramHtml: `<svg viewBox="0 0 570 200" role="img" aria-label="은행에서 온 돈과 사장님이 넣은 돈의 대변 계정 비교">
+          <rect x="0" y="0" width="570" height="200" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(20,22)">
+            <rect x="0" y="0" width="250" height="150" rx="12" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2"/>
+            <text x="125" y="30" text-anchor="middle" font-size="14" font-weight="900" fill="#1D4B7A">A. 은행에서 빌린 500,000원</text>
+            <rect x="40" y="46" width="170" height="36" rx="8" fill="#FFFFFF" stroke="#8FB3D6" stroke-width="2"/>
+            <text x="125" y="70" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">(차) 보통예금 500,000</text>
+            <rect x="40" y="94" width="170" height="36" rx="8" fill="#FFFFFF" stroke="#1D4B7A" stroke-width="2"/>
+            <text x="125" y="118" text-anchor="middle" font-size="13" font-weight="900" fill="#1D4B7A">(대) 단기차입금 500,000</text>
+          </g>
+          <g transform="translate(300,22)">
+            <rect x="0" y="0" width="250" height="150" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="125" y="30" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">B. 사장님이 넣은 500,000원</text>
+            <rect x="40" y="46" width="170" height="36" rx="8" fill="#FFFFFF" stroke="#78B998" stroke-width="2"/>
+            <text x="125" y="70" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">(차) 보통예금 500,000</text>
+            <rect x="40" y="94" width="170" height="36" rx="8" fill="#FFFFFF" stroke="#176047" stroke-width="2"/>
+            <text x="125" y="118" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">(대) 자본금 500,000</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '부채와 자본의 차이',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>구분</th><th>갚아야 하나</th><th>계정</th></tr></thead><tbody>' +
+          '<tr><td>은행이 넣은 돈</td><td>네, 원금+이자</td><td>단기차입금 (부채)</td></tr>' +
+          '<tr><td>사장이 넣은 돈</td><td>아니요 (출자)</td><td>자본금 (자본)</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">개인기업은 <strong>사장 개인 돈</strong>과 <strong>사업 돈</strong>을 반드시 나누어 기록합니다.</div>',
+        tasks: [
+          {
+            id: 'L11T1',
+            type: 'classify',
+            title: '분류 ② 대변 계정 고르기',
+            layout: 'buckets',
+            prompt: '두 입금의 대변 계정을 알맞은 칸에 넣어 보세요.',
+            items: [
+              { id: 'a', label: '은행에서 3개월 만기로 빌린 500,000원', answer: 'loan' },
+              { id: 'b', label: '사장님이 개인 돈 500,000원을 사업 계좌에 넣음', answer: 'cap' }
+            ],
+            targets: [
+              { id: 'loan', label: '단기차입금 (부채)' },
+              { id: 'cap', label: '자본금 (자본)' }
+            ],
+            hint: '나중에 갚아야 하는 돈인지, 갚지 않아도 되는 출자금인지 따져 보세요.',
+            reason: '은행 돈은 갚아야 하므로 단기차입금, 사업주 출자는 자본금입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 12,
+        conceptTag: '⑪ 추가 출자',
+        title: '사장이 사업에 돈을 더 넣다',
+        concept: '개인기업에서 사업주가 자기 돈을 사업에 더 넣으면 자본금이 늘어납니다. 이 돈은 빌린 것이 아니라 사장의 몫이 커진 것입니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>사장님이 개인 자금 <strong>800,000원</strong>을 사업용 보통예금에 추가로 넣었습니다. 이것을 <strong>추가 출자</strong>라고 합니다.'
+        ],
+        diagramTitle: '개인 계좌 → 사업용 계좌',
+        diagramHtml: `<svg viewBox="0 0 560 190" role="img" aria-label="사장님 개인 계좌에서 사업용 계좌로 800,000원이 이동하는 그림">
+          <rect x="0" y="0" width="560" height="190" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(24,40)">
+            <rect x="0" y="0" width="176" height="108" rx="12" fill="#FDF3E4" stroke="#C9B195" stroke-width="2.5"/>
+            <text x="88" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#5C493E">사장님 개인 돈</text>
+            <text x="88" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">800,000원</text>
+            <text x="88" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">생활비와 섞지 않기</text>
+          </g>
+          <g transform="translate(216,64)">
+            <line x1="0" y1="30" x2="94" y2="30" stroke="#176047" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="92,20 112,30 92,40" fill="#176047"/>
+            <text x="52" y="16" text-anchor="middle" font-size="12" font-weight="900" fill="#0F4734">추가 출자</text>
+          </g>
+          <g transform="translate(340,40)">
+            <rect x="0" y="0" width="196" height="108" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="98" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">사업용 보통예금</text>
+            <text x="98" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">+800,000</text>
+            <text x="98" y="90" text-anchor="middle" font-size="12" font-weight="800" fill="#0F4734">자본금 +800,000</text>
+          </g>
+          <text x="280" y="176" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">갚을 의무가 없습니다 → 부채가 아니라 자본</text>
+        </svg>`,
+        sidePanelTitle: '출자금은 왜 자본일까?',
+        sidePanelHtml: '<ul class="tip-list">' +
+          '<li>사장님은 <strong>돌려받을 날짜를 정하지 않고</strong> 사업에 넣었습니다.</li>' +
+          '<li>빌린 돈이 아니므로 이자도 없습니다.</li>' +
+          '<li>대신 사업의 <strong>주인 몫(자본)</strong>이 커집니다.</li>' +
+          '</ul>' +
+          '<div class="callout-tip">“사장님이 넣었다”는 사실이 확인되면 대변은 <strong>자본금</strong>입니다.</div>',
+        tasks: [
+          {
+            id: 'L12T1',
+            type: 'journal',
+            title: '분개 ⑦ 추가 출자 800,000원',
+            prompt: '사업주가 개인 자금 800,000원을 사업용 보통예금에 추가로 넣었다.',
+            chips: ['보통예금', '현금', '자본금', '단기차입금', '매출'],
+            answer: { debit: [{ account: '보통예금', amount: 800000 }], credit: [{ account: '자본금', amount: 800000 }] },
+            hint: '자산(보통예금)이 늘고, 자본(자본금)도 늘어납니다.',
+            reason: '사업주 출자는 부채가 아니라 자본금 증가로 기록합니다.'
+          }
+        ]
+      },
+
+      {
+        id: 13,
+        conceptTag: '⑫ 개인 용도 인출',
+        title: '사장이 개인 용도로 가져가다',
+        concept: '사업 돈을 개인 생활비로 가져가면 인출금으로 기록합니다. 이것은 카페의 비용이 아닙니다. 사업의 이익을 줄이는 비용과, 사장이 가져간 돈을 구별해야 합니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>사장님이 개인 생활비 <strong>120,000원</strong>을 사업용 보통예금에서 인출했습니다.'
+        ],
+        diagramTitle: '사업용 계좌 → 개인 생활비',
+        diagramHtml: `<svg viewBox="0 0 560 190" role="img" aria-label="사업용 계좌에서 개인 생활비로 120,000원이 빠져나가는 그림">
+          <rect x="0" y="0" width="560" height="190" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(24,40)">
+            <rect x="0" y="0" width="186" height="108" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2.5"/>
+            <text x="93" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">사업용 보통예금</text>
+            <text x="93" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">−120,000</text>
+            <text x="93" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">사업 자금</text>
+          </g>
+          <g transform="translate(222,64)">
+            <line x1="0" y1="30" x2="94" y2="30" stroke="#B3261E" stroke-width="4" stroke-linecap="round"/>
+            <polygon points="92,20 112,30 92,40" fill="#B3261E"/>
+            <text x="52" y="16" text-anchor="middle" font-size="12" font-weight="900" fill="#8C1D18">개인 인출</text>
+          </g>
+          <g transform="translate(346,40)">
+            <rect x="0" y="0" width="190" height="108" rx="12" fill="#FDECEC" stroke="#E0A9A5" stroke-width="2.5"/>
+            <text x="95" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#8C1D18">사장님 개인 생활비</text>
+            <text x="95" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">120,000원</text>
+            <text x="95" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#8C1D18">카페 비용 아님</text>
+          </g>
+          <text x="280" y="176" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">장부에는 인출금으로 따로 표시합니다.</text>
+        </svg>`,
+        sidePanelTitle: '비용과 인출금의 차이',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>나간 돈</th><th>계정</th><th>이익에 영향</th></tr></thead><tbody>' +
+          '<tr><td>원두 구입비</td><td>매입(비용)</td><td>이익 감소</td></tr>' +
+          '<tr><td>차입금 이자</td><td>이자비용</td><td>이익 감소</td></tr>' +
+          '<tr><td>사장님 생활비</td><td><strong>인출금</strong></td><td>비용 아님(자본 감소)</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">“사장님이 가져갔다”는 사실이 보이면 <strong>인출금</strong>입니다.</div>',
+        tasks: [
+          {
+            id: 'L13T1',
+            type: 'journal',
+            title: '분개 ⑧ 개인 용도 인출 120,000원',
+            prompt: '사업주가 개인 생활비 120,000원을 사업용 보통예금에서 인출했다.',
+            chips: ['인출금', '이자비용', '보통예금', '자본금', '현금'],
+            answer: { debit: [{ account: '인출금', amount: 120000 }], credit: [{ account: '보통예금', amount: 120000 }] },
+            hint: '개인 용도로 가져간 돈은 인출금(차변)입니다. 비용 계정과 헷갈리지 마세요.',
+            reason: '인출 당일에는 인출금을 차변에 씁니다. 기말에 자본금과 정리합니다.'
+          }
+        ]
+      },
+
+      {
+        id: 14,
+        conceptTag: '⑬ 기말 정리',
+        title: '인출금을 기말에 정리하다',
+        concept: '인출금은 기말에 자본금으로 대체합니다. 사장이 가져간 만큼 자본이 줄어드는 것입니다. 이때 보통예금이 또 빠져나가는 것은 아닙니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>기말에 13장의 <strong>인출금 잔액 120,000원</strong>을 <strong>자본금 계정으로 대체</strong>했습니다. 돈이 다시 나가는 거래가 아니라 장부 정리입니다.'
+        ],
+        diagramTitle: '가져간 날 / 기말 정리',
+        diagramHtml: `<svg viewBox="0 0 580 200" role="img" aria-label="인출 당일 인출금 차변, 기말에 자본금 차변과 인출금 대변으로 정리">
+          <rect x="0" y="0" width="580" height="200" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(20,26)">
+            <rect x="0" y="0" width="250" height="140" rx="12" fill="#FDF3E4" stroke="#C9B195" stroke-width="2"/>
+            <text x="125" y="30" text-anchor="middle" font-size="14" font-weight="900" fill="#5C493E">① 가져간 날 (13장)</text>
+            <text x="125" y="66" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">(차) 인출금 120,000</text>
+            <text x="125" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">(대) 보통예금 120,000</text>
+            <text x="125" y="122" text-anchor="middle" font-size="12" font-weight="700" fill="#5C493E">실제로 돈이 나감</text>
+          </g>
+          <g transform="translate(310,26)">
+            <rect x="0" y="0" width="250" height="140" rx="12" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="125" y="30" text-anchor="middle" font-size="14" font-weight="900" fill="#0F4734">② 기말 정리 (14장)</text>
+            <text x="125" y="66" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">(차) 자본금 120,000</text>
+            <text x="125" y="94" text-anchor="middle" font-size="13" font-weight="800" fill="#2B211B">(대) 인출금 120,000</text>
+            <text x="125" y="122" text-anchor="middle" font-size="12" font-weight="700" fill="#0F4734">돈은 나가지 않음</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '왜 자본금이 줄까?',
+        sidePanelHtml: '<ul class="tip-list">' +
+          '<li>사장이 가져간 돈은 <strong>사업의 몫을 줄이는 일</strong>입니다.</li>' +
+          '<li>그래서 기말에 자본금을 차변에 써서 줄입니다.</li>' +
+          '<li>인출금 계정은 대변에 써서 0원으로 정리합니다.</li>' +
+          '</ul>' +
+          '<div class="callout-tip">기말 정리 분개에서 <strong>보통예금은 나오지 않습니다.</strong></div>',
+        tasks: [
+          {
+            id: 'L14T1',
+            type: 'journal',
+            title: '분개 ⑨ 기말 인출금 대체 120,000원',
+            prompt: '기말에 인출금 잔액 120,000원을 자본금 계정으로 대체했다.',
+            chips: ['자본금', '인출금', '보통예금', '이자비용'],
+            answer: { debit: [{ account: '자본금', amount: 120000 }], credit: [{ account: '인출금', amount: 120000 }] },
+            hint: '자본이 줄면 차변, 정리되는 인출금은 대변입니다.',
+            reason: '가져간 만큼 자본금이 줄고 인출금 계정은 0원이 됩니다.'
+          }
+        ]
+      },
+
+      {
+        id: 15,
+        conceptTag: '⑭ 자본금 계산',
+        title: '자본금은 얼마나 남을까?',
+        concept: '기초 자본금에 추가 출자를 더하고, 인출금 대체만큼 빼면 기말 정리 후 자본금이 됩니다. 당기손익이나 다른 자본 변동은 없다고 가정합니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span><strong>기초 자본금 2,000,000원</strong>, 12장 추가 출자 <strong>800,000원</strong>, 14장 인출금 대체 <strong>120,000원</strong>. 이 세 가지만 반영해 봅시다.'
+        ],
+        diagramTitle: '자본금 증감 막대',
+        diagramHtml: `<svg viewBox="0 0 600 210" role="img" aria-label="기초 2,000,000에 추가 출자 800,000을 더하고 인출 120,000을 빼서 2,680,000이 되는 그림">
+          <rect x="0" y="0" width="600" height="210" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(40,40)">
+            <rect x="0" y="0" width="200" height="46" rx="8" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="100" y="29" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">기초 2,000,000</text>
+          </g>
+          <text x="256" y="70" text-anchor="middle" font-size="18" font-weight="900" fill="#176047">+</text>
+          <g transform="translate(276,40)">
+            <rect x="0" y="0" width="180" height="46" rx="8" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="90" y="29" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">추가 출자 800,000</text>
+          </g>
+          <text x="472" y="70" text-anchor="middle" font-size="18" font-weight="900" fill="#B3261E">−</text>
+          <g transform="translate(492,40)">
+            <rect x="0" y="0" width="96" height="46" rx="8" fill="#FDECEC" stroke="#E0A9A5" stroke-width="2"/>
+            <text x="48" y="29" text-anchor="middle" font-size="12" font-weight="900" fill="#8C1D18">인출 120,000</text>
+          </g>
+          <g transform="translate(120,120)">
+            <rect x="0" y="0" width="360" height="52" rx="10" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2.5"/>
+            <text x="180" y="34" text-anchor="middle" font-size="15" font-weight="900" fill="#7A4E00">기말 정리 후 자본금 = ?</text>
+          </g>
+          <text x="300" y="196" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">더하기와 빼기의 순서에 주의하세요.</text>
+        </svg>`,
+        sidePanelTitle: '자본금 계산 공식',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>항목</th><th>금액</th><th>부호</th></tr></thead><tbody>' +
+          '<tr><td>기초 자본금</td><td>2,000,000</td><td>+</td></tr>' +
+          '<tr><td>추가 출자</td><td>800,000</td><td>+</td></tr>' +
+          '<tr><td>인출금 대체</td><td>120,000</td><td>−</td></tr>' +
+          '<tr><td><strong>기말 자본금</strong></td><td><strong>2,680,000</strong></td><td>=</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">인출금은 <strong>자본을 줄이는 항목</strong>이라는 점만 기억하면 됩니다.</div>',
+        tasks: [
+          {
+            id: 'L15T1',
+            type: 'calc',
+            title: '계산 ② 기말 자본금',
+            prompt: '기초 자본금 2,000,000원, 추가 출자 800,000원, 인출금 대체 120,000원일 때 기말 정리 후 자본금은?',
+            fields: [{ key: 'capital', label: '기말 자본금', kind: 'number', answer: 2680000, unit: '원' }],
+            hint: '2,000,000 + 800,000 − 120,000 을 차례로 계산하세요.',
+            reason: '2,000,000 + 800,000 − 120,000 = 2,680,000원입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 16,
+        conceptTag: '⑮ 부채 계정의 전기',
+        title: '지급어음과 단기차입금 전기',
+        concept: '분개장의 기록을 총계정원장(T형)으로 옮기는 것이 전기입니다. 부채는 생기면 오른쪽(대변), 사라지면 왼쪽(차변)에 적습니다. 이 두 계정은 모두 갚아서 잔액이 0원이 됩니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>5~9장의 거래를 두 계정의 원장으로 옮겨 봅시다. 지급어음은 6/1 발행 420,000원과 7/1 결제 420,000원, 단기차입금은 4/1 차입 1,200,000원과 7/1 상환 1,200,000원입니다.'
+        ],
+        diagramTitle: '두 개의 T형 원장',
+        diagramHtml: `<svg viewBox="0 0 620 230" role="img" aria-label="지급어음과 단기차입금의 T형 원장 구조">
+          <rect x="0" y="0" width="620" height="230" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(20,20)">
+            <text x="140" y="18" text-anchor="middle" font-size="13" font-weight="900" fill="#0F4734">지급어음</text>
+            <line x1="0" y1="30" x2="280" y2="30" stroke="#B99D82" stroke-width="2"/>
+            <line x1="140" y1="6" x2="140" y2="150" stroke="#B99D82" stroke-width="2"/>
+            <text x="70" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#1D4B7A">(차) 왼쪽</text>
+            <text x="210" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#7D3C12">(대) 오른쪽</text>
+            <text x="70" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2B211B">7/1 보통예금</text>
+            <text x="70" y="100" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2B211B">420,000</text>
+            <text x="210" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2B211B">6/1 외상매입금</text>
+            <text x="210" y="100" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2B211B">420,000</text>
+            <text x="140" y="134" text-anchor="middle" font-size="12" font-weight="900" fill="#0F4734">잔액 0원</text>
+          </g>
+          <g transform="translate(330,20)">
+            <text x="140" y="18" text-anchor="middle" font-size="13" font-weight="900" fill="#1D4B7A">단기차입금</text>
+            <line x1="0" y1="30" x2="280" y2="30" stroke="#B99D82" stroke-width="2"/>
+            <line x1="140" y1="6" x2="140" y2="150" stroke="#B99D82" stroke-width="2"/>
+            <text x="70" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#1D4B7A">(차) 왼쪽</text>
+            <text x="210" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#7D3C12">(대) 오른쪽</text>
+            <text x="70" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2B211B">7/1 보통예금</text>
+            <text x="70" y="100" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2B211B">1,200,000</text>
+            <text x="210" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2B211B">4/1 보통예금</text>
+            <text x="210" y="100" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2B211B">1,200,000</text>
+            <text x="140" y="134" text-anchor="middle" font-size="12" font-weight="900" fill="#1D4B7A">잔액 0원</text>
+          </g>
+          <text x="310" y="204" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">이자비용 24,000원은 단기차입금 계정에 적지 않습니다.</text>
+        </svg>`,
+        sidePanelTitle: '전기 규칙 한 줄',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>부채의 움직임</th><th>원장 위치</th></tr></thead><tbody>' +
+          '<tr><td>새로 생김(발행·차입)</td><td>오른쪽(대변)</td></tr>' +
+          '<tr><td>갚아서 사라짐</td><td>왼쪽(차변)</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">분개장과 원장은 <strong>같은 방향</strong>으로 옮겨 적습니다. 차변이면 왼쪽, 대변이면 오른쪽입니다.</div>',
+        tasks: [
+          {
+            id: 'L16T1',
+            type: 'ledger',
+            title: '전기 ① 빈칸을 채우고 잔액 확인',
+            prompt: '두 계정의 원장을 보고 차변 합계와 잔액을 입력하세요.',
+            accounts: [
+              {
+                title: '지급어음',
+                leftRows: [{ date: '7/1', summary: '보통예금', amount: 420000, hiddenInBlank: true }],
+                rightRows: [{ date: '6/1', summary: '외상매입금', amount: 420000, hiddenInBlank: true }],
+                balanceText: '차변 420,000 − 대변 420,000 = 잔액 0원'
+              },
+              {
+                title: '단기차입금',
+                leftRows: [{ date: '7/1', summary: '보통예금', amount: 1200000, hiddenInBlank: true }],
+                rightRows: [{ date: '4/1', summary: '보통예금', amount: 1200000, hiddenInBlank: true }],
+                balanceText: '차변 1,200,000 − 대변 1,200,000 = 잔액 0원'
+              }
+            ],
+            fields: [
+              { key: 'noteLeft', label: '지급어음 차변(왼쪽) 합계', kind: 'number', answer: 420000, unit: '원' },
+              { key: 'loanRight', label: '단기차입금 대변(오른쪽) 합계', kind: 'number', answer: 1200000, unit: '원' }
+            ],
+            hint: '지급어음 결제액과 단기차입금 차입액을 원장 방향에 맞게 찾아보세요.',
+            reason: '부채는 생길 때 대변, 갚을 때 차변에 적습니다. 두 계정 모두 잔액은 0원입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 17,
+        conceptTag: '⑯ 인출금 vs 이자비용',
+        title: '인출인가, 카페 비용인가?',
+        concept: '같은 보통예금에서 나간 돈이라도 목적에 따라 계정이 다릅니다. 사장님 개인 지출은 인출금, 카페가 빌린 돈의 이자는 이자비용입니다.',
+        story: [
+          '<span class="story-tag">달빛 카페</span>오늘 두 건이 출금되었습니다. <strong>사장님 개인 생활비 35,000원</strong>과 <strong>차입금 이자 15,000원</strong>. 둘 다 보통예금에서 나갔지만 계정은 다릅니다.'
+        ],
+        diagramTitle: '같은 출금, 다른 목적',
+        diagramHtml: `<svg viewBox="0 0 570 200" role="img" aria-label="개인 생활비는 인출금, 차입 이자는 이자비용으로 나뉘는 그림">
+          <rect x="0" y="0" width="570" height="200" rx="14" fill="#FFFDF9"/>
+          <g transform="translate(200,66)">
+            <rect x="0" y="0" width="170" height="70" rx="12" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2.5"/>
+            <text x="85" y="30" text-anchor="middle" font-size="13" font-weight="900" fill="#1D4B7A">사업용 보통예금</text>
+            <text x="85" y="54" text-anchor="middle" font-size="12" font-weight="800" fill="#2B211B">−50,000</text>
+          </g>
+          <g transform="translate(30,20)">
+            <line x1="176" y1="60" x2="10" y2="20" stroke="#B3261E" stroke-width="3.5" stroke-linecap="round"/>
+            <polygon points="12,10 -8,20 12,30" fill="#B3261E"/>
+            <text x="86" y="10" text-anchor="middle" font-size="12" font-weight="900" fill="#8C1D18">생활비 35,000</text>
+            <text x="86" y="44" text-anchor="middle" font-size="12" font-weight="800" fill="#8C1D18">→ 인출금</text>
+          </g>
+          <g transform="translate(384,120)">
+            <line x1="0" y1="0" x2="160" y2="34" stroke="#176047" stroke-width="3.5" stroke-linecap="round"/>
+            <polygon points="158,24 178,36 156,44" fill="#176047"/>
+            <text x="86" y="62" text-anchor="middle" font-size="12" font-weight="900" fill="#0F4734">이자 15,000</text>
+            <text x="86" y="84" text-anchor="middle" font-size="12" font-weight="800" fill="#0F4734">→ 이자비용</text>
+          </g>
+          <text x="285" y="186" text-anchor="middle" font-size="12" font-weight="800" fill="#5C493E">대변은 둘 다 보통예금, 차변 계정이 다릅니다.</text>
+        </svg>`,
+        sidePanelTitle: '차변 계정만 다르다',
+        sidePanelHtml: '<div class="info-table-wrap"><table class="info-table">' +
+          '<thead><tr><th>거래</th><th>차변</th><th>대변</th></tr></thead><tbody>' +
+          '<tr><td>생활비 35,000</td><td><strong>인출금</strong></td><td>보통예금</td></tr>' +
+          '<tr><td>차입 이자 15,000</td><td><strong>이자비용</strong></td><td>보통예금</td></tr>' +
+          '</tbody></table>' +
+          '<div class="callout-tip">“누구를 위한 지출인가”를 먼저 물어보세요. 사장 개인이면 인출금입니다.</div>',
+        tasks: [
+          {
+            id: 'L17T1',
+            type: 'classify',
+            title: '분류 ③ 지출 목적에 맞는 계정',
+            layout: 'slots',
+            prompt: '두 지출의 차변 계정을 골라 넣어 보세요.',
+            chips: [
+              { id: 'in', label: '인출금' },
+              { id: 'int', label: '이자비용' },
+              { id: 'buy', label: '매입' }
+            ],
+            slots: [
+              { id: 's1', title: '①', prompt: '사장님 개인 생활비 35,000원을 보통예금에서 지급', answer: 'in', reason: '개인 용도로 가져간 돈' },
+              { id: 's2', title: '②', prompt: '카페 차입금 이자 15,000원을 보통예금에서 지급', answer: 'int', reason: '빌린 돈의 대가' }
+            ],
+            hint: '카페의 이익을 줄이는 지출인지, 사장 개인이 가져간 돈인지 구별하세요.',
+            reason: '개인 지출은 인출금, 차입 이자는 이자비용입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 18,
+        conceptTag: '⑰ 거래 단계 짝 맞추기',
+        title: '거래 단계별로 짝 맞추기',
+        concept: '부채는 생길 때 대변, 사라질 때 차변입니다. 자본금은 늘 때 대변, 인출금은 생길 때 차변입니다. 네 가지 거래의 전후를 한 표로 정리해 봅시다.',
+        story: [
+          '<span class="story-tag">정리</span>수납↔송금, 발행↔만기, 차입↔상환, 출자↔인출 — 짝이 되는 두 순간을 맞춰 보세요.'
+        ],
+        diagramTitle: '네 줄 거래 흐름표',
+        diagramHtml: `<svg viewBox="0 0 600 240" role="img" aria-label="예수금, 지급어음, 단기차입금, 자본 거래의 전후 흐름표">
+          <rect x="0" y="0" width="600" height="240" rx="14" fill="#FFFDF9"/>
+          <g font-size="12" font-weight="800" fill="#2B211B">
+            <rect x="16" y="16" width="568" height="46" rx="8" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="34" y="45" fill="#0F4734">예수금</text>
+            <text x="130" y="45">대신 받으면 → 대변</text>
+            <text x="330" y="45">제휴점에 넘기면 → 차변</text>
+            <rect x="16" y="70" width="568" height="46" rx="8" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2"/>
+            <text x="34" y="99" fill="#7A4E00">지급어음</text>
+            <text x="130" y="99">어음을 발행하면 → 대변</text>
+            <text x="330" y="99">만기에 지급하면 → 차변</text>
+            <rect x="16" y="124" width="568" height="46" rx="8" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2"/>
+            <text x="34" y="153" fill="#1D4B7A">단기차입금</text>
+            <text x="130" y="153">돈을 빌리면 → 대변</text>
+            <text x="330" y="153">원금을 갚으면 → 차변</text>
+            <rect x="16" y="178" width="568" height="46" rx="8" fill="#FDF3E4" stroke="#C9B195" stroke-width="2"/>
+            <text x="34" y="207" fill="#5C493E">자본·인출</text>
+            <text x="130" y="207">추가 출자 → 자본금 대변</text>
+            <text x="330" y="207">개인 인출 → 인출금 차변</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '공통 규칙 하나',
+        sidePanelHtml: '<ul class="tip-list">' +
+          '<li><strong>대변</strong> = 생겨난 것 (부채·자본이 늘어남)</li>' +
+          '<li><strong>차변</strong> = 사라진 것 (부채·자본이 줄어듦)</li>' +
+          '<li>인출금은 자본을 줄이는 성격이라 <strong>차변</strong>에 생깁니다.</li>' +
+          '</ul>' +
+          '<div class="callout-tip">방향이 헷갈리면 “돈을 갚았나, 받았나?”만 물어보세요.</div>',
+        tasks: [
+          {
+            id: 'L18T1',
+            type: 'classify',
+            title: '분류 ④ 거래와 계정·방향 연결',
+            layout: 'slots',
+            prompt: '네 거래에 맞는 계정과 방향을 골라 넣어 보세요.',
+            chips: [
+              { id: 'c1', label: '예수금 대변' },
+              { id: 'c2', label: '예수금 차변' },
+              { id: 'c3', label: '지급어음 대변' },
+              { id: 'c4', label: '지급어음 차변' },
+              { id: 'c5', label: '단기차입금 대변' },
+              { id: 'c6', label: '단기차입금 차변' },
+              { id: 'c7', label: '자본금 대변' },
+              { id: 'c8', label: '인출금 차변' }
+            ],
+            slots: [
+              { id: 's1', title: '①', prompt: '제휴점 몫 예약금을 대신 받았다', answer: 'c1', reason: '부채가 생김 → 대변' },
+              { id: 's2', title: '②', prompt: '보관하던 예약금을 제휴점에 넘겼다', answer: 'c2', reason: '부채가 사라짐 → 차변' },
+              { id: 's3', title: '③', prompt: '외상매입금을 정리하려고 어음을 발행했다', answer: 'c3', reason: '새 부채 발생 → 대변' },
+              { id: 's4', title: '④', prompt: '사장님이 개인 돈을 사업에 넣었다', answer: 'c7', reason: '자본 증가 → 대변' }
+            ],
+            hint: '부채·자본이 늘면 대변, 줄면 차변입니다.',
+            reason: '부채의 발생은 대변, 소멸은 차변, 추가 출자는 자본금 대변입니다.'
+          }
+        ]
+      },
+
+      {
+        id: 19,
+        conceptTag: '⑱ 마감 실전 점검',
+        title: '마감 실전 점검 — 6문항',
+        concept: '새 숫자로 예수금·지급어음·단기차입금·자본을 한 번에 점검합니다. 같은 문항을 다시 골라도 중복으로 세지 않고 가장 최근 응답만 반영됩니다.',
+        story: [
+          '<span class="story-tag">최종 점검</span>지금까지 배운 부채·자본 개념을 6문항으로 확인해 봅시다. 오답이면 힌트를 먼저 보고, 필요하면 해설을 열어 보세요.'
+        ],
+        diagramTitle: '점검 영역',
+        diagramHtml: `<svg viewBox="0 0 560 150" role="img" aria-label="예수금, 지급어음, 이자, 자본 네 영역 점검">
+          <rect x="0" y="0" width="560" height="150" rx="14" fill="#FFFDF9"/>
+          <g font-size="12.5" font-weight="900">
+            <rect x="16" y="30" width="124" height="90" rx="10" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="78" y="66" text-anchor="middle" fill="#0F4734">예수금</text>
+            <text x="78" y="90" text-anchor="middle" fill="#5C493E" font-size="11.5">Q1 · Q6</text>
+            <rect x="150" y="30" width="124" height="90" rx="10" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2"/>
+            <text x="212" y="66" text-anchor="middle" fill="#7A4E00">지급어음</text>
+            <text x="212" y="90" text-anchor="middle" fill="#5C493E" font-size="11.5">Q2</text>
+            <rect x="284" y="30" width="124" height="90" rx="10" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2"/>
+            <text x="346" y="66" text-anchor="middle" fill="#1D4B7A">차입·이자</text>
+            <text x="346" y="90" text-anchor="middle" fill="#5C493E" font-size="11.5">Q3</text>
+            <rect x="418" y="30" width="126" height="90" rx="10" fill="#FDF3E4" stroke="#C9B195" stroke-width="2"/>
+            <text x="481" y="66" text-anchor="middle" fill="#5C493E">자본·인출</text>
+            <text x="481" y="90" text-anchor="middle" fill="#5C493E" font-size="11.5">Q4 · Q5</text>
+          </g>
+        </svg>`,
+        tasks: [
+          {
+            id: 'L19Q1',
+            type: 'choice',
+            title: 'Q1. 예수금 송금',
+            isChallenge27: true,
+            prompt: '제휴 제과점 상품의 예약금 68,000원을 대신 받아 보관했다. 상품 인도일에 보통예금에서 제과점으로 전액 송금했다. 송금 분개는?',
+            options: [
+              '(차) 예수금 68,000 (대) 보통예금 68,000',
+              '(차) 선수금 68,000 (대) 보통예금 68,000',
+              '(차) 보통예금 68,000 (대) 예수금 68,000',
+              '(차) 예수금 68,000 (대) 현금 68,000'
+            ],
+            answerIndex: 0,
+            hint: '넘겨줄 의무가 사라지면 예수금은 차변, 돈이 나간 계좌는 대변입니다.',
+            reason: '대신 받아 보관하던 돈을 보통예금에서 보냈으므로 예수금과 보통예금이 줄어듭니다. 복습 3~4장.'
+          },
+          {
+            id: 'L19Q2',
+            type: 'choice',
+            title: 'Q2. 지급어음 발행과 만기',
+            isChallenge27: true,
+            prompt: '기존 상품 외상매입금 275,000원에 대해 자기 회사 약속어음을 발행했고, 만기에는 보통예금에서 전액 지급했다. 두 분개가 모두 옳은 것은?',
+            options: [
+              '발행 (차) 외상매입금 275,000 (대) 지급어음 275,000 / 만기 (차) 외상매입금 275,000 (대) 보통예금 275,000',
+              '발행 (차) 외상매입금 275,000 (대) 받을어음 275,000 / 만기 (차) 지급어음 275,000 (대) 보통예금 275,000',
+              '발행 (차) 외상매입금 275,000 (대) 지급어음 275,000 / 만기 (차) 지급어음 275,000 (대) 보통예금 275,000',
+              '발행 (차) 지급어음 275,000 (대) 외상매입금 275,000 / 만기 (차) 지급어음 275,000 (대) 보통예금 275,000'
+            ],
+            answerIndex: 2,
+            hint: '발행할 때는 외상매입금이 사라지고, 만기에는 지급어음이 사라집니다.',
+            reason: '발행 때 외상매입금이 지급어음으로 바뀌고, 만기 결제 때 지급어음이 줄어듭니다. 복습 5~6장.'
+          },
+          {
+            id: 'L19Q3',
+            type: 'choice',
+            title: 'Q3. 이자와 상환',
+            isChallenge27: true,
+            prompt: '은행에서 900,000원을 연이율 8%, 만기 2개월 조건으로 빌렸다. 만기에 원금과 이자를 보통예금에서 전액 지급했다. 전에 이자를 지급하거나 장부에 기록한 일은 없다. 올바른 상환 분개는?',
+            options: [
+              '(차) 단기차입금 900,000, 이자비용 72,000 (대) 보통예금 972,000',
+              '(차) 단기차입금 900,000, 이자비용 12,000 (대) 보통예금 912,000',
+              '(차) 단기차입금 912,000 (대) 보통예금 912,000',
+              '(차) 단기차입금 900,000, 이자비용 6,000 (대) 보통예금 906,000'
+            ],
+            answerIndex: 1,
+            hint: '900,000 × 0.08 × 2/12 를 계산해 보세요.',
+            reason: '이자는 900,000 × 0.08 × 2/12 = 12,000원입니다. 원금과 이자비용을 나누어 기록합니다. 복습 8~9장.'
+          },
+          {
+            id: 'L19Q4',
+            type: 'choice',
+            title: 'Q4. 추가 출자',
+            isChallenge27: true,
+            prompt: '개인기업 달빛 카페의 사업주가 개인 돈 650,000원을 사업용 보통예금에 추가로 넣었다. 올바른 분개는?',
+            options: [
+              '(차) 보통예금 650,000 (대) 단기차입금 650,000',
+              '(차) 자본금 650,000 (대) 보통예금 650,000',
+              '(차) 보통예금 650,000 (대) 매출 650,000',
+              '(차) 보통예금 650,000 (대) 자본금 650,000'
+            ],
+            answerIndex: 3,
+            hint: '갚을 의무가 없는 사업주 출자입니다.',
+            reason: '사업주가 자기 돈을 사업에 넣은 거래입니다. 보통예금과 자본금이 늘어납니다. 복습 11~12장.'
+          },
+          {
+            id: 'L19Q5',
+            type: 'choice',
+            title: 'Q5. 개인 용도 인출',
+            isChallenge27: true,
+            prompt: '사업주가 개인 생활비로 사업용 보통예금에서 74,000원을 인출했다. 인출금을 별도 계정으로 기록하는 경우, 인출 당일 분개는?',
+            options: [
+              '(차) 인출금 74,000 (대) 보통예금 74,000',
+              '(차) 자본금 74,000 (대) 인출금 74,000',
+              '(차) 이자비용 74,000 (대) 보통예금 74,000',
+              '(차) 보통예금 74,000 (대) 인출금 74,000'
+            ],
+            answerIndex: 0,
+            hint: '인출 당일에는 인출금이 차변에 생깁니다. 자본금 대체는 기말의 일입니다.',
+            reason: '인출 당일은 인출금을 차변에 씁니다. 자본금 대체는 기말 정리 때입니다. 복습 13~14장.'
+          },
+          {
+            id: 'L19Q6',
+            type: 'choice',
+            title: 'Q6. 선수금과 예수금',
+            isChallenge27: true,
+            prompt: '두 거래에서 수납할 때 대변에 기록하는 부채 계정의 순서로 옳은 것은? ㉠ 자기 상품을 다음 주에 인도하기로 하고 예약금을 받았다. ㉡ 제휴 제과점이 판매하는 상품의 예약금을 대신 받아 보관했다.',
+            options: [
+              '예수금 → 선수금',
+              '선수금 → 선수금',
+              '선수금 → 예수금',
+              '예수금 → 예수금'
+            ],
+            answerIndex: 2,
+            hint: '내 물건 대금을 미리 받으면 선수금, 남의 돈을 맡으면 예수금입니다.',
+            reason: '자기 상품 판매대금을 미리 받으면 선수금, 제휴점에 넘길 돈을 대신 받으면 예수금입니다. 복습 2~4장.'
+          }
+        ]
+      },
+
+      {
+        id: 20,
+        kind: 'summary',
+        title: '장부 마감 체크표',
+        concept: '부채·자본 단원의 네 가지 질문으로 스스로 점검합니다. 점검 결과를 보고 틀린 개념의 장으로 돌아가 다시 풀어 보세요.',
+        checklist: [
+          { name: '대신 받은 돈인가?', question: '내 상품 예약금이면 선수금, 남의 돈을 맡았으면 예수금', jump: 2, label: '2~4장' },
+          { name: '어음을 발행했나?', question: '발행은 대변 지급어음, 만기 지급은 차변 지급어음', jump: 5, label: '5~6장' },
+          { name: '원금과 이자를 나눴나?', question: '이자 = 원금 × 연이율 × 월수/12, 상환은 복합분개', jump: 8, label: '7~9장' },
+          { name: '사장이 넣었나, 가져갔나?', question: '추가는 자본금 대변, 개인 용도는 인출금 차변 → 기말 자본금 대체', jump: 12, label: '11~15장' }
+        ],
+        diagramHtml: `<svg viewBox="0 0 600 190" role="img" aria-label="부채와 자본 네 영역 마감 체크">
+          <rect x="0" y="0" width="600" height="190" rx="14" fill="#FFFDF9"/>
+          <g font-size="12" font-weight="800">
+            <rect x="18" y="24" width="270" height="66" rx="10" fill="#E6F3ED" stroke="#78B998" stroke-width="2"/>
+            <text x="34" y="50" fill="#0F4734">① 누구의 돈인가</text>
+            <text x="34" y="74" fill="#5C493E" font-size="11.5">선수금 vs 예수금 → 2~4장</text>
+            <rect x="312" y="24" width="270" height="66" rx="10" fill="#FFF3CC" stroke="#DFB24D" stroke-width="2"/>
+            <text x="328" y="50" fill="#7A4E00">② 어음의 두 순간</text>
+            <text x="328" y="74" fill="#5C493E" font-size="11.5">발행 대변 · 만기 차변 → 5~6장</text>
+            <rect x="18" y="100" width="270" height="66" rx="10" fill="#EEF4FA" stroke="#8FB3D6" stroke-width="2"/>
+            <text x="34" y="126" fill="#1D4B7A">③ 빌린 돈의 대가</text>
+            <text x="34" y="150" fill="#5C493E" font-size="11.5">월할 이자 · 원금 분리 → 7~9장</text>
+            <rect x="312" y="100" width="270" height="66" rx="10" fill="#FDF3E4" stroke="#C9B195" stroke-width="2"/>
+            <text x="328" y="126" fill="#5C493E">④ 사장의 돈</text>
+            <text x="328" y="150" fill="#5C493E" font-size="11.5">자본금 · 인출금 → 11~15장</text>
+          </g>
+        </svg>`,
+        sidePanelTitle: '복습 바로가기',
+        sidePanelHtml: '<div class="review-grid">' +
+          '<div class="review-item"><span class="review-label">선수금·예수금</span><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="2">2장</button></div>' +
+          '<div class="review-item"><span class="review-label">예수금 정산</span><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="4">4장</button></div>' +
+          '<div class="review-item"><span class="review-label">지급어음</span><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="5">5장</button><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="6">6장</button></div>' +
+          '<div class="review-item"><span class="review-label">차입·이자</span><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="8">8장</button><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="9">9장</button></div>' +
+          '<div class="review-item"><span class="review-label">추가 출자·인출</span><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="12">12장</button><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="13">13장</button></div>' +
+          '<div class="review-item"><span class="review-label">전기</span><button type="button" class="btn btn-secondary btn-sm" data-jump-slide="16">16장</button></div>' +
+          '</div>' +
+          '<div class="callout-tip" style="margin-top:12px;">점검 6문항은 <strong>19장</strong>에서 다시 풀 수 있습니다. 아래 ‘다시 풀기’는 19장 응답만 지웁니다.</div>',
+        tasks: []
+      }
+    );
+    if (typeof window.validateSlidesData === 'function') {
+      window.validateSlidesData();
+    }
+    if (typeof window.initApp === 'function') {
+      window.initApp();
+    }
+
+</script>
+</body>
+</html>

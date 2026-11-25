@@ -273,5 +273,32 @@
   "slides": "materials/inventory-exam-01/slides.html",
   "worksheetHtml": null,
   "worksheetPdf": null
+ },
+ {
+  "id": "liabilities-equity-exam-01",
+  "chapter": "Ⅲ. 부채·자본",
+  "chapterOrder": 3,
+  "unit": "부채·자본 종합",
+  "unitOrder": 1,
+  "account": "기말 대비",
+  "accountOrder": 1,
+  "lesson": 1,
+  "title": "카페 사장님의 장부 미션 · 부채·자본 기말 대비",
+  "description": "예수금·지급어음·단기차입금과 월할 이자, 개인기업의 추가 출자·인출금까지 20장으로 정리하고 6문항으로 점검해요.",
+  "pages": null,
+  "tags": [
+   "예수금",
+   "선수금",
+   "지급어음",
+   "단기차입금",
+   "이자비용",
+   "자본금",
+   "인출금",
+   "전기",
+   "분개"
+  ],
+  "slides": "materials/liabilities-equity-exam-01/slides.html",
+  "worksheetHtml": null,
+  "worksheetPdf": null
  }
 ]
