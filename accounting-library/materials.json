@@ -299,7 +299,17 @@
   ],
   "slides": "materials/liabilities-equity-exam-01/slides.html",
   "worksheetHtml": null,
-  "worksheetPdf": null
+  "worksheetPdf": null,
+  "worksheets": [
+   {
+    "path": "materials/exam-c-liabilities-01/worksheet.pdf",
+    "label": "학습지 C(부채)"
+   },
+   {
+    "path": "materials/exam-d-capital-cumulative-01/worksheet.pdf",
+    "label": "학습지 D(자본·누적)"
+   }
+  ]
  },
  {
   "id": "accounting-basics-exam-01",
