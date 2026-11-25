@@ -265,7 +265,7 @@
     }
   }
 
-  function trayCell() { return window.innerWidth <= 350 ? 20 : window.innerWidth <= 400 ? 23 : 25; }
+  function trayCell() { return window.innerWidth <= 350 ? 22 : window.innerWidth <= 400 ? 25 : 28; }
 
   function renderTray() {
     trayEl.innerHTML = '';
@@ -278,6 +278,7 @@
       any = true;
       const el = document.createElement('div');
       el.className = 'piece';
+      el.style.gap = '3px';
       el.dataset.slot = String(si);
       const rows = Math.max.apply(null, pc.cells.map((x) => x[0])) + 1;
       const cols = Math.max.apply(null, pc.cells.map((x) => x[1])) + 1;
