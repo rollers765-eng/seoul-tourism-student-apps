@@ -42,7 +42,7 @@
   function bubble(msg) {
     const host = $('#bubbles');
     const b = document.createElement('div');
-    b.className = 'speech bubble-float';
+    b.className = 'bubble-float';
     b.textContent = msg;
     host.appendChild(b);
     setTimeout(() => b.remove(), 2200);
