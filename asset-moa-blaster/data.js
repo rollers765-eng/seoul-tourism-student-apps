@@ -503,6 +503,7 @@
       id: corner.key + '-' + stageNo,
       corner: corner.key,
       stage: stageNo,
+      gen: corner.plan[stageNo - 1],
       mode: base.mode || 'journal',
       tag: base.tag || '',
       prompt: base.prompt,
@@ -541,7 +542,20 @@
     for (let i = 1; i <= c.stages; i++) STAGES[c.key].push(buildStage(c, i));
   });
 
-  const api = { CORNERS, STAGES, ACCOUNTS, buildStage, makeRng, won };
+  /* 11월 30일 3차 서술형평가 출제 유형과 같은 단계 (단계 선택 화면에 '3차' 표시) */
+  const EXAM = {
+    'inv-sell-credit': '3차 1번 유형 · 상품 외상매출',
+    'inv-freight-in': '3차 2번 유형 · 매입운임',
+    'inv-return-out': '3차 3번 유형 · 매출환입',
+    'inv-allowance-in': '3차 4번 유형 · 매입에누리',
+    'fin-hold-bond': '3차 5번 유형 · 만기보유증권',
+    'fin-available-stock': '3차 6번 유형 · 매도가능증권',
+    'fa-buy-fixture-install': '3차 7번 유형 · 비품+설치비',
+    'fa-mixed-expense': '3차 8번 유형 · 지출 구분',
+    'fa-dep-indirect': '3차 9번 유형 · 정액법 간접법',
+    'ia-software': '3차 10번 유형 · 소프트웨어'
+  };
+  const api = { CORNERS, STAGES, ACCOUNTS, EXAM, buildStage, makeRng, won };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.BlasterData = api;
 })(typeof window !== 'undefined' ? window : globalThis);

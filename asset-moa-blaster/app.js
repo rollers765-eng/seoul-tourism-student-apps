@@ -136,6 +136,18 @@
     $('stages-bar').style.width = Math.round((Math.min(curCorner.stages, p.cleared) / curCorner.stages) * 100) + '%';
     const grid = $('stage-grid');
     grid.innerHTML = '';
+    // 3차 대비 단계 안내
+    const examStages = D.STAGES[key].filter((st) => D.EXAM && D.EXAM[st.gen] && st.stage <= Math.min(curCorner.stages, p.cleared + 1));
+    $('stages-hint').innerHTML = examStages.length
+      ? '앞 단계를 클리어하면 다음 단계가 열려요. <b>3차</b> 표시는 11/30 서술형평가와 같은 유형이에요.'
+      : '앞 단계를 클리어하면 다음 단계가 열려요.';
+    const noteBar = $('note-bar');
+    const cornerNotes = S.notes.filter((n) => n.corner === key);
+    noteBar.classList.toggle('hidden', !cornerNotes.length);
+    if (cornerNotes.length) {
+      noteBar.textContent = '📕 이 코너 오답 ' + cornerNotes.length + '개 다시 풀기';
+      noteBar.onclick = () => { renderNotes(key); show('note'); };
+    }
     for (let i = 1; i <= curCorner.stages; i++) {
       const cleared = p.cleared;
       const isDone = i <= cleared;
@@ -144,7 +156,9 @@
       el.type = 'button';
       el.className = 'stage-chip ' + (isDone ? 'done' : isNext ? 'next' : '');
       const stars = p.stars[i] || 0;
-      el.innerHTML = i + '<span class="stars">' + (stars ? '★'.repeat(stars) : (isDone ? '☆' : '')) + '</span>';
+      const isExam = D.EXAM && D.EXAM[D.STAGES[key][i - 1].gen];
+      el.innerHTML = i + '<span class="stars">' + (stars ? '★'.repeat(stars) : (isDone ? '☆' : '')) + '</span>' +
+        (isExam ? '<span class="exam-dot">3차</span>' : '');
       if (isDone || isNext) el.addEventListener('click', () => startStage(key, i));
       else el.setAttribute('aria-disabled', 'true');
       grid.appendChild(el);
@@ -390,6 +404,7 @@
     byc.wrong++;
     A.bad();
     if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+    if (P.wrong === 1) setTimeout(() => { if (P && !P.ended) toast('단서: 그 계정이 늘어나는지 줄어드는지 먼저 생각해 봐요. 힌트 버튼도 있어요', 3000); }, 700);
     renderHearts();
     updateHUD();
     if (P.lives <= 0) endStage(false, '목숨을 모두 잃었어요');
@@ -504,14 +519,17 @@
   }
 
   /* ══════════ 오답 노트 ══════════ */
-  function renderNotes() {
+  let noteFilter = null;
+  function renderNotes(cornerKey) {
+    noteFilter = cornerKey || null;
     const wrap = $('note-list');
-    if (!S.notes.length) {
+    const list = noteFilter ? S.notes.filter((n) => n.corner === noteFilter) : S.notes;
+    if (!list.length) {
       wrap.innerHTML = '<p class="empty-state">아직 오답이 없어요.<br>단계를 풀다가 틀리면 여기에 모여요.</p>';
       return;
     }
     wrap.innerHTML = '';
-    S.notes.forEach((n) => {
+    list.forEach((n) => {
       const el = document.createElement('div');
       el.className = 'note-card';
       const ans = n.mode === 'pick'
@@ -520,13 +538,13 @@
       el.innerHTML = '<h3>' + n.cornerName + ' ' + n.stage + '단계 · ' + (n.tag || '') + '</h3>' +
         '<p>' + n.prompt + '</p>' + ans +
         '<div class="note-explain">' + n.explain + '</div>' +
-        '<div class="row"><button class="pxbtn primary" data-i="' + S.notes.indexOf(n) + '">다시 풀기</button></div>';
+        '<div class="row"><button class="pxbtn primary" data-id="' + n.corner + ',' + n.stage + '">다시 풀기</button></div>';
       wrap.appendChild(el);
     });
-    wrap.querySelectorAll('button[data-i]').forEach((b) => {
+    wrap.querySelectorAll('button[data-id]').forEach((b) => {
       b.addEventListener('click', () => {
-        const n = S.notes[Number(b.getAttribute('data-i'))];
-        startStage(n.corner, n.stage);
+        const parts = b.getAttribute('data-id').split(',');
+        startStage(parts[0], Number(parts[1]));
       });
     });
   }
