@@ -117,10 +117,10 @@
       btn.type = 'button';
       btn.innerHTML =
         '<span class="corner-emoji">' + c.emoji + '</span>' +
-        '<span><span class="corner-name">' + c.name + ' 코너</span>' +
+        '<span class="corner-body"><span class="corner-name">' + c.name + ' 코너</span>' +
         '<span class="corner-desc">' + c.desc + '</span>' +
         '<span class="mini-bar"><i style="width:' + Math.round((cleared / c.stages) * 100) + '%;background:' + c.color + '"></i></span></span>' +
-        '<span style="text-align:right"><span class="corner-count">' + cleared + '/' + c.stages + '</span><br><span class="corner-go">' + (cleared ? next + '단계' : '시작') + '</span></span>';
+        '<span class="corner-side"><span class="corner-count">' + cleared + '/' + c.stages + '</span><span class="corner-go">' + (cleared ? next + '단계' : '시작') + '</span></span>';
       btn.addEventListener('click', () => openStages(c.key));
       list.appendChild(btn);
     });
