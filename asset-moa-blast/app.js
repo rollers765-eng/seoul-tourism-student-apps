@@ -677,7 +677,7 @@
     flashText('−' + drop, 'bad');
     shakeBoard();
     highlightSide(miss.side);
-    const why = a.ex || a.desc || (piece.key + ' 계정의 자리를 다시 확인해 보세요.');
+    const why = (P.st && P.st.explain) || a.ex || a.desc || (piece.key + ' 계정의 자리를 다시 확인해 보세요.');
     const floorNote = ((P.earned || 0) - P.penalty) < 0 ? ' (점수는 0에서 멈춰요)' : '';
     showTip('❌ ' + piece.key + '은(는) ' + need + ' 칸!  −' + drop + '점', why + floorNote);
   }
