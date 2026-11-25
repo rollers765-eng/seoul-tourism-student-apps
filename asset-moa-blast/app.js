@@ -397,8 +397,16 @@
     const rect = pEl.getBoundingClientRect();
     const cols = Math.max.apply(null, pc.cells.map((a) => a[1])) + 1;
     const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
-    const offC = Math.min(cols - 1, Math.max(0, Math.floor((e.clientX - rect.left) / (rect.width / cols))));
-    const offR = Math.min(rows - 1, Math.max(0, Math.floor((e.clientY - rect.top) / (rect.height / rows))));
+    // 누른 지점에서 가장 가까운 '채워진 칸'을 집는 칸으로 삼는다 (대각선·구멍 있는 조각 대응)
+    const lx = (e.clientX - rect.left) / (rect.width / cols) - 0.5;
+    const ly = (e.clientY - rect.top) / (rect.height / rows) - 0.5;
+    let best = pc.cells[0], bestD = Infinity;
+    pc.cells.forEach(([r, c]) => {
+      const d = (r - ly) * (r - ly) + (c - lx) * (c - lx);
+      if (d < bestD) { bestD = d; best = [r, c]; }
+    });
+    const offR = best[0];
+    const offC = best[1];
     drag = { piece: pc, slot: si, offR: offR, offC: offC, ghost: null, preview: [], startX: e.clientX, startY: e.clientY, moved: false };
     buildGhost(pc, e.clientX, e.clientY, m);
     pEl.classList.add('gone');
