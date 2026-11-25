@@ -644,7 +644,7 @@
     if (!c) return;
     const ctx = c.getContext('2d');
     ctx.clearRect(0, 0, c.width, c.height);
-    Engine.drawSprite(ctx, 3, 0, 0);
+    Engine.drawSprite(ctx, 2, 0, 0);
   }
 
   /* ══════════ 이벤트 연결 ══════════ */

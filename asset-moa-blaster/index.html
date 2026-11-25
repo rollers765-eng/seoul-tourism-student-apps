@@ -17,7 +17,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23151a3d'/%3E%3Crect x='4' y='6' width='10' height='8' fill='%237ce7c8'/%3E%3Crect x='18' y='6' width='10' height='8' fill='%23ff8fa3'/%3E%3Crect x='4' y='18' width='10' height='8' fill='%23ffb95a'/%3E%3Crect x='18' y='18' width='10' height='8' fill='%23c59bff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css">
-<link rel="stylesheet" href="./style.css?v=4">
+<link rel="stylesheet" href="./style.css?v=5">
 </head>
 <body>
 <div class="app" id="app">
@@ -83,7 +83,10 @@
         <span class="round" id="play-round">계정 라운드</span>
         <button class="mini" id="btn-hint">힌트</button>
       </div>
-      <p id="prompt-text">문제를 불러오는 중…</p>
+      <div class="prompt-body">
+        <canvas id="mascot" width="32" height="32" aria-hidden="true"></canvas>
+        <p id="prompt-text">문제를 불러오는 중…</p>
+      </div>
     </div>
 
     <div class="journal" id="journal">
@@ -102,7 +105,6 @@
 
     <div class="field">
       <canvas id="canvas" aria-label="블록 블라스터 게임 화면"></canvas>
-      <div class="field-mascot" aria-hidden="true"><canvas id="mascot" width="48" height="48"></canvas></div>
     </div>
 
     <div class="cannons">
@@ -155,8 +157,8 @@
   <div class="toast hidden" id="toast"></div>
 </div>
 
-<script src="./data.js?v=4"></script>
-<script src="./engine.js?v=4"></script>
-<script src="./app.js?v=4"></script>
+<script src="./data.js?v=5"></script>
+<script src="./engine.js?v=5"></script>
+<script src="./app.js?v=5"></script>
 </body>
 </html>

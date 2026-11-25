@@ -341,11 +341,13 @@
       const w = b.w, h = b.h;
       const isPick = b.kind === 'pick';
       const isAmount = b.kind === 'amount';
-      const isBad = b.kind === 'bad';
-      const base = isBad ? '#4a3560' : isPick ? '#4d4290' : isAmount ? '#2f5a86' : '#2c6a72';
-      const light = isBad ? '#6a5386' : isPick ? '#6e60c4' : isAmount ? '#4a7fbc' : '#4c9aa0';
-      const dark = isBad ? '#2a1c3a' : isPick ? '#2c2456' : isAmount ? '#1b3552' : '#173f46';
-      const border = isBad ? '#22152f' : isPick ? '#1d1740' : isAmount ? '#122539' : '#0f2b30';
+      // 색으로 정답을 알 수 없도록, 같은 라운드의 블록은 모두 같은 색을 쓴다
+      const palette = isPick
+        ? { base: '#4d4290', light: '#6e60c4', dark: '#2c2456', border: '#1d1740' }
+        : isAmount
+          ? { base: '#2f5a86', light: '#4a7fbc', dark: '#1b3552', border: '#122539' }
+          : { base: '#2c6a72', light: '#4c9aa0', dark: '#173f46', border: '#0f2b30' };
+      const base = palette.base, light = palette.light, dark = palette.dark, border = palette.border;
 
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.fillRect(Math.round(x) + 3, Math.round(y) + 4, w, h);
