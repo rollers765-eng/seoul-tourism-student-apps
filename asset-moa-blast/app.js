@@ -233,6 +233,8 @@
       const d = document.createElement('div');
       d.className = 'cell ' + (c < 4 ? 'debit' : 'credit');
       d.dataset.i = String(i);
+      d.setAttribute('role', 'gridcell');
+      d.setAttribute('aria-label', (c < 4 ? '차변 ' : '대변 ') + (r + 1) + '행 ' + (c % 4 + 1) + '열' + (v && v.key ? ' · ' + v.key : (P.obst.has(i) ? ' · 잠금 상자' : ' · 빈 칸')));
       if (P.obst.has(i)) d.classList.add('obstacle');
       else if (v) {
         const b = document.createElement('div');
@@ -247,7 +249,7 @@
     }
   }
 
-  function trayCell() { return window.innerWidth <= 380 ? 15 : window.innerWidth <= 420 ? 16 : 18; }
+  function trayCell() { return window.innerWidth <= 350 ? 20 : window.innerWidth <= 400 ? 23 : 25; }
 
   function renderTray() {
     trayEl.innerHTML = '';
@@ -267,15 +269,20 @@
       el.style.gridTemplateRows = 'repeat(' + rows + ', ' + cs + 'px)';
       const map = {};
       pc.cells.forEach(([r, c]) => { map[r + ':' + c] = 1; });
+      const first = pc.cells.slice().sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]))[0];
       for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
         const cell = document.createElement('div');
         if (map[r + ':' + c]) {
           cell.className = 'pcell ' + pc.cat;
-          if (r === 0 && c === 0) { cell.classList.add('lbl'); cell.textContent = pc.key.length > 4 ? pc.key.slice(0, 4) : pc.key; }
+          if (r === first[0] && c === first[1]) { cell.classList.add('lbl'); cell.textContent = pc.key.length > 5 ? pc.key.slice(0, 5) : pc.key; }
         } else cell.style.visibility = 'hidden';
         el.appendChild(cell);
       }
       wrap.appendChild(el);
+      const nm = document.createElement('span');
+      nm.className = 'piece-name';
+      nm.textContent = pc.key;
+      wrap.appendChild(nm);
       trayEl.appendChild(wrap);
     });
     if (!any) {
@@ -362,8 +369,10 @@
     e.preventDefault();
     const m = metrics(); if (!m) return;
     const rect = pEl.getBoundingClientRect();
-    const offR = Math.round((e.clientY - rect.top) / m.stride);
-    const offC = Math.round((e.clientX - rect.left) / m.stride);
+    const cols = Math.max.apply(null, pc.cells.map((a) => a[1])) + 1;
+    const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
+    const offC = Math.min(cols - 1, Math.max(0, Math.floor((e.clientX - rect.left) / (rect.width / cols))));
+    const offR = Math.min(rows - 1, Math.max(0, Math.floor((e.clientY - rect.top) / (rect.height / rows))));
     drag = { piece: pc, slot: si, offR: offR, offC: offC, ghost: null, preview: [] };
     buildGhost(pc, e.clientX, e.clientY, m);
     pEl.classList.add('gone');
@@ -1087,7 +1096,10 @@
   });
 
   document.addEventListener('click', function (e) {
-    if (e.target.closest('[data-back]')) { show('screen-home'); renderHome(); }
+    if (e.target.closest('[data-back]')) {
+      if (CH && CH.tick) { clearInterval(CH.tick); CH.tick = null; }
+      show('screen-home'); renderHome();
+    }
   });
 
   /* ───────── 바인딩 ───────── */
