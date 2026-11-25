@@ -102,7 +102,18 @@
   function totalStars() {
     return D.CORNERS.reduce((s, c) => s + Object.values(prog(c.key).stars).reduce((a, b) => a + b, 0), 0);
   }
+  function dday(target) {
+    const now = new Date();
+    const t = new Date(target + 'T00:00:00+09:00');
+    const d = Math.ceil((t - now) / 86400000);
+    return d;
+  }
   function renderHome() {
+    const d1 = dday('2026-11-30'), d2 = dday('2026-12-14');
+    const dd = $('home-dday');
+    if (d1 > 0) dd.textContent = '3차 서술형 D-' + d1;
+    else if (d2 > 0) dd.textContent = '기말고사 D-' + d2;
+    else dd.classList.add('hidden');
     $('home-total').textContent = totalCleared() + ' / 160 클리어';
     $('home-stars').textContent = '★ ' + totalStars();
     $('home-notes').textContent = '오답 ' + S.notes.length;

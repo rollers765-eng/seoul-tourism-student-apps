@@ -88,6 +88,7 @@ button { font-family: inherit; color: inherit; cursor: pointer; }
   font-family: var(--pixel); font-size: 11px; padding: 6px 9px;
   border: 2px solid #39406f; background: #1a2044; color: var(--ink);
 }
+.chip.dday { background: #4a2030; border-color: #7a3d52; color: #ffc9d4; }
 .corner-list { display: grid; gap: 10px; }
 .corner-card {
   display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center;
