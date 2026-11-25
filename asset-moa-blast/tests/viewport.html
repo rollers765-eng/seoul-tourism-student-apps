@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blast 뷰포트 검수</title>
+<style>
+  html,body{margin:0;background:#1b1730;color:#fff;font:13px/1.4 -apple-system,system-ui,sans-serif}
+  .wrap{padding:10px}
+  .label{font:12px/1.6 monospace;color:#cfc4ff;margin-bottom:6px}
+  iframe{border:0;display:block;background:#000;box-shadow:0 0 0 1px #6b5bd6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="label" id="lb">뷰포트</div>
+  <iframe id="fr" src="../index.html" title="게임 미리보기"></iframe>
+</div>
+<script>
+  var p = new URLSearchParams(location.search);
+  var w = parseInt(p.get('w') || '390', 10);
+  var h = parseInt(p.get('h') || '844', 10);
+  var fr = document.getElementById('fr');
+  fr.width = w; fr.height = h;
+  document.getElementById('lb').textContent = w + '×' + h + ' · ' + (p.get('n') || '');
+</script>
+</body>
+</html>
