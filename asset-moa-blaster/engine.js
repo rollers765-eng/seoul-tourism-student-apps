@@ -32,7 +32,7 @@
 
   function goalFor(level) {
     const lines = 2 + Math.floor(Math.max(0, level - 3) / 6);
-    return { lines, score: 180 + lines * 100 + Math.max(0, level - 3) * 12 };
+    return { lines, score: 120 + lines * 100 };
   }
 
   function seedFor(corner, level) {
