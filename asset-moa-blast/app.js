@@ -771,6 +771,7 @@
     $('#ovClear').hidden = false;
 
     fx.confetti(300); fx.fireworks(4);
+    setTimeout(function () { if (!document.hidden) fx.confetti(140); }, 700);
     SOUND.play('right'); SOUND.play('applause'); SOUND.play('whistle');
     setTimeout(() => SOUND.play('boom'), 260);
   }
@@ -907,11 +908,11 @@
             y: h * (0.08 + Math.random() * 0.6),
             vx: (left ? 1 : -1) * (5 + Math.random() * 12),
             vy: -(4 + Math.random() * 10),
-            g: 0.16 + Math.random() * 0.12, drag: 0.995,
+            g: 0.12 + Math.random() * 0.09, drag: 0.996,
             s: 9 + Math.random() * 12,
             color: COLORS[i % COLORS.length],
             rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.55,
-            life: 150 + Math.random() * 110
+            life: 210 + Math.random() * 130
           });
         }
         for (let i = 0; i < Math.round(total * 0.5); i++) {
@@ -921,11 +922,11 @@
             y: -30 - Math.random() * h * 0.35,
             vx: (Math.random() - 0.5) * 7,
             vy: 2 + Math.random() * 5,
-            g: 0.12 + Math.random() * 0.07, drag: 0.997,
+            g: 0.09 + Math.random() * 0.06, drag: 0.997,
             s: 9 + Math.random() * 13,
             color: COLORS[(i + 3) % COLORS.length],
             rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.5,
-            life: 170 + Math.random() * 130
+            life: 240 + Math.random() * 150
           });
         }
         kick();
