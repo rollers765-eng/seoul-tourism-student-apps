@@ -663,6 +663,22 @@
     paintScore(bump !== false);
   }
 
+  /* 왜 그쪽(차변/대변)인지 — 계정의 성질과 이 거래에서의 증감으로 짧게 설명한다 */
+  function tipForSide(key, needSide) {
+    const a = ACCT[key] || {};
+    const nat = a.inc === '대변' ? '대변' : '차변';
+    const natSide = nat === '대변' ? 'c' : 'd';
+    const need = needSide === 'd' ? '차변' : '대변';
+    const kind = String(a.kind || '');
+    if (kind.indexOf('차감') >= 0) {
+      return key + '은(는) ' + kind.replace(/\s*차감/, '') + '에서 빼는 계정이라 ' + nat + '에 적어요.';
+    }
+    if (needSide === natSide) {
+      return key + '은(는) ' + (kind ? kind + ' 계정' : '이 계정') + '이라 늘어나면 ' + nat + '에 적어요.';
+    }
+    return '이 거래에서는 ' + key + '이(가) 줄어들어 ' + need + '에 적어요. (' + key + '은(는) 늘어날 때 ' + nat + ')';
+  }
+
   /* 잘못된 분개 위치 → 감점 + 짧은 학습 팁 + 올바른 쪽 표시 */
   function wrongSideTip(piece, miss) {
     const a = ACCT[piece.key] || {};
@@ -677,7 +693,7 @@
     flashText('−' + drop, 'bad');
     shakeBoard();
     highlightSide(miss.side);
-    const why = (P.st && P.st.explain) || a.ex || a.desc || (piece.key + ' 계정의 자리를 다시 확인해 보세요.');
+    const why = tipForSide(piece.key, miss.side);
     const floorNote = ((P.earned || 0) - P.penalty) < 0 ? ' (점수는 0에서 멈춰요)' : '';
     showTip('❌ ' + piece.key + '은(는) ' + need + ' 칸!  −' + drop + '점', why + floorNote);
   }
@@ -868,7 +884,7 @@
     const m = $('#mission');
     if (m) {
       const r = m.getBoundingClientRect();
-      el.style.top = Math.max(6, Math.round(r.top) - 2) + 'px';
+      el.style.top = Math.round(r.bottom) + 6 + 'px';
     }
     el.classList.add('show');
     clearTimeout(tipTimer);
