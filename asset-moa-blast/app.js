@@ -407,8 +407,15 @@
   }
 
   trayEl.addEventListener('pointerdown', function (e) {
-    const pEl = e.target.closest('.piece');
-    if (!pEl || !P || P.over || P.done || P.settling || drag) return;
+    if (!e.isPrimary || e.button !== 0) return;
+    // 같은 입력 종류의 새 primary down은 이전 제스처가 끝났다는 뜻이다.
+    if (drag && drag.pointerType !== e.pointerType &&
+        drag.source.isConnected && trayEl.hasPointerCapture(drag.pointerId)) return;
+    const interrupted = drag ? clearDrag() : null;
+    const wrap = e.target.closest('.slot-piece');
+    const pEl = e.target.closest('.piece') ||
+      (interrupted?.source.parentElement === wrap && interrupted.source);
+    if (!pEl || !P || P.over || P.done || P.settling) return;
     const si = Number(pEl.dataset.slot);
     const pc = P.tray[si];
     if (!pc) return;
@@ -427,11 +434,13 @@
     });
     const offR = best[0];
     const offC = best[1];
-    drag = { piece: pc, slot: si, offR: offR, offC: offC, ghost: null, preview: [], startX: e.clientX, startY: e.clientY, moved: false };
+    drag = { piece: pc, slot: si, source: pEl, pointerId: e.pointerId, pointerType: e.pointerType,
+      offR, offC, ghost: null, startX: e.clientX, startY: e.clientY, moved: false };
     buildGhost(pc, e.clientX, e.clientY, m);
     pEl.classList.add('gone');
     moveDrag(e.clientX, e.clientY);
-    try { pEl.setPointerCapture(e.pointerId); } catch (err) {}
+    // 리필로 교체되는 조각 대신 유지되는 트레이에서 포인터를 캡처한다.
+    try { trayEl.setPointerCapture(e.pointerId); } catch (err) {}
   });
 
   function buildGhost(pc, x, y, m) {
@@ -477,7 +486,8 @@
     drag.ghost.style.top = gy + 'px';
     const at = cellAtPoint(x, y);
     clearPreview();
-    if (!at) return;
+    drag.target = null;
+    if (!at || at.outside) return;
     const r0 = at.r - drag.offR, c0 = at.c - drag.offC;
     const ok = canPlace(drag.piece, r0, c0, P.grid, P.obst);
     drag.target = ok ? { r: r0, c: c0 } : null;
@@ -491,24 +501,59 @@
     boardEl.querySelectorAll('.preview-ok,.preview-bad').forEach((el) => el.classList.remove('preview-ok', 'preview-bad'));
   }
 
-  document.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) > 8) drag.moved = true;
-    if (!drag.moved) return;
-    e.preventDefault();
-    moveDrag(e.clientX, e.clientY);
-  }, { passive: false });
-
-  document.addEventListener('pointerup', function (e) {
-    if (!drag) return;
-    const d = drag; drag = null;
-    if (d.ghost) d.ghost.remove();
+  function clearDrag() {
+    const current = drag;
+    if (!current) return null;
+    drag = null;
+    current.ghost?.remove();
+    current.source.classList.remove('gone');
     clearPreview();
-    const pieceEl = trayEl.querySelector('.piece[data-slot="' + d.slot + '"]');
-    if (pieceEl) pieceEl.classList.remove('gone');
-    if (d.target && d.moved) { tryPlace(d.piece, d.slot, d.target.r, d.target.c); return; }
-    if (!d.moved) selectPiece(d.slot);
-  });
+    if (trayEl.hasPointerCapture(current.pointerId)) trayEl.releasePointerCapture(current.pointerId);
+    return current;
+  }
+
+  function movedPointer(event, current) {
+    return Math.abs(event.clientX - current.startX) + Math.abs(event.clientY - current.startY) > 8;
+  }
+
+  function ownsPointer(event) {
+    return drag && event.pointerId === drag.pointerId && event.pointerType === drag.pointerType;
+  }
+
+  window.addEventListener('pointermove', (event) => {
+    if (!ownsPointer(event)) return;
+    drag.moved ||= movedPointer(event, drag);
+    if (!drag.moved) return;
+    event.preventDefault();
+    moveDrag(event.clientX, event.clientY);
+  }, { capture: true, passive: false });
+
+  window.addEventListener('pointerup', (event) => {
+    if (!ownsPointer(event)) return;
+    const outside = event.clientX < 0 || event.clientY < 0 ||
+      event.clientX >= window.innerWidth || event.clientY >= window.innerHeight;
+    if (outside || !drag.source.isConnected || P?.tray[drag.slot] !== drag.piece) {
+      clearDrag();
+      return;
+    }
+    drag.moved ||= movedPointer(event, drag);
+    if (drag.moved) moveDrag(event.clientX, event.clientY);
+    const finished = clearDrag();
+    if (finished.moved) {
+      if (finished.target) tryPlace(finished.piece, finished.slot, finished.target.r, finished.target.c);
+    } else selectPiece(finished.slot);
+  }, true);
+
+  function cancelDrag(event) {
+    if (ownsPointer(event)) clearDrag();
+  }
+  window.addEventListener('pointercancel', cancelDrag, true);
+  window.addEventListener('lostpointercapture', (event) => {
+    if (event.target === trayEl) cancelDrag(event);
+  }, true);
+  window.addEventListener('blur', (event) => {
+    if (event.target === window) clearDrag();
+  }, true);
 
   function selectPiece(slot) {
     if (!P || P.over || P.done || P.settling) return;
@@ -527,15 +572,6 @@
     });
     boardEl.classList.toggle('pick-mode', !!sel);
   }
-  document.addEventListener('pointercancel', function () {
-    if (!drag) return;
-    const d = drag; drag = null;
-    if (d.ghost) d.ghost.remove();
-    clearPreview();
-    const pieceEl = trayEl.querySelector('.piece[data-slot="' + d.slot + '"]');
-    if (pieceEl) pieceEl.classList.remove('gone');
-  });
-
   /* 보드 탭 배치 (드래그 보조) */
   boardEl.addEventListener('click', function (e) {
     if (!sel || !P || P.over || P.done || P.settling) return;
@@ -775,8 +811,7 @@
     $('#placementTip').hidden = true;
     boardEl.classList.remove('placement-shake');
     sel = null;
-    if (drag?.ghost) drag.ghost.remove();
-    drag = null;
+    clearDrag();
     show('screen-play');
     renderBoard();
     refillTray();
