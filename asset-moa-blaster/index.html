@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151a3d">
+<title>자산모아 블럭모아 Blaster · 회계원리 분개 연습</title>
+<meta name="description" content="블록을 부수며 재고자산·투자자산·유형자산·무형자산 계정과목과 분개를 익히는 2D 픽셀 학습 게임입니다.">
+<link rel="canonical" href="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blaster/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="서울관광고등학교 회계원리 자료실">
+<meta property="og:title" content="자산모아 블럭모아 Blaster | 3차 서술형 평가 대비">
+<meta property="og:description" content="재고자산·투자자산·유형자산·무형자산 160단계. 블록을 부수며 계정과목과 분개를 반복 연습해요.">
+<meta property="og:url" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blaster/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23151a3d'/%3E%3Crect x='4' y='6' width='10' height='8' fill='%237ce7c8'/%3E%3Crect x='18' y='6' width='10' height='8' fill='%23ff8fa3'/%3E%3Crect x='4' y='18' width='10' height='8' fill='%23ffb95a'/%3E%3Crect x='18' y='18' width='10' height='8' fill='%23c59bff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ═════════ 홈 ═════════ -->
+  <section class="screen is-active" id="screen-home" aria-label="홈">
+    <header class="home-head">
+      <div class="logo-pixels" aria-hidden="true">
+        <i class="p p1"></i><i class="p p2"></i><i class="p p3"></i><i class="p p4"></i>
+        <i class="p p5"></i><i class="p p6"></i><i class="p p7"></i><i class="p p8"></i>
+      </div>
+      <p class="eyebrow">SEOUL TOURISM HIGH SCHOOL · 회계원리</p>
+      <h1 class="game-title">자산모아<br><span>블럭모아</span> BLASTER</h1>
+      <p class="home-sub">블록을 부수며 계정과목과 분개를 익히는 160단계</p>
+      <div class="home-chips">
+        <span class="chip" id="home-total">0 / 160 클리어</span>
+        <span class="chip" id="home-stars">★ 0</span>
+        <span class="chip" id="home-notes">오답 0</span>
+      </div>
+    </header>
+
+    <div class="corner-list" id="corner-list"></div>
+
+    <div class="home-actions">
+      <button class="pxbtn ghost" id="btn-notes">📕 오답 노트</button>
+      <button class="pxbtn ghost" id="btn-codex">📖 계정과목 도감</button>
+      <button class="pxbtn ghost" id="btn-report">📊 학습 리포트</button>
+      <button class="pxbtn ghost" id="btn-settings">⚙️ 설정</button>
+    </div>
+    <p class="foot-note">서울관광고등학교 회계원리 · 모아와 함께</p>
+  </section>
+
+  <!-- ═════════ 단계 선택 ═════════ -->
+  <section class="screen" id="screen-stages" aria-label="단계 선택">
+    <div class="topbar">
+      <button class="iconbtn" id="btn-stages-back" aria-label="뒤로">←</button>
+      <div class="topbar-title"><b id="stages-title">재고자산</b><span id="stages-desc"></span></div>
+      <button class="iconbtn" id="btn-stages-codex" aria-label="계정과목 도감">📖</button>
+    </div>
+    <div class="progress-line"><i id="stages-bar"></i></div>
+    <p class="hint-text" id="stages-hint">앞 단계를 클리어하면 다음 단계가 열려요.</p>
+    <div class="stage-grid" id="stage-grid"></div>
+  </section>
+
+  <!-- ═════════ 플레이 ═════════ -->
+  <section class="screen" id="screen-play" aria-label="플레이">
+    <div class="topbar play-top">
+      <button class="iconbtn" id="btn-play-back" aria-label="그만두기">←</button>
+      <div class="topbar-title"><b id="play-corner">재고자산</b><span id="play-stage">1단계</span></div>
+      <div class="hearts" id="hearts" aria-label="목숨"></div>
+    </div>
+    <div class="hud">
+      <div class="hud-item"><span>점수</span><b id="hud-score">0</b></div>
+      <div class="hud-item"><span>콤보</span><b id="hud-combo">x1</b></div>
+      <div class="hud-item"><span>남은 시간</span><b id="hud-time">60</b></div>
+    </div>
+    <div class="timer"><i id="timer-bar"></i></div>
+
+    <div class="prompt-card">
+      <div class="prompt-head">
+        <span class="tag" id="play-tag">3분법 매입</span>
+        <span class="round" id="play-round">계정 라운드</span>
+        <button class="mini" id="btn-hint">힌트</button>
+      </div>
+      <p id="prompt-text">문제를 불러오는 중…</p>
+    </div>
+
+    <div class="journal" id="journal">
+      <div class="jside jd">
+        <h4>차변 <span class="debit-mark">D</span></h4>
+        <ul id="journal-d"></ul>
+      </div>
+      <div class="jside jc">
+        <h4>대변 <span class="credit-mark">C</span></h4>
+        <ul id="journal-c"></ul>
+      </div>
+    </div>
+    <div class="pickbar hidden" id="pickbar">
+      <span>정답 칸</span><div id="pick-slots"></div>
+    </div>
+
+    <div class="field">
+      <canvas id="canvas" aria-label="블록 블라스터 게임 화면"></canvas>
+      <div class="field-mascot" aria-hidden="true"><canvas id="mascot" width="48" height="48"></canvas></div>
+    </div>
+
+    <div class="cannons">
+      <button class="canon d is-active" id="canon-d" aria-pressed="true">
+        <span class="canon-icon">◤</span><b>차변 캐논</b><small>왼쪽 · 1</small>
+      </button>
+      <button class="canon p hidden" id="canon-p" aria-pressed="false">
+        <span class="canon-icon">◈</span><b>정답 캐논</b><small>가운데</small>
+      </button>
+      <button class="canon c" id="canon-c" aria-pressed="false">
+        <span class="canon-icon">◥</span><b>대변 캐논</b><small>오른쪽 · 2</small>
+      </button>
+    </div>
+  </section>
+
+  <!-- ═════════ 오답 노트 ═════════ -->
+  <section class="screen" id="screen-note" aria-label="오답 노트">
+    <div class="topbar">
+      <button class="iconbtn" id="btn-note-back" aria-label="뒤로">←</button>
+      <div class="topbar-title"><b>오답 노트</b><span>틀린 단계를 다시 풀어 봐요</span></div>
+      <button class="iconbtn" id="btn-note-clear" aria-label="비우기">🗑</button>
+    </div>
+    <div id="note-list" class="note-list"></div>
+  </section>
+
+  <!-- ═════════ 계정과목 도감 ═════════ -->
+  <section class="screen" id="screen-codex" aria-label="계정과목 도감">
+    <div class="topbar">
+      <button class="iconbtn" id="btn-codex-back" aria-label="뒤로">←</button>
+      <div class="topbar-title"><b>계정과목 도감</b><span>뜻·성격·예시를 확인해요</span></div>
+    </div>
+    <input class="search" id="codex-search" type="search" placeholder="계정과목 검색 (예: 매입운임)" autocomplete="off">
+    <div class="codex-filters" id="codex-filters"></div>
+    <div id="codex-list" class="codex-list"></div>
+  </section>
+
+  <!-- ═════════ 리포트 ═════════ -->
+  <section class="screen" id="screen-report" aria-label="학습 리포트">
+    <div class="topbar">
+      <button class="iconbtn" id="btn-report-back" aria-label="뒤로">←</button>
+      <div class="topbar-title"><b>학습 리포트</b><span>약점을 확인해요</span></div>
+    </div>
+    <div id="report-body"></div>
+  </section>
+
+  <!-- ═════════ 오버레이 ═════════ -->
+  <div class="overlay hidden" id="overlay" role="dialog" aria-modal="true">
+    <div class="overlay-card" id="overlay-card"></div>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+</div>
+
+<script src="./data.js"></script>
+<script src="./engine.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
