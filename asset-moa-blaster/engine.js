@@ -324,6 +324,17 @@
       context.fillStyle = blink && (y === 7 || y === 8) && 'WK'.includes(ink) ? INK.M : INK[ink];
       context.fillRect((x - 8) * 3, (y - 8) * 3, 3, 3);
     }));
+    context.fillStyle = '#468884';
+    context.fillRect(-21, 0, 8, 15);
+    context.fillStyle = '#e97b55';
+    context.fillRect(-23, -6, 3, 12);
+    context.fillStyle = '#fff0ce';
+    context.fillRect(-23, -8, 3, 2);
+    context.fillStyle = '#d6ebee';
+    context.fillRect(-20, 3, 7, 10);
+    context.fillStyle = '#38615a';
+    context.fillRect(-19, 4, 5, 2);
+    for (const x of [-19, -16]) for (const y of [8, 11]) context.fillRect(x, y, 1, 1);
     context.restore();
     if (mood === 'cheer' || mood === 'correct' || mood === 'wrong') {
       context.fillStyle = mood === 'wrong' ? INK.P : INK.Y;
@@ -332,9 +343,10 @@
     }
   }
 
-  function mount({ canvas, mascot, game }) {
+  function mount({ canvas, mascot, game, onSelection = () => {} }) {
     const context = canvas.getContext('2d');
     const mascotContext = mascot?.getContext('2d');
+    let mascotScale = 1;
     const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
     const originalTouch = canvas.style.touchAction;
     const originalOverscroll = canvas.style.overscrollBehavior;
@@ -343,6 +355,8 @@
     let state = game.state();
     let geometry;
     let drag;
+    let selected = null;
+    let tapTarget = null;
     let returning;
     let frame;
     let previousTime = 0;
@@ -369,9 +383,18 @@
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.imageSmoothingEnabled = false;
+      if (mascotContext) {
+        const pixels = Math.round((mascot.clientWidth || 104) * dpr);
+        if (mascot.width !== pixels || mascot.height !== pixels) {
+          mascot.width = mascot.height = pixels;
+        }
+        mascotScale = pixels / 72;
+        mascotContext.setTransform(mascotScale, 0, 0, mascotScale, 0, 0);
+        mascotContext.imageSmoothingEnabled = false;
+      }
       const cell = Math.max(1, Math.min((width - 16) / SIZE, (height - 105) / SIZE));
       geometry = { width, height, cell, x: (width - cell * SIZE) / 2, y: 6, trayY: cell * SIZE + 14 };
-      if (drag) updateDrag(drag.clientX, drag.clientY);
+      if (drag && !drag.boardTap) updateDrag(drag.clientX, drag.clientY);
     }
 
     function trayBox(index) {
@@ -437,6 +460,27 @@
       drag.target = near ? { col, row, ok: game.canPlace(drag.index, col, row) } : null;
     }
 
+    function select(index) {
+      if (selected === index) return;
+      selected = index;
+      tapTarget = null;
+      if (index !== null && state.tray[index]) {
+        for (let i = 0; i < SIZE * SIZE && !tapTarget; i++) {
+          const col = i % SIZE;
+          const row = Math.floor(i / SIZE);
+          if (game.canPlace(index, col, row)) tapTarget = { col, row, ok: true };
+        }
+      }
+      onSelection(index);
+    }
+
+    function aimTap(point) {
+      const col = Math.floor((point.x - geometry.x) / geometry.cell);
+      const row = Math.floor((point.y - geometry.y) / geometry.cell);
+      return col >= 0 && col < SIZE && row >= 0 && row < SIZE
+        ? { col, row, ok: game.canPlace(selected, col, row) } : null;
+    }
+
     function pointerDown(event) {
       if (drag || !geometry || !game.canPlay() || event.button !== 0 || !event.isPrimary) return;
       const point = local(event.clientX, event.clientY);
@@ -453,7 +497,15 @@
         return point.x >= box.x && point.x <= box.x + box.width &&
           point.y >= box.y && point.y <= box.y + box.height;
       });
-      if (index < 0) return;
+      if (index < 0) {
+        const target = selected === null ? null : aimTap(point);
+        if (!target) return;
+        event.preventDefault();
+        drag = { id: event.pointerId, boardTap: true, target, startX: event.clientX, startY: event.clientY };
+        tapTarget = target;
+        canvas.setPointerCapture(event.pointerId);
+        return;
+      }
       event.preventDefault();
       const piece = state.tray[index];
       const shape = SHAPES[piece.shape];
@@ -461,7 +513,7 @@
       const anchored = (value, max) => Math.max(0.15, Math.min(max - 0.15, value));
       const mouse = event.pointerType === 'mouse';
       drag = {
-        index, piece, id: event.pointerId, lift: mouse ? 0 : 60,
+        index, piece, id: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false, lift: mouse ? 0 : 60,
         anchorX: mouse ? anchored((point.x - preview.x) / preview.cell, shape.width) : shape.width / 2,
         anchorY: mouse ? anchored((point.y - preview.y) / preview.cell, shape.height) : shape.height / 2
       };
@@ -474,6 +526,7 @@
     function armBomb(value = true) {
       bombArmed = Boolean(value && state.bombs && game.canPlay() && !drag);
       if (!bombArmed) bombTarget = null;
+      else select(null);
       return bombArmed;
     }
 
@@ -484,22 +537,47 @@
     }
 
     function pointerMove(event) {
+      if (!geometry) return;
       if (bombArmed && event.isPrimary) aimBomb(local(event.clientX, event.clientY));
-      if (drag?.id !== event.pointerId) return;
+      if (drag?.id !== event.pointerId) {
+        if (!drag && selected !== null && event.pointerType === 'mouse') {
+          tapTarget = aimTap(local(event.clientX, event.clientY));
+        }
+        return;
+      }
       event.preventDefault();
-      updateDrag(event.clientX, event.clientY);
+      if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) >= 8) drag.moved = true;
+      if (drag.boardTap) tapTarget = aimTap(local(event.clientX, event.clientY));
+      else updateDrag(event.clientX, event.clientY);
     }
 
     function pointerEnd(event) {
       if (drag?.id !== event.pointerId) return;
       const dropped = event.type === 'pointerup';
-      if (dropped) updateDrag(event.clientX, event.clientY);
       const item = drag;
+      if (dropped && !item.boardTap) updateDrag(event.clientX, event.clientY);
+      const moved = item.moved || (dropped &&
+        Math.hypot(event.clientX - item.startX, event.clientY - item.startY) >= 8);
       drag = null;
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-      if (dropped && item.target?.ok && game.place(item.index, item.target.col, item.target.row)) return;
+      if (item.boardTap) {
+        if (dropped && !moved) {
+          const target = aimTap(local(event.clientX, event.clientY));
+          if (target?.ok && game.place(selected, target.col, target.row)) select(null);
+          else game.signalInvalid();
+        }
+        return;
+      }
+      if (dropped && !moved) {
+        select(selected === item.index ? null : item.index);
+        return;
+      }
+      if (dropped && item.target?.ok && game.place(item.index, item.target.col, item.target.row)) {
+        select(null);
+        return;
+      }
       if (dropped) game.signalInvalid();
-      if (!reduced) returning = { ...item, started: performance.now() };
+      if (moved && !reduced) returning = { ...item, started: performance.now() };
     }
 
     function burst(cell, now, power) {
@@ -522,6 +600,7 @@
 
     const unsubscribe = game.subscribe((event, next) => {
       state = next;
+      if (event.type === 'revive' || (selected !== null && (!state.tray[selected] || state.status !== 'playing'))) select(null);
       const now = performance.now();
       if (event.type === 'place') {
         for (const cell of event.placed) pops.set(cell.y * SIZE + cell.x, now + 180);
@@ -616,9 +695,11 @@
         const scale = !reduced && pop > now ? 1 + Math.sin((pop - now) / 180 * Math.PI) * 0.13 : 1;
         if (color) tile(left, top, cell, PALETTE[color - 1], 1, scale);
       }));
-      if (drag?.target && game.canPlay()) {
-        const { col, row, ok } = drag.target;
-        paintPiece(drag.piece, { x: x + col * cell, y: y + row * cell, cell },
+      const activeGhost = drag?.moved && !drag.boardTap ? drag.target : tapTarget;
+      const ghostPiece = drag?.moved && !drag.boardTap ? drag.piece : state.tray[selected];
+      if (activeGhost && ghostPiece && game.canPlay()) {
+        const { col, row, ok } = activeGhost;
+        paintPiece(ghostPiece, { x: x + col * cell, y: y + row * cell, cell },
           ok ? '#63ee9d' : '#ff687e', ok ? 0.52 + 0.13 * Math.sin(now / 95) : 0.64);
       }
       if (bombArmed && bombTarget) {
@@ -633,6 +714,11 @@
         const box = trayBox(index);
         context.fillStyle = '#202b44';
         context.fillRect(box.x, box.y, box.width, box.height);
+        if (selected === index) {
+          context.strokeStyle = reduced || Math.sin(now / 130) >= 0 ? '#afffd0' : '#87dfff';
+          context.lineWidth = 3;
+          context.strokeRect(box.x + 2, box.y + 2, box.width - 4, box.height - 4);
+        }
         if (piece && drag?.index !== index && returning?.index !== index) {
           paintPiece(piece, trayPose(index, SHAPES[piece.shape]));
         }
@@ -646,7 +732,7 @@
         paintPiece(returning.piece, pose);
         if (progress === 1) returning = null;
       }
-      if (drag?.pose && game.canPlay()) paintPiece(drag.piece, drag.pose, undefined, drag.target?.ok ? 0.7 : 0.95);
+      if (drag?.moved && drag.pose && game.canPlay()) paintPiece(drag.piece, drag.pose, undefined, drag.target?.ok ? 0.7 : 0.95);
       if (mascotContext) {
         mascotContext.clearRect(0, 0, 72, 72);
         const elapsed = now - flipStart;
@@ -665,11 +751,6 @@
     canvas.addEventListener('contextmenu', event => event.preventDefault(), opts);
     for (const event of ['gesturestart', 'gesturechange']) {
       canvas.addEventListener(event, gesture => gesture.preventDefault(), { ...opts, passive: false });
-    }
-    if (mascot) {
-      mascot.width = 72;
-      mascot.height = 72;
-      mascotContext.imageSmoothingEnabled = false;
     }
     resize();
     frame = requestAnimationFrame(draw);

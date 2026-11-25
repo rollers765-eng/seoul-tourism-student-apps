@@ -334,10 +334,27 @@
     return form;
   }
 
+  function meter(label, cls = '') {
+    const bar = el('progress', 'meter ' + cls);
+    bar.setAttribute('aria-label', label);
+    bar.max = 1;
+    bar.value = 0;
+    return bar;
+  }
+
   function home() {
-    heading('자산모아 블럭모아 Blaster', '블록을 놓고 줄을 지워 회계 미션에 도전하세요.');
+    const hero = el('section', 'hero');
+    hero.append(el('p', 'exam-ribbon', '3차 서술형 · ' + examDay()),
+      el('h2', 'hero-title', '자산모아 블럭모아 Blaster'),
+      el('p', '', '블록을 놓고 줄을 지워 회계 미션에 도전하세요.'));
+    const startButton = button('게임 시작', () => {
+      deck.scrollIntoView({ block: 'nearest' });
+      deck.querySelector('button')?.focus({ preventScroll: true });
+    }, 'primary');
+    hero.append(startButton);
+    root.append(hero);
     const stat = totals();
-    root.append(el('p', 'summary', '3차 서술형 ' + examDay() + ' · ★ ' + stat.stars + ' · 보석 ' + store.gems + ' · 오답 ' + stat.notes));
+    root.append(el('p', 'summary', '★ ' + stat.stars + ' · 보석 ' + store.gems + ' · 오답 ' + stat.notes));
     if (!store.nickname) root.append(nicknameForm());
     else root.append(el('p', 'summary', store.nickname + '의 별명 챌린지'));
     const deck = el('section', 'corner-grid');
@@ -345,7 +362,10 @@
       const count = D.STAGES[c.key].filter(p => store.levels[p.id]?.clear).length;
       const tile = button(c.emoji + ' ' + c.name, () => show('stages', { corner: c.key }), 'corner');
       tile.style.setProperty('--accent', c.color);
-      tile.append(el('small', '', count + ' / ' + c.stages + ' 완료'));
+      const bar = meter(c.name + ' 진행률');
+      bar.max = c.stages;
+      bar.value = count;
+      tile.append(el('small', '', count + ' / ' + c.stages + ' 완료'), bar);
       deck.append(tile);
     }
     root.append(deck);
@@ -393,10 +413,26 @@
   }
 
   function updateHud(state) {
-    hud.score.textContent = 'SCORE ' + format(state.score);
+    if (hud.scoreValue !== state.score) {
+      if (state.score > (hud.scoreValue ?? state.score) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        hud.scorePop?.cancel();
+        hud.scorePop = hud.score.animate([
+          { transform: 'scale(1)', color: '#fff7cf' },
+          { transform: 'scale(1.14)', color: '#a4ecc3', offset: .34 },
+          { transform: 'scale(1)', color: '#fff7cf' }
+        ], { duration: 240 });
+      }
+      hud.scoreValue = state.score;
+      hud.score.textContent = format(state.score);
+    }
     hud.best.textContent = 'BEST ' + format(state.best);
-    hud.goal.textContent = '줄 ' + state.lines + '/' + state.goal.lines + ' · 목표 ' + format(state.goal.score) + '점';
-    hud.combo.textContent = '콤보 ' + state.streak;
+    hud.lines.label.textContent = '줄 ' + state.lines + ' / ' + state.goal.lines;
+    hud.points.label.textContent = '점수 ' + format(state.score) + ' / ' + format(state.goal.score);
+    for (const [group, value, max] of [[hud.lines, state.lines, state.goal.lines], [hud.points, state.score, state.goal.score]]) {
+      group.bar.max = max;
+      group.bar.value = Math.min(max, value);
+    }
+    hud.combo.textContent = '🔥 콤보 ' + state.streak;
     hud.bomb.textContent = '💣 선물 폭탄 ×' + state.bombs;
     hud.bomb.disabled = !state.bombs || state.status !== 'playing' || !!modal;
   }
@@ -412,39 +448,68 @@
     const p = route.problem;
     const stage = el('section', 'play-stage');
     const strip = el('div', 'play-hud');
+    const character = el('div', 'moa-panel');
+    const speech = el('span', 'moa-bubble', '차변부터 볼까?');
     const mascot = el('canvas', 'moa');
     mascot.setAttribute('aria-hidden', 'true');
+    character.append(mascot, el('span', 'moa-name', '모아'), speech);
     const board = el('canvas', 'puzzle-canvas');
-    board.setAttribute('aria-label', '8×8 퍼즐 보드와 조각 세 개. 아래 조각을 끌어 빈칸에 놓으세요.');
+    board.setAttribute('aria-label', '8×8 퍼즐 보드와 조각 세 개. 아래 조각을 탭한 뒤 시작 칸을 탭하거나, 조각을 끌어 놓으세요.');
     const header = el('div', 'hud-info');
     header.append(el('h1', '', D.CORNERS.find(c => c.key === p.corner).name + ' ' + p.stage + '단계'));
     if (D.EXAM[p.gen]) header.append(el('span', 'badge', '3차 대비'));
     const scores = el('div', 'scores');
-    hud = { score: el('strong'), best: el('strong'), goal: el('span'), combo: el('span') };
-    scores.append(hud.score, hud.best);
-    header.append(scores, hud.goal, hud.combo);
-    strip.append(mascot, header);
+    function target(label, cls) {
+      const node = el('div', 'target-meter');
+      const title = el('span', 'target-label');
+      const bar = meter(label, cls);
+      node.append(title, bar);
+      return { node, bar, label: title };
+    }
+    hud = { score: el('strong', 'score-value'), best: el('strong', 'best-value'),
+      combo: el('span', 'combo-badge'), lines: target('목표 줄 진행률', 'mint-meter'),
+      points: target('목표 점수 진행률', 'gold-meter') };
+    const currentScore = el('div', 'score-current');
+    currentScore.append(el('span', 'score-label', 'SCORE'), hud.score);
+    const secondary = el('div', 'score-secondary');
+    secondary.append(hud.best, hud.combo);
+    scores.append(currentScore, secondary);
+    header.append(scores, hud.lines.node, hud.points.node);
+    strip.append(character, header);
     hud.bomb = button('선물 폭탄', () => {
       const isArmed = hud.bomb.getAttribute('aria-pressed') === 'true';
       const active = view.armBomb(!isArmed);
       hud.bomb.setAttribute('aria-pressed', String(active));
-      hint.textContent = active ? '폭탄을 터뜨릴 보드의 칸을 탭하세요.' : '조각을 끌어서 놓으세요.';
+      hint.textContent = active ? '폭탄을 터뜨릴 보드의 칸을 탭하세요.' : '조각을 탭한 뒤 놓을 칸을 탭하거나 끌어 놓으세요.';
     }, 'bomb-button');
     hud.bomb.setAttribute('aria-pressed', 'false');
-    const hint = el('p', 'play-hint', '조각을 끌어서 놓으세요.');
+    const hint = el('p', 'play-hint', '조각을 탭한 뒤 놓을 칸을 탭하거나 끌어 놓으세요.');
     const foot = el('div', 'play-actions');
     foot.append(hud.bomb, hint);
     stage.append(strip, board, foot);
     root.append(stage);
     game = E.createGame({ corner: p.corner, level: p.stage, bestScore: levelRecord(p).best, snapshot: run.snapshot });
-    view = E.mount({ canvas: board, mascot, game });
+    view = E.mount({ canvas: board, mascot, game, onSelection(index) {
+      if (hud.bomb.getAttribute('aria-pressed') === 'true') return;
+      hint.textContent = index === null ? '조각을 탭한 뒤 놓을 칸을 탭하거나 끌어 놓으세요.'
+        : '놓을 시작 칸을 탭하세요. 같은 조각을 탭하면 취소됩니다.';
+    } });
+    let bubbleTimer;
+    const currentView = generation;
     game.subscribe((event, state) => {
       audio.play(event.type, event);
+      if (event.type === 'lines') {
+        speech.textContent = '분개하기!';
+        clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(() => {
+          if (currentView === generation && !modal) speech.textContent = '차변부터 볼까?';
+        }, 1100);
+      }
       updateHud(state);
       if (['place', 'bomb', 'revive'].includes(event.type)) persist(state);
       if (event.type === 'bomb') {
         hud.bomb.setAttribute('aria-pressed', 'false');
-        hint.textContent = '조각을 끌어서 놓으세요.';
+        hint.textContent = '조각을 탭한 뒤 놓을 칸을 탭하거나 끌어 놓으세요.';
       }
       if (event.type === 'goal' || event.type === 'no-moves') {
         run.phase = event.type === 'goal' ? 'mission' : 'revival';
@@ -502,8 +567,8 @@
   }
 
   function amountChoices(p, value) {
-    const candidates = [...new Set([value, ...p.decoys.map(d => d.amount), ...p.entries.map(e => e.amount),
-      value + 1000, value + 10000, Math.floor(value * 1.1)])].filter(Number.isSafeInteger);
+    const candidates = [...new Set([value, ...(p.amountDecoys ?? []), ...p.decoys.map(d => d.amount), ...p.entries.map(e => e.amount),
+      value + 1000, value + 10000, Math.floor(value * 1.1)])].filter(n => Number.isSafeInteger(n) && n > 0);
     return shuffle(candidates.slice(0, 4));
   }
 
@@ -588,21 +653,29 @@
       }
     }
 
+    const amountQuestions = p.entries.length >= 3
+      ? [{ title: '차변의 합계는 얼마인가요?', amount: p.entries.filter(entry => entry.side === 'd')
+        .reduce((sum, entry) => sum + entry.amount, 0) }]
+      : p.entries.map(entry => ({
+        title: (entry.side === 'd' ? '차변' : '대변') + ' · ' + entry.account + ' 금액',
+        amount: entry.amount
+      }));
+
     function takeAmounts(index = 0) {
-      if (index >= p.entries.length) { finish(true); return; }
-      const entry = p.entries[index];
+      if (index >= amountQuestions.length) { finish(true); return; }
+      const question = amountQuestions[index];
       const pool = el('div', 'chip-bank');
       task.replaceChildren(el('p', 'instruction',
-        (entry.side === 'd' ? '차변' : '대변') + ' · ' + entry.account + ' 금액 (' + (index + 1) + '/' + p.entries.length + ')'), pool);
-      for (const value of amountChoices(p, entry.amount)) {
-        pool.append(button(format(value) + '원', () => value === entry.amount ? takeAmounts(index + 1) : finish(false), 'chip'));
+        question.title + (amountQuestions.length > 1 ? ' (' + (index + 1) + '/' + amountQuestions.length + ')' : '')), pool);
+      for (const value of amountChoices(p, question.amount)) {
+        pool.append(button(format(value) + '원', () => value === question.amount ? takeAmounts(index + 1) : finish(false), 'chip'));
       }
     }
 
     const groups = missionGroups(p);
     function groupAt(index) {
       if (index === groups.length) {
-        if (p.mode === 'journal' && p.amountPhase) takeAmounts();
+        if (p.mode === 'journal' && (p.amountPhase || p.entries.length >= 3)) takeAmounts();
         else finish(true);
         return;
       }
@@ -881,14 +954,15 @@
         [r.best_score, r.cleared_stages, r.best_combo].every(n => Number.isSafeInteger(Number(n)) && Number(n) >= 0))
         .sort((a, b) => b.best_score - a.best_score || b.cleared_stages - a.cleared_stages || b.best_combo - a.best_combo);
       if (!sorted.length) list.append(el('p', '', '점수 기록이 아직 없어요.'));
-      sorted.slice(0, 30).forEach((entry, index) => list.append(el('p', 'rank-row',
+      sorted.slice(0, 20).forEach((entry, index) => list.append(el('p', 'rank-row',
         (index + 1) + '. ' + entry.nickname + ' · ' + format(entry.best_score) + '점 · ' +
         entry.cleared_stages + '단계 · 콤보 ' + entry.best_combo)));
     };
     updateProfile();
     save();
     draw(Object.values(store.profiles));
-    root.append(state, list);
+    const sourceHint = el('p', 'muted', '온라인에 연결되기 전에는 이 기기에 저장된 기록이 표시됩니다.');
+    root.append(state, sourceHint, list);
     if (!store.nickname) root.append(nicknameForm());
     const config = boardConfig();
     if (!config) return;
@@ -897,7 +971,8 @@
       try {
         const remote = await rpc(config, config.board, {});
         if (generation !== token || !Array.isArray(remote)) return;
-        state.textContent = '온라인 점수판';
+        state.textContent = '온라인 점수판 · 상위 20명';
+        sourceHint.hidden = true;
         draw(remote);
       } catch { /* 기기 기록 사용 */ }
     })();
