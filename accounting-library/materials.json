@@ -218,5 +218,33 @@
     "chapterOrder": 2,
     "unitOrder": 5,
     "accountOrder": 1
+  },
+  {
+    "id": "current-assets-exam-01",
+    "chapter": "Ⅱ. 자산의 회계 처리",
+    "chapterOrder": 2,
+    "unit": "당좌자산 종합",
+    "unitOrder": 3.5,
+    "account": "기말 대비",
+    "accountOrder": 1,
+    "lesson": 1,
+    "title": "카페 사장님의 장부 미션 · 당좌자산 기말 대비",
+    "description": "현금·현금성자산부터 단기매매증권, 받을어음, 가지급금·선급금·미수금까지 10개 개념을 28장으로 정리하고 6문항으로 점검해요.",
+    "pages": null,
+    "tags": [
+      "현금성자산",
+      "당좌수표",
+      "현금과부족",
+      "당좌차월",
+      "자기앞수표",
+      "단기매매증권",
+      "받을어음",
+      "가지급금",
+      "선급금",
+      "미수금"
+    ],
+    "slides": "materials/current-assets-exam-01/slides.html",
+    "worksheetHtml": null,
+    "worksheetPdf": null
   }
 ]
