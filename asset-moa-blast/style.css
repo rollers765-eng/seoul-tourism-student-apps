@@ -631,3 +631,37 @@ body{
   .section-desc{font-size:13.5px}
   .stage{font-size:17px}
 }
+
+/* v5 · 플레이 영역의 조각 표시와 배치 피드백 */
+#screen-play .board .account-cell-label{
+  display:grid;place-content:center;white-space:pre-line;letter-spacing:0;
+}
+#screen-play .piece-name.acct{
+  font-size:19px;white-space:pre-line;text-overflow:clip;line-height:1.05;
+  text-align:center;letter-spacing:0;
+}
+#screen-play .slot-piece.account-slot{padding-bottom:var(--account-reserve,16px)}
+#screen-play .account-edge{outline:1px solid rgba(255,218,105,.85);outline-offset:-1px;animation:account-edge-glow 2s ease-in-out infinite}
+#screen-play .tray-refill .piece,#screen-play .tray-refill .piece-name{animation:tray-refill-pop .24s ease-out}
+#screen-play .tray-refill .piece.sel{animation:selpulse .9s ease-in-out infinite}
+#screen-play .mission-with-tip{position:relative}
+#screen-play .placement-tip{
+  position:absolute;z-index:12;left:10px;right:10px;top:100%;margin:0;
+  padding:6px 9px;border:1px solid #f8bb97;border-radius:9px;color:#672b23;
+  background:#fff4dd;box-shadow:0 4px 12px #281b4c55;font-size:12px;
+  line-height:1.35;font-weight:800;word-break:keep-all;overflow-wrap:break-word;pointer-events:none;
+}
+#screen-play .placement-tip[hidden]{display:none}
+#screen-play .placement-shake{animation:placement-shake .26s ease-out}
+@keyframes account-edge-glow{0%,100%{outline-color:#ffda6999}50%{outline-color:#ffeebd}}
+@keyframes tray-refill-pop{0%{opacity:.38;scale:.72}64%{opacity:1;scale:1.07}100%{opacity:1;scale:1}}
+@keyframes placement-shake{25%,75%{translate:-3px 0}50%{translate:3px 0}}
+@media(max-width:399px){#screen-play .piece-name.acct{font-size:16px}}
+@media(prefers-reduced-motion:reduce){
+  #screen-play .account-edge,#screen-play .tray-refill .piece,#screen-play .tray-refill .piece-name,
+  #screen-play .placement-shake{animation:none}
+}
+@media(max-width:400px) and (max-height:680px){
+  #screen-play .tray{min-height:108px}
+  #screen-play .slot-piece{height:92px}
+}

@@ -49,6 +49,7 @@
     host.appendChild(b);
     setTimeout(() => b.remove(), 2200);
   }
+  function playScore() { return Math.max(0, P.earned - P.penalty); }
   function won(n) { return Number(n).toLocaleString('ko-KR'); }
   function paintGems() {
     ['#homeGems', '#stagesGems', '#playGems', '#chGems', '#shopGems', '#rankGems', '#bookGems'].forEach((s) => {
@@ -76,48 +77,28 @@
     const list = KIND_STYLES[a.kind] || ['c-asset'];
     return list[hashOf(name) % list.length];
   }
-  function isAccount(name) { return !!ACCT[name]; }
-  function sideOf(name) { return ACCT[name] ? (ACCT[name].inc === '대변' ? 'c' : 'd') : null; }
-
   /* ───────── 조각 모양 카탈로그 ───────── */
+  function shape(name, weight, ...rows) {
+    return { n: name, weight, c: rows.flatMap((row, r) =>
+      [...row].flatMap((cell, c) => cell === '#' ? [[r, c]] : [])) };
+  }
   const SHAPES = [
-    { n: '1', c: [[0, 0]] },
-    { n: '2가로', c: [[0, 0], [0, 1]] },
-    { n: '2세로', c: [[0, 0], [1, 0]] },
-    { n: '3가로', c: [[0, 0], [0, 1], [0, 2]] },
-    { n: '3세로', c: [[0, 0], [1, 0], [2, 0]] },
-    { n: '4가로', c: [[0, 0], [0, 1], [0, 2], [0, 3]] },
-    { n: '4세로', c: [[0, 0], [1, 0], [2, 0], [3, 0]] },
-    { n: '5가로', c: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]] },
-    { n: '5세로', c: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]] },
-    { n: '2x2', c: [[0, 0], [0, 1], [1, 0], [1, 1]] },
-    { n: '2x3', c: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2]] },
-    { n: '3x2', c: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1]] },
-    { n: '3x3', c: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]] },
-    { n: 'ㄱ', c: [[0, 0], [1, 0], [1, 1], [1, 2]] },
-    { n: 'ㄴ', c: [[0, 2], [1, 0], [1, 1], [1, 2]] },
-    { n: '역ㄱ', c: [[0, 0], [0, 1], [0, 2], [1, 0]] },
-    { n: '역ㄴ', c: [[0, 0], [0, 1], [0, 2], [1, 2]] },
-    { n: 'T', c: [[0, 0], [0, 1], [0, 2], [1, 1]] },
-    { n: '역T', c: [[1, 0], [1, 1], [1, 2], [0, 1]] },
-    { n: '+', c: [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]] },
-    { n: 'Z', c: [[0, 0], [0, 1], [1, 1], [1, 2]] },
-    { n: 'S', c: [[0, 1], [0, 2], [1, 0], [1, 1]] },
-    { n: '대각2', c: [[0, 0], [1, 1]] },
-    { n: '대각3', c: [[0, 0], [1, 1], [2, 2]] },
-    { n: '코너3', c: [[0, 0], [1, 0], [1, 1]] },
-    { n: '코너3b', c: [[0, 0], [0, 1], [1, 1]] }
+    shape('2가로', 3, '##'), shape('2세로', 3, '#', '#'),
+    shape('3가로', 4, '###'), shape('3세로', 4, '#', '#', '#'),
+    shape('4가로', 3, '####'), shape('4세로', 3, '#', '#', '#', '#'),
+    shape('2x2', 4, '##', '##'), shape('3x3', 0.6, '###', '###', '###'),
+    shape('ㄱ 소', 3, '##', '.#'), shape('역ㄱ 소', 3, '##', '#.'),
+    shape('ㄴ 소', 3, '#.', '##'), shape('역ㄴ 소', 3, '.#', '##'),
+    shape('ㄱ 대', 2, '###', '..#', '..#'), shape('역ㄱ 대', 2, '###', '#..', '#..'),
+    shape('ㄴ 대', 2, '#..', '#..', '###'), shape('역ㄴ 대', 2, '..#', '..#', '###'),
+    shape('+', 2, '.#.', '###', '.#.')
   ];
-  const SMALL = SHAPES.filter((s) => s.c.length <= 3);
+  const ACCOUNT_SHAPES = SHAPES.filter((s) => s.c.length <= 4);
+  const ACCOUNT_RATE = 0.42;
 
-  function shapeWeighted() {
-    // 큰 조각은 조금 덜, 작은 조각은 조금 더 (막힘 방지)
-    const bag = [];
-    SHAPES.forEach((s) => {
-      const w = s.c.length <= 2 ? 3 : s.c.length <= 4 ? 4 : s.c.length <= 6 ? 2 : 1;
-      for (let i = 0; i < w; i++) bag.push(s);
-    });
-    return bag[Math.floor(Math.random() * bag.length)];
+  function shapeWeighted(pool) {
+    let roll = Math.random() * pool.reduce((sum, sp) => sum + sp.weight, 0);
+    return pool.find((sp) => (roll -= sp.weight) < 0) || pool[0];
   }
   const shuffle = (a) => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
   const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
@@ -180,78 +161,39 @@
 
   function rid() { return Math.random().toString(36).slice(2); }
 
-  /* 순수 색 블록 조각 — 진짜 블록 블라스트 놀이용. 계정과목이 아니라 어디든 놓을 수 있고,
-     줄을 터뜨려 점수를 벌어 준다. */
   const PURE_CATS = ['c-pure1', 'c-pure2', 'c-pure3', 'c-pure4', 'c-pure5'];
-  function newPurePiece(usedCats) {
-    let guard = 0;
-    while (guard++ < 30) {
-      const sp = shapeWeighted();
-      const avail = PURE_CATS.filter((c) => !usedCats || !usedCats[c]);
-      const pool = avail.length ? avail : PURE_CATS;
-      const pc = {
-        key: null, pure: true, cat: pool[Math.floor(Math.random() * pool.length)],
-        cells: sp.c, shape: sp.n, side: null, id: rid()
-      };
-      if (!P) return pc;
-      if (placements(pc, P.grid, P.obst, 'any').length) return pc;
+
+  function makePiece(shape, account = null, side = null, cat = pickOne(PURE_CATS)) {
+    return { key: account, pure: account === null, cat, cells: shape.c, shape: shape.n, side, id: rid() };
+  }
+
+  function playableShapes(pool, side) {
+    return pool.filter((sp) => placements({ cells: sp.c }, P.grid, P.obst, side).length);
+  }
+
+  function nextPiece() {
+    const held = P.tray.filter(Boolean);
+    const accounts = new Set(held.filter((pc) => !pc.pure).map((pc) => pc.key));
+    const open = P.mission.filter((m) => !m.filled && !accounts.has(m.account));
+    if (open.length && (!accounts.size || Math.random() < ACCOUNT_RATE)) {
+      const options = shuffle(open).map((m) => ({ m, shapes: playableShapes(ACCOUNT_SHAPES, m.side) }));
+      const { m, shapes } = options.find((option) => option.shapes.length) || options[0];
+      // 판이 꽉 찬 경우에도 필요한 계정은 트레이에 남겨 두고 색 블록으로 판을 열 수 있게 한다.
+      return makePiece(shapeWeighted(shapes.length ? shapes : ACCOUNT_SHAPES), m.account, m.side, catClass(m.account));
     }
-    return { key: null, pure: true, cat: PURE_CATS[0], cells: SHAPES[0].c, shape: '1', side: null, id: rid() };
+    const available = playableShapes(SHAPES, 'any');
+    const colors = PURE_CATS.filter((cat) => !held.some((pc) => pc.cat === cat));
+    return makePiece(shapeWeighted(available.length ? available : SHAPES), null, null, pickOne(colors.length ? colors : PURE_CATS));
   }
 
-  /* 계정과목 조각 — 차변/대변 제 존에만 놓을 수 있고, 놓으면 분개 칸이 채워진다. */
-  function newAccountPiece(key, sideHint) {
-    const cat = catClass(key);
-    const side = sideHint || 'any';
-    const pool = SMALL.concat(SHAPES.filter((s) => s.c.length <= 4));
-    let guard = 0;
-    while (guard++ < 60) {
-      const sp = pickOne(pool);
-      const pc = { key: key, pure: false, cat: cat, cells: sp.c, shape: sp.n, side: side === 'any' ? null : side, id: rid() };
-      if (!P) return pc;
-      if (placements(pc, P.grid, P.obst, side).length) return pc;
-    }
-    return null; // 지금은 이 존에 놓을 자리가 없다 → 다음 트레이에서 다시
-  }
-
-  const CORNER_POOL = {};
-  function cornerAccounts(key) {
-    if (CORNER_POOL[key]) return CORNER_POOL[key];
-    const set = {};
-    (D.STAGES[key] || []).forEach((st) => {
-      (st.entries || []).forEach((e) => { if (e.account) set[e.account] = 1; });
-      (st.picks || []).forEach((p) => { if (isAccount(p.label)) set[p.label] = 1; });
-    });
-    CORNER_POOL[key] = Object.keys(set);
-    return CORNER_POOL[key];
-  }
-
-  /* 트레이 3칸 = 순수 색 블록 + 계정과목 조각의 혼합
-     턴1·3 → 계정 1 + 색 블록 2 / 턴2 → 계정 2 + 색 블록 1 / 턴4 → 색 블록 3(블록 블라스트 턴) */
   function refillTray() {
-    P.turn = (P.turn || 0) + 1;
-    const open = P.mission.filter((m) => !m.filled);
-    const tray = [];
-    if (open.length) {
-      const phase = P.turn % 4;
-      const accCount = phase === 0 ? 0 : (phase === 2 && open.length >= 2 ? 2 : 1);
-      shuffle(open).slice(0, accCount).forEach((m) => {
-        const pc = newAccountPiece(m.account, m.side);
-        if (pc) tray.push(pc);
-      });
-    }
-    let guard = 0;
-    const usedCats = {};
-    while (tray.length < 3 && guard++ < 30) {
-      const pc = newPurePiece(usedCats);
-      if (pc) { usedCats[pc.cat] = 1; tray.push(pc); }
-    }
-    P.tray = shuffle(tray).slice(0, 3);
+    P.tray = new Array(3).fill(null);
+    for (let i = 0; i < P.tray.length; i++) P.tray[i] = nextPiece();
     renderTray();
   }
 
   function anyTrayFits() {
-    return P.tray.some((p) => p && placements(p, P.grid, P.obst, 'any').length > 0);
+    return P.tray.some((p) => p && placements(p, P.grid, P.obst, p.side || 'any').length > 0);
   }
 
   /* ───────── 렌더 ───────── */
@@ -268,67 +210,130 @@
       else if (v) {
         const b = document.createElement('div');
         b.className = 'blk ' + v.cat + (v.sealed ? ' sealed' : '') + (v.pure ? ' pure' : '');
+        if (v.key && !v.pure) b.classList.add('account-edge');
         if (v.key) {
           const s = document.createElement('span');
+          s.className = 'account-cell-label';
+          s.dataset.label = v.key;
           s.textContent = v.key;
           b.appendChild(s);
         }
         d.appendChild(b);
-        if (animSet && animSet.has(i)) { b.classList.add('drop-anim'); }
+        if (animSet && animSet.has(i)) { d.classList.add('drop-anim'); }
       }
       boardEl.appendChild(d);
     }
+    fitBoardLabels();
   }
 
   function trayCell() { return window.innerWidth <= 350 ? 22 : window.innerWidth <= 400 ? 26 : 29; }
 
-  function renderTray() {
-    trayEl.innerHTML = '';
-    const cs = trayCell();
-    let any = false;
+  const labelMeasure = document.createElement('canvas').getContext('2d');
+  function fitLabel(node, width, height, maxSize, maxLines, lineHeight) {
+    const label = node.dataset.label;
+    if (width <= 0 || height <= 0 || !labelMeasure) return;
+    const font = getComputedStyle(node).fontFamily;
+    const chars = [...label];
+    for (let size = maxSize; size >= 5; size--) {
+      labelMeasure.font = '900 ' + size + 'px ' + font;
+      if (size * lineHeight <= height && labelMeasure.measureText(label).width <= width) {
+        node.style.fontSize = size + 'px';
+        node.textContent = label;
+        return;
+      }
+      if (maxLines === 1 || 2 * size * lineHeight > height) continue;
+      const middle = Math.ceil(chars.length / 2);
+      const lines = [chars.slice(0, middle).join('').trim(), chars.slice(middle).join('').trim()];
+      if (lines.every((line) => labelMeasure.measureText(line).width <= width)) {
+        node.style.fontSize = size + 'px';
+        node.textContent = lines.join('\n');
+        return;
+      }
+    }
+    node.style.fontSize = '5px';
+    node.textContent = label;
+  }
+
+  function fitBoardLabels() {
+    const sample = boardEl.firstElementChild;
+    if (!sample) return;
+    boardEl.querySelectorAll('.account-cell-label').forEach((node) =>
+      fitLabel(node, sample.clientWidth - 4, sample.clientHeight - 3, 15, 2, 1.05));
+  }
+
+  function fitTrayPieces() {
+    trayEl.querySelectorAll('.slot-piece').forEach((wrap) => {
+      const piece = wrap.querySelector('.piece');
+      if (!piece) return;
+      const name = wrap.querySelector('.piece-name.acct');
+      const { rows, cols } = piece.dataset;
+      if (name) fitLabel(name, wrap.clientWidth - 19, 28, innerWidth < 400 ? 16 : 19, 2, 1.05);
+      const reserve = name ? Math.max(16, name.offsetHeight + 3) : 0;
+      wrap.classList.toggle('account-slot', !!name);
+      if (name) wrap.style.setProperty('--account-reserve', reserve + 'px');
+      const size = Math.floor(Math.min(trayCell(), (wrap.clientWidth - 6 - (cols - 1) * 3) / cols,
+        (wrap.clientHeight - reserve - 8 - (rows - 1) * 3) / rows));
+      if (size > 0) {
+        piece.style.gridTemplateColumns = 'repeat(' + cols + ', ' + size + 'px)';
+        piece.style.gridTemplateRows = 'repeat(' + rows + ', ' + size + 'px)';
+      }
+    });
+  }
+
+  function renderTray(replacedSlot) {
+    const replacing = Number.isInteger(replacedSlot) && trayEl.children.length === 3;
+    if (!replacing) trayEl.replaceChildren();
     P.tray.forEach((pc, si) => {
+      if (replacing && si !== replacedSlot) return;
       const wrap = document.createElement('div');
       wrap.className = 'slot-piece';
-      if (!pc) { trayEl.appendChild(wrap); return; }
-      any = true;
-      const el = document.createElement('div');
-      el.className = 'piece' + (pc.pure ? ' pure' : ' acct');
-      el.style.gap = '3px';
-      el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', (pc.pure ? '색 블록 조각 · 어디든 놓아 줄을 터뜨려요' : pc.key + ' 조각 · 끌어 놓거나 눌러서 고르기'));
-      el.tabIndex = 0;
-      el.addEventListener('keydown', function (ev) {
-        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selectPiece(si); }
-      });
-      el.dataset.slot = String(si);
-      const rows = Math.max.apply(null, pc.cells.map((x) => x[0])) + 1;
-      const cols = Math.max.apply(null, pc.cells.map((x) => x[1])) + 1;
-      el.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cs + 'px)';
-      el.style.gridTemplateRows = 'repeat(' + rows + ', ' + cs + 'px)';
-      const map = {};
-      pc.cells.forEach(([r, c]) => { map[r + ':' + c] = 1; });
-      const first = pc.cells.slice().sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]))[0];
-      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-        const cell = document.createElement('div');
-        if (map[r + ':' + c]) {
-          cell.className = 'pcell ' + pc.cat;
-        } else cell.style.visibility = 'hidden';
-        el.appendChild(cell);
+      if (pc) {
+        const piece = document.createElement('div');
+        piece.className = 'piece' + (pc.pure ? ' pure' : ' acct');
+        piece.style.gap = '3px';
+        piece.setAttribute('role', 'button');
+        piece.setAttribute('aria-label', pc.pure ? '색 블록 조각 · 어디든 놓아 줄을 터뜨려요' :
+          pc.key + ' 조각 · 끌어 놓거나 눌러서 고르기');
+        piece.tabIndex = 0;
+        piece.dataset.slot = String(si);
+        piece.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selectPiece(si); }
+        });
+        const rows = Math.max(...pc.cells.map(([r]) => r)) + 1;
+        const cols = Math.max(...pc.cells.map(([, c]) => c)) + 1;
+        piece.dataset.rows = rows;
+        piece.dataset.cols = cols;
+        const cells = new Set(pc.cells.map(([r, c]) => r + ':' + c));
+        for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+          const cell = document.createElement('div');
+          if (cells.has(r + ':' + c)) cell.className = 'pcell ' + pc.cat + (pc.pure ? '' : ' account-edge');
+          else cell.style.visibility = 'hidden';
+          piece.appendChild(cell);
+        }
+        wrap.appendChild(piece);
+        if (!pc.pure) {
+          const name = document.createElement('span');
+          name.className = 'piece-name acct';
+          name.dataset.label = pc.key;
+          name.textContent = pc.key;
+          wrap.appendChild(name);
+        }
+        if (replacedSlot === si) wrap.classList.add('tray-refill');
       }
-      wrap.appendChild(el);
-      const nm = document.createElement('span');
-      nm.className = 'piece-name' + (pc.pure ? ' pure' : ' acct');
-      nm.textContent = pc.pure ? '색 블록' : pc.key;
-      wrap.appendChild(nm);
-      trayEl.appendChild(wrap);
+      if (replacing) trayEl.children[si].replaceWith(wrap);
+      else trayEl.appendChild(wrap);
     });
-    if (!any) {
-      const d = document.createElement('div');
-      d.className = 'tray-empty';
-      d.textContent = '조각을 불러오는 중…';
-      trayEl.appendChild(d);
-    }
+    fitTrayPieces();
+    paintSelection();
   }
+
+  function fitPlayLabels() {
+    if (!P || !$('#screen-play').classList.contains('active')) return;
+    fitTrayPieces();
+    fitBoardLabels();
+  }
+  window.addEventListener('resize', fitPlayLabels);
+  document.fonts?.ready.then(fitPlayLabels);
 
   function renderMission() {
     const st = P.st;
@@ -370,7 +375,7 @@
     }
     const done = P.mission.filter((m) => m.filled).length;
     missionProgEl.innerHTML = P.mission.map((m) => '<i class="' + (m.filled ? 'on' : '') + '"></i>').join('');
-    $('#playScore').textContent = won(P.score);
+    $('#playScore').textContent = won(playScore());
     $('#playStageLabel').textContent = cornerName(P.cornerKey) + ' ' + P.stageNo + '단계 · ' + done + '/' + P.mission.length;
   }
 
@@ -400,7 +405,7 @@
 
   trayEl.addEventListener('pointerdown', function (e) {
     const pEl = e.target.closest('.piece');
-    if (!pEl || !P || P.over || P.done) return;
+    if (!pEl || !P || P.over || P.done || P.settling || drag) return;
     const si = Number(pEl.dataset.slot);
     const pc = P.tray[si];
     if (!pc) return;
@@ -503,7 +508,7 @@
   });
 
   function selectPiece(slot) {
-    if (!P || P.over || P.done) return;
+    if (!P || P.over || P.done || P.settling) return;
     if (sel && sel.slot === slot) { sel = null; }
     else { sel = { slot: slot }; SOUND.play('place'); }
     paintSelection();
@@ -530,7 +535,7 @@
 
   /* 보드 탭 배치 (드래그 보조) */
   boardEl.addEventListener('click', function (e) {
-    if (!sel || !P || P.over || P.done) return;
+    if (!sel || !P || P.over || P.done || P.settling) return;
     const cell = e.target.closest('.cell');
     if (!cell) return;
     const i = Number(cell.dataset.i);
@@ -552,30 +557,59 @@
     SOUND.play('wrong');
   });
 
+  let tipTimer;
+  function particle(word, closed, open) {
+    const letter = word.trim().slice(-1).charCodeAt(0);
+    return letter >= 0xac00 && letter <= 0xd7a3 && (letter - 0xac00) % 28 ? closed : open;
+  }
+
+  function showPlacementTip(entry) {
+    const name = entry.account;
+    const info = ACCT[name];
+    const where = entry.side === 'd' ? '차변' : '대변';
+    let hint;
+    if (info?.inc === where) {
+      hint = name + particle(name, '은', '는') + ' ' + info.kind + ' 계정이라 늘어나면 ' + where + '에 적어요.';
+    } else if (info?.inc) {
+      hint = '이 거래에서는 ' + name + particle(name, '이', '가') + ' 줄어서 ' + where +
+        '에 적어요. (늘어날 때는 ' + info.inc + ')';
+    } else {
+      hint = name + particle(name, '은', '는') + ' 이 거래에서 ' + where + '에 적어요.';
+    }
+    const tip = $('#placementTip');
+    tip.textContent = '−30점 · ' + hint + (playScore() === 0 ? ' 점수는 0점 아래로 내려가지 않아요.' : '');
+    tip.hidden = false;
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(() => { tip.hidden = true; }, 3200);
+    boardEl.classList.remove('placement-shake');
+    void boardEl.offsetWidth;
+    boardEl.classList.add('placement-shake');
+  }
+
   /* ───────── 배치 ───────── */
   function tryPlace(piece, slot, r0, c0) {
-    if (!canPlace(piece, r0, c0, P.grid, P.obst)) return;
-    const miss = piece.pure ? null : P.mission.filter((m) => !m.filled && m.account === piece.key)[0];
+    if (!P || P.done || P.over || P.settling || P.tray[slot] !== piece ||
+      !canPlace(piece, r0, c0, P.grid, P.obst)) return;
+    const miss = piece.pure ? null : P.mission.find((m) => !m.filled && m.account === piece.key && m.side === piece.side);
+    if (!piece.pure && !miss) return;
     const sideForPiece = miss ? miss.side : null;
     if (miss && sideForPiece !== 'any' && !inSide(piece, r0, c0, sideForPiece)) {
-      // 틀린 존 → 되돌리고 힌트
-      const where = sideForPiece === 'd' ? '차변' : '대변';
-      const a = ACCT[piece.key];
-      const hint = a ? (piece.key + '은(는) ' + where + '에 놓아요') : (piece.key + '은(는) ' + where + ' 칸이에요');
-      bubble('❌ ' + hint);
-      toast(hint);
-      SOUND.play('wrong');
+      P.penalty += 30;
       P.combo = 0;
       renderMission();
+      showPlacementTip(miss);
+      SOUND.play('wrong');
       return;
     }
+    P.settling = true;
+    sel = null;
     // 히스토리 저장
     P.history.push({
       grid: P.grid.slice(),
       obst: new Set(P.obst),
       mission: P.mission.map((m) => Object.assign({}, m)),
       tray: P.tray.slice(),
-      score: P.score, combo: P.combo
+      earned: P.earned, combo: P.combo, clears: P.clears, placed: P.placed
     });
     if (P.history.length > 40) P.history.shift();
 
@@ -594,7 +628,7 @@
     if (miss) {
       miss.filled = true;
       cellsFor(piece, r0, c0).forEach(([r, c]) => { P.grid[idx(r, c)].sealed = true; });
-      P.score += 150;
+      P.earned += 150;
       SOUND.play('right');
       setTimeout(() => bubble('✅ ' + piece.key + ' 자리 완성!'), 60);
       const slotEl = journalEl.querySelector('.jslot[data-acc="' + piece.key + '"]');
@@ -603,24 +637,21 @@
     } else if (piece.pure) {
       // 색 블록은 놓는 것만으로도 점수 (블록 블라스트 손맛)
       const gain = 5 * piece.cells.length;
-      P.score += gain;
+      P.earned += gain;
       P.placed = (P.placed || 0) + 1;
     }
 
     renderBoard(anim);
     renderMission();
-    $('#playScore').textContent = won(P.score);
 
-    // 줄 터짐
-    setTimeout(() => {
-      const cleared = resolveLines();
-      if (cleared.lines.length) {
-        afterClear(cleared);
-      } else {
-        P.combo = 0;
-      }
-      finishTurn();
-    }, 130);
+    // 판 상태를 먼저 정산해 같은 입력 이벤트에서 실제로 놓을 수 있는 조각을 공급한다.
+    const cleared = resolveLines();
+    if (cleared.count) afterClear(cleared);
+    else P.combo = 0;
+    P.tray[slot] = nextPiece();
+    renderTray(slot);
+    P.settling = false;
+    finishTurn();
   }
 
   function resolveLines() {
@@ -668,14 +699,16 @@
   }
 
   function afterClear(res) {
-    const pts = [0, 100, 300, 600, 1000, 1400, 1800, 2200][Math.min(7, res.count)] + res.obstCleared * 50;
+    const clearPoints = [0, 300, 800, 1500, 2400];
+    const pts = (clearPoints[res.count] ?? 100 * res.count * (res.count + 2)) + res.obstCleared * 50;
     P.clears += res.count;
-    P.score += pts;
+    P.earned += pts;
     const goalEl = $('#missionGoal');
-    if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림! +300'; }
+    if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림!'; }
     P.combo = Math.min(9, P.combo + 1);
+    const comboGain = (P.combo - 1) * 120;
     if (P.combo >= 2) {
-      P.score += (P.combo - 1) * 50;
+      P.earned += comboGain;
       const banner = $('#comboBanner');
       banner.textContent = 'COMBO ×' + P.combo;
       banner.classList.add('show');
@@ -685,12 +718,13 @@
     } else {
       SOUND.play('clear', res.count);
     }
-    flashText('+' + pts);
-    $('#playScore').textContent = won(P.score);
+    flashText('+' + (pts + comboGain));
+    $('#playScore').textContent = won(playScore());
     if (res.count >= 1) fx.confetti(res.count >= 3 ? 150 : res.count >= 2 ? 100 : 55);
     if (res.count >= 2) fx.firework();
     if (res.count >= 3) fx.fireworks(2);
-    setTimeout(() => { renderBoard(); }, 320);
+    const stage = P;
+    setTimeout(() => { if (P === stage) renderBoard(); }, 320);
   }
 
   function flashText(text) {
@@ -702,14 +736,21 @@
   }
 
   function finishTurn() {
-    if (P.done) return;
-    const all = P.mission.every((m) => m.filled);
-    if (all) { setTimeout(stageClear, 260); return; }
-    if (P.tray.filter(Boolean).length === 0) refillTray();
+    const stage = P;
+    if (stage.done || stage.settling) return;
+    if (stage.mission.every((m) => m.filled)) {
+      stage.settling = true;
+      setTimeout(() => {
+        if (P !== stage) return;
+        stage.settling = false;
+        stageClear();
+      }, 260);
+      return;
+    }
     if (!anyTrayFits()) {
-      setTimeout(function () {
-        if (P.done) return;
-        P.over = true;
+      setTimeout(() => {
+        if (P !== stage || stage.done || !$('#screen-play').classList.contains('active') || anyTrayFits()) return;
+        stage.over = true;
         $('#overLine').textContent = '조각 3개를 놓을 자리가 없어요. 이어하기로 보드를 정리할까요?';
         $('#ovOver').hidden = false;
       }, 300);
@@ -723,17 +764,23 @@
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: buildObstacles(stageNo),
-      mission: buildMission(st), tray: [], score: 0, combo: 0, clears: 0, turn: 0, placed: 0,
+      mission: buildMission(st), tray: [], earned: 0, penalty: 0, combo: 0, clears: 0, placed: 0, settling: false,
       history: [], over: false, done: false, startedAt: Date.now()
     };
     SAVE.last = { corner: cornerKey, stage: stageNo }; save();
+    clearTimeout(tipTimer);
+    $('#placementTip').hidden = true;
+    boardEl.classList.remove('placement-shake');
+    sel = null;
+    if (drag?.ghost) drag.ghost.remove();
+    drag = null;
+    show('screen-play');
     renderBoard();
     refillTray();
     renderMission();
     $('#playScore').textContent = '0';
     const g = $('#missionGoal');
     if (g) { g.classList.remove('on'); g.textContent = '🎯 한 줄 터뜨리면 +300'; }
-    show('screen-play');
     SOUND.start();
     if (stageNo <= 2) bubble('색 블록은 어디든! 계정 블록은 차변·대변 제자리에');
   }
@@ -747,7 +794,7 @@
     const room = Math.max(0, 40 - Math.max(0, filled - 8) * 2);
     const comboBonus = P.combo * 30;
     const lineBonus = P.clears > 0 ? 300 : 0;
-    const total = 500 + P.score + speed + room + comboBonus + lineBonus;
+    const total = Math.max(0, 500 + P.earned - P.penalty + speed + room + comboBonus + lineBonus);
     const stars = total >= 1100 ? 3 : total >= 750 ? 2 : 1;
     const gems = 5 + (stars - 1) * 2;
     const id = P.st.id;
@@ -763,7 +810,7 @@
     $('#clearTitle').textContent = stars === 3 ? '완벽한 분개!' : '분개 완성!';
     $('#clearScore').textContent = won(total);
     $('#clearBreakdown').innerHTML =
-      '<span>기본 500</span><span>블록 ' + won(P.score) + '</span><span>속도 +' + won(speed) + '</span>' +
+      '<span>기본 500</span><span>블록 ' + won(P.earned) + '</span>' + (P.penalty ? '<span>실수 −' + won(P.penalty) + '</span>' : '') + '<span>속도 +' + won(speed) + '</span>' +
       '<span>여유 +' + won(room) + '</span><span>콤보 +' + won(comboBonus) + '</span>' +
       (lineBonus ? '<span>줄터짐 +300</span>' : '') + '<span>💎 +' + gems + '</span>';
     $('#clearJournal').innerHTML = journalHTML(P.st);
@@ -793,13 +840,13 @@
 
   /* ───────── 아이템 ───────── */
   function useItem(name) {
-    if (!P || P.done) return;
+    if (!P || P.done || P.settling) return;
     const cost = { undo: 3, clean: 8, hint: 2 }[name];
     if (SAVE.gems < cost) { toast('보석이 모자라요 (필요 💎' + cost + ')'); SOUND.play('wrong'); return; }
     if (name === 'undo') {
       const h = P.history.pop();
       if (!h) { toast('되돌릴 배치가 없어요'); return; }
-      P.grid = h.grid; P.obst = h.obst; P.mission = h.mission; P.tray = h.tray; P.score = h.score; P.combo = h.combo;
+      P.grid = h.grid; P.obst = h.obst; P.mission = h.mission; P.tray = h.tray; P.earned = h.earned; P.combo = h.combo; P.clears = h.clears; P.placed = h.placed;
       renderBoard(); renderTray(); renderMission();
     } else if (name === 'clean') {
       let removed = 0;
@@ -1223,7 +1270,7 @@
     if (correct) {
       const score = 100 + left * 20;
       const gems = 1 + (left >= 10 ? 1 : 0) + (left >= 13 ? 1 : 0);
-      P && ((P.score += score));
+      P && ((P.earned += score));
       SAVE.gems += gems;
       SAVE.best = Math.max(SAVE.best, score);
       save(); paintGems();
@@ -1365,7 +1412,7 @@
   });
   $('#btnChallenge').addEventListener('click', openChallenge);
   $('#itemChallenge').addEventListener('click', () => {
-    if (!P || P.done) return;
+    if (!P || P.done || P.settling) return;
     openChallenge();
   });
   $('#btnShop').addEventListener('click', () => { renderShop(); show('screen-shop'); });
@@ -1395,7 +1442,7 @@
   window.__blast = {
     state: function () {
       return P ? {
-        corner: P.cornerKey, stage: P.stageNo, score: P.score, combo: P.combo,
+        corner: P.cornerKey, stage: P.stageNo, score: playScore(), earned: P.earned, penalty: P.penalty, combo: P.combo,
         mission: P.mission.map((m) => ({ side: m.side, account: m.account, filled: m.filled })),
         tray: P.tray.map((p) => p && { key: p.key, pure: !!p.pure, cells: p.cells, shape: p.shape, side: p.side }),
         obstacles: Array.from(P.obst), gridFilled: P.grid.filter(Boolean).length,
