@@ -645,6 +645,7 @@
       SOUND.play('clear', res.count);
     }
     flashText('+' + pts);
+    $('#playScore').textContent = won(P.score);
     if (res.count >= 2) { fx.confetti(36); fx.firework(); }
     setTimeout(() => { renderBoard(); }, 320);
   }
