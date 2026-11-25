@@ -2319,6 +2319,13 @@
         html += '<div class="action-bar"><button type="button" class="btn btn-accent" data-reset-challenge="1">' + escapeHtml(window.APP_CONFIG.challengeLabel) + ' 연습 초기화 후 다시 풀기</button></div>';
       }
       html += '</section>';
+
+      if (slide.diagramHtml) {
+        html += '<section class="panel-card"><div class="svg-frame">' + slide.diagramHtml + '</div></section>';
+      }
+      if (slide.sidePanelHtml) {
+        html += '<section class="panel-card"><h2 class="panel-title">' + escapeHtml(slide.sidePanelTitle || '복습 안내') + '</h2>' + slide.sidePanelHtml + '</section>';
+      }
       return html;
     }
 
