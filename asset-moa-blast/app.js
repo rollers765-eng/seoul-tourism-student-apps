@@ -295,7 +295,10 @@
     }
     const available = playableShapes(SHAPES, 'any');
     const colors = PURE_CATS.filter((cat) => !held.some((pc) => pc.cat === cat));
-    return makePiece(available.length ? preferredShape(available, 'any', P.st.mode === 'pure' ? (P.placed === 0 ? 1 : 0.65) : 0.4) : SINGLE, null, null, pickOne(colors.length ? colors : PURE_CATS));
+    const speed = P.st.mode === 'pure';
+    const opening = speed && P.placed === 0 && held.length < 2 && available.find((sp) => sp.n === '2가로');
+    const selected = opening || (available.length ? preferredShape(available, 'any', speed ? 0.65 : 0.4) : SINGLE);
+    return makePiece(selected, null, null, pickOne(colors.length ? colors : PURE_CATS));
   }
 
   function refillTray() {
@@ -400,7 +403,7 @@
       if (!piece) return;
       const name = wrap.querySelector('.piece-name.acct');
       const { rows, cols } = piece.dataset;
-      if (name) fitLabel(name, wrap.clientWidth - 14, 22, innerWidth >= 600 ? 13 : 12, 2, 1.05);
+      if (name) fitLabel(name, wrap.clientWidth - 22, 22, innerWidth >= 600 ? 13 : 12, 2, 1.05);
       const reserve = name ? Math.min(26, Math.max(16, name.offsetHeight + 2)) : 0;
       wrap.classList.toggle('account-slot', !!name);
       if (name) wrap.style.setProperty('--account-reserve', reserve + 'px');
