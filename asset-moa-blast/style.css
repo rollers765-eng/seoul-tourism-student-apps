@@ -784,3 +784,26 @@ body{
   #screen-play .mission.mission-dense{--journal-min:68px;--slot-min:26px}
   #screen-play .mission.mission-compact{padding-block:3px;margin-block:1px}
 }
+
+#ovNickname{z-index:130}
+.nickname-panel{display:grid;gap:8px;text-align:left}
+.nickname-panel p,.nickname-panel label{margin:0;font-size:13px;line-height:1.4}
+.nickname-panel input{width:100%;padding:10px;border:2px solid #a47be9;border-radius:11px;font:inherit;color:#33205c;background:#fff}
+#nicknameError{color:#af2045;font-weight:800;min-height:1.4em}
+.rank-local{color:#efecf6}
+.rank-edit{margin-left:auto;border:0;background:none;color:inherit;cursor:pointer;font:inherit}
+#rankBody{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.rank-name{min-width:0;overflow-wrap:anywhere;flex:1}
+#rankBody .rank-row.me,.rc-row.me{outline:1px solid #ffd977;background:#fff2b93d}
+.ch-chip-bank,.ch-journal-zone{display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start}
+.ch-journal-zones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.ch-journal-zone{min-height:65px;border:2px solid #c7b1f0;border-radius:11px;padding:5px;background:#fbf8ff}
+.ch-journal-zone.drag-over,.ch-journal-zone.right{border-color:#319576}
+.ch-journal-zone.wrong{border-color:#ca426b}
+.ch-chip,.ch-zone-label{border:0;border-radius:8px;background:#e7ddff;color:#342360;padding:6px 8px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.ch-chip{touch-action:none}
+.ch-chip[aria-pressed=true]{outline:2px solid #7545d0}
+.ch-zone-label{width:100%;background:#dbe7ff}
+.ch-journal-zone[data-side=credit] .ch-zone-label{background:#ffe2ed}
+.ch-journal-solution{margin:0;color:#21694f;font-weight:800;font-size:12px}
+.ch-submit:disabled{opacity:.6}

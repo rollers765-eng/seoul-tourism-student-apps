@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="style.css?v=58">
+<link rel="stylesheet" href="style.css?v=59">
 </head>
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -31,7 +31,7 @@
   <div id="bubbles" aria-hidden="true"></div>
 
   <!-- 홈 -->
-  <section class="screen active" id="screen-home">
+  <section class="screen" id="screen-home">
     <header class="home-top">
       <a class="nav-back" href="../accounting-library/" aria-label="회계원리 자료실로 돌아가기"><span aria-hidden="true">←</span> 회계원리 자료실</a>
       <div class="home-top-right">
@@ -148,6 +148,19 @@
     <div class="book-list" id="bookList"></div>
   </section>
 
+  <div class="overlay" id="ovNickname">
+    <form class="panel nickname-panel" id="nicknameForm" role="dialog" aria-modal="true" aria-labelledby="nicknameTitle" novalidate>
+      <h2 id="nicknameTitle">반가워요! 별명을 정해 주세요</h2>
+      <p>랭킹에 이 별명으로 올라가요. 친구들이 알아볼 수 있는 별명을 써 주세요.</p>
+      <p>실명·학번·전화번호는 쓰지 마세요. 별명과 점수만 서버에 저장돼요.</p>
+      <label for="nicknameInput">한글·영문·숫자 2~10자</label>
+      <input id="nicknameInput" placeholder="예: 회계요정" autocomplete="off" maxlength="10" inputmode="text">
+      <button id="nicknameSave" class="big-btn" type="submit">시작하기</button>
+      <button id="nicknameCancel" class="ghost-btn" type="button" hidden>취소</button>
+      <p id="nicknameError" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+
   <!-- 오버레이들 -->
   <div class="overlay" id="ovClear" hidden>
     <div class="panel clear-panel">
@@ -190,8 +203,9 @@
 </div>
 
 <script src="data.js?v=1"></script>
-<script src="challenge.js?v=1"></script>
+<script src="challenge.js?v=2"></script>
 <script src="music.js?v=13"></script>
-<script src="app.js?v=58"></script>
+<script src="leaderboard.js?v=1"></script>
+<script src="app.js?v=59"></script>
 </body>
 </html>

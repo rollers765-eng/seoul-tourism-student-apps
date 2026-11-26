@@ -9,7 +9,12 @@
 
   /* ───────── 저장 ───────── */
   const KEY = 'moaBlast.v1';
-  const DEF = { gems: 30, stars: {}, best: 0, wrong: [], last: { corner: 'inv', stage: 1 }, scores: [], music: true, queue: [], recent: [], lastQid: null };
+  const BLOCKED_NAMES = ['시발', '씨발', '좆', '병신', '개새끼', '벙어리'];
+  const cleanNickname = (name) => String(name ?? '').normalize('NFC').trim().replace(/\s+/g, ' ');
+  const validNickname = (name) => /^[가-힣A-Za-z0-9 ]{2,10}$/.test(name) &&
+    !BLOCKED_NAMES.some((word) => name.replace(/ /g, '').includes(word));
+  const board = window.BlastBoard;
+  const DEF = { nickname: '', bestCombo: 0, gems: 30, stars: {}, best: 0, wrong: [], last: { corner: 'inv', stage: 1 }, scores: [], music: true, queue: [], recent: [], lastQid: null };
   let SAVE = load();
   function load() {
     try {
@@ -36,8 +41,12 @@
   const dragDiagnostics = new URLSearchParams(location.search).get('dragDiag') === '1';
 
   function show(id) {
+    if (!validNickname(SAVE.nickname)) return;
+    invalidateBoardMetrics();
     $$('.screen').forEach((s) => s.classList.toggle('active', s.id === id));
+    if (id === 'screen-play') fitPlayLabels();
     window.scrollTo(0, 0);
+    board?.activate(id, renderBoards);
   }
   function toast(msg) {
     toastEl.textContent = msg; toastEl.classList.add('show');
@@ -381,8 +390,37 @@
     fitTrayPieces();
     fitBoardLabels();
   }
-  window.addEventListener('resize', fitPlayLabels);
-  document.fonts?.ready.then(fitPlayLabels);
+  let layoutFrame = 0;
+  function invalidateBoardMetrics() {
+    // v58처럼 rect는 매 포인터 이벤트에서 새로 읽는다. 레이아웃 변경 시 진행 중 입력은 취소한다.
+    clearDrag();
+    if (!layoutFrame) layoutFrame = requestAnimationFrame(() => {
+      layoutFrame = 0;
+      fitPlayLabels();
+    });
+  }
+  let layoutSizes = new Map();
+  if (typeof ResizeObserver === 'function') {
+    const watcher = new ResizeObserver((entries) => {
+      let changed = false;
+      for (const entry of entries) {
+        const size = entry.contentRect.width + ':' + entry.contentRect.height;
+        if (layoutSizes.get(entry.target) !== size) {
+          layoutSizes.set(entry.target, size);
+          changed = true;
+        }
+      }
+      if (changed) invalidateBoardMetrics();
+    });
+    for (const node of [boardEl, dragLayer, appEl]) watcher.observe(node);
+  }
+  window.addEventListener('resize', invalidateBoardMetrics);
+  window.addEventListener('orientationchange', invalidateBoardMetrics);
+  window.visualViewport?.addEventListener('resize', invalidateBoardMetrics);
+  window.visualViewport?.addEventListener('scroll', invalidateBoardMetrics);
+  document.fonts?.ready.then(invalidateBoardMetrics);
+  const overlayWatcher = new MutationObserver(invalidateBoardMetrics);
+  $$('.overlay').forEach((node) => overlayWatcher.observe(node, { attributes: true, attributeFilter: ['hidden'] }));
 
   function renderMission() {
     const st = P.st;
@@ -834,6 +872,7 @@
     const goalEl = $('#missionGoal');
     if (goalEl) { goalEl.classList.add('on'); goalEl.textContent = '🎯 ' + P.clears + '줄 터뜨림!'; }
     P.combo = Math.min(9, P.combo + 1);
+    SAVE.bestCombo = Math.max(SAVE.bestCombo || 0, P.combo);
     P.comboMoves = 3;
     const comboGain = Math.round(pts * (P.combo - 1) * .4);
     navigator.vibrate?.([0, 25, 40, 30]);
@@ -895,7 +934,7 @@
   /* ───────── 스테이지 ───────── */
   function startStage(cornerKey, stageNo) {
     const st = D.STAGES[cornerKey][stageNo - 1];
-    if (!st) return;
+    if (!st || !validNickname(SAVE.nickname)) return;
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: buildObstacles(stageNo),
@@ -938,7 +977,7 @@
     SAVE.scores.sort((a, b) => b.score - a.score);
     SAVE.scores = SAVE.scores.slice(0, 20);
     SAVE.gems += gems;
-    save(); paintGems(); renderRankCloud();
+    save(); paintGems(); renderRankCloud(); queueRank();
 
     $('#clearStars').innerHTML = '<b>' + '★'.repeat(stars) + '</b><span>' + '★'.repeat(3 - stars) + '</span>';
     $('#clearTitle').textContent = stars === 3 ? '완벽한 분개!' : '분개 완성!';
@@ -1146,36 +1185,121 @@
 
   /* ───────── 화면: 홈 · 실시간 랭킹 ───────── */
   /* 혼자서도 겨룰 수 있는 '게임 친구' 기준 점수 (친구들 실제 기록은 각자 기기에 쌓인다) */
-  const RIVALS = [
-    { name: '모아', emoji: '🐣', score: 3200 },
-    { name: '별이', emoji: '⭐', score: 2700 },
-    { name: '보석이', emoji: '💎', score: 2250 },
-    { name: '콤보', emoji: '🔥', score: 1850 },
-    { name: '블록이', emoji: '🧩', score: 1500 }
-  ];
-  const MEDALS = ['🥇', '🥈', '🥉', '4', '5', '6', '7', '8'];
-  function rankEntries() {
-    const list = RIVALS.map((r) => ({ name: r.name, emoji: r.emoji, score: r.score, me: false }));
-    list.push({ name: '나', emoji: '🙋', score: SAVE.best || 0, me: true });
-    list.sort((a, b) => (b.score - a.score) || (a.me ? -1 : 1));
-    return list;
+  function queueRank() {
+    board?.schedule({ nickname: SAVE.nickname, best: SAVE.best || 0,
+      cleared: Object.keys(SAVE.stars).length, combo: SAVE.bestCombo || 0 });
   }
+
+  function rankView() {
+    const remote = board?.view() || { mode: 'local', entries: [], lastAt: null };
+    if (remote.mode === 'online') return remote;
+    return { ...remote, entries: SAVE.nickname ? [{ nickname: SAVE.nickname, best_score: SAVE.best || 0,
+      cleared_stages: Object.keys(SAVE.stars).length, best_combo: SAVE.bestCombo || 0 }] : [] };
+  }
+
+  function rankRow(row, i, compact) {
+    const mine = row.nickname === SAVE.nickname;
+    const el = document.createElement(compact ? 'li' : 'div');
+    el.className = (compact ? 'rc-row' : 'rank-row') + (mine ? ' me' : '');
+    const no = document.createElement('span');
+    no.className = compact ? 'rc-no' : 'no';
+    no.textContent = i + 1;
+    const name = document.createElement('span');
+    name.className = compact ? 'rc-nm' : 'rank-name';
+    name.textContent = row.nickname + (mine ? ' (나)' : '');
+    name.title = name.textContent;
+    const score = document.createElement('b');
+    score.className = compact ? 'rc-sc' : 'sc';
+    score.textContent = won(row.best_score) + (compact ? '' : '점');
+    el.append(no, name, score);
+    return el;
+  }
+
+  function mineLabel(view) {
+    const rank = view.entries.findIndex(row => row.nickname === SAVE.nickname);
+    if (rank >= 0) return SAVE.nickname + ' · ' + (rank + 1) + '위 · ' + won(view.entries[rank].best_score) + '점';
+    return SAVE.nickname + ' · ' + (view.entries.length >= 20 ? '20위권 밖 또는 미등록' : '순위 집계 전') + ' · ' + won(SAVE.best || 0) + '점';
+  }
+
   function renderRankCloud() {
-    const host = $('#rankCloud');
-    if (!host) return;
-    const list = rankEntries();
-    const top = list.slice(0, 5);
-    const myRank = list.findIndex((x) => x.me) + 1;
-    host.innerHTML =
-      '<div class="rc-head"><i class="live-dot"></i>실시간 1~5위</div>' +
-      '<ol class="rc-list">' + top.map((r, i) =>
-        '<li class="rc-row' + (r.me ? ' me' : '') + '">' +
-        '<span class="rc-no">' + (MEDALS[i] || (i + 1)) + '</span>' +
-        '<span class="rc-av">' + r.emoji + '</span>' +
-        '<span class="rc-nm">' + r.name + '</span>' +
-        '<b class="rc-sc">' + won(r.score) + '</b></li>').join('') + '</ol>' +
-      (myRank > 5 ? '<div class="rc-me">내 최고 <b>' + won(SAVE.best || 0) + '</b> · ' + myRank + '위</div>' : '');
+    const host = $('#rankCloud'), view = rankView();
+    const head = document.createElement('div');
+    head.className = 'rc-head';
+    head.textContent = view.mode === 'online' ? '● 실시간' : '이 기기 기록';
+    head.classList.toggle('rank-local', view.mode !== 'online');
+    const edit = document.createElement('button');
+    edit.type = 'button'; edit.className = 'rank-edit'; edit.textContent = '✏️'; edit.setAttribute('aria-label', '별명 바꾸기');
+    edit.addEventListener('click', () => openNickname(true));
+    head.append(edit);
+    const list = document.createElement('ol');
+    list.className = 'rc-list';
+    view.entries.slice(0, 5).forEach((row, i) => list.append(rankRow(row, i, true)));
+    const mine = document.createElement('div');
+    mine.className = 'rc-me';
+    mine.textContent = mineLabel(view);
+    host.replaceChildren(head, list, mine);
   }
+
+  function renderBoards() {
+    renderRankCloud();
+    if ($('#screen-rank').classList.contains('active')) renderRank();
+  }
+
+  const nicknameModal = $('#ovNickname'), nicknameInput = $('#nicknameInput');
+  let editingNickname = false, duplicate = '', nicknameFocus, filteredNickname = false;
+  function openNickname(edit) {
+    editingNickname = edit;
+    duplicate = '';
+    filteredNickname = false;
+    nicknameFocus = document.activeElement;
+    $('#nicknameTitle').textContent = edit ? '별명 바꾸기' : '반가워요! 별명을 정해 주세요';
+    $('#nicknameSave').textContent = edit ? '저장' : '시작하기';
+    $('#nicknameCancel').hidden = !edit;
+    $('#nicknameError').textContent = '';
+    nicknameInput.value = edit ? SAVE.nickname : '';
+    $$('.screen').forEach(node => { node.inert = true; });
+    nicknameModal.hidden = false;
+    nicknameInput.focus();
+  }
+  function closeNickname() {
+    nicknameModal.hidden = true;
+    $$('.screen').forEach(node => { node.inert = false; });
+    if (editingNickname && nicknameFocus?.isConnected) nicknameFocus.focus();
+  }
+  function setNickname(value) {
+    const name = cleanNickname(value);
+    if (!validNickname(name)) return false;
+    const first = !validNickname(SAVE.nickname);
+    SAVE.nickname = name;
+    save();
+    closeNickname();
+    queueRank();
+    if (first) { renderHome(); show('screen-home'); }
+    else renderBoards();
+    return true;
+  }
+  nicknameInput.addEventListener('input', event => {
+    if (event.isComposing) return;
+    const filtered = nicknameInput.value.normalize('NFC').replace(/[^가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9 ]/g, '');
+    filteredNickname = filtered !== nicknameInput.value;
+    if (filteredNickname) nicknameInput.value = filtered;
+    duplicate = '';
+    $('#nicknameError').textContent = filteredNickname ? '이모지·특수문자를 빼고 별명을 입력해 주세요.' : '';
+  });
+  $('#nicknameForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const name = cleanNickname(nicknameInput.value), error = $('#nicknameError');
+    if (filteredNickname) return;
+    if (BLOCKED_NAMES.some(word => name.replace(/ /g, '').includes(word))) { error.textContent = '다른 별명을 써 주세요'; return; }
+    if (!validNickname(name)) { error.textContent = '한글·영문·숫자 2~10자로 입력해 주세요.'; return; }
+    if (name !== SAVE.nickname && rankView().entries.some(row => row.nickname === name) && duplicate !== name) {
+      duplicate = name;
+      error.textContent = '이미 누가 쓰는 별명이에요. 그래도 쓰면 점수가 한 줄로 합쳐져요.';
+      return;
+    }
+    setNickname(name);
+  });
+  $('#nicknameCancel').addEventListener('click', closeNickname);
 
   function renderHome() {
     const host = $('#cornerList');
@@ -1241,107 +1365,40 @@
     const old = shuffle(pool.filter((x) => recent.indexOf(x.id) >= 0).map((x) => x.id));
     return fresh.concat(old);
   }
-  function nextPoolItem() {
-    const pool = (window.BlastChallenge || []).filter((x) => x && x.id && x.answer);
-    if (!pool.length) return null;
-    const byId = {};
-    pool.forEach((x) => { byId[x.id] = x; });
-    if (!Array.isArray(SAVE.queue) || !SAVE.queue.length) SAVE.queue = buildQueue(pool);
-    let qid = SAVE.queue.shift();
-    let guard = 0;
-    while (qid && SAVE.lastQid === qid && SAVE.queue.length && guard++ < 6) {
-      SAVE.queue.push(qid); qid = SAVE.queue.shift();
-    }
-    const item = byId[qid] || pool[Math.floor(Math.random() * pool.length)];
-    SAVE.lastQid = item.id;
-    SAVE.recent = ((SAVE.recent || []).concat(item.id)).slice(-20);
-    save();
-    return {
-      id: item.id,
-      type: item.type,
-      q: item.q,
-      opts: item.type === 'choice' ? shuffle(item.opts.slice()).map((label) => ({ label: label, ok: label === item.answer })) : null,
-      answer: String(item.answer),
-      hint: item.hint,
-      tag: item.tag || item.area,
-      unit: item.area,
-      level: item.level,
-      explain: item.explain,
-      st: null
-    };
-  }
-
-  function challengeStage() {
-    if (P && P.st) return P.st;
-    const last = SAVE.last || { corner: 'inv', stage: 1 };
-    return D.STAGES[last.corner][Math.min(last.stage, D.STAGES[last.corner].length) - 1];
-  }
   function makeChallenge() {
-    const pooled = nextPoolItem();
-    if (pooled) return pooled;
-    const st = challengeStage();
-    const kindRoll = Math.random();
-    if (st.mode === 'pick') {
-      const opts = shuffle([{ label: st.picks[0].label, ok: true }].concat((st.decoys || []).map((d) => ({ label: d.label, ok: false })))).slice(0, 4);
-      return { st: st, type: 'choice', q: st.prompt, opts: opts, answer: st.picks[0].label, tag: st.tag || '개념', hint: '보기 중 정답을 골라요' };
+    const pool = window.BlastChallenge || [];
+    if (!pool.length) return null;
+    const byId = new Map(pool.map(item => [item.id, item]));
+    if (SAVE.challengePoolVersion !== 2) {
+      SAVE.queue = [];
+      SAVE.challengePoolVersion = 2;
     }
-    const entries = st.entries;
-    const pickEntry = entries[Math.floor(Math.random() * entries.length)];
-    if (kindRoll < 0.34) {
-      const target = pickOne(entries);
-      const opts = shuffle([{ label: target.account, ok: true }].concat(accountOptions(target.account, 3).map((a) => ({ label: a, ok: false }))));
-      return {
-        st: st, type: 'choice',
-        q: (target.side === 'd' ? '차변' : '대변') + '에 올 계정과목은 무엇일까요?',
-        opts: opts, answer: target.account, tag: st.tag || '분개', hint: st.prompt
-      };
-    }
-    if (kindRoll < 0.62) {
-      return {
-        st: st, type: 'type-account',
-        q: (pickEntry.side === 'd' ? '차변' : '대변') + ' 계정과목을 직접 써 보세요.',
-        answer: pickEntry.account, tag: st.tag || '서술형 대비', hint: st.prompt
-      };
-    }
-    if (st.amountPhase) {
-      const dSum = entries.filter((e) => e.side === 'd').reduce((a, b) => a + b.amount, 0);
-      return {
-        st: st, type: 'type-amount',
-        q: '차변 합계 금액은 얼마일까요? (원)',
-        answer: String(dSum), tag: st.tag || '금액 계산',
-        hint: '거래 문장의 숫자를 더해 보세요. 콤마 없이 입력해도 돼요.'
-      };
-    }
-    // 금액이 문장에 그대로 보이는 단계는 계정 문제로 돌린다
-    const target2 = pickOne(entries);
-    return {
-      st: st, type: 'choice',
-      q: (target2.side === 'd' ? '차변' : '대변') + '에 올 계정과목은 무엇일까요?',
-      opts: shuffle([{ label: target2.account, ok: true }].concat(accountOptions(target2.account, 3).map((a) => ({ label: a, ok: false })))),
-      answer: target2.account, tag: st.tag || '분개', hint: st.prompt
-    };
-  }
-  function accountOptions(correct, n) {
-    const a = ACCT[correct];
-    const same = Object.keys(ACCT).filter((k) => k !== correct && a && ACCT[k].kind === a.kind);
-    const others = Object.keys(ACCT).filter((k) => k !== correct);
-    const out = [];
-    shuffle(same).forEach((k) => { if (out.length < n) out.push(k); });
-    shuffle(others).forEach((k) => { if (out.length < n && out.indexOf(k) < 0) out.push(k); });
-    return out;
+    SAVE.queue = SAVE.queue.filter(id => byId.has(id));
+    if (!SAVE.queue.length) SAVE.queue = buildQueue(pool);
+    if (SAVE.queue.length > 1 && SAVE.queue[0] === SAVE.lastQid) SAVE.queue.push(SAVE.queue.shift());
+    const item = byId.get(SAVE.queue.shift());
+    SAVE.lastQid = item.id;
+    SAVE.recent = SAVE.recent.concat(item.id).slice(-20);
+    save();
+    return { ...item, opts: item.opts ? shuffle(item.opts) : undefined,
+      chips: item.chips ? shuffle(item.chips) : undefined };
   }
 
   function openChallenge() {
+    if (!validNickname(SAVE.nickname)) return;
+    if (CH?.tick) clearInterval(CH.tick);
     SOUND.start();
     CH = makeChallenge();
+    if (!CH) return;
+    const duration = CH.type === 'journal' ? 30 : 15;
     CH.startedAt = Date.now();
-    CH.timer = 15;
+    CH.timer = duration;
     $('#chGems').textContent = SAVE.gems;
     renderChallenge();
     show('screen-challenge');
     CH.tick = setInterval(() => {
-      CH.timer -= 0.1;
-      $('#chBar').style.width = Math.max(0, (CH.timer / 15) * 100) + '%';
+      CH.timer = Math.max(0, duration - (Date.now() - CH.startedAt) / 1000);
+      $('#chBar').style.width = (CH.timer / duration * 100) + '%';
       if (CH.timer <= 0) { clearInterval(CH.tick); CH.tick = null; answerChallenge(null); }
     }, 100);
     $('#chBar').style.width = '100%';
@@ -1352,64 +1409,130 @@
     card.innerHTML = '';
     const tag = document.createElement('div');
     tag.className = 'ch-tag';
-    tag.textContent = '#' + (CH.tag || '개념') + ' · ' + (CH.unit ? CH.unit + ' · ' + CH.level : cornerName(CH.st.corner) + ' ' + CH.st.stage + '단계');
-    card.appendChild(tag);
+    tag.textContent = '#' + CH.tag + ' · ' + CH.area + ' · ' + CH.level;
     const q = document.createElement('p');
     q.className = 'ch-q';
     q.textContent = CH.q;
-    card.appendChild(q);
     const hint = document.createElement('p');
     hint.className = 'ch-hint';
     hint.textContent = CH.hint;
-    card.appendChild(hint);
+    card.append(tag, q, hint);
     if (CH.type === 'choice') {
       const wrap = document.createElement('div');
       wrap.className = 'ch-opts';
-      CH.opts.forEach((o) => {
-        const b = document.createElement('button');
-        b.className = 'ch-opt';
-        b.textContent = o.label;
-        b.addEventListener('click', () => answerChallenge(o.label));
-        wrap.appendChild(b);
-      });
-      card.appendChild(wrap);
-    } else {
-      const row = document.createElement('div');
-      row.className = 'ch-input-row';
-      const inp = document.createElement('input');
-      inp.className = 'ch-input';
-      inp.id = 'chInput';
-      inp.placeholder = (CH.type === 'type-amount' || CH.type === 'amount') ? '예: 300000' : '계정과목 입력';
-      inp.inputMode = (CH.type === 'type-amount' || CH.type === 'amount') ? 'numeric' : 'text';
-      inp.autocomplete = 'off';
-      const send = document.createElement('button');
-      send.className = 'ch-send';
-      send.textContent = '확인';
-      const go = () => answerChallenge(inp.value);
-      send.addEventListener('click', go);
-      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
-      row.appendChild(inp); row.appendChild(send);
-      card.appendChild(row);
-    }
+      CH.opts.forEach(label => wrap.append(challengeButton(label, 'ch-opt', () => answerChallenge(label))));
+      card.append(wrap);
+    } else renderJournalChallenge(card);
     const res = document.createElement('div');
     res.id = 'chResult';
     card.appendChild(res);
   }
 
-  function normalize(s) {
-    return String(s == null ? '' : s).replace(/\s+/g, '').replace(/[(),원₩,]/g, '').replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xFEE0));
+  function challengeButton(text, cls, action) {
+    const element = document.createElement('button');
+    element.type = 'button'; element.className = cls; element.textContent = text;
+    element.addEventListener('click', action);
+    return element;
+  }
+
+  function renderJournalChallenge(card) {
+    const question = CH;
+    let selected = '', held = null, ignoreChip = '';
+    const placements = new Map();
+    const bank = document.createElement('div');
+    bank.className = 'ch-chip-bank';
+    const zones = document.createElement('div');
+    zones.className = 'ch-journal-zones';
+    const submit = challengeButton('제출', 'big-btn ch-submit', () => {
+      answerChallenge({
+        debit: question.chips.filter(name => placements.get(name) === 'debit'),
+        credit: question.chips.filter(name => placements.get(name) === 'credit')
+      });
+    });
+    function put(name, side) {
+      if (question.answered) return;
+      placements.set(name, side);
+      selected = '';
+      draw();
+    }
+    function draw() {
+      bank.replaceChildren();
+      zones.replaceChildren();
+      for (const name of question.chips) {
+        if (placements.has(name)) continue;
+        const chip = challengeButton(name, 'ch-chip', () => {
+          if (question.answered) return;
+          if (ignoreChip === name) { ignoreChip = ''; return; }
+          selected = selected === name ? '' : name;
+          bank.querySelectorAll('button').forEach(node =>
+            node.setAttribute('aria-pressed', String(node.textContent === selected)));
+        });
+        chip.setAttribute('aria-pressed', String(selected === name));
+        chip.addEventListener('pointerdown', event => {
+          if (!event.isPrimary || event.button !== 0 || question.answered) return;
+          ignoreChip = '';
+          held = { id: event.pointerId, x: event.clientX, y: event.clientY };
+          try { chip.setPointerCapture(event.pointerId); } catch {}
+        });
+        chip.addEventListener('pointermove', event => {
+          if (held?.id !== event.pointerId) return;
+          const zone = document.elementFromPoint(event.clientX, event.clientY)?.closest('.ch-journal-zone');
+          zones.querySelectorAll('.ch-journal-zone').forEach(node => node.classList.toggle('drag-over', node === zone));
+        });
+        chip.addEventListener('pointerup', event => {
+          if (held?.id !== event.pointerId) return;
+          const moved = Math.hypot(event.clientX - held.x, event.clientY - held.y) > 7;
+          held = null;
+          zones.querySelectorAll('.drag-over').forEach(node => node.classList.remove('drag-over'));
+          if (!moved) return;
+          ignoreChip = name;
+          const side = document.elementFromPoint(event.clientX, event.clientY)?.closest('.ch-journal-zone')?.dataset.side;
+          if (side) put(name, side);
+        });
+        chip.addEventListener('pointercancel', () => {
+          held = null;
+          zones.querySelectorAll('.drag-over').forEach(node => node.classList.remove('drag-over'));
+        });
+        bank.append(chip);
+      }
+      for (const [side, label] of [['debit', '차변'], ['credit', '대변']]) {
+        const zone = document.createElement('div');
+        zone.className = 'ch-journal-zone';
+        zone.dataset.side = side;
+        zone.append(challengeButton(label, 'ch-zone-label', () => { if (selected) put(selected, side); }));
+        zone.addEventListener('click', event => {
+          if (event.target === zone && selected) put(selected, side);
+        });
+        for (const [name, placed] of placements) {
+          if (placed === side) zone.append(challengeButton(name, 'ch-chip', () => {
+            if (!question.answered) { placements.delete(name); draw(); }
+          }));
+        }
+        zones.append(zone);
+      }
+      submit.disabled = !placements.size;
+    }
+    draw();
+    card.append(bank, zones, submit);
+  }
+
+  function sameAccounts(given, correct) {
+    return given.length === correct.length && correct.every(name => given.includes(name));
   }
 
   function answerText() {
-    if ((CH.type === 'amount' || CH.type === 'type-amount') && /^\d+$/.test(CH.answer)) return won(Number(CH.answer)) + '원';
-    return CH.answer;
+    if (CH.type === 'choice') return CH.answer;
+    return [['debit', '(차)'], ['credit', '(대)']].map(([side, name]) =>
+      name + CH[side].map(account => account + (CH.amount ? ' ' +
+        won(typeof CH.amount === 'number' ? CH.amount : CH.amount[side][account]) : '')).join(' / ')).join('　');
   }
 
   function answerChallenge(given) {
     if (CH.answered) return;
     CH.answered = true;    if (CH.tick) { clearInterval(CH.tick); CH.tick = null; }
     const left = Math.max(0, Math.round(CH.timer));
-    const correct = given != null && normalize(given) === normalize(CH.answer);
+    const correct = given != null && (CH.type === 'choice' ? given === CH.answer :
+      sameAccounts(given.debit, CH.debit) && sameAccounts(given.credit, CH.credit));
     const res = $('#chResult');
     if (CH.type === 'choice') {
       Array.prototype.forEach.call(document.querySelectorAll('.ch-opt'), (b) => {
@@ -1417,13 +1540,25 @@
         else if (b.textContent === given) b.classList.add('wrong');
       });
     }
+    if (CH.type === 'journal') {
+      $$('.ch-journal-zone').forEach(zone => {
+        const side = zone.dataset.side;
+        const aligned = given != null && sameAccounts(given[side], CH[side]);
+        zone.classList.add(aligned ? 'right' : 'wrong');
+        const solution = document.createElement('p');
+        solution.className = 'ch-journal-solution';
+        solution.textContent = '정답: ' + CH[side].join(' · ');
+        zone.append(solution);
+      });
+    }
+    $$('#chCard button').forEach(node => { node.disabled = true; });
     if (correct) {
       const score = 100 + left * 20;
       const gems = 1 + (left >= 10 ? 1 : 0) + (left >= 13 ? 1 : 0);
       P && ((P.earned += score));
       SAVE.gems += gems;
       SAVE.best = Math.max(SAVE.best, score);
-      save(); paintGems();
+      save(); paintGems(); queueRank();
       $('#chGems').textContent = SAVE.gems;
       res.className = 'ch-result ok';
       res.innerHTML = '🎉 정답! +' + won(score) + '점 · 💎 +' + gems + ' (남은 ' + left + '초 보너스)<br><b>' + answerText() + '</b>' + (CH.explain ? '<br>' + CH.explain : '');
@@ -1483,25 +1618,24 @@
   /* ───────── 랭킹 ───────── */
   function renderRank() {
     $('#rankGems').textContent = SAVE.gems;
-    const host = $('#rankBody');
-    const list = rankEntries();
-    let html = '<p class="section-desc">친구들 실제 기록은 각자 기기에 쌓여요. 모아·별이·보석이는 혼자서도 겨룰 수 있게 넣은 <b>게임 친구</b> 기준 점수예요.</p>';
-    list.slice(0, 8).forEach((r, i) => {
-      html += '<div class="rank-row' + (r.me ? ' me' : '') + '">' +
-        '<span class="no">' + (i + 1) + '</span><span class="av">' + r.emoji + '</span>' +
-        '<span>' + r.name + '</span>' +
-        '<span class="sc">' + won(r.score) + '점</span></div>';
-    });
-    html += '<p class="section-desc" style="margin-top:12px">최고 점수 <b>' + won(SAVE.best || 0) + '점</b> · 클리어한 단계 ' + Object.keys(SAVE.stars).length + '개</p>';
-    const rows = SAVE.scores.slice(0, 6);
-    if (rows.length) {
-      html += '<p class="section-desc" style="margin-top:8px">내가 세운 단계 기록</p>';
-      rows.forEach((r, i) => {
-        const st = r.id.split('-');
-        html += '<div class="rank-row"><span class="no">' + (i + 1) + '</span><span>' + cornerName(st[0]) + ' ' + st[1] + '단계</span><span class="sc">' + won(r.score) + '점</span></div>';
-      });
-    }
-    host.innerHTML = html;
+    const host = $('#rankBody'), view = rankView();
+    host.replaceChildren();
+    const title = document.createElement('p');
+    title.className = 'section-desc';
+    title.textContent = view.mode === 'online' ? '● 실시간 · 상위 20명' : '이 기기 기록';
+    host.append(title);
+    view.entries.forEach((row, i) => host.append(rankRow(row, i, false)));
+    const own = document.createElement('p');
+    own.className = 'section-desc';
+    own.textContent = mineLabel(view);
+    const info = document.createElement('p');
+    info.className = 'section-desc';
+    info.textContent = '마지막 갱신 ' + (view.lastAt ? new Date(view.lastAt).toLocaleTimeString('ko-KR', {hour12:false}) : '—') +
+      ' · 별명과 점수만 서버에 저장돼요.';
+    const edit = document.createElement('button');
+    edit.type = 'button'; edit.className = 'ghost-btn'; edit.textContent = '별명 바꾸기';
+    edit.addEventListener('click', () => openNickname(true));
+    host.append(own, edit, info);
   }
   function closeScreens() {}
 
@@ -1583,13 +1717,21 @@
   }
   if (SOUND.setOnTrack) SOUND.setOnTrack(paintTrack);
   paintTrack();
-  renderHome();
+  if (validNickname(SAVE.nickname)) { renderHome(); closeNickname(); show('screen-home'); }
+  else openNickname(false);
   paintGems();
   SOUND.set(SAVE.music !== false);
   paintTrack();
 
   /* 테스트용 읽기 전용 훅 */
   window.__blast = {
+    nickname: () => SAVE.nickname,
+    setNickname,
+    board: rankView,
+    challengeInfo: () => CH ? JSON.parse(JSON.stringify({
+      type: CH.type, q: CH.q, answer: CH.answer, opts: CH.opts, debit: CH.debit,
+      credit: CH.credit, chips: CH.chips, timer: CH.timer
+    })) : null,
     state: function () {
       return P ? {
         corner: P.cornerKey, stage: P.stageNo, score: playScore(), earned: P.earned, penalty: P.penalty, combo: P.combo, comboMoves: P.comboMoves,
