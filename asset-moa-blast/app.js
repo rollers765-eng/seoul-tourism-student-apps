@@ -1446,30 +1446,21 @@
 
   function renderOwnRank(node, view, compact = false) {
     node.classList.add('rank-gap');
-    const { myRank, aboveName, prefix, score, suffix, text } = rankGap(view);
-    if (compact) node.title = text;
-    node.append(compact && myRank === null && score ? '20위 ' + aboveName + '님까지 ' : prefix);
+    const { myRank, prefix, score, suffix, text } = rankGap(view);
+    if (compact) {
+      node.title = text;
+      node.append(myRank === 1 ? '👑 현재 1위' :
+        score ? (myRank === null ? 20 : myRank - 1) + '위까지 ' : prefix);
+    } else {
+      node.append(prefix);
+    }
     if (score) {
       const highlight = document.createElement('b');
       highlight.className = 'gap';
       highlight.textContent = score;
       node.append(highlight);
     }
-    node.append(suffix);
-  }
-
-  function fitHomeRankText(node) {
-    if (!node.clientWidth) return;
-    // Keep the compact card to two lines without truncating a player's name.
-    const style = getComputedStyle(node);
-    let size = parseFloat(style.fontSize);
-    const padding = parseFloat(style.paddingTop);
-    const fits = () => node.clientHeight <= Math.ceil(padding + 2 * parseFloat(style.lineHeight));
-    if (!fits()) node.classList.add('rank-gap-tight');
-    while (size > 6 && !fits()) {
-      size -= .25;
-      node.style.fontSize = size + 'px';
-    }
+    node.append(compact ? (myRank > 1 ? '!' : '') : suffix);
   }
 
   function renderRankCloud() {
@@ -1489,7 +1480,6 @@
     mine.className = 'rc-me';
     renderOwnRank(mine, view, true);
     host.replaceChildren(head, list, mine);
-    fitHomeRankText(mine);
   }
 
   function renderBoards() {

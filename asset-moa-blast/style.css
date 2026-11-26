@@ -939,7 +939,7 @@ body{
 @media(prefers-reduced-motion:reduce){
   .journal-stamp{animation:journal-stamp-fade .5s linear both}
 }
-.rank-gap{overflow-wrap:anywhere}
-.rc-me.rank-gap{line-height:1.2}
-.rc-me.rank-gap-tight{word-break:break-all;text-wrap:balance}
+.rank-gap:not(.rc-me){overflow-wrap:anywhere}
+.rc-me.rank-gap{font-size:8.5px;line-height:1.2;word-break:keep-all}
+.rc-me .gap{white-space:nowrap}
 .rank-gap .gap{color:#aa285f;font-weight:900}
