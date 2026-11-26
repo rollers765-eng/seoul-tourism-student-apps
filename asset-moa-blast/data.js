@@ -542,6 +542,66 @@
     for (let i = 1; i <= c.stages; i++) STAGES[c.key].push(buildStage(c, i));
   });
 
+  // Mode placement has its own seed. Transaction generation continues to use makeRng.
+  function modeSeed(key) {
+    return [...('blast-v8:' + key)].reduce((hash, ch) =>
+      Math.imul(hash ^ ch.charCodeAt(0), 16777619) >>> 0, 2166136261);
+  }
+
+  function assignModes(corner, stages) {
+    const long = corner.stages === 50;
+    const hardCount = long ? 8 : 5;
+    const pureCount = long ? 20 : 10;
+    const targets = (st) => [...new Set(st.entries.map((entry) => entry.amount)
+      .filter((amount) => amount > 0 && amount % 10000 === 0 && amount <= 7920000))];
+    const candidates = stages.filter((st) => st.stage >= 16 && st.stage < corner.stages &&
+      st.mode === 'journal' && targets(st).length);
+    let best = [];
+    let bestCost = Infinity;
+
+    function spread(start, selected, cost) {
+      if (cost >= bestCost) return;
+      if (selected.length === hardCount) {
+        best = selected;
+        bestCost = cost;
+        return;
+      }
+      const ideal = 16 + selected.length * (corner.stages - 17) / (hardCount - 1);
+      for (let i = start; i <= candidates.length - (hardCount - selected.length); i++) {
+        const st = candidates[i];
+        if (st.stage - (selected.at(-1)?.stage ?? 0) < 2) continue;
+        const tie = modeSeed(corner.key + ':hard:' + st.stage) / 4294967296;
+        spread(i + 1, [...selected, st], cost + (st.stage - ideal) ** 2 + tie / 10);
+      }
+    }
+
+    spread(0, [], 0);
+    best.forEach((st) => {
+      st.mode = 'hard';
+      st.hardTargets = targets(st);
+    });
+
+    const taken = [1, corner.stages];
+    for (let i = 0; i < pureCount; i++) {
+      const eligible = stages.slice(1, -1).filter((st) => st.mode !== 'hard' && st.mode !== 'pure')
+        .filter((st) => {
+          // Never let another speed stage create a run of four.
+          let start = st.stage - 1;
+          let end = start;
+          while (stages[start - 1]?.mode === 'pure') start--;
+          while (stages[end + 1]?.mode === 'pure') end++;
+          return end - start < 3;
+        });
+      const spacing = (st) => Math.min(...taken.map((n) => Math.abs(n - st.stage)));
+      eligible.sort((a, b) => spacing(b) - spacing(a) ||
+        modeSeed(corner.key + ':pure:' + a.stage) - modeSeed(corner.key + ':pure:' + b.stage));
+      const st = eligible[0];
+      st.mode = 'pure';
+      taken.push(st.stage);
+    }
+  }
+  CORNERS.forEach((corner) => assignModes(corner, STAGES[corner.key]));
+
   /* 11월 30일 3차 서술형평가 출제 유형과 같은 단계 (단계 선택 화면에 '3차' 표시) */
   const EXAM = {
     'inv-sell-credit': '3차 1번 유형 · 상품 외상매출',

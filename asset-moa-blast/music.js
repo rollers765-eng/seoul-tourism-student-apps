@@ -311,7 +311,9 @@
     if (!enabled) return;
     const c = ensure();
     if (!c) return;
-    if (c.state === 'suspended') { try { c.resume(); } catch (e) {} }
+    if (c.state === 'suspended' || c.state === 'interrupted') {
+      try { c.resume().catch(() => {}); } catch (e) {}
+    }
     startMusic();
   }
   document.addEventListener('pointerdown', unlock, { passive: true });

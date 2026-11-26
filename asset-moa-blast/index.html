@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="style.css?v=61">
+<link rel="stylesheet" href="style.css?v=62">
 </head>
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -83,6 +83,10 @@
     </header>
     <div class="combo-banner" id="comboBanner">COMBO ×2</div>
     <div class="mission mission-with-tip" id="mission">
+      <div class="mode-title" id="modeTitle" hidden></div>
+      <p class="mode-target" id="modeTarget" hidden></p>
+      <progress id="modeMeter" max="1200" value="0" aria-label="스피드 블라스트 목표 점수" hidden></progress>
+      <p class="mode-help" id="modeHelp" hidden></p>
       <div class="mission-head"><img src="assets/moa.png" alt="모아" class="mission-moa"><p class="mission-text" id="missionText"></p></div>
       <div class="journal" id="journal"></div>
       <div class="mission-foot"><div class="mission-progress" id="missionProgress"></div><span class="mission-goal" id="missionGoal">🎯 한 줄 터뜨리면 +300</span></div>
@@ -92,6 +96,7 @@
       <div class="board" id="board" role="grid" aria-label="8x8 블록 보드"></div>
       <div class="zone-label debit">차변</div>
       <div class="zone-label credit">대변</div>
+      <div id="amountSums"></div>
       <div class="drag-layer" id="dragLayer" aria-hidden="true"></div>
     </div>
     <div class="tray" id="tray"></div>
@@ -200,10 +205,10 @@
   <div id="toast" role="status" aria-live="polite"></div>
 </div>
 
-<script src="data.js?v=1"></script>
+<script src="data.js?v=2"></script>
 <script src="challenge.js?v=4"></script>
-<script src="music.js?v=13"></script>
+<script src="music.js?v=14"></script>
 <script src="leaderboard.js?v=1"></script>
-<script src="app.js?v=60"></script>
+<script src="app.js?v=62"></script>
 </body>
 </html>

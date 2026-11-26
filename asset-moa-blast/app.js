@@ -104,7 +104,11 @@
     shape('ㄴ 대', 2, '#..', '#..', '###'), shape('역ㄴ 대', 2, '..#', '..#', '###'),
     shape('+', 2, '.#.', '###', '.#.')
   ];
-  const ACCOUNT_SHAPES = SHAPES.filter((s) => s.c.length <= 4);
+  const SINGLE = shape('1×1', 1, '#');
+  const ACCOUNT_SHAPES = SHAPES.filter((s) => s.c.length <= 3);
+  const SPEED_GOAL = 1200;
+  const modeLabel = { hard: '🔥 HARD MODE', pure: '⚡ 스피드 블라스트' };
+  const specialMode = (st) => Object.hasOwn(modeLabel, st.mode);
   const ACCOUNT_RATE = 0.42;
 
   function shapeWeighted(pool) {
@@ -182,9 +186,9 @@
     return pool.filter((sp) => placements({ cells: sp.c }, P.grid, P.obst, side).length);
   }
 
-  function preferredShape(pool, side) {
+  function preferredShape(pool, side, chance = 0.4) {
     const occupied = P.grid.reduce((count, cell) => count + (cell ? 1 : 0), 0);
-    if (occupied >= 4 && occupied + P.obst.size <= 42 && Math.random() < 0.4) {
+    if (occupied >= 4 && occupied + P.obst.size <= 42 && Math.random() < chance) {
       const gaps = [];
       for (let line = 0; line < N; line++) {
         for (const axis of ['row', 'col']) {
@@ -203,8 +207,80 @@
     return shapeWeighted(pool);
   }
 
+  function amountLines() {
+    return ['row', 'col'].flatMap((axis) => Array.from({ length: N }, (_, line) => {
+      const cells = Array.from({ length: N }, (_, i) => axis === 'row' ? idx(line, i) : idx(i, line));
+      const sum = cells.reduce((total, i) => total + (P.grid[i]?.number || 0), 0);
+      return { axis, line, cells, sum, remaining: P.goal - sum,
+        free: cells.filter((i) => !P.grid[i] && !P.obst.has(i)) };
+    }));
+  }
+
+  function closestAmountLine() {
+    return amountLines().filter(({ remaining, free }) =>
+      remaining > 0 && free.length >= Math.ceil(remaining / 99))
+      .sort((a, b) => a.remaining - b.remaining || b.free.length - a.free.length)[0];
+  }
+
+  function minimumAmount(remaining) {
+    return remaining <= 99 ? 1 : remaining - (Math.ceil(remaining / 99) - 1) * 99;
+  }
+
+  function usefulAmount(piece, line) {
+    const minimum = line.sum > 0 && line.remaining <= 99 ? line.remaining : minimumAmount(line.remaining);
+    return piece?.number >= minimum && piece.number <= line.remaining;
+  }
+
+  function amountPiece(held) {
+    const line = closestAmountLine();
+    if (!line) return null;
+    const covered = held.some((piece) => usefulAmount(piece, line));
+    if (covered && (!held.some((piece) => !piece.number) || Math.random() >= 0.32)) return null;
+    const { remaining, sum } = line;
+    const minimum = minimumAmount(remaining);
+    const maximum = Math.min(!sum && remaining > 1 ? remaining - 1 : remaining, 99);
+    const number = sum > 0 && remaining <= 99 ? remaining :
+      minimum + Math.floor(Math.random() * (maximum - minimum + 1));
+    return { ...makePiece(SINGLE, null, null, 'c-number'), number };
+  }
+
+  function modePreset() {
+    if (P.st.mode === 'pure') {
+      // Two opening rows with gaps that the first tray can fill.
+      for (const r of [2, 5]) {
+        const gap = Math.floor(Math.random() * 7);
+        const cat = pickOne(PURE_CATS);
+        for (let c = 0; c < N; c++) {
+          if (c !== gap && c !== gap + 1) P.grid[idx(r, c)] = { pure: true, cat };
+        }
+      }
+      return;
+    }
+    if (P.st.mode !== 'hard') return;
+    P.goal = pickOne(P.st.hardTargets) / 10000;
+    const row = Math.floor(Math.random() * N);
+    const cols = shuffle(Array.from({ length: N }, (_, i) => i));
+    // Large amounts must leave a remainder that at most three tiles can make.
+    let seeded = 0;
+    while (P.goal - seeded > 297 || (!seeded && P.goal > 1 && Math.random() < 0.35)) {
+      const minimum = Math.max(1, Math.min(99, P.goal - seeded - 297));
+      const max = Math.min(99, P.goal - seeded - 1);
+      const number = minimum > max ? max : minimum + Math.floor(Math.random() * (max - minimum + 1));
+      P.grid[idx(row, cols.pop())] = { number, pure: true, cat: 'c-number' };
+      seeded += number;
+    }
+    if (seeded && Math.random() < 0.7) {
+      const offRow = Array.from({ length: 64 }, (_, i) => i).filter((i) => Math.floor(i / N) !== row);
+      shuffle(offRow).slice(0, 1 + Math.floor(Math.random() * 3)).forEach((i) => P.obst.add(i));
+    }
+  }
+
   function nextPiece() {
     const held = P.tray.filter(Boolean);
+    if (P.st.mode === 'hard') {
+      const numeric = amountPiece(held);
+      if (numeric) return numeric;
+    }
     const accounts = new Set(held.filter((pc) => !pc.pure).map((pc) => pc.key));
     const open = P.mission.filter((m) => !m.filled && !accounts.has(m.account));
     if (open.length && (!accounts.size || Math.random() < ACCOUNT_RATE)) {
@@ -214,11 +290,12 @@
           return makePiece(preferredShape(shapes, entry.side), entry.account, entry.side, catClass(entry.account));
         }
       }
-      // 막힌 계정은 미션에 남겨 두고, 빈자리가 생긴 다음 리필에서 다시 검사한다.
+      const fallback = open.find((entry) => playableShapes([SINGLE], entry.side).length);
+      if (fallback) return makePiece(SINGLE, fallback.account, fallback.side, catClass(fallback.account));
     }
     const available = playableShapes(SHAPES, 'any');
     const colors = PURE_CATS.filter((cat) => !held.some((pc) => pc.cat === cat));
-    return makePiece(available.length ? preferredShape(available, 'any') : shapeWeighted(SHAPES), null, null, pickOne(colors.length ? colors : PURE_CATS));
+    return makePiece(available.length ? preferredShape(available, 'any', P.st.mode === 'pure' ? (P.placed === 0 ? 1 : 0.65) : 0.4) : SINGLE, null, null, pickOne(colors.length ? colors : PURE_CATS));
   }
 
   function refillTray() {
@@ -241,10 +318,13 @@
       d.dataset.i = String(i);
       d.setAttribute('role', 'gridcell');
       d.setAttribute('aria-label', (c < 4 ? '차변 ' : '대변 ') + (r + 1) + '행 ' + (c % 4 + 1) + '열' + (v && v.key ? ' · ' + v.key : (v && v.pure ? ' · 색 블록' : (P.obst.has(i) ? ' · 잠금 상자' : ' · 빈 칸'))));
+      if (specialMode(P.st)) d.setAttribute('aria-label', (r + 1) + '행 ' + (c + 1) + '열 · ' +
+        (v?.number ? v.number + '만원' : v ? '색 블록' : P.obst.has(i) ? '잠금 상자' : '빈 칸'));
       if (P.obst.has(i)) d.classList.add('obstacle');
       else if (v) {
         const b = document.createElement('div');
         b.className = 'blk ' + v.cat + (v.sealed ? ' sealed' : '') + (v.pure ? ' pure' : '');
+        if (v.number) b.textContent = v.number;
         if (v.key && !v.pure) b.classList.add('account-edge');
         if (v.key) {
           const s = document.createElement('span');
@@ -259,6 +339,24 @@
       boardEl.appendChild(d);
     }
     fitBoardLabels();
+    renderAmountSums();
+  }
+
+  function renderAmountSums() {
+    const host = $('#amountSums');
+    host.replaceChildren();
+    if (P.st.mode !== 'hard') return;
+    for (const { axis, line, sum } of amountLines()) {
+      if (!sum) continue;
+      const badge = document.createElement('span');
+      badge.className = 'sum-badge ' + axis + (sum > P.goal ? ' over' :
+        sum === P.goal ? ' exact' : sum >= P.goal * 0.8 ? ' near' : '');
+      badge.style.setProperty('--line', line);
+      badge.textContent = sum + '/' + P.goal;
+      badge.setAttribute('aria-label', (line + 1) + (axis === 'row' ? '행 ' : '열 ') +
+        sum + '만원 / 목표 ' + P.goal + '만원');
+      host.appendChild(badge);
+    }
   }
 
   function trayCell() { return window.innerWidth <= 350 ? 22 : window.innerWidth <= 400 ? 26 : 29; }
@@ -293,7 +391,7 @@
     const sample = boardEl.firstElementChild;
     if (!sample) return;
     boardEl.querySelectorAll('.account-cell-label').forEach((node) =>
-      fitLabel(node, sample.clientWidth - 4, sample.clientHeight - 3, 15, 2, 1.05));
+      fitLabel(node, sample.clientWidth - 4, sample.clientHeight - 3, Math.min(15, Math.floor(sample.clientWidth / 3)), 2, 1.05));
   }
 
   function fitTrayPieces() {
@@ -302,12 +400,12 @@
       if (!piece) return;
       const name = wrap.querySelector('.piece-name.acct');
       const { rows, cols } = piece.dataset;
-      if (name) fitLabel(name, wrap.clientWidth - 19, 28, innerWidth < 400 ? 16 : 19, 2, 1.05);
-      const reserve = name ? Math.max(16, name.offsetHeight + 3) : 0;
+      if (name) fitLabel(name, wrap.clientWidth - 14, 22, innerWidth >= 600 ? 13 : 12, 2, 1.05);
+      const reserve = name ? Math.min(26, Math.max(16, name.offsetHeight + 2)) : 0;
       wrap.classList.toggle('account-slot', !!name);
       if (name) wrap.style.setProperty('--account-reserve', reserve + 'px');
       const size = Math.floor(Math.min(trayCell(), (wrap.clientWidth - 6 - (cols - 1) * 3) / cols,
-        (wrap.clientHeight - reserve - 8 - (rows - 1) * 3) / rows));
+        (wrap.clientHeight - reserve - 3 - (rows - 1) * 3) / rows));
       if (size > 0) {
         piece.style.gridTemplateColumns = 'repeat(' + cols + ', ' + size + 'px)';
         piece.style.gridTemplateRows = 'repeat(' + rows + ', ' + size + 'px)';
@@ -327,7 +425,7 @@
         piece.className = 'piece' + (pc.pure ? ' pure' : ' acct');
         piece.style.gap = '3px';
         piece.setAttribute('role', 'button');
-        piece.setAttribute('aria-label', pc.pure ? '색 블록 조각 · 어디든 놓아 줄을 터뜨려요' :
+        piece.setAttribute('aria-label', pc.number ? pc.number + '만원 조각' : pc.pure ? '색 블록 조각 · 어디든 놓아 줄을 터뜨려요' :
           pc.key + ' 조각 · 끌어 놓거나 눌러서 고르기');
         piece.tabIndex = 0;
         piece.dataset.slot = String(si);
@@ -343,6 +441,7 @@
           const cell = document.createElement('div');
           if (cells.has(r + ':' + c)) cell.className = 'pcell ' + pc.cat + (pc.pure ? '' : ' account-edge');
           else cell.style.visibility = 'hidden';
+          if (pc.number) cell.textContent = pc.number;
           piece.appendChild(cell);
         }
         wrap.appendChild(piece);
@@ -372,6 +471,7 @@
       return sum + node.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
     }, parseFloat(edges.paddingTop) + parseFloat(edges.paddingBottom)) - 1);
     const mission = stack[1];
+    const sumsReserve = P?.st.mode === 'hard' ? 18 : 0;
     const variants = ['mission-dense', 'mission-tight', 'mission-compact'];
     const target = Number(edges.getPropertyValue('--board-target')) || 0;
     mission.classList.remove(...variants);
@@ -381,7 +481,7 @@
       mission.classList.add(variant);
       width = budget();
     }
-    screen.style.setProperty('--board-fit', Math.max(96, width) + 'px');
+    screen.style.setProperty('--board-fit', Math.max(96, width - sumsReserve) + 'px');
   }
 
   function fitPlayLabels() {
@@ -415,6 +515,24 @@
 
   function renderMission() {
     const st = P.st;
+    if (specialMode(st)) {
+      $('#playStageLabel').textContent = cornerName(P.cornerKey) + ' ' + P.stageNo + '단계 · ' + modeLabel[st.mode];
+      $('#playScore').textContent = won(playScore());
+      const title = $('#modeTitle');
+      title.textContent = modeLabel[st.mode];
+      const meter = $('#modeMeter');
+      if (st.mode === 'hard') {
+        $('#modeTarget').textContent = '🎯 목표 금액 ' + won(P.goal * 10000) + '원';
+        $('#modeHelp').textContent = '예: 20 + 25 = 45만원 · 같은 행이나 열에 모으면 터져요.';
+        missionTextEl.textContent = st.prompt;
+        journalEl.innerHTML = journalHTML(st);
+      } else {
+        $('#modeTarget').textContent = won(P.earned) + ' / 목표 ' + won(SPEED_GOAL) + '점';
+        meter.value = P.earned;
+      }
+      fitBoardToScreen();
+      return;
+    }
     missionTextEl.textContent = st.prompt;
     journalEl.innerHTML = '';
     if (st.mode === 'pick') {
@@ -532,6 +650,7 @@
         d.className = 'blk ' + pc.cat;
         d.style.position = 'relative';
         d.style.borderRadius = '7px';
+        if (pc.number) d.textContent = pc.number;
         if (pc.key) {
           const sp = document.createElement('span');
           sp.textContent = pc.key;
@@ -761,7 +880,7 @@
     const anim = new Set();
     cellsFor(piece, r0, c0).forEach(([r, c]) => {
       const i = idx(r, c);
-      P.grid[i] = { key: piece.key, cat: piece.cat, pure: !!piece.pure, sealed: false };
+      P.grid[i] = { key: piece.key, cat: piece.cat, pure: !!piece.pure, sealed: false, number: piece.number };
       anim.add(i);
     });
     P.tray[slot] = null;
@@ -790,13 +909,40 @@
     renderBoard(anim);
     renderMission();
 
+    if (P.st.mode === 'hard' && clearAmountLine()) return;
+
     // 판 상태를 먼저 정산해 같은 입력 이벤트에서 실제로 놓을 수 있는 조각을 공급한다.
     const cleared = resolveLines();
     updateStreak(cleared);
     P.tray[slot] = nextPiece();
     renderTray(slot);
     P.settling = false;
+    if (specialMode(P.st)) {
+      renderAmountSums();
+      renderMission();
+    }
     finishTurn();
+  }
+
+  function clearAmountLine() {
+    const matched = amountLines().find(({ sum }) => sum === P.goal);
+    if (!matched) return false;
+    const centers = matched.cells.map((i) => {
+      const cell = boardEl.children[i];
+      cell.classList.add('amount-flash');
+      const rect = cell.getBoundingClientRect();
+      return [rect.x + rect.width / 2, rect.y + rect.height / 2];
+    });
+    matched.cells.forEach((i) => { P.grid[i] = null; P.obst.delete(i); });
+    P.earned += 300;
+    P.clears++;
+    $('#playScore').textContent = won(playScore());
+    fx.shards(centers, 3);
+    navigator.vibrate?.([0, 25, 40, 30]);
+    SOUND.play('clear', 2);
+    flashText('🎯 ' + won(P.goal * 10000) + '원!');
+    scheduleClear();
+    return true;
   }
 
   function resolveLines() {
@@ -904,13 +1050,10 @@
   function finishTurn() {
     const stage = P;
     if (stage.done || stage.settling) return;
-    if (stage.mission.every((m) => m.filled)) {
-      stage.settling = true;
-      setTimeout(() => {
-        if (P !== stage) return;
-        stage.settling = false;
-        stageClear();
-      }, 260);
+    const cleared = stage.st.mode === 'pure' ? (stage.earned >= SPEED_GOAL || !stage.grid.some(Boolean)) :
+      stage.st.mode !== 'hard' && stage.mission.every((m) => m.filled);
+    if (cleared) {
+      scheduleClear();
       return;
     }
     if (!anyTrayFits()) {
@@ -923,14 +1066,25 @@
     }
   }
 
+  function scheduleClear() {
+    const stage = P;
+    stage.settling = true;
+    stage.finishedAt = Date.now();
+    setTimeout(() => {
+      if (P !== stage || stage.done || !$('#screen-play').classList.contains('active')) return;
+      stage.settling = false;
+      stageClear();
+    }, 260);
+  }
+
   /* ───────── 스테이지 ───────── */
   function startStage(cornerKey, stageNo) {
     const st = D.STAGES[cornerKey][stageNo - 1];
     if (!st || !validNickname(SAVE.nickname)) return;
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
-      grid: emptyGrid(), obst: buildObstacles(stageNo),
-      mission: buildMission(st), tray: [], earned: 0, penalty: 0, combo: 0, comboMoves: 0, clears: 0, placed: 0, settling: false,
+      grid: emptyGrid(), obst: specialMode(st) ? new Set() : buildObstacles(stageNo),
+      mission: specialMode(st) ? [] : buildMission(st), tray: [], earned: 0, penalty: 0, combo: 0, comboMoves: 0, clears: 0, placed: 0, settling: false,
       history: [], over: false, done: false, startedAt: Date.now()
     };
     SAVE.last = { corner: cornerKey, stage: stageNo }; save();
@@ -939,6 +1093,11 @@
     boardEl.classList.remove('placement-shake');
     sel = null;
     clearDrag();
+    $('#screen-play').dataset.mode = st.mode;
+    ['#modeTitle', '#modeTarget'].forEach((selector) => { $(selector).hidden = !specialMode(st); });
+    $('#modeHelp').hidden = st.mode !== 'hard';
+    $('#modeMeter').hidden = st.mode !== 'pure';
+    modePreset();
     show('screen-play');
     renderBoard();
     refillTray();
@@ -953,15 +1112,19 @@
   function stageClear() {
     if (P.done) return;
     P.done = true;
-    const sec = Math.max(1, Math.round((Date.now() - P.startedAt) / 1000));
+    const elapsed = (P.finishedAt - P.startedAt) / 1000;
+    const sec = Math.max(1, Math.round(P.st.mode === 'pure' ? elapsed : (Date.now() - P.startedAt) / 1000));
+    const isSpeed = P.st.mode === 'pure';
+    const emptyBonus = isSpeed && !P.grid.some(Boolean) ? 3 : 0;
     const speed = Math.max(0, 500 - Math.max(0, sec - 25) * 8);
     const filled = P.grid.filter(Boolean).length;
     const room = Math.max(0, 40 - Math.max(0, filled - 8) * 2);
     const comboBonus = P.combo * 30;
     const lineBonus = P.clears > 0 ? 300 : 0;
     const total = Math.max(0, 500 + P.earned - P.penalty + speed + room + comboBonus + lineBonus);
-    const stars = total >= 1100 ? 3 : total >= 750 ? 2 : 1;
-    const gems = 5 + (stars - 1) * 2;
+    const stars = isSpeed ? (emptyBonus || elapsed <= 30 ? 3 : elapsed <= 50 ? 2 : 1) :
+      total >= 1100 ? 3 : total >= 750 ? 2 : 1;
+    const gems = 5 + (stars - 1) * 2 + emptyBonus;
     const id = P.st.id;
     SAVE.stars[id] = Math.max(SAVE.stars[id] || 0, stars);
     SAVE.best = Math.max(SAVE.best, total);
@@ -972,14 +1135,18 @@
     save(); paintGems(); renderRankCloud(); queueRank();
 
     $('#clearStars').innerHTML = '<b>' + '★'.repeat(stars) + '</b><span>' + '★'.repeat(3 - stars) + '</span>';
-    $('#clearTitle').textContent = stars === 3 ? '완벽한 분개!' : '분개 완성!';
+    $('#clearTitle').textContent = isSpeed ? '⚡ 스피드 블라스트 완료!' :
+      P.st.mode === 'hard' ? '🔥 목표 금액 완성!' : stars === 3 ? '완벽한 분개!' : '분개 완성!';
     $('#clearScore').textContent = won(total);
     $('#clearBreakdown').innerHTML =
       '<span>기본 500</span><span>블록 ' + won(P.earned) + '</span>' + (P.penalty ? '<span>실수 −' + won(P.penalty) + '</span>' : '') + '<span>속도 +' + won(speed) + '</span>' +
       '<span>여유 +' + won(room) + '</span><span>콤보 +' + won(comboBonus) + '</span>' +
       (lineBonus ? '<span>줄터짐 +300</span>' : '') + '<span>💎 +' + gems + '</span>';
-    $('#clearJournal').innerHTML = journalHTML(P.st);
-    $('#clearExplain').textContent = P.st.explain || '';
+    if (P.st.mode === 'hard') $('#clearBreakdown').insertAdjacentHTML('beforeend', '<span>🔥 하드모드</span>');
+    if (isSpeed) $('#clearBreakdown').insertAdjacentHTML('beforeend',
+      '<span>' + elapsed.toFixed(1) + '초</span>' + (emptyBonus ? '<span>보드 비우기 💎 +3</span>' : ''));
+    $('#clearJournal').innerHTML = isSpeed ? '' : journalHTML(P.st);
+    $('#clearExplain').textContent = isSpeed ? '' : P.st.explain || '';
     $('#ovClear').hidden = false;
 
     fx.confetti(300); fx.fireworks(4);
@@ -1028,6 +1195,22 @@
       renderBoard();
       fx.confetti(30);
     } else if (name === 'hint') {
+      const line = P.st.mode === 'hard' ? closestAmountLine() : null;
+      if (specialMode(P.st)) {
+        const slot = line ? P.tray.findIndex((piece) => usefulAmount(piece, line)) :
+          P.st.mode === 'pure' ? P.tray.findIndex((piece) => piece && placements(piece, P.grid, P.obst, 'any').length) : -1;
+        if (slot < 0) { toast('색 블록으로 줄을 터뜨려 자리를 만들어 보세요'); return; }
+        const spots = line ? line.free : cellsFor(P.tray[slot], ...placements(P.tray[slot], P.grid, P.obst, 'any')[0])
+          .map(([r, c]) => idx(r, c));
+        spots.forEach((i) => boardEl.children[i]?.classList.add('hint'));
+        const piece = trayEl.querySelector('.piece[data-slot="' + slot + '"]');
+        piece?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.14)' }, { transform: 'scale(1)' }], { duration: 700, iterations: 2 });
+        setTimeout(() => boardEl.querySelectorAll('.hint').forEach((el) => el.classList.remove('hint')), 3000);
+        addGems(-cost);
+        toast(line ? '남은 금액 ' + line.remaining + '만원 · 빛나는 숫자를 표시한 줄에 놓아요' : '빛나는 조각을 표시한 자리에 놓아요');
+        SOUND.play('gem');
+        return;
+      }
       const open = P.mission.filter((m) => !m.filled);
       if (!open.length) { toast('이미 다 채웠어요'); return; }
       const target = open[0];
@@ -1048,6 +1231,19 @@
     addGems(-cost);
     toast('💎' + cost + ' 사용 · 남은 ' + SAVE.gems);
     SOUND.play('gem');
+    if (name === 'clean' && specialMode(P.st)) {
+      if (P.st.mode === 'hard') {
+        const line = closestAmountLine();
+        if (line && !P.tray.some((piece) => usefulAmount(piece, line))) {
+          const slot = P.tray.findIndex((piece) => !piece?.number);
+          if (slot >= 0) {
+            P.tray[slot] = amountPiece(P.tray.filter((_, index) => index !== slot));
+            renderTray(slot);
+          }
+        }
+      }
+      finishTurn();
+    }
   }
 
   /* ───────── 이펙트 ───────── */
@@ -1337,7 +1533,8 @@
       const prev = s.stage === 1 ? true : !!SAVE.stars[sts[s.stage - 2].id];
       b.className = 'stage' + (stars ? ' done' : '') + (prev ? '' : ' locked');
       b.innerHTML = '<span class="st">' + (stars ? '★'.repeat(stars) : '') + '</span><span>' + s.stage + '</span>' +
-        (D.EXAM[s.gen] ? '<span class="exam">3차</span>' : '');
+        (D.EXAM[s.gen] ? '<span class="exam">3차</span>' : '') +
+        (specialMode(s) ? '<span class="stage-mode" title="' + modeLabel[s.mode] + '">' + modeLabel[s.mode].split(' ')[0] + '</span>' : '');
       b.addEventListener('click', () => {
         if (!prev) { toast('이전 단계를 먼저 클리어해 주세요'); SOUND.play('wrong'); return; }
         startStage(key, s.stage);
@@ -1669,6 +1866,7 @@
         P.over = false;
         renderBoard(); refillTray(); renderMission();
         toast('💎5 사용 · 보드를 정리했어요');
+        if (specialMode(P.st)) finishTurn();
       }
     }
   });
@@ -1726,9 +1924,10 @@
     })) : null,
     state: function () {
       return P ? {
-        corner: P.cornerKey, stage: P.stageNo, score: playScore(), earned: P.earned, penalty: P.penalty, combo: P.combo, comboMoves: P.comboMoves,
+        corner: P.cornerKey, stage: P.stageNo, mode: P.st.mode, goal: P.goal, score: playScore(), earned: P.earned, penalty: P.penalty, combo: P.combo, comboMoves: P.comboMoves,
         mission: P.mission.map((m) => ({ side: m.side, account: m.account, filled: m.filled })),
-        tray: P.tray.map((p) => p && { key: p.key, pure: !!p.pure, cells: p.cells, shape: p.shape, side: p.side }),
+        tray: P.tray.map((p) => p && { key: p.key, pure: !!p.pure, cells: p.cells, shape: p.shape, side: p.side, number: p.number }),
+        amounts: P.st.mode === 'hard' ? amountLines() : undefined,
         obstacles: Array.from(P.obst), gridFilled: P.grid.filter(Boolean).length,
         done: P.done, over: P.over, gems: SAVE.gems
       } : { gems: SAVE.gems, stars: Object.keys(SAVE.stars).length };

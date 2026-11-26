@@ -850,3 +850,51 @@ body{
   #screen-home .rank-cloud{flex-basis:90px;width:90px}
   #screen-home .tagline{font-size:10.5px}
 }
+
+/* v8 play modes */
+#screen-play .piece-name.acct{font-size:12px;width:max-content;padding:0 5px;border-radius:9px}
+@media(min-width:600px){#screen-play .piece-name.acct{font-size:13px}}
+.stage-mode{position:absolute;top:3px;left:5px;font-size:13px}
+.mode-title{font-size:13px;font-weight:900;color:#62348a}
+.mode-target{margin:2px 0;font-size:clamp(18px,4.6vw,26px);line-height:1.2;color:#382061;font-weight:900}
+.mode-help{margin:3px 0;font-size:11px;line-height:1.25;color:#604473}
+#modeMeter{width:100%;height:12px;accent-color:#8d4de8}
+#screen-play[data-mode=pure] :is(.mission-head,.journal,.mission-foot),
+#screen-play[data-mode=hard] .mission-foot,
+#screen-play:is([data-mode=pure],[data-mode=hard]) .zone-label,
+#screen-play:is([data-mode=pure],[data-mode=hard]) .board::before{display:none}
+#screen-play:is([data-mode=pure],[data-mode=hard]) .cell{
+  background:linear-gradient(180deg,#312059,#261741);
+}
+#screen-play[data-mode=hard] .mission{
+  --mission-text:11px;--mission-moa:23px;--journal-head:11px;--journal-slot:11px;--slot-min:17px;--journal-min:0px;
+  padding-block:6px;
+}
+#screen-play[data-mode=hard] .board-wrap{
+  width:min(calc(100% - 40px),var(--board-fit,100%));margin-bottom:18px;
+}
+#amountSums{
+  position:absolute;inset:7px;display:grid;grid-template:repeat(8,minmax(0,1fr))/repeat(8,minmax(0,1fr));
+  gap:3px;pointer-events:none;z-index:5;
+}
+#amountSums:empty{display:none}
+.sum-badge{
+  align-self:center;justify-self:center;font-size:clamp(7px,2vw,10px);font-weight:900;
+  line-height:12px;border-radius:4px;padding-inline:2px;background:#e5dbf9;color:#382061;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.sum-badge.row{grid-row:calc(var(--line) + 1);grid-column:8;justify-self:end;transform:translateX(calc(100% + 8px))}
+.sum-badge.col{grid-column:calc(var(--line) + 1);grid-row:8;align-self:end;transform:translateY(calc(100% + 8px))}
+.sum-badge.near{background:#ffe277;color:#573100}
+.sum-badge.over{background:#ffb4b8;color:#72142e}
+.sum-badge.exact{background:#8df6b5;color:#124327}
+.c-number{
+  display:grid;place-items:center;background:linear-gradient(#fff3aa,#ffc34b 65%,#ff9c31);
+  color:#4d280b;font-size:clamp(12px,3.6vw,20px);font-weight:900;font-variant-numeric:tabular-nums;
+}
+.amount-flash{animation:amount-gold .34s ease-out both;z-index:3}
+.amount-flash .blk{animation:blast-shatter .24s ease-out both}
+@keyframes amount-gold{
+  0%,40%{background:#fff6b3;box-shadow:0 0 12px 3px #ffdb69}
+  100%{background:#70434c}
+}
