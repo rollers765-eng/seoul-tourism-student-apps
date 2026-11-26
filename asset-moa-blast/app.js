@@ -216,19 +216,25 @@
     }));
   }
 
+  function amountRange(line) {
+    // Strictly below half the initial target, so no two tiles can win.
+    const cap = Math.floor((P.goal - 1) / 2);
+    const remaining = line.remaining;
+    if (!line.sum) return [Math.ceil(P.goal / 3), cap];
+    if (remaining <= cap) return [remaining, remaining];
+    return [remaining - cap, Math.min(cap, Math.ceil(remaining / 2))];
+  }
+
   function closestAmountLine() {
+    const cap = Math.floor((P.goal - 1) / 2);
     return amountLines().filter(({ remaining, free }) =>
-      remaining > 0 && free.length >= Math.ceil(remaining / 99))
+      remaining > 0 && free.length >= Math.ceil(remaining / cap))
       .sort((a, b) => a.remaining - b.remaining || b.free.length - a.free.length)[0];
   }
 
-  function minimumAmount(remaining) {
-    return remaining <= 99 ? 1 : remaining - (Math.ceil(remaining / 99) - 1) * 99;
-  }
-
   function usefulAmount(piece, line) {
-    const minimum = line.sum > 0 && line.remaining <= 99 ? line.remaining : minimumAmount(line.remaining);
-    return piece?.number >= minimum && piece.number <= line.remaining;
+    const [min, max] = amountRange(line);
+    return piece?.number >= min && piece.number <= max;
   }
 
   function amountPiece(held) {
@@ -236,11 +242,8 @@
     if (!line) return null;
     const covered = held.some((piece) => usefulAmount(piece, line));
     if (covered && (!held.some((piece) => !piece.number) || Math.random() >= 0.32)) return null;
-    const { remaining, sum } = line;
-    const minimum = minimumAmount(remaining);
-    const maximum = Math.min(!sum && remaining > 1 ? remaining - 1 : remaining, 99);
-    const number = sum > 0 && remaining <= 99 ? remaining :
-      minimum + Math.floor(Math.random() * (maximum - minimum + 1));
+    const [min, max] = amountRange(line);
+    const number = min + Math.floor(Math.random() * (max - min + 1));
     return { ...makePiece(SINGLE, null, null, 'c-number'), number };
   }
 
@@ -258,21 +261,9 @@
     }
     if (P.st.mode !== 'hard') return;
     P.goal = pickOne(P.st.hardTargets) / 10000;
-    const row = Math.floor(Math.random() * N);
-    const cols = shuffle(Array.from({ length: N }, (_, i) => i));
-    // Large amounts must leave a remainder that at most three tiles can make.
-    let seeded = 0;
-    while (P.goal - seeded > 297 || (!seeded && P.goal > 1 && Math.random() < 0.35)) {
-      const minimum = Math.max(1, Math.min(99, P.goal - seeded - 297));
-      const max = Math.min(99, P.goal - seeded - 1);
-      const number = minimum > max ? max : minimum + Math.floor(Math.random() * (max - minimum + 1));
-      P.grid[idx(row, cols.pop())] = { number, pure: true, cat: 'c-number' };
-      seeded += number;
-    }
-    if (seeded && Math.random() < 0.7) {
-      const offRow = Array.from({ length: 64 }, (_, i) => i).filter((i) => Math.floor(i / N) !== row);
-      shuffle(offRow).slice(0, 1 + Math.floor(Math.random() * 3)).forEach((i) => P.obst.add(i));
-    }
+    // Obstacles vary on replay, but the three amount tiles are all player placements.
+    shuffle(Array.from({ length: 64 }, (_, i) => i))
+      .slice(0, Math.floor(Math.random() * 4)).forEach((i) => P.obst.add(i));
   }
 
   function nextPiece() {
@@ -474,7 +465,6 @@
       return sum + node.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
     }, parseFloat(edges.paddingTop) + parseFloat(edges.paddingBottom)) - 1);
     const mission = stack[1];
-    const sumsReserve = P?.st.mode === 'hard' ? 18 : 0;
     const variants = ['mission-dense', 'mission-tight', 'mission-compact'];
     const target = Number(edges.getPropertyValue('--board-target')) || 0;
     mission.classList.remove(...variants);
@@ -484,7 +474,7 @@
       mission.classList.add(variant);
       width = budget();
     }
-    screen.style.setProperty('--board-fit', Math.max(96, width - sumsReserve) + 'px');
+    screen.style.setProperty('--board-fit', Math.max(96, width) + 'px');
   }
 
   function fitPlayLabels() {
@@ -519,7 +509,7 @@
   function renderMission() {
     const st = P.st;
     if (specialMode(st)) {
-      $('#playStageLabel').textContent = cornerName(P.cornerKey) + ' ' + P.stageNo + '단계 · ' + modeLabel[st.mode];
+      $('#playStageLabel').textContent = cornerName(P.cornerKey) + ' ' + P.stageNo + '단계';
       $('#playScore').textContent = won(playScore());
       const title = $('#modeTitle');
       title.textContent = modeLabel[st.mode];
@@ -1084,6 +1074,8 @@
   function startStage(cornerKey, stageNo) {
     const st = D.STAGES[cornerKey][stageNo - 1];
     if (!st || !validNickname(SAVE.nickname)) return;
+    $('#ovClear').hidden = true;
+    $('#ovOver').hidden = true;
     P = {
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: specialMode(st) ? new Set() : buildObstacles(stageNo),

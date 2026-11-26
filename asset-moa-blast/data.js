@@ -553,8 +553,8 @@
     const hardCount = long ? 8 : 5;
     const pureCount = long ? 20 : 10;
     const targets = (st) => [...new Set(st.entries.map((entry) => entry.amount)
-      .filter((amount) => amount > 0 && amount % 10000 === 0 && amount <= 7920000))];
-    const candidates = stages.filter((st) => st.stage >= 16 && st.stage < corner.stages &&
+      .filter((amount) => amount >= 300000 && amount <= 950000 && amount % 10000 === 0))];
+    const candidates = stages.filter((st) => st.stage >= 6 && st.stage < corner.stages &&
       st.mode === 'journal' && targets(st).length);
     let best = [];
     let bestCost = Infinity;
@@ -569,9 +569,9 @@
       const ideal = 16 + selected.length * (corner.stages - 17) / (hardCount - 1);
       for (let i = start; i <= candidates.length - (hardCount - selected.length); i++) {
         const st = candidates[i];
-        if (st.stage - (selected.at(-1)?.stage ?? 0) < 2) continue;
+        const adjacent = st.stage - (selected.at(-1)?.stage ?? 0) === 1;
         const tie = modeSeed(corner.key + ':hard:' + st.stage) / 4294967296;
-        spread(i + 1, [...selected, st], cost + (st.stage - ideal) ** 2 + tie / 10);
+        spread(i + 1, [...selected, st], cost + (adjacent ? 10000 : 0) + (st.stage < 16 ? 1000 : 0) + (st.stage - ideal) ** 2 + tie / 10);
       }
     }
 
