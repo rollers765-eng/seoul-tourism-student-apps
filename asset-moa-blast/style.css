@@ -58,7 +58,10 @@ body{
   pointer-events:none;z-index:120;
   touch-action:none;-webkit-user-select:none;user-select:none;
 }
-.drag-layer{position:fixed;inset:0;pointer-events:none;z-index:110;touch-action:none}
+.drag-layer{position:absolute;inset:0;pointer-events:none;z-index:110;touch-action:none;overflow:visible}
+.drag-layer .drag-ghost{position:absolute;pointer-events:none}
+#app.drag-active{overflow:visible}
+#app.drag-active::before{clip-path:inset(14.2857% 8.3333%)}
 #bubbles{position:absolute;inset:0;pointer-events:none;z-index:65}
 .bubble-float{
   position:absolute;left:50%;top:42%;transform:translate(-50%,0);max-width:250px;text-align:center;
