@@ -802,3 +802,51 @@ body{
 .ch-journal-zone[data-side=credit] .ch-zone-label{background:#ffe2ed}
 .ch-journal-solution{margin:0;color:#21694f;font-weight:800;font-size:12px}
 .ch-submit:disabled{opacity:.6}
+
+/* 모아와 타이틀을 한 줄에, 태그라인과 회계 팁은 각각 아래 줄에 둔다. */
+#screen-home .hero{gap:8px;margin-top:9px}
+#screen-home .hero-left{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  align-items:center;column-gap:7px;row-gap:4px;
+}
+#screen-home #homeMoa{
+  display:block;width:110px;height:auto;
+  filter:saturate(1.15) contrast(1.04) drop-shadow(0 6px 8px rgba(28,10,60,.3));
+}
+#screen-home .logo{font-size:30px;white-space:nowrap}
+#screen-home .logo-blast{font-size:.78em}
+#screen-home .tagline{
+  display:block;grid-column:1/-1;margin:0;text-align:center;
+  font-size:12px;white-space:nowrap;
+}
+#screen-home .speech{
+  grid-column:1/-1;justify-self:center;max-width:100%;padding:5px 8px;
+  font-size:10px;word-break:keep-all;overflow-wrap:break-word;
+}
+#screen-home .speech::after{content:none}
+#screen-home .rank-cloud{flex:0 0 102px;width:102px;padding:6px 5px;margin-top:2px}
+#screen-home .rc-row{padding:2px 3px}
+@media(min-width:386px) and (min-height:740px){
+  #screen-home #homeMoa{width:118px}
+  #screen-home .logo{font-size:32px}
+  #screen-home .tagline{font-size:13px}
+  #screen-home .speech{font-size:11px}
+}
+@media(min-width:600px){
+  #screen-home .hero{gap:13px;margin-top:12px}
+  #screen-home .hero-left{column-gap:12px;row-gap:6px}
+  #screen-home #homeMoa{width:158px}
+  #screen-home .logo{font-size:46px}
+  #screen-home .tagline{font-size:17px}
+  #screen-home .speech{font-size:13px;padding:6px 10px}
+  #screen-home .rank-cloud{flex-basis:172px;width:172px;padding:10px 9px}
+  #screen-home .rc-row{padding:3px 5px}
+}
+@media(max-width:360px){
+  #screen-home .hero{gap:6px}
+  #screen-home .hero-left{column-gap:5px}
+  #screen-home #homeMoa{width:clamp(82px,28vw,100px)}
+  #screen-home .logo{font-size:clamp(23px,7.5vw,27px)}
+  #screen-home .rank-cloud{flex-basis:90px;width:90px}
+  #screen-home .tagline{font-size:10.5px}
+}
