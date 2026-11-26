@@ -32,6 +32,8 @@
   const boardEl = $('#board'), trayEl = $('#tray'), journalEl = $('#journal');
   const missionTextEl = $('#missionText'), missionProgEl = $('#missionProgress');
   const dragLayer = $('#dragLayer'), toastEl = $('#toast');
+  const appEl = $('#app');
+  const dragDiagnostics = new URLSearchParams(location.search).get('dragDiag') === '1';
 
   function show(id) {
     $$('.screen').forEach((s) => s.classList.toggle('active', s.id === id));
@@ -442,7 +444,13 @@
     if (!cells.length) return null;
     const r0 = cells[0].getBoundingClientRect();
     const r1 = cells[1].getBoundingClientRect();
-    return { size: r0.width, stride: r1.left - r0.left, top: r0.top, left: r0.left };
+    const nextRow = cells[N].getBoundingClientRect();
+    const layerRect = dragLayer.getBoundingClientRect();
+    const layerStyle = getComputedStyle(dragLayer);
+    const scaleX = layerRect.width / parseFloat(layerStyle.width) || 1;
+    const scaleY = layerRect.height / parseFloat(layerStyle.height) || 1;
+    return { width: r0.width, height: r0.height, strideX: r1.left - r0.left,
+      strideY: nextRow.top - r0.top, top: r0.top, left: r0.left, layerRect, scaleX, scaleY };
   }
   trayEl.addEventListener('pointerdown', function (e) {
     if (!e.isPrimary || e.button !== 0) return;
@@ -458,7 +466,6 @@
     const pc = P.tray[si];
     if (!pc) return;
     e.preventDefault();
-    const m = metrics(); if (!m) return;
     const rect = pEl.getBoundingClientRect();
     const cols = Math.max.apply(null, pc.cells.map((a) => a[1])) + 1;
     const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
@@ -474,25 +481,20 @@
     const offC = best[1];
     drag = { piece: pc, slot: si, source: pEl, pointerId: e.pointerId, pointerType: e.pointerType,
       offR, offC, ghost: null, startX: e.clientX, startY: e.clientY, moved: false };
-    buildGhost(pc, e.clientX, e.clientY, m);
+    buildGhost(pc);
     pEl.classList.add('gone');
     moveDrag(e.clientX, e.clientY);
     // 리필로 교체되는 조각 대신 유지되는 트레이에서 포인터를 캡처한다.
     try { trayEl.setPointerCapture(e.pointerId); } catch (err) {}
   });
 
-  function buildGhost(pc, x, y, m) {
+  function buildGhost(pc) {
     const g = document.createElement('div');
-    g.className = 'piece';
+    g.className = 'piece drag-ghost';
     const rows = Math.max.apply(null, pc.cells.map((a) => a[0])) + 1;
     const cols = Math.max.apply(null, pc.cells.map((a) => a[1])) + 1;
-    const s = m.size;
-    g.style.gridTemplateColumns = 'repeat(' + cols + ', ' + s + 'px)';
-    g.style.gridTemplateRows = 'repeat(' + rows + ', ' + s + 'px)';
-    g.style.gap = (m.stride - m.size) + 'px';
-    g.style.position = 'fixed';
-    g.style.pointerEvents = 'none';
-    g.style.zIndex = '70';
+    g.dataset.cols = cols;
+    g.dataset.rows = rows;
     const map = {};
     pc.cells.forEach(([r, c]) => { map[r + ':' + c] = 1; });
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
@@ -511,15 +513,15 @@
     }
     dragLayer.appendChild(g);
     drag.ghost = g;
-    drag.size = s;
+    appEl.classList.add('drag-active');
   }
 
   function moveDrag(x, y) {
     if (!drag) return;
     const m = metrics(); if (!m) return;
-    const lift = drag.pointerType === 'touch' ? Math.max(44, Math.min(72, m.stride * 1.1)) : 0;
-    const row = (y - lift - m.top - m.size / 2) / m.stride - drag.offR;
-    const col = (x - m.left - m.size / 2) / m.stride - drag.offC;
+    const lift = drag.pointerType === 'touch' ? Math.max(44, Math.min(72, m.strideY * 1.1)) : 0;
+    const row = (y - lift - m.top - m.height / 2) / m.strideY - drag.offR;
+    const col = (x - m.left - m.width / 2) / m.strideX - drag.offC;
     const nearest = { r: Math.round(row), c: Math.round(col) };
     const direct = canPlace(drag.piece, nearest.r, nearest.c, P.grid, P.obst);
     const preferredSide = direct ? 'any' : (drag.piece.side || 'any');
@@ -536,8 +538,14 @@
     }
     drag.target = best;
     const anchor = best || { r: row, c: col };
-    drag.ghost.style.left = (m.left + anchor.c * m.stride) + 'px';
-    drag.ghost.style.top = (m.top + anchor.r * m.stride) + 'px';
+    const ghost = drag.ghost;
+    // 뷰포트 rect 차이를 보드 레이어의 로컬 CSS 좌표로 바꿔 같은 레이아웃에서 그린다.
+    ghost.style.left = (m.left - m.layerRect.left + anchor.c * m.strideX) / m.scaleX + 'px';
+    ghost.style.top = (m.top - m.layerRect.top + anchor.r * m.strideY) / m.scaleY + 'px';
+    ghost.style.gridTemplateColumns = 'repeat(' + ghost.dataset.cols + ', ' + m.width / m.scaleX + 'px)';
+    ghost.style.gridTemplateRows = 'repeat(' + ghost.dataset.rows + ', ' + m.height / m.scaleY + 'px)';
+    ghost.style.columnGap = (m.strideX - m.width) / m.scaleX + 'px';
+    ghost.style.rowGap = (m.strideY - m.height) / m.scaleY + 'px';
     clearPreview();
     const preview = best || nearest;
     const ok = best && inSide(drag.piece, preview.r, preview.c, drag.piece.side || 'any');
@@ -546,6 +554,23 @@
       const el = boardEl.children[idx(r, c)];
       if (el) el.classList.add(ok ? 'preview-ok' : 'preview-bad');
     });
+    if (dragDiagnostics || window.__blastDragDiagEnabled === true) recordDragGeometry(ghost, best);
+  }
+
+  function recordDragGeometry(ghost, target) {
+    const keys = ['left', 'top', 'width', 'height'];
+    const bounds = ghost.getBoundingClientRect();
+    const rect = Object.fromEntries(keys.map((key) => [key, bounds[key]]));
+    const cells = [...boardEl.querySelectorAll('.preview-ok,.preview-bad')].map((cell) => cell.getBoundingClientRect());
+    let preview = null;
+    if (cells.length) {
+      const left = Math.min(...cells.map((cell) => cell.left));
+      const top = Math.min(...cells.map((cell) => cell.top));
+      preview = { left, top, width: Math.max(...cells.map((cell) => cell.right)) - left,
+        height: Math.max(...cells.map((cell) => cell.bottom)) - top };
+    }
+    const delta = preview ? Object.fromEntries(keys.map((key) => [key, rect[key] - preview[key]])) : null;
+    window.__blastDragDiag = { ghost: rect, preview, delta, target: target ? { ...target } : null, cells: cells.length };
   }
   function clearPreview() {
     boardEl.querySelectorAll('.preview-ok,.preview-bad').forEach((el) => el.classList.remove('preview-ok', 'preview-bad'));
@@ -556,6 +581,7 @@
     if (!current) return null;
     drag = null;
     current.ghost?.remove();
+    appEl.classList.remove('drag-active');
     current.source.classList.remove('gone');
     clearPreview();
     if (trayEl.hasPointerCapture(current.pointerId)) trayEl.releasePointerCapture(current.pointerId);
