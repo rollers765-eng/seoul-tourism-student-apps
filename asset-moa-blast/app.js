@@ -391,27 +391,18 @@
     fitBoardLabels();
   }
   let layoutFrame = 0;
+  const boardSize = () => boardEl.clientWidth + ':' + boardEl.clientHeight;
   function invalidateBoardMetrics() {
-    // v58처럼 rect는 매 포인터 이벤트에서 새로 읽는다. 레이아웃 변경 시 진행 중 입력은 취소한다.
-    clearDrag();
+    // 스크롤로 보드가 이동해도 다음 moveDrag에서 새 rect를 읽는다.
+    if (drag && drag.boardSize !== boardSize()) clearDrag();
     if (!layoutFrame) layoutFrame = requestAnimationFrame(() => {
       layoutFrame = 0;
       fitPlayLabels();
+      if (drag && drag.boardSize !== boardSize()) clearDrag();
     });
   }
-  let layoutSizes = new Map();
   if (typeof ResizeObserver === 'function') {
-    const watcher = new ResizeObserver((entries) => {
-      let changed = false;
-      for (const entry of entries) {
-        const size = entry.contentRect.width + ':' + entry.contentRect.height;
-        if (layoutSizes.get(entry.target) !== size) {
-          layoutSizes.set(entry.target, size);
-          changed = true;
-        }
-      }
-      if (changed) invalidateBoardMetrics();
-    });
+    const watcher = new ResizeObserver(invalidateBoardMetrics);
     for (const node of [boardEl, dragLayer, appEl]) watcher.observe(node);
   }
   window.addEventListener('resize', invalidateBoardMetrics);
@@ -518,7 +509,7 @@
     const offR = best[0];
     const offC = best[1];
     drag = { piece: pc, slot: si, source: pEl, pointerId: e.pointerId, pointerType: e.pointerType,
-      offR, offC, ghost: null, startX: e.clientX, startY: e.clientY, moved: false };
+      offR, offC, ghost: null, boardSize: boardSize(), startX: e.clientX, startY: e.clientY, moved: false };
     buildGhost(pc);
     pEl.classList.add('gone');
     moveDrag(e.clientX, e.clientY);
@@ -631,6 +622,7 @@
   }
 
   function ownsPointer(event) {
+    if (drag && drag.boardSize !== boardSize()) clearDrag();
     return drag && event.pointerId === drag.pointerId && event.pointerType === drag.pointerType;
   }
 
