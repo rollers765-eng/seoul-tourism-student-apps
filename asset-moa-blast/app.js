@@ -361,15 +361,14 @@
       return sum + node.offsetHeight + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
     }, parseFloat(edges.paddingTop) + parseFloat(edges.paddingBottom)) - 1);
     const mission = stack[1];
-    mission.classList.remove('mission-dense', 'mission-tight');
+    const variants = ['mission-dense', 'mission-tight', 'mission-compact'];
+    const target = Number(edges.getPropertyValue('--board-target')) || 0;
+    mission.classList.remove(...variants);
     let width = budget();
-    if (innerWidth >= 390 && innerHeight >= 780 && width < 360) {
-      mission.classList.add('mission-dense');
+    for (const variant of variants) {
+      if (width >= target) break;
+      mission.classList.add(variant);
       width = budget();
-      if (width < 360) {
-        mission.classList.add('mission-tight');
-        width = budget();
-      }
     }
     screen.style.setProperty('--board-fit', Math.max(96, width) + 'px');
   }
