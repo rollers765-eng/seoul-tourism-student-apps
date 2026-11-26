@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>창업 아이디어 구현하기 | 성공적인 직업생활</title>
+<style>
+:root{--bg:#faf9f6;--ink:#30291f;--accent:#a55725;--line:#e8e0d4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all}
+a{color:#814016}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #a55725;outline-offset:3px}
+header{background:#fff;border-bottom:1px solid var(--line)}
+.head{max-width:1100px;margin:auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.head img{display:block;width:min(230px,55vw);height:auto}.head a:last-child{white-space:nowrap}
+main{max-width:1100px;margin:auto;padding:20px}
+nav{display:flex;gap:8px;flex-wrap:wrap;color:#6f6559;font-size:14px}
+.back{display:inline-flex;align-items:center;min-height:44px;margin:8px 0;color:#704023;font-weight:700}
+.hero{padding:32px 0 24px}.eyebrow,.label{color:var(--accent);font-weight:800}.hero h1{font-size:clamp(32px,6vw,50px);line-height:1.2;margin:8px 0}.hero p{margin:8px 0}.badge{display:inline-block;background:#f3e5d8;color:#87431d;border-radius:99px;padding:4px 14px;font-weight:700}
+section{margin:0 0 42px}h2{font-size:clamp(23px,4vw,29px);line-height:1.3;margin:0 0 16px}h3{font-size:19px;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card,details,.table-wrap{background:#fff;border:1px solid var(--line);border-radius:10px}.card{padding:20px}.card p{margin:8px 0}.card ul{margin:8px 0;padding-left:22px}
+details{margin-bottom:10px}summary{cursor:pointer;font-weight:700;min-height:50px;padding:12px 17px}details>div{padding:0 17px 16px}
+table{width:100%;border-collapse:collapse}th,td{padding:13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f7f2eb}tr:last-child td{border-bottom:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 17px;border:0;border-radius:7px;background:var(--accent);color:white;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}.btn:disabled{background:#e9e5df;color:#6b6257;cursor:default}
+.prompt{display:flex;flex-direction:column;gap:10px}.prompt details{margin:0}.prompt pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;word-break:normal;margin:0}.prompt .btn{align-self:flex-start}
+.note{padding:15px 18px;border-left:4px solid var(--accent);background:#f4ede5}.buttons{display:flex;flex-wrap:wrap;gap:10px}
+footer{border-top:1px solid var(--line);padding:24px 20px;color:#695f53}footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#30291f;color:white;border-radius:8px;padding:10px 16px;max-width:90vw;z-index:10;box-shadow:0 3px 15px #0002}#toast[hidden]{display:none}
+@media(max-width:640px){.grid,.steps{grid-template-columns:1fr}.card{padding:17px}.hero{padding:22px 0}.table-wrap{border:0;background:transparent}table,tbody,tr,td{display:block}thead{display:none}tr{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:12px}td{border:0;padding:4px 0}td:before{content:attr(data-label);display:block;font-weight:800;color:#8d481e}}
+</style>
+</head>
+<body>
+<header><div class="head">
+<a href="../business-finance/"><img src="../accounting-library/assets/school-signature.png" width="979" height="264" alt="서울관광고등학교"></a>
+<a href="../business-finance/">교과교실 ↗</a>
+</div></header>
+<main>
+<nav aria-label="현재 위치"><a href="../business-finance/">경영·금융 교과교실</a><span>›</span><a href="./">성공적인직업생활</a><span>›</span><span aria-current="page">창업 아이디어 구현하기</span></nav>
+<a class="back" href="./">← 자료실</a>
+<div class="hero"><p class="eyebrow">2026학년도 2학기 · 성공적인 직업생활 · 2학년 1~4반</p><h1>창업 아이디어 구현하기</h1><p>마지막 수행평가 · 반영비율 15% · 100점</p><span class="badge">1인 또는 2인 1조</span></div>
+
+<section><h2>이렇게 진행해요</h2><div class="grid">
+<article class="card"><span class="label">1차시 · 50분</span><h3>아이디어를 보고서로</h3><p>15분 동안 교과서의 창업 핵심 개념을 공부합니다. 시험 범위에 해당합니다.</p><p>이후 35분 동안 아이패드 멀티창의 한쪽에서 AI와 대화하고, 다른 한쪽 보고서 웹앱에서 모둠 등록 → STEP 1~4 작성 → 그림·이미지 업로드 → 제출을 진행합니다.</p></article>
+<article class="card"><span class="label">수업 후 과제</span><h3>인포그래픽 미리 만들기</h3><p>집이나 스마트폰에서 캔바 AI 또는 제미나이로 1장 인포그래픽을 만듭니다. <strong>2차시 전까지 반별 패들렛에 업로드</strong>하세요.</p></article>
+<article class="card"><span class="label">2차시 · 50분</span><h3>발표하고 함께 감상하기</h3><p>전원 3분 이내 발표 → 친구 댓글 피드백 → 투표 → 학급별 최다 득표 팀 함께 보기</p><p>가장 기발한 아이디어로 뽑힌 학급별 최다 득표 팀에는 발표점수 최고점 30점을 부여합니다.</p></article>
+</div></section>
+
+<section><h2>창업 핵심 개념 15분 정리</h2>
+<details><summary>창업의 의미와 조건</summary><div>창업은 새로운 사업을 구상하고 자원을 모아 제품이나 서비스를 제공하는 활동입니다. 문제를 발견하는 태도, 고객 이해, 필요한 자원과 실행 계획을 함께 살펴봅니다.</div></details>
+<details><summary>창업 절차</summary><div>아이템 선정 → 시장·고객 분석 → 사업성 검토 → 실행의 흐름으로 생각합니다. 실제로는 결과를 살피며 앞 단계를 다시 점검할 수 있습니다.</div></details>
+<details><summary>창업 성공·실패 사례의 공통 원인</summary><div>고객의 문제를 충분히 이해했는지, 차별화가 있는지, 비용과 자원을 현실적으로 고려했는지, 변화에 맞춰 개선했는지를 비교합니다.</div></details>
+<details><summary>기존 제품을 개선할 때 구분해 적는 법</summary><div>기존 제품의 특징과 불편한 점을 밝히고, 우리 아이디어가 바꾸는 부분과 기대 효과를 따로 씁니다. 참고한 자료의 출처도 표시합니다.</div></details>
+</section>
+
+<section><h2>Be the CEO 보고서 STEP 1–4</h2><div class="grid steps">
+<article class="card"><span class="label">STEP 1</span><h3>팀·기업 개요</h3><p>팀명, 회사명과 로고 스케치, 사업 내용 100자 요약</p></article>
+<article class="card"><span class="label">STEP 2</span><h3>아이디어 구체화</h3><p>아이디어 제목, 제안 배경과 문제 인식, 아이디어 내용, 기대 효과, 핵심 문장</p></article>
+<article class="card"><span class="label">STEP 3</span><h3>시장 환경 분석 · SWOT</h3><p>강점과 약점, 기회와 위협을 구분합니다.</p></article>
+<article class="card"><span class="label">STEP 4</span><h3>4P MIX</h3><p>Product 제품 · Price 가격 · Place 유통 · Promotion 홍보</p></article>
+</div></section>
+
+<section><h2>평가 기준 · 100점</h2><div class="table-wrap"><table><thead><tr><th>항목</th><th>배점과 성취수준</th><th>확인 포인트</th></tr></thead><tbody>
+<tr><td data-label="항목">아이디어 창의성 및 기업가 정신</td><td data-label="배점">30점 · A30 B27 C24 D21 E18</td><td data-label="확인 포인트">독창성, 일상·산업 현장 문제 해결, 가치 창출</td></tr>
+<tr><td data-label="항목">보고서의 논리성 및 타당성</td><td data-label="배점">30점 · A30 B27 C24 D21 E18</td><td data-label="확인 포인트">SWOT·4P 등 아이템 선정 절차의 논리성</td></tr>
+<tr><td data-label="항목">발표 자료 및 의사소통 능력</td><td data-label="배점">30점 · A30 B27 C24 D21 E18</td><td data-label="확인 포인트">1장 인포그래픽 구성, 명확한 전달, 질의응답·댓글 대응</td></tr>
+<tr><td data-label="항목">프로젝트 참여도 및 완성도</td><td data-label="배점">10점 · A10 B8 C6 D4 E2</td><td data-label="확인 포인트">협력 또는 개인의 자기 주도성, 기한 준수, 완성도</td></tr>
+</tbody></table></div></section>
+
+<section><h2>AI 프롬프트 3종 원클릭 복사</h2><p>복사한 뒤 [ ] 안을 자신의 내용으로 채워 AI에 입력하세요.</p><div class="grid">
+<article class="card prompt"><h3>[1차시] 보고서 작성 도우미</h3><p>질문에 답하며 아이디어를 고르고 보고서 초안을 정리합니다.</p><button class="btn copy" data-target="prompt1">복사</button><details><summary>전체 보기</summary><div><pre id="prompt1">너는 고등학교 2학년 학생의 친절한 창업 멘토야. 나는 「Be the CEO」 보고서를 스스로 작성할 거야.
+
+[나의 정보]
+관심 분야: [직접 입력]
+평소 불편했던 점: [직접 입력]
+좋아하는 것·잘하는 것: [직접 입력]
+활동 형태: [1인 / 2인 1조]
+
+한 번에 질문 하나씩 하고 내 답변을 기다려 줘. 학생이 경험하지 않은 사실, 수치, 수상 실적을 만들지 마. 확인되지 않은 시장 규모나 통계는 추정이라고 밝히고 확인이 필요하다고 알려 줘. 선택지를 제시하되 최종 결정은 내가 하도록 도와줘.
+
+먼저 내 답변을 바탕으로 실현 가능한 아이디어 3개를 제시하고, 내가 1개를 고를 때까지 기다려 줘. 그다음 필요한 질문을 하나씩 하며 아이디어를 구체화해 줘.
+
+마지막에는 다음 활동지 칸 순서대로 보고서 초안을 표로 정리해 줘.
+
+STEP 1 팀·기업 개요: 팀명, 회사명, 로고 스케치 설명, 사업 내용 100자 요약
+STEP 2 아이디어 구체화: 아이디어 제목, 제안 배경(문제 인식), 아이디어 내용, 기대 효과, 핵심 문장
+STEP 3 시장 환경 분석: 강점·약점·기회·위협(SWOT)
+STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
+
+기존 제품을 개선한다면 기존 제품의 특징과 내가 개선한 점을 구분해 줘. 참고한 자료와 출처를 표시하고 확인되지 않은 내용은 구분해 줘. 끝으로 선생님께 확인받을 점 3가지를 알려줘.
+
+이제 첫 질문 하나만 해 줘.</pre></div></details></article>
+<article class="card prompt"><h3>[수업 후] 인포그래픽 1장 만들기</h3><p>완성한 보고서를 바탕으로 발표 자료를 준비합니다.</p><button class="btn copy" data-target="prompt2">복사</button><details><summary>전체 보기</summary><div><pre id="prompt2">너는 고등학생의 창업 아이디어 발표 자료를 돕는 디자인 코치야. 아래 보고서를 바탕으로 1장 인포그래픽 제작을 도와줘.
+
+[보고서 내용]
+[STEP 1~4 보고서 내용 붙여넣기]
+
+다음 두 결과를 구분해서 제시해 줘.
+
+(a) 캔바 AI 또는 제미나이에 그대로 붙일 수 있는 1장 구성 텍스트
+- 제목: 15자 이내
+- 한 줄 카피: 25자 이내
+- 문제 → 해결: 각각 35자 이내
+- 핵심 기능 3개: 각 20자 이내
+- SWOT 요약: 강점·약점·기회·위협 각 15자 이내
+- 4P 요약: 제품·가격·유통·홍보 각 20자 이내
+- 타깃 고객: 20자 이내
+- 기대 효과: 30자 이내
+
+(b) 이미지 생성용 영문 프롬프트
+스타일, 세로 또는 가로 구도, 색상, 시각적 구성과 피해야 할 요소를 구체적으로 적어 줘. 텍스트가 들어갈 여백을 남겨 줘.
+
+보고서에 없는 수치, 로고, 수상 실적을 만들지 마. 이미지 생성 시 한글이 깨질 수 있으므로 제목과 설명은 이미지 제작 후 캔바 등에서 직접 입력하도록 안내해 줘. 참고한 자료와 AI 활용 내용을 표시하도록 알려줘.</pre></div></details></article>
+<article class="card prompt"><h3>[2차시] 3분 발표 대본과 예상 질문</h3><p>내 아이디어를 짧고 명확하게 전달하는 연습을 합니다.</p><button class="btn copy" data-target="prompt3">복사</button><details><summary>전체 보기</summary><div><pre id="prompt3">너는 고등학생의 창업 발표를 돕는 코치야. 아래 보고서를 바탕으로 발표 연습 자료를 만들어 줘.
+
+[보고서 내용]
+[STEP 1~4 보고서 내용 붙여넣기]
+
+1. 도입 → 문제 → 해결 → 차별점 → 마무리 순서로 3분 이내 발표 대본을 450~500자로 작성해 줘.
+2. 예상 질문 5개와 각 질문에 답할 핵심 포인트를 알려줘.
+3. 목소리, 시선, 말하기 속도, 시간 관리가 포함된 발표 태도 체크리스트를 만들어 줘.
+4. 친구의 댓글에 감사하고 질문에 답하거나 개선점을 설명하는 방법을 알려줘.
+
+보고서에 없는 경험, 수치, 성과를 만들지 마. 내가 직접 이해하고 자연스럽게 말할 수 있는 쉬운 표현으로 써 줘.</pre></div></details></article>
+</div></section>
+
+<section><h2>보고서 웹앱</h2><p>모둠 등록과 보고서 작성·이미지 제출에 사용합니다.</p><!-- 보고서 웹앱 주소 --><button class="btn" disabled>보고서 웹앱 준비 중</button></section>
+<section><h2>제출 안내</h2><p>보고서는 보고서 웹앱에서 제출합니다. 2인 모둠은 <strong>각자의 역할</strong>을 반드시 작성하세요.</p><p>인포그래픽은 <strong>2차시 전까지</strong> 해당 학급 패들렛에 올립니다.</p><div class="note">파일명 예시<br>개인 · 2-3 홍길동<br>팀 · 2-3 홍길동·김철수</div><div class="buttons" style="margin-top:16px">
+<!-- PADLET 1반 --><button class="btn" disabled>1반 패들렛 준비 중</button>
+<!-- PADLET 2반 --><button class="btn" disabled>2반 패들렛 준비 중</button>
+<!-- PADLET 3반 --><button class="btn" disabled>3반 패들렛 준비 중</button>
+<!-- PADLET 4반 --><button class="btn" disabled>4반 패들렛 준비 중</button>
+</div></section>
+<section><h2>유의사항</h2><ul><li>참고 자료와 AI 활용 출처를 표시합니다.</li><li>다른 사람의 아이디어를 그대로 모방하지 않습니다.</li><li>기존 제품을 개선했다면 기존 제품과 개선한 내용을 구분합니다.</li><li>발표는 3분 이내로 준비합니다.</li></ul></section>
+</main>
+<footer><div><span>서울관광고등학교 · 성공적인 직업생활</span><a href="./">← 자료실</a></div></footer>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script>
+const toast = document.getElementById('toast');
+let toastTimer;
+function announce(message) {
+  toast.textContent = message;
+  toast.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.hidden = true; }, 2000);
+}
+document.querySelectorAll('.copy').forEach(button => {
+  button.addEventListener('click', async () => {
+    const text = document.getElementById(button.dataset.target).textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      announce('복사했어요. AI에 붙여넣으세요.');
+    } catch (error) {
+      const details = button.parentElement.querySelector('details');
+      details.open = true;
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById(button.dataset.target));
+      selection.removeAllRanges();
+      selection.addRange(range);
+      announce('선택한 내용을 복사해 주세요.');
+    }
+  });
+});
+</script>
+</body>
+</html>
