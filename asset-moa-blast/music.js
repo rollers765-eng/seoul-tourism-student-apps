@@ -219,6 +219,17 @@
   }
 
   /* ───── 효과음 ───── */
+  function ladder(n) {
+    const offsets = [0, 2, 4, 7, 9];
+    const step = Math.max(0, Math.min(offsets.length - 1, Math.trunc(Number(n) || 1) - 1));
+    // Rotate through C-major pentatonic, continuing into the next octave.
+    const notes = offsets.map((_, i) => {
+      const degree = step + i;
+      return 72 + offsets[degree % offsets.length] + 12 * Math.floor(degree / offsets.length);
+    });
+    return { step, notes, freqs: notes.map(freq) };
+  }
+
   const sfx = {
     place: function () {
       tone({ note: 84, at: 0, dur: 0.09, lvl: 0.14, type: 'square', bus: sfxGain });
@@ -231,10 +242,17 @@
       }
       noise({ dur: 0.3, lvl: 0.08, freq: 2200, sweep: 400, bus: sfxGain });
     },
+    stamp: function () {
+      tone({ note: 37, dur: 0.12, lvl: 0.08, type: 'sine', bus: sfxGain });
+      noise({ dur: 0.05, lvl: 0.025, freq: 1400, bus: sfxGain });
+    },
     combo: function (n) {
-      [0, 4, 7, 12].forEach(function (d, i) {
-        tone({ note: 76 + d + Math.min(7, n || 2), at: ctx.currentTime + i * 0.05, dur: 0.2, lvl: 0.09, type: 'square', bus: sfxGain });
+      const { notes } = ladder(n);
+      const start = ctx.currentTime;
+      notes.forEach((note, i) => {
+        tone({ note, at: start + i * 0.045, dur: 0.18, lvl: 0.08, type: 'triangle', bus: sfxGain });
       });
+      tone({ note: notes.at(-1) + 12, at: start + 0.18, dur: 0.18, lvl: 0.025, type: 'sine', bus: sfxGain });
     },
     right: function () {
       [0, 4, 7, 12, 16].forEach(function (d, i) {
@@ -327,6 +345,7 @@
 
   window.MoaSound = {
     play: play,
+    ladder,
     start: startMusic,
     stop: stopMusic,
     isOn: function () { return enabled; },

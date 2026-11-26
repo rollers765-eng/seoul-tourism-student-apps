@@ -1018,10 +1018,9 @@
       banner.classList.add('show');
       clearTimeout(banner._t);
       banner._t = setTimeout(() => banner.classList.remove('show'), 1100);
-      SOUND.play('combo', P.combo);
-    } else {
-      SOUND.play('clear', res.count);
     }
+    showJournalStamp();
+    SOUND.play('combo', P.combo);
     flashText('+' + (pts + comboGain));
     $('#playScore').textContent = won(playScore());
     if (res.count >= 2 || P.combo >= 3) fx.confetti(Math.min(180, 65 + res.count * 18 + P.combo * 12));
@@ -1030,6 +1029,25 @@
     const stage = P;
     clearTimeout(stage.clearPaint);
     stage.clearPaint = setTimeout(() => { if (P === stage) renderBoard(); }, 175);
+  }
+
+  function showJournalStamp() {
+    $('.journal-stamp')?.remove();
+    const stamp = document.createElement('div');
+    stamp.className = 'journal-stamp';
+    stamp.textContent = '분개 완료!';
+    stamp.setAttribute('aria-hidden', 'true');
+    stamp.addEventListener('animationend', () => stamp.remove(), { once: true });
+    boardEl.parentElement.append(stamp);
+    setTimeout(() => stamp.remove(), 780);
+    SOUND.play('stamp');
+  }
+
+  function stampView() {
+    const stamp = $('.journal-stamp');
+    return { visible: !!stamp?.getClientRects().length, text: stamp?.textContent ?? null,
+      rect: stamp?.getBoundingClientRect().toJSON() ?? null,
+      pointerEvents: stamp ? getComputedStyle(stamp).pointerEvents : null };
   }
 
   function flashText(text) {
@@ -1074,6 +1092,7 @@
   function startStage(cornerKey, stageNo) {
     const st = D.STAGES[cornerKey][stageNo - 1];
     if (!st || !validNickname(SAVE.nickname)) return;
+    $('.journal-stamp')?.remove();
     $('#ovClear').hidden = true;
     $('#ovOver').hidden = true;
     P = {
@@ -1375,7 +1394,8 @@
 
   function rankView() {
     const remote = board?.view() || { mode: 'local', entries: [], lastAt: null };
-    if (remote.mode === 'online') return remote;
+    if (remote.mode === 'online') return { ...remote,
+      entries: [...remote.entries].sort((a, b) => b.best_score - a.best_score) };
     return { ...remote, entries: SAVE.nickname ? [{ nickname: SAVE.nickname, best_score: SAVE.best || 0,
       cleared_stages: Object.keys(SAVE.stars).length, best_combo: SAVE.bestCombo || 0 }] : [] };
   }
@@ -1404,6 +1424,54 @@
     return SAVE.nickname + ' · ' + (view.entries.length >= 20 ? '20위권 밖 또는 미등록' : '순위 집계 전') + ' · ' + won(SAVE.best || 0) + '점';
   }
 
+  function rankGap(view = rankView()) {
+    const ownIndex = view.entries.findIndex(row => row.nickname === SAVE.nickname);
+    const myRank = ownIndex < 0 ? null : ownIndex + 1;
+    const ownScore = ownIndex < 0 ? SAVE.best || 0 : view.entries[ownIndex].best_score;
+    const above = ownIndex > 0 ? view.entries[ownIndex - 1] :
+      ownIndex < 0 && view.entries.length >= 20 ? view.entries[19] : null;
+    const difference = above ? above.best_score - ownScore : null;
+    const hasGap = ownIndex > 0 || difference > 0;
+    const gap = hasGap ? difference : null;
+    const aboveName = hasGap ? above.nickname : null;
+    const score = gap === null ? '' : won(gap) + '점';
+    const fallback = mineLabel(view);
+    const record = ' · 내 기록 ' + won(ownScore) + '점';
+    const prefix = ownIndex === 0 ? '👑 현재 1위!' :
+      ownIndex > 0 ? '바로 위 ' + aboveName + '님까지 ' :
+      hasGap ? fallback + ' · 20위 ' + aboveName + '님까지 ' : fallback;
+    const suffix = ownIndex === 0 ? record : ownIndex > 0 ? '!' + record : hasGap ? '!' : '';
+    return { myRank, aboveName, gap, text: prefix + score + suffix, prefix, score, suffix };
+  }
+
+  function renderOwnRank(node, view, compact = false) {
+    node.classList.add('rank-gap');
+    const { myRank, aboveName, prefix, score, suffix, text } = rankGap(view);
+    if (compact) node.title = text;
+    node.append(compact && myRank === null && score ? '20위 ' + aboveName + '님까지 ' : prefix);
+    if (score) {
+      const highlight = document.createElement('b');
+      highlight.className = 'gap';
+      highlight.textContent = score;
+      node.append(highlight);
+    }
+    node.append(suffix);
+  }
+
+  function fitHomeRankText(node) {
+    if (!node.clientWidth) return;
+    // Keep the compact card to two lines without truncating a player's name.
+    const style = getComputedStyle(node);
+    let size = parseFloat(style.fontSize);
+    const padding = parseFloat(style.paddingTop);
+    const fits = () => node.clientHeight <= Math.ceil(padding + 2 * parseFloat(style.lineHeight));
+    if (!fits()) node.classList.add('rank-gap-tight');
+    while (size > 6 && !fits()) {
+      size -= .25;
+      node.style.fontSize = size + 'px';
+    }
+  }
+
   function renderRankCloud() {
     const host = $('#rankCloud'), view = rankView();
     const head = document.createElement('div');
@@ -1419,8 +1487,9 @@
     view.entries.slice(0, 5).forEach((row, i) => list.append(rankRow(row, i, true)));
     const mine = document.createElement('div');
     mine.className = 'rc-me';
-    mine.textContent = mineLabel(view);
+    renderOwnRank(mine, view, true);
     host.replaceChildren(head, list, mine);
+    fitHomeRankText(mine);
   }
 
   function renderBoards() {
@@ -1811,7 +1880,7 @@
     view.entries.forEach((row, i) => host.append(rankRow(row, i, false)));
     const own = document.createElement('p');
     own.className = 'section-desc';
-    own.textContent = mineLabel(view);
+    renderOwnRank(own, view);
     const info = document.createElement('p');
     info.className = 'section-desc';
     info.textContent = '마지막 갱신 ' + (view.lastAt ? new Date(view.lastAt).toLocaleTimeString('ko-KR', {hour12:false}) : '—') +
@@ -1913,6 +1982,11 @@
     nickname: () => SAVE.nickname,
     setNickname,
     board: rankView,
+    stamp: stampView,
+    rankGap: () => {
+      const { myRank, aboveName, gap, text } = rankGap();
+      return { myRank, aboveName, gap, text };
+    },
     challengeInfo: () => CH ? JSON.parse(JSON.stringify({
       type: CH.type, q: CH.q, answer: CH.answer, opts: CH.opts, debit: CH.debit,
       credit: CH.credit, chips: CH.chips, timer: CH.timer

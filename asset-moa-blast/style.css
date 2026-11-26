@@ -909,3 +909,37 @@ body{
 
 #clearBreakdown{gap:4px;align-content:center}
 #clearBreakdown span{flex:0 0 auto;white-space:nowrap;line-height:1.25}
+
+.journal-stamp{
+  position:absolute;z-index:70;left:calc((100% - var(--amount-rail,0px)) / 2);
+  top:calc((100% - var(--amount-footer,0px)) / 2);
+  width:calc((100% - var(--amount-rail,0px)) * .68);
+  padding:10px 4px;border:4px solid #bc2039;border-radius:12px;
+  background:linear-gradient(150deg,#fff9ce,#ffdf72);
+  box-shadow:inset 0 0 0 3px #f7b73c,0 0 20px #ffd452b8,0 5px 12px #6d112a80;
+  color:#a91630;text-shadow:0 1px #fff6c0;font-size:clamp(19px,8vw,43px);
+  line-height:1.15;font-weight:1000;text-align:center;white-space:nowrap;
+  pointer-events:none;user-select:none;
+  transform:translate(-50%,-50%) rotate(-8deg);
+  animation:journal-stamp-bounce .72s ease-out both;
+}
+.journal-stamp::before,.journal-stamp::after{
+  content:"✦";position:absolute;color:#ffdd72;text-shadow:0 0 6px #a94216;font-size:.65em;
+}
+.journal-stamp::before{left:8px;top:4px}
+.journal-stamp::after{right:8px;bottom:4px}
+@keyframes journal-stamp-bounce{
+  0%{transform:translate(-50%,-50%) rotate(-11deg) scale(1.8)}
+  20%{transform:translate(-50%,-50%) rotate(-6deg) scale(.95)}
+  37%{transform:translate(-50%,-50%) rotate(-9deg) scale(1)}
+  49%,79%{transform:translate(-50%,-50%) rotate(-8deg) scale(1);opacity:1}
+  100%{opacity:0}
+}
+@keyframes journal-stamp-fade{0%,70%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){
+  .journal-stamp{animation:journal-stamp-fade .5s linear both}
+}
+.rank-gap{overflow-wrap:anywhere}
+.rc-me.rank-gap{line-height:1.2}
+.rc-me.rank-gap-tight{word-break:break-all;text-wrap:balance}
+.rank-gap .gap{color:#aa285f;font-weight:900}
