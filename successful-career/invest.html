@@ -1564,6 +1564,155 @@ button:disabled {
     font-size: 14px;
   }
 }
+
+:root {
+  --text-muted: #62696e;
+  --mint-text: #006d70;
+  --coral-text: #a62939;
+  --focus-ring: #075e64;
+}
+
+.btn-primary:not(:disabled),
+.class-btn[aria-pressed="true"] {
+  background: #00787b;
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #006467;
+}
+
+.live-badge:not(.is-closed),
+.pill-status.is-closed,
+.bar-row.is-leader .bar-count-pill,
+.funding-badge,
+.admin-msg:not(.ok),
+#admin-panel > .panel:last-child .section-label {
+  color: var(--coral-text);
+}
+#admin-panel > .panel:last-child .section-label {
+  color: var(--coral-text) !important;
+}
+
+.btn-danger,
+#admin-reset-btn:not(:disabled) {
+  color: var(--coral-text);
+  border-color: var(--coral-text);
+}
+.btn-danger:hover:not(:disabled),
+#admin-reset-btn:hover:not(:disabled),
+.leader-badge,
+.check-pill,
+.rank-num.rank-1,
+.bar-row.is-leader .rank-num {
+  background: var(--coral-text);
+  color: #fff;
+}
+.rank-num { color: var(--text); }
+
+:focus-visible,
+.text-input:focus-visible,
+.text-area:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.nav-tab:focus-visible {
+  outline-offset: -3px;
+}
+
+#retry-live {
+  min-height: 44px;
+  border-color: var(--mint-text);
+}
+.demo-badge {
+  background: #fff0ca;
+  color: #634300;
+}
+
+.company-name,
+.company-desc {
+  display: block;
+  overflow: visible;
+}
+.company-name {
+  font-size: 18px;
+  font-weight: 800;
+}
+.company-desc { font-size: 14px; }
+.company-name,
+.company-item,
+.company-desc,
+.bar-company,
+.bar-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.card-pill,
+.card-progress-meta { font-size: 12px; }
+.card-amount-row { margin-top: 4px; }
+.bar-fill { max-width: 100%; }
+
+@media (max-width: 820px) {
+  .board-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .topbar-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    height: auto;
+  }
+
+  .brand {
+    min-height: 54px;
+    gap: 6px;
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .brand > span:first-child { flex: 1 0 auto; }
+  .demo-badge {
+    padding-inline: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .nav-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(max-content, 1fr));
+    gap: 0;
+    height: auto;
+  }
+  .nav-tab {
+    justify-content: center;
+    min-height: 44px;
+    padding-inline: 6px;
+  }
+
+  .bar-head { row-gap: 6px; }
+  .bar-name-wrap { flex-basis: 100%; }
+  .bar-amount-group {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+  .bar-amount {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .stat-card {
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+}
+
+@media (min-width: 1200px) {
+  #view-board .board-title { font-size: 32px; }
+  #view-board .stat-label,
+  #view-board .bar-item,
+  #view-board .feed-meta { font-size: 16px; }
+  #view-board .feed-text { font-size: 17px; }
+  #view-board .leader-badge,
+  #view-board .bar-count-pill { font-size: 14px; }
+}
   </style>
 </head>
 <body>
@@ -2531,6 +2680,7 @@ button:disabled {
 
 function renderCompanyCards(companies) {
   if (!dom.companyList) return;
+
   if (!Array.isArray(companies) || companies.length === 0) {
     dom.companyList.innerHTML =
       '<div class="empty-hint">아직 등록된 회사가 없습니다. 선생님이 회사를 등록하면 여기에 표시됩니다.</div>';
@@ -2539,60 +2689,53 @@ function renderCompanyCards(companies) {
 
   const sorted = [...companies].sort((a, b) => (a.sort || 0) - (b.sort || 0));
   const isOpen = Boolean(state.studentBoard && state.studentBoard.is_open);
-  const maxTotal = Math.max(0, ...sorted.map((c) => Number(c.total) || 0));
-  const sumTotal = sorted.reduce((acc, c) => acc + (Number(c.total) || 0), 0);
+  const sumTotal = sorted.reduce((sum, company) => sum + (Number(company.total) || 0), 0);
 
-  dom.companyList.innerHTML = sorted
-    .map((co, idx) => {
-      const selected = state.selectedCompanyId === co.id;
-      const total = Number(co.total) || 0;
-      const count = co.count != null
-        ? Number(co.count) || 0
-        : Math.round(total / CONFIG.INVEST_AMOUNT);
-      const barPct = maxTotal > 0 && total > 0
-        ? Math.max(4, Math.round((total / maxTotal) * 100))
-        : 0;
-      const sharePct = sumTotal > 0 ? Math.round((total / sumTotal) * 100) : 0;
-      const nameStr = String(co.name || '').trim();
-      const initial = nameStr ? [...nameStr][0] : '?';
-      const themeIdx = idx % 6;
-      const amountLabel = total > 0 ? `${formatMoney(total)}+` : formatMoney(0);
+  dom.companyList.innerHTML = sorted.map((company, index) => {
+    const companyId = String(company.id);
+    const selected = state.selectedCompanyId === companyId;
+    const name = String(company.name || '').trim();
+    const initial = [...name][0] || '?';
+    const themeIndex = (name ? name.charCodeAt(0) : index) % 6;
+    const total = Number(company.total) || 0;
+    const count = company.count != null
+      ? Number(company.count) || 0
+      : Math.round(total / CONFIG.INVEST_AMOUNT);
+    const share = sumTotal > 0 ? (total / sumTotal) * 100 : 0;
+    const shareLabel = share.toLocaleString('ko-KR', { maximumFractionDigits: 1 });
 
-      return `
-        <button
-          type="button"
-          class="company-card"
-          data-company-id="${escapeHtml(co.id)}"
-          aria-pressed="${selected ? 'true' : 'false'}"
-        >
-          <div class="card-thumb thumb-theme-${themeIdx}" aria-hidden="true">
-            <span class="thumb-initial">${escapeHtml(initial)}</span>
-            <span class="thumb-badge-cat">창업 프로젝트</span>
-            <span class="thumb-badge-fund">1억 펀딩</span>
-            <span class="check-pill">✓</span>
-          </div>
-          <div class="company-card-main">
-            <div class="card-amount-row">
-              <span class="company-amount">${escapeHtml(amountLabel)}</span>
-              <span class="card-pills">
-                <span class="card-pill pill-count">${count}명 참여</span>
-                <span class="card-pill pill-status${isOpen ? '' : ' is-closed'}">${isOpen ? '진행 중' : '마감'}</span>
-              </span>
-            </div>
-            <div class="company-name">${escapeHtml(co.name)}</div>
-            ${co.item ? `<div class="company-item">${escapeHtml(co.item)}</div>` : ''}
-            ${co.description ? `<p class="company-desc">${escapeHtml(co.description)}</p>` : ''}
-            <div class="card-progress">
-              <div class="card-progress-track" aria-hidden="true">
-                <div class="card-progress-fill" style="width: ${barPct}%;"></div>
-              </div>
-              <div class="card-progress-meta">전체의 ${sharePct}%</div>
-            </div>
-          </div>
-        </button>
-      `;
-    })
-    .join('');
+    return `
+      <button
+        type="button"
+        class="company-card"
+        data-company-id="${escapeHtml(companyId)}"
+        aria-pressed="${selected}"
+      >
+        <span class="card-thumb thumb-theme-${themeIndex}" aria-hidden="true">
+          <span class="thumb-initial">${escapeHtml(initial)}</span>
+          <span class="check-pill">✓</span>
+        </span>
+        <span class="company-card-main">
+          <span class="company-name">${escapeHtml(name)}</span>
+          ${company.item ? `<span class="company-item">${escapeHtml(company.item)}</span>` : ''}
+          ${company.description ? `<span class="company-desc">${escapeHtml(company.description)}</span>` : ''}
+          <span class="card-amount-row">
+            <span class="company-amount">${escapeHtml(formatMoney(total))}</span>
+            <span class="card-pills">
+              <span class="card-pill pill-count">${count}명 찈여</span>
+              <span class="card-pill pill-status${isOpen ? '' : ' is-closed'}">${isOpen ? '진행 중' : '마감'}</span>
+            </span>
+          </span>
+          <span class="card-progress">
+            <span class="card-progress-track" aria-hidden="true">
+              <span class="card-progress-fill" style="display: block; width: ${share}%;"></span>
+            </span>
+            <span class="card-progress-meta">전체 투자금의 ${shareLabel}%</span>
+          </span>
+        </span>
+      </button>
+    `;
+  }).join('');
 }
 
   function renderStudentView() {
