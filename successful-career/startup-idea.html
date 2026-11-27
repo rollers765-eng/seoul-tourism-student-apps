@@ -64,6 +64,209 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
  details>summary{padding:15px 16px}details>div{padding:0 16px 16px}
  .prompt pre{max-height:240px}
 }
+
+/* BananaX 인포그래픽 안내 블록 */
+.infog-guide,
+.infog-guide * {
+  box-sizing: border-box;
+}
+
+.infog-guide {
+  min-width: 0;
+  max-width: 100%;
+  margin: 16px 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  background: var(--soft);
+  color: var(--ink);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.infog-title {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.infog-desc {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.infog-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 13px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.infog-link:visited {
+  color: #fff;
+}
+
+.infog-link:hover {
+  background: #87431d;
+  border-color: #87431d;
+  color: #fff;
+}
+
+.infog-link-text {
+  min-width: 0;
+}
+
+.infog-link-icon,
+.infog-link-arrow {
+  flex: 0 0 auto;
+}
+
+.infog-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.infog-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.infog-num {
+  display: inline-flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #f3e5d8;
+  color: #87431d;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.infog-step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.infog-step-title {
+  display: block;
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.infog-step-desc {
+  margin: 0;
+  color: #625448;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.infog-note {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .infog-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .infog-guide {
+    padding: 16px 12px;
+  }
+
+  .infog-title {
+    font-size: 17px;
+  }
+
+  .infog-link {
+    gap: 6px;
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .infog-step {
+    padding: 12px;
+  }
+}
+/* 기존 모바일 버튼 수정 CSS를 아래 코드로 교체 */
+@media (max-width: 600px) {
+  .infog-link {
+    display: block;
+    min-height: 46px;
+    padding: 12px 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-align: center;
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    text-wrap: balance;
+  }
+  .infog-link-text {
+    display: inline;
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    text-wrap: balance;
+  }
+  .infog-link-icon,
+  .infog-link-arrow {
+    display: inline;
+    font-size: inherit;
+    white-space: nowrap;
+  }
+  .infog-link-arrow::before { content: "\2060"; }
+}
+/* 14px 유지 · 균형 줄바꿈 · 화살표 인라인 배치 */
+/* HTML 및 600px 초과 화면 변경 없음 */
+/* 실제 줄바꿈 위치는 브라우저 렌더링에 따라 달라질 수 있음 */
 </style>
 </head>
 <body>
@@ -158,6 +361,76 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 보고서에 없는 경험, 수치, 성과를 만들지 마. 내가 직접 이해하고 자연스럽게 말할 수 있는 쉬운 표현으로 써 줘.</pre></article>
 </div>
 </details>
+
+<!-- BananaX 인포그래픽 안내: AI 프롬프트 details 직후 삽입 -->
+<section class="infog-guide" aria-labelledby="infog-title">
+
+  <h3 class="infog-title" id="infog-title">
+    수업 외 · 인포그래픽 1장 만들기
+  </h3>
+
+  <p class="infog-desc">
+    집이나 스마트폰에서 1장을 만들고,
+    <strong>2차시 전까지 우리 반 패들렛에 올립니다.</strong>
+  </p>
+
+  <a class="infog-link"
+     href="https://furoku.github.io/bananaX/projects/infographic-evaluation/ko/?lang=ko"
+     target="_blank"
+     rel="noopener">
+    <span class="infog-link-icon" aria-hidden="true">🍌</span>
+    <span class="infog-link-text">
+      BananaX 인포그래픽 프롬프트 300+ 보러 가기
+    </span>
+    <span class="infog-link-arrow" aria-hidden="true">→</span>
+  </a>
+
+  <ol class="infog-steps" role="list">
+
+    <li class="infog-step">
+      <span class="infog-num" aria-hidden="true">1</span>
+      <div class="infog-step-body">
+        <strong class="infog-step-title">디자인 선택</strong>
+        <p class="infog-step-desc">
+          BananaX에서 미니멀·입체 도해·손그림 등
+          내 창업 아이디어에 어울리는 스타일을 골라 보세요.
+        </p>
+      </div>
+    </li>
+
+    <li class="infog-step">
+      <span class="infog-num" aria-hidden="true">2</span>
+      <div class="infog-step-body">
+        <strong class="infog-step-title">프롬프트 복사</strong>
+        <p class="infog-step-desc">
+          마음에 드는 디자인 예시를 선택하고,
+          해당 예시의 프롬프트를 복사하세요.
+        </p>
+      </div>
+    </li>
+
+    <li class="infog-step">
+      <span class="infog-num" aria-hidden="true">3</span>
+      <div class="infog-step-body">
+        <strong class="infog-step-title">내 자료로 만들기</strong>
+        <p class="infog-step-desc">
+          NotebookLM이나 제미나이에
+          <strong>내 창업 보고서 내용 + 복사한 프롬프트</strong>를
+          함께 붙여넣고 인포그래픽 이미지 1장을 만들어 보세요.
+        </p>
+      </div>
+    </li>
+
+  </ol>
+
+  <p class="infog-note">
+    <strong>💡 업로드 전 확인!</strong>
+    완성된 이미지의 글자와 수치가 내 보고서 내용과 일치하는지
+    확인한 후 우리 반 패들렛에 올려 주세요.
+  </p>
+
+</section>
+<!-- BananaX 인포그래픽 안내 끝 -->
 
 <div class="row">
 <div class="body"><h3><span class="num">3</span>보고서 작성</h3><p>팀(회사) 등록 → STEP 1~4 작성 → 그림·이미지 올리기 → 제출을 아이패드에서 합니다.</p></div>
