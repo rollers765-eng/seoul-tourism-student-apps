@@ -267,6 +267,13 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
 /* 14px 유지 · 균형 줄바꿈 · 화살표 인라인 배치 */
 /* HTML 및 600px 초과 화면 변경 없음 */
 /* 실제 줄바꿈 위치는 브라우저 렌더링에 따라 달라질 수 있음 */
+/* 태블릿 세로(900px 이하)에서는 3단계 세로 스택 — ChatGPT 제안 */
+@media (max-width: 900px) {
+  .infog-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}
 </style>
 </head>
 <body>
