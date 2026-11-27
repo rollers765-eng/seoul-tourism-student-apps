@@ -7,98 +7,115 @@
 <style>
 :root{--bg:#faf9f6;--ink:#30291f;--accent:#a55725;--line:#e8e0d4;--soft:#f7f2eb}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all}
-a{color:#814016}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #a55725;outline-offset:3px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-wrap:break-word}
+a{color:#814016}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #a55725;outline-offset:3px}
 header{background:#fff;border-bottom:1px solid var(--line)}
 .head{max-width:1100px;margin:auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.head img{display:block;width:min(230px,55vw);height:auto}.head a:last-child{white-space:nowrap}
+.head img{display:block;width:min(230px,55vw);height:auto}
+.head a:last-child{white-space:nowrap}
 main{max-width:1100px;margin:auto;padding:20px 20px 40px}
 nav{display:flex;gap:8px;flex-wrap:wrap;color:#6f6559;font-size:14px}
 .back{display:inline-flex;align-items:center;min-height:44px;margin:8px 0;color:#704023;font-weight:700}
-.hero{padding:26px 0 10px}.eyebrow,.label{color:var(--accent);font-weight:800}
-.hero h1{font-size:clamp(31px,6vw,46px);line-height:1.2;margin:8px 0}.hero p{margin:6px 0}
+.hero{padding:26px 0 10px}
+.eyebrow,.label{color:var(--accent);font-weight:800}
+.hero h1{font-size:clamp(31px,6vw,46px);line-height:1.2;margin:8px 0}
+.hero p{margin:6px 0}
 .badge{display:inline-block;background:#f3e5d8;color:#87431d;border-radius:99px;padding:4px 14px;font-weight:700;font-size:14px}
 section{margin:34px 0 0}
 h2{font-size:clamp(21px,3.4vw,26px);line-height:1.3;margin:0 0 6px}
-.lead{margin:0 0 14px;color:#5f564b}
+.lead{margin:0 0 12px;color:#5f564b}
+
+/* 차시별 단계 표시 바 */
+.flow-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 16px;padding:10px 14px;background:var(--soft);border:1px solid var(--line);border-radius:10px;list-style:none}
+.flow-bar li{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:14px;font-weight:700;color:var(--ink)}
+.flow-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#fff;border:1px solid var(--line);border-radius:99px;font-size:13px;font-weight:700;color:#704023}
+.flow-arrow{color:var(--accent);font-weight:800;font-size:13px}
+
+/* 기본 단계 카드 (가로 배치형 / 블록형) */
 .row{display:flex;align-items:center;gap:18px;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px}
-.row .body{min-width:0}
-.row h3{font-size:18px;margin:0 0 4px}
-.row p{margin:2px 0;color:#5b5247;font-size:15px}
-.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:#f3e5d8;color:#87431d;font-size:13px;font-weight:800;text-align:center;line-height:22px;margin-right:6px}
+.row .body{min-width:0;flex:1}
+.row h3,.card h3{font-size:18px;margin:0 0 4px;line-height:1.4}
+.row p,.card-desc{margin:2px 0;color:#5b5247;font-size:15px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px;min-width:0}
+.card-head{margin-bottom:12px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:#f3e5d8;color:#87431d;font-size:13px;font-weight:800;text-align:center;line-height:22px;margin-right:6px;vertical-align:1px}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-weight:700;text-decoration:none;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.btn:hover:not(:disabled){background:#87431d}
 .btn.ghost{background:#fff;color:#814016;border:1px solid #dcc6b2}
+.btn.ghost:hover:not(:disabled){background:var(--soft)}
 .btn:disabled{background:#eeebe6;color:#6f675d;border:1px solid #e4dfd8;cursor:default}
-.padlets{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn-stack{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.padlets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .padlets .btn{min-height:44px;padding:9px 15px}
-.details{margin:0 0 12px}
-details{background:#fff;border:1px solid var(--line);border-radius:12px}
+
+/* 1차시 2번 카드 내 3단계 안내 */
+.mini-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 14px;padding:0;list-style:none}
+.mini-step{display:flex;align-items:flex-start;gap:10px;min-width:0;margin:0;padding:14px;background:var(--soft);border:1px solid var(--line);border-radius:10px}
+.mini-num{display:inline-flex;flex:0 0 22px;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#f3e5d8;color:#87431d;font-size:12px;font-weight:800;line-height:1}
+.mini-body{flex:1;min-width:0}
+.mini-title{display:block;margin:0 0 4px;font-size:14px;font-weight:800;color:var(--ink);line-height:1.45}
+.mini-desc{margin:0;font-size:13.5px;color:#5b5247;line-height:1.6}
+
+/* 프롬프트 박스 (바로 보이는 단일 카드 내부) */
+.prompt{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--soft);min-width:0}
+.prompt h4{margin:0 0 4px;font-size:16px}
+.prompt p{margin:0 0 10px;font-size:14px;color:#5b5247}
+.prompt .tools{display:flex;gap:8px;flex-wrap:wrap}
+.prompt .btn{min-height:44px;padding:8px 14px;font-size:14px}
+.prompt pre{display:none;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px;line-height:1.6;margin:10px 0 0;padding:12px;background:#fff;border:1px solid var(--line);border-radius:8px;max-height:280px;overflow:auto}
+.prompt pre.show{display:block}
+
+/* 평가 기준·유의사항 아코디언 */
+details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
 details>summary{cursor:pointer;list-style:none;min-height:56px;padding:17px 20px;font-weight:700;display:flex;align-items:center;gap:10px}
 details>summary::-webkit-details-marker{display:none}
 details>summary::after{content:"＋";margin-left:auto;color:var(--accent);font-weight:800}
 details[open]>summary::after{content:"−"}
 details>div{padding:0 20px 18px}
-.prompts{display:grid;grid-template-columns:1fr;gap:12px}
-.prompt{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--soft)}
-.prompt h4{margin:0 0 4px;font-size:16px}.prompt p{margin:0 0 8px;font-size:14px;color:#5b5247}
-.prompt .tools{display:flex;gap:8px;flex-wrap:wrap}
-.prompt .btn{min-height:42px;padding:8px 14px;font-size:14px}
-.prompt pre{display:none;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px;line-height:1.6;margin:10px 0 0;padding:12px;background:#fff;border:1px solid var(--line);border-radius:8px;max-height:280px;overflow:auto}
-.prompt pre.show{display:block}
 table{width:100%;border-collapse:collapse;font-size:15px}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
-th{background:var(--soft)}tr:last-child td{border-bottom:0}
+th{background:var(--soft)}
+tr:last-child td{border-bottom:0}
 td:last-child{white-space:nowrap}
-ul{margin:0;padding-left:20px}li{margin:4px 0}
+ul{margin:0;padding-left:20px}
+li{margin:4px 0}
 .note{padding:12px 16px;border-left:4px solid var(--accent);background:#f4ede5;border-radius:0 8px 8px 0;margin:12px 0}
 footer{border-top:1px solid var(--line);padding:22px 20px;color:#695f53}
 footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#30291f;color:#fff;border-radius:8px;padding:10px 16px;max-width:90vw;z-index:10;box-shadow:0 3px 15px #0002}#toast[hidden]{display:none}
-@media(max-width:640px){
- .row{flex-direction:column;align-items:stretch;gap:12px}
- .btn{width:100%}
- .padlets{display:grid;grid-template-columns:1fr 1fr}
- .padlets .btn{width:100%}
- table{font-size:14px}th,td{padding:8px 6px}
- td:last-child{white-space:normal}
- details>summary{padding:15px 16px}details>div{padding:0 16px 16px}
- .prompt pre{max-height:240px}
-}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#30291f;color:#fff;border-radius:8px;padding:10px 16px;max-width:90vw;z-index:10;box-shadow:0 3px 15px #0002}
+#toast[hidden]{display:none}
 
 /* BananaX 인포그래픽 안내 블록 */
 .infog-guide,
 .infog-guide * {
   box-sizing: border-box;
 }
-
 .infog-guide {
   min-width: 0;
   max-width: 100%;
-  margin: 16px 0;
-  padding: 20px;
+  margin: 14px 0 0;
+  padding: 18px;
   border: 1px solid var(--line);
   border-left: 4px solid var(--accent);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--soft);
   color: var(--ink);
   word-break: keep-all;
   overflow-wrap: break-word;
 }
-
 .infog-title {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: var(--accent);
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 800;
   line-height: 1.5;
 }
-
 .infog-desc {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   font-size: 14px;
   line-height: 1.7;
 }
-
 .infog-link {
   display: flex;
   align-items: center;
@@ -120,47 +137,34 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
   word-break: keep-all;
   overflow-wrap: break-word;
 }
-
-.infog-link:visited {
-  color: #fff;
-}
-
+.infog-link:visited { color: #fff; }
 .infog-link:hover {
   background: #87431d;
   border-color: #87431d;
   color: #fff;
 }
-
-.infog-link-text {
-  min-width: 0;
-}
-
+.infog-link-text { min-width: 0; }
 .infog-link-icon,
-.infog-link-arrow {
-  flex: 0 0 auto;
-}
-
+.infog-link-arrow { flex: 0 0 auto; }
 .infog-steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  margin: 16px 0 0;
+  margin: 14px 0 0;
   padding: 0;
   list-style: none;
 }
-
 .infog-step {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   min-width: 0;
   margin: 0;
-  padding: 16px;
+  padding: 14px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
 }
-
 .infog-num {
   display: inline-flex;
   flex: 0 0 22px;
@@ -175,12 +179,7 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
   font-weight: 800;
   line-height: 1;
 }
-
-.infog-step-body {
-  flex: 1;
-  min-width: 0;
-}
-
+.infog-step-body { flex: 1; min-width: 0; }
 .infog-step-title {
   display: block;
   margin: 0 0 6px;
@@ -189,14 +188,12 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
   font-weight: 800;
   line-height: 1.5;
 }
-
 .infog-step-desc {
   margin: 0;
   color: #625448;
   font-size: 14px;
   line-height: 1.7;
 }
-
 .infog-note {
   margin: 14px 0 0;
   padding: 10px 12px;
@@ -208,34 +205,34 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
   line-height: 1.7;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+  .mini-steps,
   .infog-steps {
     grid-template-columns: minmax(0, 1fr);
     gap: 8px;
   }
 }
-
-@media (max-width: 600px) {
-  .infog-guide {
-    padding: 16px 12px;
-  }
-
-  .infog-title {
-    font-size: 17px;
-  }
-
-  .infog-link {
-    gap: 6px;
-    padding: 12px 10px;
-    font-size: 14px;
-  }
-
-  .infog-step {
-    padding: 12px;
-  }
+@media (max-width: 640px) {
+  main { padding: 16px 14px 36px; }
+  .row { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; }
+  .card { padding: 16px; }
+  .btn { width: 100%; }
+  .btn-stack { width: 100%; }
+  .padlets { display: grid; grid-template-columns: 1fr 1fr; }
+  .padlets .btn { width: 100%; }
+  .prompt .tools { display: grid; grid-template-columns: 1fr 1fr; }
+  .prompt .btn { width: 100%; }
+  table { font-size: 14px; }
+  th, td { padding: 8px 6px; }
+  td:last-child { white-space: normal; }
+  details>summary { padding: 15px 16px; }
+  details>div { padding: 0 16px 16px; }
+  .prompt pre { max-height: 240px; }
 }
-/* 기존 모바일 버튼 수정 CSS를 아래 코드로 교체 */
 @media (max-width: 600px) {
+  .infog-guide { padding: 16px 12px; }
+  .infog-title { font-size: 16px; }
+  .infog-step { padding: 12px; }
   .infog-link {
     display: block;
     min-height: 46px;
@@ -264,18 +261,13 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
   }
   .infog-link-arrow::before { content: "\2060"; }
 }
-/* 14px 유지 · 균형 줄바꿈 · 화살표 인라인 배치 */
-/* HTML 및 600px 초과 화면 변경 없음 */
-/* 실제 줄바꿈 위치는 브라우저 렌더링에 따라 달라질 수 있음 */
-/* 태블릿 세로(900px 이하)에서는 3단계 세로 스택 — ChatGPT 제안 */
-@media (max-width: 900px) {
-  .infog-steps {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
-  }
+@media (max-width: 640px) {
+  .flow-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .flow-bar li { display: block; }
+  .flow-chip { display: inline-flex; width: auto; max-width: 100%; }
+  .flow-arrow { display: none; }
 }
-</style>
-</head>
+</style></head>
 <body>
 <header><div class="head">
 <a href="../business-finance/"><img src="../accounting-library/assets/school-signature.png" width="979" height="264" alt="서울관광고등학교"></a>
@@ -292,45 +284,171 @@ footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-betwe
 <span class="badge">1인 또는 2인 1조 · 2차시</span>
 </div>
 
-<section>
-<h2>1차시 · 50분</h2>
+<section aria-labelledby="s1-title">
+<h2 id="s1-title">1차시 · 50분</h2>
 <p class="lead">앞 15분은 창업 핵심 개념(시험 범위), 뒤 35분은 아이패드로 보고서를 씁니다.</p>
 
+<ol class="flow-bar" aria-label="1차시 진행 순서">
+<li><span class="flow-chip">① 슬라이드</span><span class="flow-arrow" aria-hidden="true">→</span></li>
+<li><span class="flow-chip">② 보고서 프롬프트</span><span class="flow-arrow" aria-hidden="true">→</span></li>
+<li><span class="flow-chip">③ 보고서 웹앱</span></li>
+</ol>
+
 <div class="row">
-<div class="body"><h3><span class="num">1</span>수업용 슬라이드</h3><p>창업의 4대 핵심 요소 · 아이템 선정 기준 · 기업가 정신 · 경쟁 전략을 15분에 정리합니다.</p></div>
+<div class="body">
+<h3><span class="num">1</span>수업용 슬라이드</h3>
+<p>창업의 4대 핵심 요소 · 아이템 선정 기준 · 기업가 정신 · 경쟁 전략을 15분에 정리합니다.</p>
+</div>
 <a class="btn" href="startup-slides.html">슬라이드 열기 →</a>
 </div>
 
-<details class="details">
-<summary><span class="num">2</span>AI 프롬프트 모음 (3종)</summary>
-<div class="prompts">
-<article class="prompt"><h4>[1차시] 보고서 작성 도우미</h4><p>질문에 답하며 아이디어를 고르고 보고서 초안을 정리합니다.</p>
-<div class="tools"><button class="btn copy" data-target="p1">복사</button><button class="btn ghost view" data-target="p1">전체 보기</button></div>
-<pre id="p1">너는 고등학교 2학년 학생의 친절한 창업 멘토야. 나는 「Be the CEO」 보고서를 스스로 작성할 거야.
+<div class="card">
+<div class="card-head">
+<h3><span class="num">2</span>제미나이용 보고서 작성 프롬프트</h3>
+<p class="card-desc">A4 백상지에 적은 아이디어를 사진으로 찍어 제미나이와 문답하며 보고서 초안을 완성합니다.</p>
+</div>
 
-[나의 정보]
-관심 분야: [직접 입력]
-평소 불편했던 점: [직접 입력]
-좋아하는 것·잘하는 것: [직접 입력]
-활동 형태: [1인 / 2인 1조]
+<ol class="mini-steps" role="list">
+<li class="mini-step">
+<span class="mini-num" aria-hidden="true">1</span>
+<div class="mini-body">
+<strong class="mini-title">모둠이 종이에 적기</strong>
+<p class="mini-desc">A4 백상지 1장에 회사 로고(그림)·회사명(모둠명)·자유로운 의견(떠오르는 대로 메모)을 적습니다.</p>
+</div>
+</li>
+<li class="mini-step">
+<span class="mini-num" aria-hidden="true">2</span>
+<div class="mini-body">
+<strong class="mini-title">사진으로 찍어 제미나이에 붙이기</strong>
+<p class="mini-desc">그 종이를 사진으로 찍어 제미나이(또는 캔바 AI)에 첨부하고, 아래 프롬프트를 복사해 함께 보냅니다.</p>
+</div>
+</li>
+<li class="mini-step">
+<span class="mini-num" aria-hidden="true">3</span>
+<div class="mini-body">
+<strong class="mini-title">문답으로 다듬어 보고서에 옮겨 적기</strong>
+<p class="mini-desc">제미나이가 한 번에 하나씩 묻는 질문에 모둠원이 답하고, 마지막에 정리해 주는 표를 보고 <strong>3번 보고서 웹앱</strong>의 해당 칸에 그대로 옮겨 적습니다.</p>
+</div>
+</li>
+</ol>
 
-한 번에 질문 하나씩 하고 내 답변을 기다려 줘. 학생이 경험하지 않은 사실, 수치, 수상 실적을 만들지 마. 확인되지 않은 시장 규모나 통계는 추정이라고 밝히고 확인이 필요하다고 알려 줘. 선택지를 제시하되 최종 결정은 내가 하도록 도와줘.
+<article class="prompt">
+<h4>[1차시] 보고서 작성 도우미</h4>
+<p>복사해 제미나이에 붙여넣고, 백상지 사진과 함께 보내세요.</p>
+<div class="tools">
+<button type="button" class="btn copy" data-target="p1">복사</button>
+<button type="button" class="btn ghost view" data-target="p1" aria-expanded="false" aria-controls="p1">전체 보기</button>
+</div>
+<pre id="p1">너는 고등학교 2학년 학생의 친절한 창업 멘토야. 나는 「Be the CEO」 창업 보고서를 보고서 웹앱에 직접 입력해 제출할 거야.
 
-먼저 내 답변을 바탕으로 실현 가능한 아이디어 3개를 제시하고, 내가 1개를 고를 때까지 기다려 줘. 그다음 필요한 질문을 하나씩 하며 아이디어를 구체화해 줘.
+[우리 팀 정보]
+- 관심 분야: &lt;직접 입력&gt;
+- 평소 불편했던 점: &lt;직접 입력&gt;
+- 좋아하는 것·잘하는 것: &lt;직접 입력&gt;
+- 활동 형태: &lt;1인 / 2인 1조&gt;
+- 모둠원 이름: &lt;이름 입력 (1인이면 내 이름만)&gt;
 
-마지막에는 다음 활동지 칸 순서대로 보고서 초안을 표로 정리해 줘.
+[첨부 사진 안내]
+A4 백상지에 적은 회사 로고(그림), 회사명(모둠명), 자유로운 의견을 사진으로 첨부했어.
+1. 먼저 사진에서 읽은 내용을 항목별로 정리해서 보여 줘.
+2. 글씨가 흐리거나 그림이 잘 안 보이는 부분이 있으면, 그 부분만 따로 물어봐 줘.
+3. 사진과 내 답변에 없는 내용은 절대 스스로 지어내지 마.
+4. 만약 사진이 열리지 않으면 나에게 알려 줘. 내가 글로 적어서 다시 보내 줄게.
 
-STEP 1 팀·기업 개요: 팀명, 회사명, 로고 스케치 설명, 사업 내용 100자 요약
-STEP 2 아이디어 구체화: 아이디어 제목, 제안 배경(문제 인식), 아이디어 내용, 기대 효과, 핵심 문장
-STEP 3 시장 환경 분석: 강점·약점·기회·위협(SWOT)
-STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
+[문답 규칙]
+- 한 번에 질문 하나만 하고 내 답변을 기다려 줘.
+- 내가 고르기 쉽게 선택지를 2~3개 제안해 주되, 최종 결정은 내가 하도록 해 줘.
+- 내가 답하기 막혀 하면 이해하기 쉬운 예시를 들어 줘.
 
-기존 제품을 개선한다면 기존 제품의 특징과 내가 개선한 점을 구분해 줘. 참고한 자료와 출처를 표시하고 확인되지 않은 내용은 구분해 줘. 끝으로 선생님께 확인받을 점 3가지를 알려줘.
+[진행 순서]
+1단계: 백상지의 자유 의견을 재료로 실현 가능한 후보 아이디어 2~3개를 정리해 주고, 내가 1개를 고를 때까지 기다려 줘.
+2단계: 내가 고른 아이디어를 아래 보고서 웹앱의 STEP 1 → STEP 2 → STEP 3 → STEP 4 → STEP 5 순서대로 하나씩 질문하며 구체화해 줘.
 
-이제 첫 질문 하나만 해 줘.</pre></article>
+[보고서 웹앱 입력 항목과 글자 수 제한]
+■ STEP 1. 회사 정체성 &amp; 로고 스케치
+- 회사명(=팀명) [필수, 80자 이내]: 기억에 남는 우리 회사의 이름
+- 사업 내용(100자 내외 핵심 요약) [필수, 300자 이내]: 누구에게 어떤 제품·서비스를 제공하는 회사인지 한눈에
+- 로고 디자인 설명 [1000자 이내]: 로고의 모양, 색상, 상징하는 의미
+- (웹앱 직접 그리기) 로고 스케치: 웹앱 캔버스에 손·애플펜슬로 직접 그리고 [로고 스케치 서버 저장]
 
-<article class="prompt"><h4>[수업 후] 인포그래픽 1장 만들기</h4><p>보고서를 1장 발표 자료로 바꿉니다. 2차시 전까지 패들렛에 올립니다.</p>
-<div class="tools"><button class="btn copy" data-target="p2">복사</button><button class="btn ghost view" data-target="p2">전체 보기</button></div>
+■ STEP 2. 창업 아이디어 구체화 &amp; 스케치
+- 보고서 제목 [필수, 150자 이내]: 창업 아이템의 매력이 드러나는 제목
+- 문제 인식 및 배경 [필수, 3000자 이내]: 고객이 겪는 불편함, 시장의 빈틈, 이 창업이 필요한 이유
+- 창업 아이디어 상세 내용 [필수, 3000자 이내]: 제품·서비스의 작동 방식, 차별화 포인트, 주요 기능
+- 기대 효과 [필수, 3000자 이내]: 고객·사회·수익 측면에서 기대되는 변화
+- 발표용 한 줄 핵심 문장 [필수, 300자 이내]: 예) 외국인 관광객의 메뉴 고민을 3초 만에 해결하는 AR 미식 가이드
+- (웹앱 직접 그리기) 아이디어 스케치: 웹앱 캔버스에 시제품·화면·매장 구조도 직접 그림
+
+■ STEP 3. SWOT 분석 &amp; 마케팅 믹스(4P)
+- 강점(Strength) [필수, 1500자 이내]: 우리 팀·아이템만의 내부 강점
+- 약점(Weakness) [필수, 1500자 이내]: 초기 자본, 기술력 등 보완해야 할 약점
+- 기회(Opportunity) [필수, 1500자 이내]: 시장 트렌드, 정책 등 유리한 외부 환경
+- 위협(Threat) [필수, 1500자 이내]: 경쟁사, 규제, 경기 변화 등 외부 위협 요인
+- 제품(Product) [필수, 1500자 이내]: 핵심 상품 구성, 디자인, 품질·패키지 전략
+- 가격(Price) [필수, 1500자 이내]: 판매 가격대, 수익 모델(구독/단품), 할인 정책
+- 유통(Place) [필수, 1500자 이내]: 온·오프라인 판매 채널, 앱/웹/매장 입지
+- 홍보(Promotion) [필수, 1500자 이내]: SNS, 체험 이벤트, 제휴 마케팅 등 홍보 방법
+
+■ STEP 4. 팀 역할 분담 &amp; 출처·AI 활용
+- 대표 역할 [필수, 1000자 이내]: 기획, 자료조사, 보고서 작성, 발표 등
+- 팀원 역할 [2인 팀일 때 필수, 1000자 이내]: 2인 1조인 경우 팀원의 구체적 역할
+- 참고 출처(통계·기사·웹사이트 등) [2000자 이내]
+- AI 활용 내용(활용한 도구와 도움 받은 부분) [2000자 이내]: 예) 제미나이로 백상지 사진을 정리하고 SWOT 초안을 잡은 뒤 모둠이 직접 수정함 (미활용 시 "미활용")
+
+■ STEP 5. 사진·영상·코드 첨부
+- 이미지 파일: 최대 4장, 1장 5MB(JPEG·PNG·WebP) → A4 백상지 사진을 여기에 올림
+- 영상: YouTube/Google Drive 링크 또는 파일(최대 20MB), 최대 3개
+- HTML·코드: 파일 또는 붙여넣기, 최대 200KB, 최대 3개
+
+[지켜야 할 규칙]
+- 내가 경험하지 않은 사실, 수치, 수상 실적, 시장 규모를 절대 만들어 내지 마.
+- 확인되지 않은 통계나 숫자가 나오면 반드시 "추정"이라고 밝히고, 출처 확인이 필요하다고 알려 줘.
+- 참고한 자료와 AI 활용 내용은 STEP 4 칸에 솔직하게 적도록 도와줘.
+
+[최종 정리 출력 형식]
+모든 문답이 끝나면 아래 순서대로 정리해 줘.
+1. 보고서 웹앱의 STEP·항목 이름과 똑같은 표로 정리해 줘. 칸마다 [항목명 / 글자 수 제한 / 현재 글자 수 / 작성 내용]을 함께 적어, 내가 웹앱에 그대로 복사해 붙여넣을 수 있게 해 줘.
+2. 표 아래에 '웹앱에서 직접 그려야 하는 것(로고 스케치, 아이디어 스케치)'과 'STEP 5에서 첨부할 것(백상지 사진, 이미지 최대 4장, 영상 링크, HTML 코드)'을 따로 정리해 줘.
+3. 마지막으로 다음 3가지를 덧붙여 줘.
+   ① 선생님께 확인받을 점 3가지
+   ② 제출 전 자체 점검 체크리스트 (필수 칸이 비지 않았는지, 글자 수를 넘지 않았는지, 백상지 사진과 스케치를 올렸는지, 모둠원 역할을 적었는지)
+   ③ 발표 때 쓸 한 줄 핵심 문장
+
+이제 첫 질문 하나만 해 줘.</pre>
+</article>
+</div>
+
+<div class="row">
+<div class="body">
+<h3><span class="num">3</span>보고서 웹앱 작성</h3>
+<p>팀(회사) 등록 → STEP 1~4 입력 → 로고·아이디어 스케치 → STEP 5 사진·영상·코드 첨부 → 제출 순서로 아이패드에서 작성합니다.</p>
+</div>
+<!-- 보고서 웹앱 주소 --><button type="button" class="btn" disabled>보고서 웹앱 준비 중</button>
+</div>
+</section><section aria-labelledby="s2-title">
+<h2 id="s2-title">2차시 · 50분</h2>
+<p class="lead">반별로 발표하고, 친구 회사에 1억을 투자합니다.</p>
+
+<ol class="flow-bar" aria-label="2차시 진행 순서">
+<li><span class="flow-chip">① 인포그래픽(집에서)</span><span class="flow-arrow" aria-hidden="true">→</span></li>
+<li><span class="flow-chip">② 패들렛에 올리고 발표</span><span class="flow-arrow" aria-hidden="true">→</span></li>
+<li><span class="flow-chip">③ 발표 대본</span><span class="flow-arrow" aria-hidden="true">→</span></li>
+<li><span class="flow-chip">④ 1억 투자</span></li>
+</ol>
+
+<div class="card">
+<div class="card-head">
+<h3><span class="num">1</span>인포그래픽 1장 만들기 <span class="badge" style="font-size:12px;padding:2px 10px;vertical-align:1px">2차시 전 · 집·휴대폰</span></h3>
+<p class="card-desc"><strong>2차시 전까지 우리 반 패들렛에 올립니다.</strong> 아래 프롬프트나 BananaX를 활용해 보고서를 1장 발표 자료로 만드세요.</p>
+</div>
+
+<article class="prompt">
+<h4>[수업 후] 인포그래픽 1장 만들기</h4>
+<p>보고서를 1장 발표 자료로 바꿉니다. 2차시 전까지 패들렛에 올립니다.</p>
+<div class="tools">
+<button type="button" class="btn copy" data-target="p2">복사</button>
+<button type="button" class="btn ghost view" data-target="p2" aria-expanded="false" aria-controls="p2">전체 보기</button>
+</div>
 <pre id="p2">너는 고등학생의 창업 아이디어 발표 자료를 돕는 디자인 코치야. 아래 보고서를 바탕으로 1장 인포그래픽 제작을 도와줘.
 
 [보고서 내용]
@@ -351,10 +469,73 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 (b) 이미지 생성용 영문 프롬프트
 스타일, 세로 또는 가로 구도, 색상, 시각적 구성과 피해야 할 요소를 구체적으로 적어 줘. 텍스트가 들어갈 여백을 남겨 줘.
 
-보고서에 없는 수치, 로고, 수상 실적을 만들지 마. 이미지 생성 시 한글이 깨질 수 있으므로 제목과 설명은 이미지 제작 후 캔바 등에서 직접 입력하도록 안내해 줘. 참고한 자료와 AI 활용 내용을 표시하도록 알려줘.</pre></article>
+보고서에 없는 수치, 로고, 수상 실적을 만들지 마. 이미지 생성 시 한글이 깨질 수 있으므로 제목과 설명은 이미지 제작 후 캔바 등에서 직접 입력하도록 안내해 줘. 참고한 자료와 AI 활용 내용을 표시하도록 알려줘.</pre>
+</article>
 
-<article class="prompt"><h4>[2차시] 2~3분 발표 대본과 예상 질문</h4><p>내 아이디어를 짧고 명확하게 전달하는 연습을 합니다.</p>
-<div class="tools"><button class="btn copy" data-target="p3">복사</button><button class="btn ghost view" data-target="p3">전체 보기</button></div>
+<div class="infog-guide" role="region" aria-labelledby="infog-title">
+<h4 class="infog-title" id="infog-title">BananaX로 인포그래픽 1장 만들기</h4>
+<p class="infog-desc"><strong>2차시 전까지 우리 반 패들렛에 올립니다.</strong> 집이나 스마트폰에서 아래 순서대로 1장을 만들어 보세요.</p>
+
+<a class="infog-link" href="https://furoku.github.io/bananaX/projects/infographic-evaluation/ko/?lang=ko" target="_blank" rel="noopener">
+<span class="infog-link-icon" aria-hidden="true">🍌</span>
+<span class="infog-link-text">BananaX 인포그래픽 프롬프트 300+ 보러 가기</span>
+<span class="infog-link-arrow" aria-hidden="true">→</span>
+</a>
+
+<ol class="infog-steps" role="list">
+<li class="infog-step">
+<span class="infog-num" aria-hidden="true">1</span>
+<div class="infog-step-body">
+<strong class="infog-step-title">디자인 선택</strong>
+<p class="infog-step-desc">BananaX에서 미니멀·입체 도해·손그림 등 내 창업 아이디어에 어울리는 스타일을 골라 보세요.</p>
+</div>
+</li>
+<li class="infog-step">
+<span class="infog-num" aria-hidden="true">2</span>
+<div class="infog-step-body">
+<strong class="infog-step-title">프롬프트 복사</strong>
+<p class="infog-step-desc">마음에 드는 디자인 예시를 선택하고, 해당 예시의 프롬프트를 복사하세요.</p>
+</div>
+</li>
+<li class="infog-step">
+<span class="infog-num" aria-hidden="true">3</span>
+<div class="infog-step-body">
+<strong class="infog-step-title">내 자료로 만들기</strong>
+<p class="infog-step-desc">NotebookLM이나 제미나이에 <strong>내 창업 보고서 내용 + 복사한 프롬프트</strong>를 함께 붙여넣고 인포그래픽 이미지 1장을 만들어 보세요.</p>
+</div>
+</li>
+</ol>
+
+<p class="infog-note"><strong>💡 업로드 전 확인!</strong> 완성된 이미지의 글자와 수치가 내 보고서 내용과 일치하는지 확인한 후 우리 반 패들렛에 올려 주세요.</p>
+</div>
+</div>
+
+<div class="card">
+<div class="card-head">
+<h3><span class="num">2</span>우리 반 패들렛 (2-1 ~ 2-4반)</h3>
+<p class="card-desc">우리 반 보드에 인포그래픽을 올리고, 팀당 2~3분 발표합니다. 다른 팀 발표에는 피드백 댓글을, 친구 댓글에는 대댓글로 답합니다.</p>
+<p class="card-desc"><strong>댓글·대댓글을 성실히 남기면 프로젝트 참여도 점수에 반영됩니다.</strong></p>
+</div>
+<div class="padlets">
+<a class="btn ghost" href="https://padlet.com/rollers765/2-1-s025u3i9xbp2ww6uc0wh" target="_blank" rel="noopener">1반 패들렛 ↗</a>
+<a class="btn ghost" href="https://padlet.com/rollers765/2-2-s025u3pff6dfqy36trzl" target="_blank" rel="noopener">2반 패들렛 ↗</a>
+<a class="btn ghost" href="https://padlet.com/rollers765/2-3-s025u3q47crwwlui8nd3" target="_blank" rel="noopener">3반 패들렛 ↗</a>
+<a class="btn ghost" href="https://padlet.com/rollers765/2-4-s025u3rv0rpi43oh4o1m" target="_blank" rel="noopener">4반 패들렛 ↗</a>
+</div>
+</div>
+
+<div class="card">
+<div class="card-head">
+<h3><span class="num">3</span>발표 대본과 예상 질문 준비</h3>
+<p class="card-desc">보고서 내용을 붙여넣어 2~3분 발표 대본과 예상 질문 답변을 연습합니다.</p>
+</div>
+<article class="prompt">
+<h4>[2차시] 2~3분 발표 대본과 예상 질문</h4>
+<p>내 아이디어를 짧고 명확하게 전달하는 연습을 합니다.</p>
+<div class="tools">
+<button type="button" class="btn copy" data-target="p3">복사</button>
+<button type="button" class="btn ghost view" data-target="p3" aria-expanded="false" aria-controls="p3">전체 보기</button>
+</div>
 <pre id="p3">너는 고등학생의 창업 발표를 돕는 코치야. 아래 보고서를 바탕으로 발표 연습 자료를 만들어 줘.
 
 [보고서 내용]
@@ -365,123 +546,37 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 3. 목소리, 시선, 말하기 속도, 시간 관리가 포함된 발표 태도 체크리스트를 만들어 줘.
 4. 친구의 댓글에 감사하고 질문에 답하거나 개선점을 설명하는 방법을 알려줘.
 
-보고서에 없는 경험, 수치, 성과를 만들지 마. 내가 직접 이해하고 자연스럽게 말할 수 있는 쉬운 표현으로 써 줘.</pre></article>
-</div>
-</details>
-
-<!-- BananaX 인포그래픽 안내: AI 프롬프트 details 직후 삽입 -->
-<section class="infog-guide" aria-labelledby="infog-title">
-
-  <h3 class="infog-title" id="infog-title">
-    수업 외 · 인포그래픽 1장 만들기
-  </h3>
-
-  <p class="infog-desc">
-    집이나 스마트폰에서 1장을 만들고,
-    <strong>2차시 전까지 우리 반 패들렛에 올립니다.</strong>
-  </p>
-
-  <a class="infog-link"
-     href="https://furoku.github.io/bananaX/projects/infographic-evaluation/ko/?lang=ko"
-     target="_blank"
-     rel="noopener">
-    <span class="infog-link-icon" aria-hidden="true">🍌</span>
-    <span class="infog-link-text">
-      BananaX 인포그래픽 프롬프트 300+ 보러 가기
-    </span>
-    <span class="infog-link-arrow" aria-hidden="true">→</span>
-  </a>
-
-  <ol class="infog-steps" role="list">
-
-    <li class="infog-step">
-      <span class="infog-num" aria-hidden="true">1</span>
-      <div class="infog-step-body">
-        <strong class="infog-step-title">디자인 선택</strong>
-        <p class="infog-step-desc">
-          BananaX에서 미니멀·입체 도해·손그림 등
-          내 창업 아이디어에 어울리는 스타일을 골라 보세요.
-        </p>
-      </div>
-    </li>
-
-    <li class="infog-step">
-      <span class="infog-num" aria-hidden="true">2</span>
-      <div class="infog-step-body">
-        <strong class="infog-step-title">프롬프트 복사</strong>
-        <p class="infog-step-desc">
-          마음에 드는 디자인 예시를 선택하고,
-          해당 예시의 프롬프트를 복사하세요.
-        </p>
-      </div>
-    </li>
-
-    <li class="infog-step">
-      <span class="infog-num" aria-hidden="true">3</span>
-      <div class="infog-step-body">
-        <strong class="infog-step-title">내 자료로 만들기</strong>
-        <p class="infog-step-desc">
-          NotebookLM이나 제미나이에
-          <strong>내 창업 보고서 내용 + 복사한 프롬프트</strong>를
-          함께 붙여넣고 인포그래픽 이미지 1장을 만들어 보세요.
-        </p>
-      </div>
-    </li>
-
-  </ol>
-
-  <p class="infog-note">
-    <strong>💡 업로드 전 확인!</strong>
-    완성된 이미지의 글자와 수치가 내 보고서 내용과 일치하는지
-    확인한 후 우리 반 패들렛에 올려 주세요.
-  </p>
-
-</section>
-<!-- BananaX 인포그래픽 안내 끝 -->
-
-<div class="row">
-<div class="body"><h3><span class="num">3</span>보고서 작성</h3><p>팀(회사) 등록 → STEP 1~4 작성 → 그림·이미지 올리기 → 제출을 아이패드에서 합니다.</p></div>
-<!-- 보고서 웹앱 주소 --><button class="btn" disabled>보고서 웹앱 준비 중</button>
-</div>
-</section>
-
-<section>
-<h2>2차시 · 50분</h2>
-<p class="lead">반별로 발표하고, 친구 회사에 1억을 투자합니다.</p>
-
-<div class="row">
-<div class="body"><h3><span class="num">1</span>패들렛 · 발표 자료와 피드백</h3><p>우리 반 보드에 인포그래픽을 올리고, 팀당 2~3분 발표합니다. 다른 팀 발표에는 피드백 댓글을, 친구 댓글에는 대댓글로 답합니다.</p>
-<p><strong>댓글·대댓글을 성실히 남기면 프로젝트 참여도 점수에 반영됩니다.</strong></p></div>
-</div>
-<div class="padlets" style="margin:0 0 12px">
-<a class="btn ghost" href="https://padlet.com/rollers765/2-1-s025u3i9xbp2ww6uc0wh" target="_blank" rel="noopener">1반 패들렛 ↗</a>
-<a class="btn ghost" href="https://padlet.com/rollers765/2-2-s025u3pff6dfqy36trzl" target="_blank" rel="noopener">2반 패들렛 ↗</a>
-<a class="btn ghost" href="https://padlet.com/rollers765/2-3-s025u3q47crwwlui8nd3" target="_blank" rel="noopener">3반 패들렛 ↗</a>
-<a class="btn ghost" href="https://padlet.com/rollers765/2-4-s025u3rv0rpi43oh4o1m" target="_blank" rel="noopener">4반 패들렛 ↗</a>
+보고서에 없는 경험, 수치, 성과를 만들지 마. 내가 직접 이해하고 자연스럽게 말할 수 있는 쉬운 표현으로 써 줘.</pre>
+</article>
 </div>
 
 <div class="row">
-<div class="body"><h3><span class="num">2</span>💰 1억으로 투자하기</h3>
+<div class="body">
+<h3><span class="num">4</span>💰 1억으로 투자하기</h3>
 <p>여러분은 투자자입니다. 자기 돈 <strong>1억 원</strong>을 가장 유망한 팀(회사) 한 곳에 투자하세요.</p>
 <p><strong>펀딩으로 가장 많은 투자금을 모은 회사가 반별 우승!</strong> 우승 팀에는 발표점수 최고점을 부여합니다.</p>
-<p>이름·학번은 적지 않습니다. 반을 고른 뒤 우리 반 회사 카드에서 한 곳을 고르고, 투자 이유를 한 줄 적으면 됩니다.</p></div>
-<div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+<p>이름·학번은 적지 않습니다. 반을 고른 뒤 우리 반 회사 카드에서 한 곳을 고르고, 투자 이유를 한 줄 적으면 됩니다.</p>
+</div>
+<div class="btn-stack">
 <a class="btn" href="invest.html">💰 1억 투자하러 가기</a>
 <a class="btn ghost" href="invest.html?board=1">📊 교실 현황판 열기</a>
 </div>
 </div>
 </section>
 
-<section>
+<section aria-label="평가 기준과 유의사항">
 <details>
 <summary>평가 기준 · 100점</summary>
 <div>
-<table><thead><tr><th>평가 항목</th><th>배점</th></tr></thead><tbody>
+<table>
+<thead><tr><th>평가 항목</th><th>배점</th></tr></thead>
+<tbody>
 <tr><td>아이디어 창의성 및 기업가 정신</td><td>30점</td></tr>
 <tr><td>보고서의 논리성 및 타당성</td><td>30점</td></tr>
 <tr><td>발표 자료 및 의사소통 능력</td><td>30점</td></tr>
 <tr><td>프로젝트 참여도 및 완성도</td><td>10점</td></tr>
-</tbody></table>
+</tbody>
+</table>
 </div>
 </details>
 
@@ -498,8 +593,13 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 </details>
 </section>
 </main>
-<footer><div><span>서울관광고등학교 · 성공적인 직업생활</span><a href="./">← 자료실</a></div></footer>
+
+<footer>
+<div><span>서울관광고등학교 · 성공적인 직업생활</span><a href="./">← 자료실</a></div>
+</footer>
+
 <div id="toast" role="status" aria-live="polite" hidden></div>
+
 <script>
 const toast = document.getElementById('toast');
 let toastTimer;
@@ -511,13 +611,18 @@ function announce(message) {
 }
 document.querySelectorAll('.copy').forEach(button => {
   button.addEventListener('click', async () => {
-    const text = document.getElementById(button.dataset.target).textContent;
+    const pre = document.getElementById(button.dataset.target);
+    const text = pre.textContent;
     try {
       await navigator.clipboard.writeText(text);
       announce('복사했어요. AI에 붙여넣으세요.');
     } catch (error) {
-      const pre = document.getElementById(button.dataset.target);
       pre.classList.add('show');
+      const viewBtn = document.querySelector(`.view[data-target="${button.dataset.target}"]`);
+      if (viewBtn) {
+        viewBtn.textContent = '접기';
+        viewBtn.setAttribute('aria-expanded', 'true');
+      }
       const selection = window.getSelection();
       const range = document.createRange();
       range.selectNodeContents(pre);
@@ -530,8 +635,9 @@ document.querySelectorAll('.copy').forEach(button => {
 document.querySelectorAll('.view').forEach(button => {
   button.addEventListener('click', () => {
     const pre = document.getElementById(button.dataset.target);
-    pre.classList.toggle('show');
-    button.textContent = pre.classList.contains('show') ? '접기' : '전체 보기';
+    const isOpen = pre.classList.toggle('show');
+    button.textContent = isOpen ? '접기' : '전체 보기';
+    button.setAttribute('aria-expanded', String(isOpen));
   });
 });
 </script>
