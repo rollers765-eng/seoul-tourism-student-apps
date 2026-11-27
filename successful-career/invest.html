@@ -877,11 +877,19 @@
       .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
+    #retry-live .retry-mobile { display: none; }
+
     @media (max-width: 600px) {
-      .topbar-inner { justify-content: center; }
-      .brand { width: 100%; justify-content: center; }
-      .nav-tabs { width: 100%; justify-content: space-between; }
-      .nav-tab { flex: 1; padding: 0 8px; font-size: 13px; }
+      .topbar { padding-inline: 0; }
+      .topbar-inner { margin-inline: 12px; flex-wrap: wrap; row-gap: 8px; }
+      .brand { flex: 0 0 100%; gap: 4px; font-size: 18px; white-space: nowrap; }
+      .demo-badge { order: 1; padding-inline: 6px; }
+      #retry-live { order: 2; min-height: 40px; padding-inline: 4px; font-size: 12px; }
+      .demo-badge, #retry-live { white-space: nowrap; flex-shrink: 0; }
+      #retry-live .retry-desktop { display: none; }
+      #retry-live .retry-mobile { display: inline; }
+      .nav-tabs { flex: 0 0 100%; }
+      .nav-tab { flex: 1; min-width: 0; height: 52px; padding: 0 8px; font-size: 15px; white-space: nowrap; }
       .stats-grid { grid-template-columns: 1fr; }
       .panel { padding: 16px; }
     }
@@ -900,7 +908,7 @@
     <div class="topbar-inner">
       <div class="brand">
         <span>💰 <span class="brand-gold">1억으로 투자하기</span></span>
-        <button id="retry-live" type="button" class="hidden">실서버 다시 연결</button>
+        <button id="retry-live" type="button" class="hidden"><span class="retry-desktop">실서버 다시 연결</span><span class="retry-mobile">재연결</span></button>
         <span id="demo-badge" class="demo-badge hidden" aria-live="polite">데모 데이터</span>
       </div>
       <nav class="nav-tabs" aria-label="화면 전환">
@@ -2224,7 +2232,7 @@
     }
     if (dom.boardRound) {
       const shortRound = board && board.round_id ? String(board.round_id).slice(0, 6) : '------';
-      dom.boardRound.textContent = `라운드 ${shortRound}`;
+      dom.boardRound.textContent = state.isDemo ? '데모 라운드' : `라운드 ${shortRound}`;
     }
     if (dom.boardStatusBadge && dom.boardStatusText) {
       const isOpen = Boolean(board && board.is_open);
