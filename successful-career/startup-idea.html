@@ -5,28 +5,65 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>창업 아이디어 구현하기 | 성공적인 직업생활</title>
 <style>
-:root{--bg:#faf9f6;--ink:#30291f;--accent:#a55725;--line:#e8e0d4}
+:root{--bg:#faf9f6;--ink:#30291f;--accent:#a55725;--line:#e8e0d4;--soft:#f7f2eb}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all}
 a{color:#814016}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #a55725;outline-offset:3px}
 header{background:#fff;border-bottom:1px solid var(--line)}
 .head{max-width:1100px;margin:auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .head img{display:block;width:min(230px,55vw);height:auto}.head a:last-child{white-space:nowrap}
-main{max-width:1100px;margin:auto;padding:20px}
+main{max-width:1100px;margin:auto;padding:20px 20px 40px}
 nav{display:flex;gap:8px;flex-wrap:wrap;color:#6f6559;font-size:14px}
 .back{display:inline-flex;align-items:center;min-height:44px;margin:8px 0;color:#704023;font-weight:700}
-.hero{padding:32px 0 24px}.eyebrow,.label{color:var(--accent);font-weight:800}.hero h1{font-size:clamp(32px,6vw,50px);line-height:1.2;margin:8px 0}.hero p{margin:8px 0}.badge{display:inline-block;background:#f3e5d8;color:#87431d;border-radius:99px;padding:4px 14px;font-weight:700}
-section{margin:0 0 42px}h2{font-size:clamp(23px,4vw,29px);line-height:1.3;margin:0 0 16px}h3{font-size:19px;margin:0 0 8px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card,details,.table-wrap{background:#fff;border:1px solid var(--line);border-radius:10px}.card{padding:20px}.card p{margin:8px 0}.card ul{margin:8px 0;padding-left:22px}
-details{margin-bottom:10px}summary{cursor:pointer;font-weight:700;min-height:50px;padding:12px 17px}details>div{padding:0 17px 16px}
-table{width:100%;border-collapse:collapse}th,td{padding:13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f7f2eb}tr:last-child td{border-bottom:0}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 17px;border:0;border-radius:7px;background:var(--accent);color:white;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}.btn:disabled{background:#e9e5df;color:#6b6257;cursor:default}
-.prompt{display:flex;flex-direction:column;gap:10px}.prompt details{margin:0}.prompt pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;word-break:normal;margin:0}.prompt .btn{align-self:flex-start}
-.note{padding:15px 18px;border-left:4px solid var(--accent);background:#f4ede5}.buttons{display:flex;flex-wrap:wrap;gap:10px}
-footer{border-top:1px solid var(--line);padding:24px 20px;color:#695f53}footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#30291f;color:white;border-radius:8px;padding:10px 16px;max-width:90vw;z-index:10;box-shadow:0 3px 15px #0002}#toast[hidden]{display:none}
-@media(max-width:640px){.grid,.steps{grid-template-columns:1fr}.card{padding:17px}.hero{padding:22px 0}.table-wrap{border:0;background:transparent}table,tbody,tr,td{display:block}thead{display:none}tr{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:12px}td{border:0;padding:4px 0}td:before{content:attr(data-label);display:block;font-weight:800;color:#8d481e}}
+.hero{padding:26px 0 10px}.eyebrow,.label{color:var(--accent);font-weight:800}
+.hero h1{font-size:clamp(31px,6vw,46px);line-height:1.2;margin:8px 0}.hero p{margin:6px 0}
+.badge{display:inline-block;background:#f3e5d8;color:#87431d;border-radius:99px;padding:4px 14px;font-weight:700;font-size:14px}
+section{margin:34px 0 0}
+h2{font-size:clamp(21px,3.4vw,26px);line-height:1.3;margin:0 0 6px}
+.lead{margin:0 0 14px;color:#5f564b}
+.row{display:flex;align-items:center;gap:18px;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px}
+.row .body{min-width:0}
+.row h3{font-size:18px;margin:0 0 4px}
+.row p{margin:2px 0;color:#5b5247;font-size:15px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:#f3e5d8;color:#87431d;font-size:13px;font-weight:800;text-align:center;line-height:22px;margin-right:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-weight:700;text-decoration:none;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.btn.ghost{background:#fff;color:#814016;border:1px solid #dcc6b2}
+.btn:disabled{background:#eeebe6;color:#6f675d;border:1px solid #e4dfd8;cursor:default}
+.padlets{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.padlets .btn{min-height:44px;padding:9px 15px}
+.details{margin:0 0 12px}
+details{background:#fff;border:1px solid var(--line);border-radius:12px}
+details>summary{cursor:pointer;list-style:none;min-height:56px;padding:17px 20px;font-weight:700;display:flex;align-items:center;gap:10px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"＋";margin-left:auto;color:var(--accent);font-weight:800}
+details[open]>summary::after{content:"−"}
+details>div{padding:0 20px 18px}
+.prompts{display:grid;grid-template-columns:1fr;gap:12px}
+.prompt{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--soft)}
+.prompt h4{margin:0 0 4px;font-size:16px}.prompt p{margin:0 0 8px;font-size:14px;color:#5b5247}
+.prompt .tools{display:flex;gap:8px;flex-wrap:wrap}
+.prompt .btn{min-height:42px;padding:8px 14px;font-size:14px}
+.prompt pre{display:none;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px;line-height:1.6;margin:10px 0 0;padding:12px;background:#fff;border:1px solid var(--line);border-radius:8px;max-height:280px;overflow:auto}
+.prompt pre.show{display:block}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--soft)}tr:last-child td{border-bottom:0}
+td:last-child{white-space:nowrap}
+ul{margin:0;padding-left:20px}li{margin:4px 0}
+.note{padding:12px 16px;border-left:4px solid var(--accent);background:#f4ede5;border-radius:0 8px 8px 0;margin:12px 0}
+footer{border-top:1px solid var(--line);padding:22px 20px;color:#695f53}
+footer>div{max-width:1100px;margin:auto;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#30291f;color:#fff;border-radius:8px;padding:10px 16px;max-width:90vw;z-index:10;box-shadow:0 3px 15px #0002}#toast[hidden]{display:none}
+@media(max-width:640px){
+ .row{flex-direction:column;align-items:stretch;gap:12px}
+ .btn{width:100%}
+ .padlets{display:grid;grid-template-columns:1fr 1fr}
+ .padlets .btn{width:100%}
+ table{font-size:14px}th,td{padding:8px 6px}
+ td:last-child{white-space:normal}
+ details>summary{padding:15px 16px}details>div{padding:0 16px 16px}
+ .prompt pre{max-height:240px}
+}
 </style>
 </head>
 <body>
@@ -37,71 +74,29 @@ footer{border-top:1px solid var(--line);padding:24px 20px;color:#695f53}footer>d
 <main>
 <nav aria-label="현재 위치"><a href="../business-finance/">경영·금융 교과교실</a><span>›</span><a href="./">성공적인직업생활</a><span>›</span><span aria-current="page">창업 아이디어 구현하기</span></nav>
 <a class="back" href="./">← 자료실</a>
-<div class="hero"><p class="eyebrow">2026학년도 2학기 · 성공적인 직업생활 · 2학년 1~4반</p><h1>창업 아이디어 구현하기</h1><p>마지막 수행평가 · 반영비율 15% · 100점</p><span class="badge">1인 또는 2인 1조</span></div>
 
-<section><h2>이렇게 진행해요</h2><div class="grid">
-<article class="card"><span class="label">1차시 · 50분</span><h3>아이디어를 보고서로</h3><p>15분 동안 교과서의 창업 핵심 개념을 공부합니다. 시험 범위에 해당합니다.</p><p>이후 35분 동안 아이패드 멀티창의 한쪽에서 AI와 대화하고, 다른 한쪽 보고서 웹앱에서 모둠 등록 → STEP 1~4 작성 → 그림·이미지 업로드 → 제출을 진행합니다.</p></article>
-<article class="card"><span class="label">수업 후 과제</span><h3>인포그래픽 미리 만들기</h3><p>집이나 스마트폰에서 캔바 AI 또는 제미나이로 1장 인포그래픽을 만듭니다. <strong>2차시 전까지 반별 패들렛에 업로드</strong>하세요.</p></article>
-<article class="card"><span class="label">2차시 · 50분</span><h3>발표하고 함께 감상하기</h3><p>반별 12~13팀이 <strong>팀당 2~3분</strong> 발표 → 패들렛 피드백 댓글·대댓글 → 구글 설문지 투표 → 학급별 최다 득표 팀 함께 보기</p><p>가장 기발한 아이디어로 뽑힌 학급별 최다 득표 팀에는 발표점수 최고점 30점을 부여합니다.</p></article>
-</div></section>
+<div class="hero">
+<p class="eyebrow">2026학년도 2학기 · 성공적인 직업생활 · 2학년 1~4반</p>
+<h1>창업 아이디어 구현하기</h1>
+<p>마지막 수행평가 · 반영비율 15% · 100점</p>
+<span class="badge">1인 또는 2인 1조 · 2차시</span>
+</div>
 
-<section><h2>2차시 발표 · 피드백 · 투표</h2><div class="grid">
-<article class="card"><span class="label">발표</span><h3>팀당 2~3분</h3><p>한 반에 <strong>12~13팀</strong>입니다. 팀당 <strong>2~3분(최대 3분)</strong>으로 발표 순서를 미리 정하고, 인포그래픽 한 장을 띄워 놓고 발표합니다.</p></article>
-<article class="card"><span class="label">피드백</span><h3>패들렛 댓글 + 대댓글</h3><p>다른 팀 발표를 듣고 패들렛에 <strong>피드백 댓글</strong>을 남깁니다. 친구가 남긴 피드백에 <strong>대댓글(재댓글)</strong>로 답하거나 의견을 덧붙이면 참여 활동으로 인정합니다.</p><p><strong>댓글과 대댓글을 성실히 남긴 학생은 '프로젝트 참여도' 점수에서 높은 점수</strong>를 받습니다.</p></article>
-<article class="card"><span class="label">투표</span><h3>구글 설문지로</h3><p>투표는 <strong>학생 이름을 적지 않고</strong> 구글 설문지로 합니다. 뽑은 팀의 <strong>팀명(회사명) · 창업 아이템명 · 핵심</strong>을 적어 제출합니다.</p><p>가장 기발한 아이디어로 뽑힌 학급별 최다 득표 팀에는 발표점수 최고점 30점을 부여합니다.</p><!-- GOOGLE FORM 투표 링크 --><button class="btn" disabled>투표 설문 준비 중</button></article>
-</div></section>
+<section>
+<h2>1차시 · 50분</h2>
+<p class="lead">앞 15분은 창업 핵심 개념(시험 범위), 뒤 35분은 아이패드로 보고서를 씁니다.</p>
 
-<section><h2>창업 핵심 개념 15분 정리</h2>
-<details><summary>창업의 4대 핵심 요소 &amp; 아이템 선정 기준 <span class="label">p.136</span></summary><div>
-<h3>창업의 4대 핵심 요소</h3>
-<ul>
-<li><strong>창업자</strong> — 창업을 계획하고 실행하는 사람. 창업의 성패를 좌우합니다.</li>
-<li><strong>창업 아이템</strong> — 시장에서 고객이 원하는 것을 충족시켜 줄 제품이나 서비스입니다.</li>
-<li><strong>창업 자본</strong> — 사업을 시작하고 운영하는 데 필요한 자금입니다.</li>
-<li><strong>시장</strong> — 제품이나 서비스를 사고파는 곳. 고객이 모여 있는 공간입니다.</li>
-</ul>
-<h3>아이템 선정 기준</h3>
-<ul>
-<li>소비자가 원하면서 <strong>기존 시장과 차별화</strong>된 것을 발굴해야 시장에서 호응을 얻습니다.</li>
-<li>단순히 <strong>유행을 쫓기보다 자신의 능력·적성에 맞는</strong> 아이템을 선택해야 지속 가능합니다.</li>
-</ul>
-</div></details>
-<details><summary>기업가 정신 5요소 <span class="label">p.137</span></summary><div>
-<ul>
-<li><strong>혁신성</strong> — 새로운 가치를 만들어 내려는 태도. 새로운 제품·서비스·경영 방식을 시도합니다.</li>
-<li><strong>위험 감수성</strong> — 실패할 위험을 두려워하지 않고 과감히 도전하는 태도입니다.</li>
-<li><strong>진취성</strong> — 무한 경쟁 속에서 <strong>경쟁 기업보다 우위를 차지하려는 미래 지향적·도전적 자세</strong>입니다. 개인에게는 미래에 대한 도전적 사고로 앞으로 나아가는 자세입니다.</li>
-<li><strong>자율성</strong> — 자신의 판단과 의지로 일을 결정하고 스스로 통제해 나가는 태도입니다.</li>
-<li><strong>사회적 책임성</strong> — 이윤만이 아니라 사회에 기여하고 사회적 가치를 실현하려는 태도입니다.</li>
-</ul>
-<p class="note">다섯 요소를 각각의 설명 문장과 짝지어 두면 구분이 쉽습니다.</p>
-</div></details>
-<details><summary>경쟁 전략 3가지 <span class="label">p.72</span></summary><div>
-<ul>
-<li><strong>원가 우위 전략</strong> — 경쟁 기업보다 <strong>낮은 원가</strong>로 생산·제공해 가격 경쟁력을 확보합니다.</li>
-<li><strong>차별화 전략</strong> — 자사의 제품·서비스를 <strong>경쟁 기업과 다르게</strong> 만들어 돋보이게 합니다. 성공하면 가격을 경쟁사보다 높게 받을 수 있습니다.</li>
-<li><strong>집중화 전략</strong> — 특정 고객·세분 시장(예: 반려견 동반 카페, 비건 다이닝)에 역량을 집중합니다.</li>
-</ul>
-<p class="note">낮은 원가로 이긴 것인지, 다르게 만들어 이긴 것인지, 한 시장에 집중한 것인지로 구분합니다.</p>
-</div></details>
-</section>
+<div class="row">
+<div class="body"><h3><span class="num">1</span>수업용 슬라이드</h3><p>창업의 4대 핵심 요소 · 아이템 선정 기준 · 기업가 정신 · 경쟁 전략을 15분에 정리합니다.</p></div>
+<a class="btn" href="startup-slides.html">슬라이드 열기 →</a>
+</div>
 
-<section><h2>Be the CEO 보고서 STEP 1–4</h2><div class="grid steps">
-<article class="card"><span class="label">STEP 1</span><h3>팀·기업 개요</h3><p>팀명, 회사명과 로고 스케치, 사업 내용 100자 요약</p></article>
-<article class="card"><span class="label">STEP 2</span><h3>아이디어 구체화</h3><p>아이디어 제목, 제안 배경과 문제 인식, 아이디어 내용, 기대 효과, 핵심 문장</p></article>
-<article class="card"><span class="label">STEP 3</span><h3>시장 환경 분석 · SWOT</h3><p>강점과 약점, 기회와 위협을 구분합니다.</p></article>
-<article class="card"><span class="label">STEP 4</span><h3>4P MIX</h3><p>Product 제품 · Price 가격 · Place 유통 · Promotion 홍보</p></article>
-</div></section>
-
-<section><h2>평가 기준 · 100점</h2><div class="table-wrap"><table><thead><tr><th>항목</th><th>배점과 성취수준</th><th>확인 포인트</th></tr></thead><tbody>
-<tr><td data-label="항목">아이디어 창의성 및 기업가 정신</td><td data-label="배점">30점 · A30 B27 C24 D21 E18</td><td data-label="확인 포인트">독창성, 일상·산업 현장 문제 해결, 가치 창출</td></tr>
-<tr><td data-label="항목">보고서의 논리성 및 타당성</td><td data-label="배점">30점 · A30 B27 C24 D21 E18</td><td data-label="확인 포인트">SWOT·4P 등 아이템 선정 절차의 논리성</td></tr>
-<tr><td data-label="항목">발표 자료 및 의사소통 능력</td><td data-label="배점">30점 · A30 B27 C24 D21 E18</td><td data-label="확인 포인트">1장 인포그래픽 구성, 명확한 전달, 질의응답·댓글 대응</td></tr>
-<tr><td data-label="항목">프로젝트 참여도 및 완성도</td><td data-label="배점">10점 · A10 B8 C6 D4 E2</td><td data-label="확인 포인트">협력 또는 개인의 자기 주도성, 기한 준수, 완성도(패들렛 피드백 댓글·대댓글 참여 포함)</td></tr>
-</tbody></table></div></section>
-
-<section><h2>AI 프롬프트 3종 원클릭 복사</h2><p>복사한 뒤 [ ] 안을 자신의 내용으로 채워 AI에 입력하세요.</p><div class="grid">
-<article class="card prompt"><h3>[1차시] 보고서 작성 도우미</h3><p>질문에 답하며 아이디어를 고르고 보고서 초안을 정리합니다.</p><button class="btn copy" data-target="prompt1">복사</button><details><summary>전체 보기</summary><div><pre id="prompt1">너는 고등학교 2학년 학생의 친절한 창업 멘토야. 나는 「Be the CEO」 보고서를 스스로 작성할 거야.
+<details class="details">
+<summary><span class="num">2</span>AI 프롬프트 모음 (3종)</summary>
+<div class="prompts">
+<article class="prompt"><h4>[1차시] 보고서 작성 도우미</h4><p>질문에 답하며 아이디어를 고르고 보고서 초안을 정리합니다.</p>
+<div class="tools"><button class="btn copy" data-target="p1">복사</button><button class="btn ghost view" data-target="p1">전체 보기</button></div>
+<pre id="p1">너는 고등학교 2학년 학생의 친절한 창업 멘토야. 나는 「Be the CEO」 보고서를 스스로 작성할 거야.
 
 [나의 정보]
 관심 분야: [직접 입력]
@@ -122,8 +117,11 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 
 기존 제품을 개선한다면 기존 제품의 특징과 내가 개선한 점을 구분해 줘. 참고한 자료와 출처를 표시하고 확인되지 않은 내용은 구분해 줘. 끝으로 선생님께 확인받을 점 3가지를 알려줘.
 
-이제 첫 질문 하나만 해 줘.</pre></div></details></article>
-<article class="card prompt"><h3>[수업 후] 인포그래픽 1장 만들기</h3><p>완성한 보고서를 바탕으로 발표 자료를 준비합니다.</p><button class="btn copy" data-target="prompt2">복사</button><details><summary>전체 보기</summary><div><pre id="prompt2">너는 고등학생의 창업 아이디어 발표 자료를 돕는 디자인 코치야. 아래 보고서를 바탕으로 1장 인포그래픽 제작을 도와줘.
+이제 첫 질문 하나만 해 줘.</pre></article>
+
+<article class="prompt"><h4>[수업 후] 인포그래픽 1장 만들기</h4><p>보고서를 1장 발표 자료로 바꿉니다. 2차시 전까지 패들렛에 올립니다.</p>
+<div class="tools"><button class="btn copy" data-target="p2">복사</button><button class="btn ghost view" data-target="p2">전체 보기</button></div>
+<pre id="p2">너는 고등학생의 창업 아이디어 발표 자료를 돕는 디자인 코치야. 아래 보고서를 바탕으로 1장 인포그래픽 제작을 도와줘.
 
 [보고서 내용]
 [STEP 1~4 보고서 내용 붙여넣기]
@@ -143,8 +141,11 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 (b) 이미지 생성용 영문 프롬프트
 스타일, 세로 또는 가로 구도, 색상, 시각적 구성과 피해야 할 요소를 구체적으로 적어 줘. 텍스트가 들어갈 여백을 남겨 줘.
 
-보고서에 없는 수치, 로고, 수상 실적을 만들지 마. 이미지 생성 시 한글이 깨질 수 있으므로 제목과 설명은 이미지 제작 후 캔바 등에서 직접 입력하도록 안내해 줘. 참고한 자료와 AI 활용 내용을 표시하도록 알려줘.</pre></div></details></article>
-<article class="card prompt"><h3>[2차시] 2~3분 발표 대본과 예상 질문</h3><p>내 아이디어를 짧고 명확하게 전달하는 연습을 합니다.</p><button class="btn copy" data-target="prompt3">복사</button><details><summary>전체 보기</summary><div><pre id="prompt3">너는 고등학생의 창업 발표를 돕는 코치야. 아래 보고서를 바탕으로 발표 연습 자료를 만들어 줘.
+보고서에 없는 수치, 로고, 수상 실적을 만들지 마. 이미지 생성 시 한글이 깨질 수 있으므로 제목과 설명은 이미지 제작 후 캔바 등에서 직접 입력하도록 안내해 줘. 참고한 자료와 AI 활용 내용을 표시하도록 알려줘.</pre></article>
+
+<article class="prompt"><h4>[2차시] 2~3분 발표 대본과 예상 질문</h4><p>내 아이디어를 짧고 명확하게 전달하는 연습을 합니다.</p>
+<div class="tools"><button class="btn copy" data-target="p3">복사</button><button class="btn ghost view" data-target="p3">전체 보기</button></div>
+<pre id="p3">너는 고등학생의 창업 발표를 돕는 코치야. 아래 보고서를 바탕으로 발표 연습 자료를 만들어 줘.
 
 [보고서 내용]
 [STEP 1~4 보고서 내용 붙여넣기]
@@ -154,17 +155,65 @@ STEP 4 4P MIX: Product 제품, Price 가격, Place 유통, Promotion 홍보
 3. 목소리, 시선, 말하기 속도, 시간 관리가 포함된 발표 태도 체크리스트를 만들어 줘.
 4. 친구의 댓글에 감사하고 질문에 답하거나 개선점을 설명하는 방법을 알려줘.
 
-보고서에 없는 경험, 수치, 성과를 만들지 마. 내가 직접 이해하고 자연스럽게 말할 수 있는 쉬운 표현으로 써 줘.</pre></div></details></article>
-</div></section>
+보고서에 없는 경험, 수치, 성과를 만들지 마. 내가 직접 이해하고 자연스럽게 말할 수 있는 쉬운 표현으로 써 줘.</pre></article>
+</div>
+</details>
 
-<section><h2>보고서 웹앱</h2><p>모둠 등록과 보고서 작성·이미지 제출에 사용합니다.</p><!-- 보고서 웹앱 주소 --><button class="btn" disabled>보고서 웹앱 준비 중</button></section>
-<section><h2>제출 안내</h2><p>보고서는 보고서 웹앱에서 제출합니다. 2인 모둠은 <strong>각자의 역할</strong>을 반드시 작성하세요.</p><p>인포그래픽은 <strong>2차시 전까지</strong> 해당 학급 패들렛에 올립니다.</p><div class="note">파일명 예시<br>개인 · 2-3 홍길동<br>팀 · 2-3 홍길동·김철수</div><div class="buttons" style="margin-top:16px">
-<!-- PADLET 1반 --><a class="btn" href="https://padlet.com/rollers765/2-1-s025u3i9xbp2ww6uc0wh" target="_blank" rel="noopener">1반 패들렛</a>
-<!-- PADLET 2반 --><a class="btn" href="https://padlet.com/rollers765/2-2-s025u3pff6dfqy36trzl" target="_blank" rel="noopener">2반 패들렛</a>
-<!-- PADLET 3반 --><a class="btn" href="https://padlet.com/rollers765/2-3-s025u3q47crwwlui8nd3" target="_blank" rel="noopener">3반 패들렛</a>
-<!-- PADLET 4반 --><a class="btn" href="https://padlet.com/rollers765/2-4-s025u3rv0rpi43oh4o1m" target="_blank" rel="noopener">4반 패들렛</a>
-</div></section>
-<section><h2>유의사항</h2><ul><li>참고 자료와 AI 활용 출처를 표시합니다.</li><li>다른 사람의 아이디어를 그대로 모방하지 않습니다.</li><li>기존 제품을 개선했다면 기존 제품과 개선한 내용을 구분합니다.</li><li>발표는 팀당 2~3분(최대 3분)으로 준비합니다.</li><li>패들렛 피드백 댓글과 대댓글은 구체적이고 예의 있게 씁니다.</li><li>투표는 학생 이름 없이 팀명(회사명)·창업 아이템명·핵심을 적어 구글 설문지로 합니다.</li></ul></section>
+<div class="row">
+<div class="body"><h3><span class="num">3</span>보고서 작성</h3><p>팀(회사) 등록 → STEP 1~4 작성 → 그림·이미지 올리기 → 제출을 아이패드에서 합니다.</p></div>
+<!-- 보고서 웹앱 주소 --><button class="btn" disabled>보고서 웹앱 준비 중</button>
+</div>
+</section>
+
+<section>
+<h2>2차시 · 50분</h2>
+<p class="lead">반별로 발표하고, 친구 회사에 1억을 투자합니다.</p>
+
+<div class="row">
+<div class="body"><h3><span class="num">1</span>패들렛 · 발표 자료와 피드백</h3><p>우리 반 보드에 인포그래픽을 올리고, 팀당 2~3분 발표합니다. 다른 팀 발표에는 피드백 댓글을, 친구 댓글에는 대댓글로 답합니다.</p>
+<p><strong>댓글·대댓글을 성실히 남기면 프로젝트 참여도 점수에 반영됩니다.</strong></p></div>
+</div>
+<div class="padlets" style="margin:0 0 12px">
+<a class="btn ghost" href="https://padlet.com/rollers765/2-1-s025u3i9xbp2ww6uc0wh" target="_blank" rel="noopener">1반 패들렛 ↗</a>
+<a class="btn ghost" href="https://padlet.com/rollers765/2-2-s025u3pff6dfqy36trzl" target="_blank" rel="noopener">2반 패들렛 ↗</a>
+<a class="btn ghost" href="https://padlet.com/rollers765/2-3-s025u3q47crwwlui8nd3" target="_blank" rel="noopener">3반 패들렛 ↗</a>
+<a class="btn ghost" href="https://padlet.com/rollers765/2-4-s025u3rv0rpi43oh4o1m" target="_blank" rel="noopener">4반 패들렛 ↗</a>
+</div>
+
+<div class="row">
+<div class="body"><h3><span class="num">2</span>💰 1억으로 투자하기</h3>
+<p>여러분은 투자자입니다. 자기 돈 <strong>1억 원</strong>을 가장 유망한 팀(회사) 한 곳에 투자하세요.</p>
+<p><strong>펀딩으로 가장 많은 투자금을 모은 회사가 반별 우승!</strong> 우승 팀에는 발표점수 최고점을 부여합니다.</p>
+<p>이름은 적지 않고, 팀명(회사명)·창업 아이템명·핵심 한 줄을 적어 제출합니다.</p></div>
+<!-- GOOGLE FORM 투자 설문 링크 --><button class="btn" disabled>투자 설문 준비 중</button>
+</div>
+</section>
+
+<section>
+<details>
+<summary>평가 기준 · 100점</summary>
+<div>
+<table><thead><tr><th>평가 항목</th><th>배점</th></tr></thead><tbody>
+<tr><td>아이디어 창의성 및 기업가 정신</td><td>30점</td></tr>
+<tr><td>보고서의 논리성 및 타당성</td><td>30점</td></tr>
+<tr><td>발표 자료 및 의사소통 능력</td><td>30점</td></tr>
+<tr><td>프로젝트 참여도 및 완성도</td><td>10점</td></tr>
+</tbody></table>
+</div>
+</details>
+
+<details>
+<summary>제출과 유의사항</summary>
+<div>
+<ul>
+<li>보고서는 보고서 웹앱에서 제출하고, 2인 1조는 <strong>각자의 역할</strong>을 반드시 적습니다.</li>
+<li>인포그래픽은 <strong>2차시 전까지</strong> 우리 반 패들렛에 올립니다.</li>
+<li>참고 자료와 AI 활용 출처를 표시하고, 다른 사람의 아이디어를 그대로 모방하지 않습니다.</li>
+<li>파일명 예시 — 개인: <strong>2-3 홍길동</strong> / 팀: <strong>2-3 홍길동·김철수</strong></li>
+</ul>
+</div>
+</details>
+</section>
 </main>
 <footer><div><span>서울관광고등학교 · 성공적인 직업생활</span><a href="./">← 자료실</a></div></footer>
 <div id="toast" role="status" aria-live="polite" hidden></div>
@@ -184,15 +233,22 @@ document.querySelectorAll('.copy').forEach(button => {
       await navigator.clipboard.writeText(text);
       announce('복사했어요. AI에 붙여넣으세요.');
     } catch (error) {
-      const details = button.parentElement.querySelector('details');
-      details.open = true;
+      const pre = document.getElementById(button.dataset.target);
+      pre.classList.add('show');
       const selection = window.getSelection();
       const range = document.createRange();
-      range.selectNodeContents(document.getElementById(button.dataset.target));
+      range.selectNodeContents(pre);
       selection.removeAllRanges();
       selection.addRange(range);
       announce('선택한 내용을 복사해 주세요.');
     }
+  });
+});
+document.querySelectorAll('.view').forEach(button => {
+  button.addEventListener('click', () => {
+    const pre = document.getElementById(button.dataset.target);
+    pre.classList.toggle('show');
+    button.textContent = pre.classList.contains('show') ? '접기' : '전체 보기';
   });
 });
 </script>

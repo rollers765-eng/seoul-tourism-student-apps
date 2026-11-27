@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>창업 아이디어 구현하기 — 창업 핵심 개념 15분</title>
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --surface: #ffffff;
+      --sub-bg: #f3e5d8;
+      --text: #30291f;
+      --muted: #6c5f51;
+      --accent: #a55725;
+      --accent-soft: #f7ebe0;
+      --border: #e8e0d4;
+      --red: #b3352b;
+      --red-bg: #fdf1f0;
+      --blue: #2f5d8c;
+      --blue-bg: #eef4fa;
+      --green: #3f6b45;
+      --green-bg: #eff6f0;
+      --radius: 14px;
+      --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      word-break: keep-all;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 좌상단 복귀 버튼 */
+    .back-link {
+      position: fixed;
+      top: 12px;
+      left: 14px;
+      z-index: 100;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      padding: 0 14px;
+      background: rgba(250, 249, 246, 0.92);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .back-link:hover,
+    .back-link:focus-visible {
+      background: var(--sub-bg);
+      border-color: var(--accent);
+      color: var(--accent);
+      outline: none;
+    }
+
+    /* 전체 레이아웃 */
+    .deck-shell {
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 16px 76px;
+      position: relative;
+    }
+
+    /* 16:9 무대 */
+    .stage-wrap {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      max-width: 1440px;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: min(100%, calc((100dvh - 140px) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    /* 슬라이드 공통 */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(22px, 3.4vw, 52px) clamp(24px, 4.4vw, 68px);
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.25s ease;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .slide::-webkit-scrollbar {
+      display: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    .slide-inner {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(14px, 2vw, 26px);
+      margin: auto 0;
+    }
+
+    /* 타이포그래피 */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      padding: 4px 12px;
+      background: var(--sub-bg);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: clamp(13px, 1.15vw, 17px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .slide-title {
+      font-size: clamp(26px, 3.3vw, 52px);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+
+    .slide-subtitle {
+      font-size: clamp(17px, 1.8vw, 28px);
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .body-text {
+      font-size: clamp(16px, 1.65vw, 26px);
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    .hl {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .hl-red {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .hl-blue {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .hl-green {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    /* 1장 표지 전용 */
+    .cover-slide {
+      background: linear-gradient(155deg, #faf9f6 0%, #f3e5d8 100%);
+      text-align: center;
+      align-items: center;
+    }
+
+    .cover-slide .slide-inner {
+      align-items: center;
+      max-width: 920px;
+      gap: clamp(16px, 2.2vw, 28px);
+    }
+
+    .cover-title {
+      font-size: clamp(34px, 4.8vw, 72px);
+      font-weight: 900;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .cover-sub {
+      font-size: clamp(18px, 2.1vw, 32px);
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .cover-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 20px;
+      margin-top: clamp(6px, 1vw, 14px);
+      padding: 10px 22px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: clamp(15px, 1.4vw, 22px);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .cover-hint {
+      font-size: clamp(14px, 1.2vw, 18px);
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* 카드 & 그리드 공통 */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(12px, 1.6vw, 22px);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(12px, 1.5vw, 20px);
+    }
+
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: clamp(10px, 1.2vw, 16px);
+    }
+
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(14px, 1.8vw, 24px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-white {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(16px, 2vw, 28px);
+    }
+
+    .card-accent {
+      background: var(--accent-soft);
+      border: 2px solid var(--accent);
+    }
+
+    .card-blue {
+      background: var(--blue-bg);
+      border: 1px solid #c9dcef;
+    }
+
+    .card-green {
+      background: var(--green-bg);
+      border: 1px solid #c9decb;
+    }
+
+    .card-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: clamp(28px, 2.4vw, 38px);
+      height: clamp(28px, 2.4vw, 38px);
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: clamp(15px, 1.35vw, 20px);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: clamp(18px, 1.85vw, 28px);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: clamp(16px, 1.45vw, 22px);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .card-ex {
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: clamp(15px, 1.3vw, 19px);
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .card-ex strong {
+      color: var(--accent);
+    }
+
+    /* 하단 띠 / 배너 */
+    .banner {
+      padding: clamp(12px, 1.3vw, 18px) clamp(16px, 1.8vw, 24px);
+      background: var(--sub-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: clamp(16px, 1.45vw, 22px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .banner-red {
+      background: var(--red-bg);
+      border-color: #e9c2be;
+      color: var(--red);
+    }
+
+    .banner-blue {
+      background: var(--blue-bg);
+      border-color: #c9dcef;
+      color: var(--blue);
+    }
+
+    /* 사례 / 질문 / 힌트 / 체크리스트 (3~4장용) */
+    .case-box {
+      background: var(--sub-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(18px, 2.2vw, 32px);
+      font-size: clamp(18px, 2.1vw, 32px);
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .question-box {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: clamp(16px, 2vw, 28px);
+      font-size: clamp(20px, 2.4vw, 38px);
+      font-weight: 800;
+      color: var(--accent);
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .hint-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .hint-chip {
+      padding: 8px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: clamp(15px, 1.35vw, 20px);
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .split-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      gap: clamp(14px, 2vw, 28px);
+      align-items: stretch;
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: clamp(16px, 1.45vw, 22px);
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .step-check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #ffffff;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    /* 퀴즈 (10장용) */
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.2vw, 16px);
+    }
+
+    .quiz-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.6vw, 22px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quiz-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .quiz-q {
+      font-size: clamp(16px, 1.35vw, 21px);
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .quiz-choices {
+      font-size: clamp(14px, 1.2vw, 18px);
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .quiz-btn {
+      flex-shrink: 0;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--accent);
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .quiz-btn:hover,
+    .quiz-btn:focus-visible {
+      background: var(--accent);
+      color: #ffffff;
+      outline: none;
+    }
+
+    .quiz-btn[aria-expanded="true"] {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .quiz-ans {
+      display: none;
+      padding: 10px 14px;
+      background: var(--green-bg);
+      border: 1px solid #c9decb;
+      border-radius: 10px;
+      font-size: clamp(15px, 1.3vw, 19px);
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .quiz-ans.open {
+      display: block;
+    }
+
+    .quiz-ans strong {
+      color: var(--green);
+    }
+
+    /* 요약 (11장용) */
+    .summary-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.4vw, 18px);
+    }
+
+    .summary-item {
+      padding: clamp(12px, 1.4vw, 18px) clamp(16px, 1.8vw, 24px);
+      background: var(--bg);
+      border-left: 5px solid var(--accent);
+      border-top: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: clamp(17px, 1.75vw, 27px);
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .divider {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 4px 0;
+    }
+
+    /* 좌우 화살표 컨트롤 */
+    .nav-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 90;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(250, 249, 246, 0.92);
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    }
+
+    .nav-btn:hover:not(:disabled),
+    .nav-btn:focus-visible:not(:disabled) {
+      background: var(--sub-bg);
+      border-color: var(--accent);
+      color: var(--accent);
+      outline: none;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.28;
+      cursor: default;
+    }
+
+    .nav-prev {
+      left: 12px;
+    }
+
+    .nav-next {
+      right: 12px;
+    }
+
+    /* 하단 진행 표시줄 */
+    .deck-footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 80;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 0 16px;
+      background: rgba(250, 249, 246, 0.92);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 0;
+      background: #d7ccbe;
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.25);
+    }
+
+    .counter {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 56px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 반응형: 태블릿 / 좁은 노트북 */
+    @media (max-width: 1024px) {
+      .grid-5 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .deck-shell {
+        padding: 62px 64px 72px;
+      }
+    }
+
+    /* 반응형: 모바일 세로 화면 */
+    @media (max-width: 767px) {
+      .deck-shell {
+        padding: 60px 10px 68px;
+      }
+      .stage {
+        max-width: 100%;
+        height: 100%;
+        aspect-ratio: auto;
+        border-radius: 14px;
+      }
+      .slide {
+        justify-content: flex-start;
+        padding: 18px 16px 24px;
+      }
+      .slide-inner {
+        margin: 0;
+      }
+      .cover-slide {
+        justify-content: center;
+      }
+      .cover-slide .slide-inner {
+        margin: auto 0;
+      }
+      .grid-2,
+      .grid-3,
+      .split-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .grid-5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .quiz-top {
+        flex-direction: column;
+      }
+      .quiz-btn {
+        align-self: flex-start;
+      }
+      .nav-btn {
+        top: auto;
+        bottom: 8px;
+        transform: none;
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+      .nav-prev {
+        left: 10px;
+      }
+      .nav-next {
+        right: 10px;
+      }
+      .deck-footer {
+        padding: 0 62px;
+        gap: 10px;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+      }
+    }
+  
+    /* 반응형 보정: 하단 점 터치 영역 32px (보이는 크기는 유지) */
+    .dots { gap: 0; }
+    .dot { width: 32px; height: 32px; padding: 10.5px; background-clip: content-box; }
+    @media (max-width: 767px) { .dot { width: 32px; height: 32px; padding: 11.5px; } }
+
+    /* 반응형 보정: 세로로 긴 화면(가로:세로 비율 1.25 이하, 아이패드 세로 등) */
+    @media (max-aspect-ratio: 5/4) {
+      .stage { max-width: 100%; height: 100%; aspect-ratio: auto; }
+      .slide { justify-content: flex-start; overflow-y: auto; }
+      .slide-inner { margin: 0; }
+      .cover-slide { justify-content: center; }
+      .cover-slide .slide-inner { margin: auto 0; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="./" aria-label="자료실로 돌아가기">← 자료실</a>
+
+  <button type="button" class="nav-btn nav-prev" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+  <button type="button" class="nav-btn nav-next" id="nextBtn" aria-label="다음 슬라이드">›</button>
+
+  <main class="deck-shell">
+    <div class="stage-wrap">
+      <div class="stage" id="stage" aria-live="polite">
+
+        <!-- 1장: 표지 -->
+        <section class="slide cover-slide active" data-title="표지">
+          <div class="slide-inner">
+            <span class="eyebrow">🚀 1차시 앞 15분 수업</span>
+            <h1 class="cover-title">창업 아이디어 구현하기</h1>
+            <p class="cover-sub">1차시 · 창업 핵심 개념 15분</p>
+            <div class="cover-meta">
+              <span>성공적인 직업생활 · 2학년 1~4반</span>
+              <span>서울관광고등학교</span>
+            </div>
+            <p class="cover-hint">← → 키, 화살표 버튼, 화면을 밀어서 넘기세요</p>
+          </div>
+        </section>
+
+        <!-- 2장: 오늘 15분의 지도 -->
+        <section class="slide" data-title="오늘 15분의 지도">
+          <div class="slide-inner">
+            <span class="eyebrow">🗺️ 오늘의 학습 지도</span>
+            <h2 class="slide-title">오늘 15분, 네 가지만 잡고 갑니다</h2>
+            <div class="grid-2">
+              <article class="card">
+                <div class="card-head">
+                  <span class="card-num">1</span>
+                  <h3 class="card-title">창업의 4대 핵심 요소</h3>
+                </div>
+                <p class="card-desc"><span class="hl">창업자 · 아이템 · 자본 · 시장</span> (p.136)</p>
+              </article>
+              <article class="card">
+                <div class="card-head">
+                  <span class="card-num">2</span>
+                  <h3 class="card-title">아이템 선정 기준</h3>
+                </div>
+                <p class="card-desc"><span class="hl">기존 시장과 차별화</span>, <span class="hl">나의 능력·적성</span> (p.136)</p>
+              </article>
+              <article class="card">
+                <div class="card-head">
+                  <span class="card-num">3</span>
+                  <h3 class="card-title">기업가 정신 5요소</h3>
+                </div>
+                <p class="card-desc">다섯 가지 태도, 그중 <span class="hl">진취성</span> (p.137)</p>
+              </article>
+              <article class="card">
+                <div class="card-head">
+                  <span class="card-num">4</span>
+                  <h3 class="card-title">경쟁 전략 3가지</h3>
+                </div>
+                <p class="card-desc"><span class="hl">원가 우위 · 차별화 · 집중화</span> (p.72)</p>
+              </article>
+            </div>
+            <div class="banner">이 15분이 끝나면 바로 35분 동안 'Be the CEO' 보고서를 씁니다.</div>
+          </div>
+        </section>
+
+<!-- PART 2 -->
+
+<!-- 3장: 우리 학교 앞 사례 -->
+        <section class="slide" data-title="우리 학교 앞 사례">
+          <div class="slide-inner">
+            <span class="eyebrow">🥪 우리 학교 앞 사례</span>
+            <h2 class="slide-title">학교 앞 <span class="hl">아침 간편식 카페</span></h2>
+            <div class="case-box">
+              “등교 시간이 급한 학생이 <span class="hl">미리 주문</span>하고, 학교 앞에서 <span class="hl">기다리지 않고 바로 받아 가는</span> 아침 간편식 카페”
+            </div>
+            <div class="question-box">“이 가게를 열려면 무엇이 필요할까요?”</div>
+            <div class="hint-row">
+              <span class="hint-chip">누가 만들까?</span>
+              <span class="hint-chip">무엇을 팔까?</span>
+              <span class="hint-chip">무엇이 있어야 열 수 있을까?</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4장: 창업이란 -->
+        <section class="slide" data-title="창업이란">
+          <div class="slide-inner">
+            <span class="eyebrow">💡 창업의 뜻 · p.135</span>
+            <h2 class="slide-title">창업은 <span class="hl">새로운 사업을 구상하고</span>, 제품이나 서비스를 <span class="hl">제공하는 활동</span></h2>
+            <div class="split-layout">
+              <div class="card card-accent" style="justify-content: center;">
+                <p class="body-text">
+                  단순히 가게를 여는 것만이 아니라, <strong>사람들의 필요와 불편을 찾아내어 새로운 사업으로 만들고</strong> 실제 제품이나 서비스를 고객에게 전하는 전 과정을 말합니다.
+                </p>
+              </div>
+              <div class="card">
+                <ul class="step-list">
+                  <li class="step-item"><span class="step-check">✓</span><span>불편 발견</span></li>
+                  <li class="step-item"><span class="step-check">✓</span><span>아이디어 구상</span></li>
+                  <li class="step-item"><span class="step-check">✓</span><span>가게(사업) 운영</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="banner">아침 간편식 카페도 '창업'입니다 — 학생의 불편을 발견하고, 그것을 해결하는 가게를 구상했기 때문입니다.</div>
+          </div>
+        </section>
+
+        <!-- 5장: 창업의 4대 핵심 요소 -->
+        <section class="slide" data-title="창업의 4대 핵심 요소">
+          <div class="slide-inner">
+            <span class="eyebrow">🧩 핵심 개념 1 · p.136</span>
+            <h2 class="slide-title">창업의 4대 핵심 요소</h2>
+            <div class="grid-2">
+              <article class="card">
+                <h3 class="card-title"><span class="hl">창업자</span></h3>
+                <p class="card-desc">창업을 계획하고 실행하는 사람</p>
+                <p class="card-ex"><strong>예:</strong> 우리 팀의 사장님</p>
+              </article>
+              <article class="card">
+                <h3 class="card-title"><span class="hl">창업 아이템</span></h3>
+                <p class="card-desc">고객이 원하는 것을 채워 줄 제품·서비스</p>
+                <p class="card-ex"><strong>예:</strong> 미리 주문하는 아침 간편식</p>
+              </article>
+              <article class="card">
+                <h3 class="card-title"><span class="hl">창업 자본</span></h3>
+                <p class="card-desc">사업을 시작하고 운영하는 데 필요한 자금</p>
+                <p class="card-ex"><strong>예:</strong> 조리기구·재료·간판 비용</p>
+              </article>
+              <article class="card">
+                <h3 class="card-title"><span class="hl">시장</span></h3>
+                <p class="card-desc">제품이나 서비스를 사고파는 곳, 고객이 모인 곳</p>
+                <p class="card-ex"><strong>예:</strong> 등교 시간 학교 앞 학생들</p>
+              </article>
+            </div>
+            <div class="banner banner-red">경영 능력은 창업에 필요하지만, 교과서가 말하는 '창업의 4대 핵심 요소' 명칭에는 들어가지 않습니다.</div>
+          </div>
+        </section>
+
+<!-- PART 3 -->
+
+<!-- 6장: 창업 아이템 선정 기준 -->
+        <section class="slide" data-title="창업 아이템 선정 기준">
+          <div class="slide-inner">
+            <span class="eyebrow">🎯 핵심 개념 2 · p.136</span>
+            <h2 class="slide-title">좋은 아이템을 고르는 두 가지 기준</h2>
+            <div class="grid-2">
+              <article class="card">
+                <div class="card-head">
+                  <span class="card-num">1</span>
+                  <h3 class="card-title"><span class="hl">기존 시장과 차별화</span></h3>
+                </div>
+                <p class="card-desc">소비자가 원하면서 기존 시장과 다른 것을 발굴합니다.</p>
+                <p class="card-ex"><strong>예:</strong> 그냥 김밥집이 아니라 '등교길 3분 수령' 사전 주문 김밥</p>
+              </article>
+              <article class="card">
+                <div class="card-head">
+                  <span class="card-num">2</span>
+                  <h3 class="card-title"><span class="hl">유행보다 나의 능력·적성</span></h3>
+                </div>
+                <p class="card-desc">유행만 쫓으면 오래 못 갑니다. 내가 잘하는 것과 맞는 것을 고릅니다.</p>
+                <p class="card-ex"><strong>예:</strong> 조리과 학생의 조리 실력, 카페경영과 학생의 음료 지식</p>
+              </article>
+            </div>
+            <div class="banner">유행하는 메뉴여도 내가 잘할 수 없으면 지속되기 어렵습니다.</div>
+          </div>
+        </section>
+
+        <!-- 7장: 기업가 정신 5요소 -->
+        <section class="slide" data-title="기업가 정신 5요소">
+          <div class="slide-inner">
+            <span class="eyebrow">🔥 핵심 개념 3 · p.137</span>
+            <h2 class="slide-title">기업가 정신, 다섯 가지 태도</h2>
+            <div class="grid-5">
+              <article class="card">
+                <h3 class="card-title">혁신성</h3>
+                <p class="card-desc">새로운 가치를 만들려고 <strong>새롭게 바꾸기</strong></p>
+              </article>
+              <article class="card">
+                <h3 class="card-title">위험 감수성</h3>
+                <p class="card-desc">실패 위험을 살피고 <strong>감수하기</strong></p>
+              </article>
+              <article class="card card-accent">
+                <h3 class="card-title"><span class="hl">진취성</span></h3>
+                <p class="card-desc"><span class="hl">경쟁 우위 · 미래 지향 · 도전</span></p>
+              </article>
+              <article class="card">
+                <h3 class="card-title">자율성</h3>
+                <p class="card-desc">스스로 판단하고 <strong>독립적으로 행동</strong></p>
+              </article>
+              <article class="card">
+                <h3 class="card-title">사회적 책임성</h3>
+                <p class="card-desc">이윤과 함께 <strong>경제·환경·사회적 가치</strong></p>
+              </article>
+            </div>
+            <div class="banner">이 중 오늘 시험에 바로 나오는 태도는 <span class="hl">'진취성'</span>입니다.</div>
+          </div>
+        </section>
+
+        <!-- 8장: 진취성 구별 카드 -->
+        <section class="slide" data-title="진취성 구별 카드">
+          <div class="slide-inner">
+            <span class="eyebrow">🧭 진취성 집중 보기</span>
+            <h2 class="slide-title">진취성을 알아보는 세 개의 표지</h2>
+            <div class="grid-3">
+              <article class="card card-accent">
+                <h3 class="card-title"><span class="hl">경쟁 우위</span></h3>
+                <p class="card-desc">경쟁 기업보다 앞서려는 노력</p>
+              </article>
+              <article class="card card-accent">
+                <h3 class="card-title"><span class="hl">미래 지향</span></h3>
+                <p class="card-desc">앞으로의 변화를 내다봄</p>
+              </article>
+              <article class="card card-accent">
+                <h3 class="card-title"><span class="hl">도전</span></h3>
+                <p class="card-desc">새로운 일에 과감히 나아감</p>
+              </article>
+            </div>
+            <div class="banner">무한 경쟁 속에서 경쟁 기업보다 우위를 차지하려는 미래 지향적·도전적 자세 = <span class="hl">진취성</span></div>
+            <div class="banner banner-blue">혁신성(새롭게 바꾸기) · 위험 감수성(위험을 감수)과 헷갈리지 마세요.</div>
+          </div>
+        </section>
+
+<!-- PART 4 -->
+
+<!-- 9장: 경쟁 전략 3가지 -->
+        <section class="slide" data-title="경쟁 전략 3가지">
+          <div class="slide-inner">
+            <span class="eyebrow">⚔️ 핵심 개념 4 · p.72</span>
+            <h2 class="slide-title">경쟁에서 이기는 세 가지 길</h2>
+            <div class="grid-3">
+              <article class="card">
+                <h3 class="card-title"><span class="hl">원가 우위</span></h3>
+                <p class="card-desc">더 낮은 원가로 싸게 제공</p>
+                <p class="card-ex"><strong>예:</strong> 대량 구매로 재료비를 낮춰 2,000원 김밥</p>
+              </article>
+              <article class="card card-accent">
+                <h3 class="card-title"><span class="hl">차별화</span></h3>
+                <p class="card-desc">다른 가게와 다르게 만들어 돋보이기</p>
+                <p class="card-ex"><strong>예:</strong> 앱으로 미리 주문, 이름표 붙여 3분 수령</p>
+              </article>
+              <article class="card">
+                <h3 class="card-title"><span class="hl">집중화</span></h3>
+                <p class="card-desc">특정 고객·시장에 집중</p>
+                <p class="card-ex"><strong>예:</strong> '등교 시간 학생'만 겨냥한 아침 메뉴</p>
+              </article>
+            </div>
+            <div class="banner">낮은 원가로 이겼는지 / 다르게 만들어 이겼는지 / 한 시장에 집중했는지로 구분합니다.</div>
+          </div>
+        </section>
+
+        <!-- 10장: 확인 질문 3개 -->
+        <section class="slide" data-title="확인 질문 3개">
+          <div class="slide-inner">
+            <span class="eyebrow">✋ 개념 확인 퀴즈</span>
+            <h2 class="slide-title">손들고 답해 봅시다 — 확인 질문 3개</h2>
+            <div class="quiz-list">
+              <article class="quiz-item">
+                <div class="quiz-top">
+                  <div>
+                    <p class="quiz-q"><strong>Q1.</strong> “소비자가 원하는 기존 시장과 차별화된 것을 발굴하고, 유행보다 자신의 능력과 적성에 맞는 것을 골라야 한다.” → 이것은 창업의 핵심 요소 중 무엇을 설명한 것일까요?</p>
+                    <p class="quiz-choices">보기: 창업자 / 경영 능력 / 창업 자본 / 창업 아이템</p>
+                  </div>
+                  <button type="button" class="quiz-btn" aria-expanded="false" aria-controls="quiz-ans-1">정답 보기</button>
+                </div>
+                <div class="quiz-ans" id="quiz-ans-1">
+                  <strong>정답: 창업 아이템</strong> — 차별화와 능력·적성은 '아이템을 어떻게 고르는가'의 기준입니다.
+                </div>
+              </article>
+
+              <article class="quiz-item">
+                <div class="quiz-top">
+                  <div>
+                    <p class="quiz-q"><strong>Q2.</strong> “무한 경쟁의 기업 환경 속에서 경쟁 관계에 있는 기업보다 우위를 차지하기 위해 노력하는 미래 지향적인 자세” → 기업가 정신의 구성 요소로 가장 적절한 것은?</p>
+                    <p class="quiz-choices">보기: 자율성 / 진취성 / 혁신성 / 위험 감수성 / 사회적 책임성</p>
+                  </div>
+                  <button type="button" class="quiz-btn" aria-expanded="false" aria-controls="quiz-ans-2">정답 보기</button>
+                </div>
+                <div class="quiz-ans" id="quiz-ans-2">
+                  <strong>정답: 진취성</strong> — 경쟁 우위·미래 지향·도전, 세 표지가 모두 나오면 진취성입니다.
+                </div>
+              </article>
+
+              <article class="quiz-item">
+                <div class="quiz-top">
+                  <div>
+                    <p class="quiz-q"><strong>Q3.</strong> 아침 간편식 카페가 “앱으로 미리 주문받아 이름표를 붙여 두고, 등교 시간에 바로 건네준다”면 어떤 경쟁 전략일까요?</p>
+                    <p class="quiz-choices">보기: 원가 우위 / 차별화 / 집중화</p>
+                  </div>
+                  <button type="button" class="quiz-btn" aria-expanded="false" aria-controls="quiz-ans-3">정답 보기</button>
+                </div>
+                <div class="quiz-ans" id="quiz-ans-3">
+                  <strong>정답: 차별화</strong> — 다른 가게와 '다르게' 만들어 돋보이게 했으므로 차별화입니다.
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11장: 30초 요약 & 다음 35분 -->
+        <section class="slide" data-title="30초 요약">
+          <div class="slide-inner">
+            <span class="eyebrow">📌 마무리 & 다음 활동</span>
+            <h2 class="slide-title">30초 요약</h2>
+            <ul class="summary-list">
+              <li class="summary-item">창업은 <span class="hl">새로운 사업을 구상해 제품·서비스를 제공하는 활동</span></li>
+              <li class="summary-item">아이템은 <span class="hl">기존 시장과의 차별화</span>, <span class="hl">나의 능력과 적성</span>으로 고른다</li>
+              <li class="summary-item">경쟁 우위를 위해 미래를 바라보고 도전하는 자세는 <span class="hl">진취성</span></li>
+            </ul>
+            <hr class="divider">
+            <div class="card card-accent">
+              <p class="card-title"><span class="hl">이제 여러분이 창업자가 됩니다.</span></p>
+              <p class="card-desc">35분 동안 'Be the CEO' 보고서 STEP 1~4 — 우리 팀과 아이디어, 시장 분석(SWOT), 4P(제품·가격·유통·홍보)를 채웁니다.</p>
+            </div>
+            <p class="cover-hint" style="text-align: right;">자료실로 돌아가려면 왼쪽 위 ‘← 자료실’ 버튼을 누르세요.</p>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="deck-footer" aria-label="슬라이드 진행 표시">
+    <div class="dots" id="dots" role="tablist" aria-label="슬라이드 선택"></div>
+    <div class="counter" id="counter" aria-live="polite"></div>
+  </footer>
+
+  <script>
+    (function () {
+      var stage = document.getElementById('stage');
+      var slides = Array.prototype.slice.call(stage.querySelectorAll('.slide'));
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+      var dotsWrap = document.getElementById('dots');
+      var counter = document.getElementById('counter');
+      var total = slides.length;
+      var current = 0;
+
+      // 점 진행 표시 자동 생성
+      var dots = slides.map(function (slide, idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'dot';
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-label', (idx + 1) + '번 슬라이드: ' + (slide.getAttribute('data-title') || ''));
+        btn.addEventListener('click', function () {
+          goTo(idx);
+        });
+        dotsWrap.appendChild(btn);
+        return btn;
+      });
+
+      function updateUI() {
+        slides.forEach(function (slide, idx) {
+          var isActive = idx === current;
+          slide.classList.toggle('active', isActive);
+          slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+          if (isActive) {
+            slide.scrollTop = 0;
+          }
+        });
+
+        dots.forEach(function (dot, idx) {
+          var isActive = idx === current;
+          dot.classList.toggle('active', isActive);
+          dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        counter.textContent = (current + 1) + ' / ' + total;
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === total - 1;
+      }
+
+      function goTo(index) {
+        if (index < 0 || index >= total || index === current) return;
+        current = index;
+        updateUI();
+      }
+
+      prevBtn.addEventListener('click', function () {
+        goTo(current - 1);
+      });
+
+      nextBtn.addEventListener('click', function () {
+        goTo(current + 1);
+      });
+
+      // 키보드 조작
+      document.addEventListener('keydown', function (e) {
+        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+          e.preventDefault();
+          goTo(current + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          goTo(current - 1);
+        } else if (e.key === ' ' || e.code === 'Space') {
+          if (tag === 'button' || tag === 'a') return;
+          e.preventDefault();
+          goTo(current + 1);
+        }
+      });
+
+      // 터치 스와이프 조작
+      var touchStartX = 0;
+      var touchStartY = 0;
+      var touchActive = false;
+
+      stage.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchActive = true;
+      }, { passive: true });
+
+      stage.addEventListener('touchend', function (e) {
+        if (!touchActive || e.changedTouches.length !== 1) return;
+        touchActive = false;
+        var dx = e.changedTouches[0].clientX - touchStartX;
+        var dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+          if (dx < 0) {
+            goTo(current + 1);
+          } else {
+            goTo(current - 1);
+          }
+        }
+      }, { passive: true });
+
+      // 퀴즈 정답 토글
+      var quizBtns = Array.prototype.slice.call(document.querySelectorAll('.quiz-btn'));
+      quizBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.getAttribute('aria-controls');
+          var ans = document.getElementById(targetId);
+          if (!ans) return;
+          var isOpen = ans.classList.toggle('open');
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btn.textContent = isOpen ? '정답 닫기' : '정답 보기';
+        });
+      });
+
+      updateUI();
+    })();
+  </script>
+</body>
+</html>
+
