@@ -1383,6 +1383,16 @@
         transition: none !important;
       }
     }
+
+    /* 세로 화면: 내용이 들어가면 가운데, 넘치면 위에서부터 */
+    @media (max-aspect-ratio: 1 / 1) {
+      .slide {
+        justify-content: flex-start;
+      }
+      .slide-inner {
+        margin: auto 0;
+      }
+    }
   </style>
 </head>
 <body>
