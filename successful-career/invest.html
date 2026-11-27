@@ -1,0 +1,2895 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>💰 1억으로 투자하기 — 실시간 펀딩</title>
+  <style>
+    :root {
+      --bg: #080e1a;
+      --bg-elev: #111a2e;
+      --bg-card: #16223a;
+      --bg-card-hover: #1c2c4a;
+      --border: rgba(148, 163, 184, 0.22);
+      --border-strong: rgba(251, 191, 36, 0.55);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --gold: #f59e0b;
+      --gold-bright: #fbbf24;
+      --gold-soft: rgba(245, 158, 11, 0.16);
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.16);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top center, #13203b 0%, var(--bg) 58%);
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.5;
+      min-height: 100%;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input, textarea {
+      font-family: inherit;
+      font-size: 16px;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      min-height: 52px;
+      touch-action: manipulation;
+    }
+
+    button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .hidden { display: none !important; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* 상단 헤더 & 네비게이션 */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(8, 14, 26, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+    }
+
+    .topbar-inner {
+      max-width: 1360px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-gold { color: var(--gold-bright); }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--gold-soft);
+      color: var(--gold-bright);
+      border: 1px solid var(--border-strong);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-elev);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      min-height: 52px;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-tab[aria-pressed="true"] {
+      background: var(--gold);
+      color: #0b1120;
+    }
+
+    /* 메인 컨테이너 */
+    .app-main {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+    }
+
+    .view-section {
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 공통 카드·버튼·반 선택 */
+    .panel {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0 0 10px;
+    }
+
+    .class-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .class-btn {
+      min-height: 56px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      transition: transform 0.15s, border-color 0.2s, background 0.2s;
+    }
+
+    .class-btn:hover { background: var(--bg-card-hover); }
+
+    .class-btn[aria-pressed="true"] {
+      background: var(--gold-soft);
+      border-color: var(--gold-bright);
+      color: var(--gold-bright);
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.16);
+    }
+
+    .btn-primary {
+      width: 100%;
+      min-height: 58px;
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+      color: #090f1d;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      box-shadow: 0 10px 24px rgba(245, 158, 11, 0.28);
+      transition: transform 0.15s, filter 0.15s;
+    }
+
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+    .btn-primary:active:not(:disabled) { transform: scale(0.985); }
+
+    .btn-secondary {
+      min-height: 52px;
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .btn-secondary:hover:not(:disabled) { background: var(--bg-card-hover); }
+
+    .btn-danger {
+      min-height: 52px;
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--danger-soft);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .status-banner {
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    .status-banner.closed {
+      background: var(--danger-soft);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+    }
+
+    /* ① 학생 투자 뷰 */
+    .student-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero-card {
+      text-align: center;
+      padding: 26px 20px;
+      background: linear-gradient(160deg, rgba(245, 158, 11, 0.14) 0%, rgba(22, 34, 58, 0.92) 65%);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 5vw, 36px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-sub {
+      margin: 0;
+      font-size: 15px;
+      color: #cbd5e1;
+    }
+
+    .company-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .company-card {
+      width: 100%;
+      text-align: left;
+      padding: 16px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+
+    .company-card:hover { background: var(--bg-card-hover); }
+
+    .company-card[aria-pressed="true"] {
+      border-color: var(--gold-bright);
+      background: rgba(245, 158, 11, 0.12);
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.18);
+    }
+
+    .company-card-main { min-width: 0; flex: 1; }
+
+    .company-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0 0 4px;
+      word-break: keep-all;
+    }
+
+    .company-item {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-bright);
+      margin: 0 0 6px;
+    }
+
+    .company-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 0;
+      word-break: keep-all;
+    }
+
+    .company-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .company-amount {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fde68a;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .check-pill {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-weight: 900;
+      color: transparent;
+    }
+
+    .company-card[aria-pressed="true"] .check-pill {
+      background: var(--gold-bright);
+      border-color: var(--gold-bright);
+      color: #0b1120;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .char-count {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .text-input, .text-area {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      background: #0b1324;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+    }
+
+    .text-input:focus, .text-area:focus {
+      border-color: var(--gold-bright);
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.16);
+    }
+
+    .text-area {
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .voted-card {
+      text-align: center;
+      padding: 28px 20px;
+      background: linear-gradient(160deg, rgba(16, 185, 129, 0.14) 0%, var(--bg-elev) 70%);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: var(--radius);
+    }
+
+    .voted-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 900;
+      color: #6ee7b7;
+    }
+
+    .voted-company {
+      margin: 0 0 18px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .empty-hint {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-muted);
+      font-size: 15px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    /* ② 교실 현황판 뷰 (1440×900 빔프로젝터 최적화) */
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .board-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .board-title {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .round-tag {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 900;
+      background: var(--emerald-soft);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--emerald);
+      animation: pulseLive 1.4s infinite;
+    }
+
+    .live-badge.is-closed {
+      background: var(--danger-soft);
+      color: #fecaca;
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .live-badge.is-closed .live-dot {
+      background: var(--danger);
+      animation: none;
+    }
+
+    @keyframes pulseLive {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.8); }
+    }
+
+    .board-class-wrap {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: clamp(24px, 3vw, 38px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.gold { color: var(--gold-bright); }
+
+    .board-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.75fr) minmax(300px, 0.85fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .bars-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bar-row {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      transition: transform 0.45s ease, border-color 0.3s;
+    }
+
+    .bar-row.is-leader {
+      border-color: var(--gold-bright);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.16) 0%, var(--bg-card) 75%);
+      box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.16);
+    }
+
+    .bar-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .bar-name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .rank-num {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text-muted);
+      min-width: 28px;
+    }
+
+    .bar-row.is-leader .rank-num { color: var(--gold-bright); }
+
+    .bar-company {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .bar-item {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .leader-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      background: var(--gold);
+      color: #0b1120;
+    }
+
+    .bar-amount {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--gold-bright);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(8, 14, 26, 0.78);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+      transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .bar-row.is-leader .bar-fill {
+      background: linear-gradient(90deg, #d97706 0%, #fbbf24 100%);
+    }
+
+    .feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feed-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      animation: slideDown 0.35s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feed-meta {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold-bright);
+      margin-bottom: 4px;
+    }
+
+    .feed-text {
+      font-size: 15px;
+      color: var(--text);
+      margin: 0;
+      word-break: break-word;
+    }
+
+    /* ③ 교사 관리 뷰 */
+    .admin-wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .pin-card {
+      max-width: 420px;
+      margin: 24px auto;
+      text-align: center;
+    }
+
+    .pin-input {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 0.35em;
+      margin: 12px 0 14px;
+    }
+
+    .admin-msg {
+      min-height: 22px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fca5a5;
+      margin-top: 10px;
+    }
+
+    .admin-msg.ok { color: #6ee7b7; }
+
+    .admin-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .admin-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+
+    .admin-stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .admin-stat-val {
+      font-size: 20px;
+      font-weight: 900;
+      margin-top: 4px;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .reset-box {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .reset-box .text-input {
+      flex: 1 1 220px;
+    }
+
+    /* 1억 원 펀딩 애니메이션 오버레이 */
+    .funding-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(8, 14, 26, 0.88);
+      backdrop-filter: blur(8px);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    #confetti-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .funding-modal {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      background: var(--bg-elev);
+      border: 2px solid var(--gold-bright);
+      border-radius: 24px;
+      padding: 34px 28px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+
+    .funding-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: var(--gold-bright);
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .funding-amount {
+      font-size: clamp(36px, 8vw, 52px);
+      font-weight: 900;
+      color: var(--gold-bright);
+      font-variant-numeric: tabular-nums;
+      margin: 6px 0 10px;
+    }
+
+    .funding-target {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+    }
+
+    /* 토스트 */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 110;
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    /* 빔프로젝터 대형 화면 (1200px 이상, 1440×900 최적화) */
+    @media (min-width: 1200px) {
+      .bar-company { font-size: 22px; }
+      .bar-item { font-size: 16px; }
+      .bar-amount { font-size: 28px; }
+      .bar-track { height: 28px; }
+      .rank-num { font-size: 20px; }
+      .feed-text { font-size: 17px; }
+    }
+
+    /* 태블릿 / 모바일 반응형 (820×1180, 390×844) */
+    @media (max-width: 960px) {
+      .board-layout { grid-template-columns: 1fr; }
+      .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .topbar-inner { justify-content: center; }
+      .brand { width: 100%; justify-content: center; }
+      .nav-tabs { width: 100%; justify-content: space-between; }
+      .nav-tab { flex: 1; padding: 0 8px; font-size: 13px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .panel { padding: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span>💰 <span class="brand-gold">1억으로 투자하기</span></span>
+        <button id="retry-live" type="button" class="hidden">실서버 다시 연결</button>
+        <span id="demo-badge" class="demo-badge hidden" aria-live="polite">데모 데이터</span>
+      </div>
+      <nav class="nav-tabs" aria-label="화면 전환">
+        <button type="button" id="tab-student" class="nav-tab" data-view="student" aria-pressed="true">학생 투자</button>
+        <button type="button" id="tab-board" class="nav-tab" data-view="board" aria-pressed="false">현황판</button>
+        <button type="button" id="tab-admin" class="nav-tab" data-view="admin" aria-pressed="false">교사 관리</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- ① 학생 투자 뷰 -->
+    <section id="view-student" class="view-section" aria-label="학생 투자">
+      <div class="student-wrap">
+        <div class="hero-card">
+          <h1 class="hero-title">💰 1억으로 투자하기</h1>
+          <p class="hero-sub">이름은 쓰지 않아요. 당신은 익명 엔젤 투자자입니다.</p>
+        </div>
+
+        <div class="panel">
+          <p class="section-label">1단계 · 우리 반 선택</p>
+          <div id="class-tabs" class="class-tabs" role="group" aria-label="반 선택">
+            <button type="button" class="class-btn" data-class="2-1" aria-pressed="false">2-1</button>
+            <button type="button" class="class-btn" data-class="2-2" aria-pressed="false">2-2</button>
+            <button type="button" class="class-btn" data-class="2-3" aria-pressed="false">2-3</button>
+            <button type="button" class="class-btn" data-class="2-4" aria-pressed="false">2-4</button>
+          </div>
+        </div>
+
+        <div id="student-closed-notice" class="status-banner closed hidden" role="status">
+          현재 이 반의 투자가 마감되었습니다. 현황판에서 결과를 확인해 주세요.
+        </div>
+
+        <div id="voted-card" class="voted-card hidden" role="status">
+          <h2 class="voted-title">이미 이번 라운드에 투자했어요</h2>
+          <p id="voted-company-name" class="voted-company"></p>
+          <button type="button" id="go-board-btn" class="btn-primary">실시간 현황판 보기</button>
+        </div>
+
+        <div id="student-form-area" class="panel hidden">
+          <p class="section-label">2단계 · 투자할 회사 선택</p>
+          <div id="company-list" class="company-grid" role="group" aria-label="회사 목록"></div>
+
+          <div style="margin-top: 20px;">
+            <label class="field-label" for="reason">
+              <span>3단계 · 투자 이유 한 줄 (선택)</span>
+              <span id="reason-count" class="char-count">0 / 60</span>
+            </label>
+            <input
+              id="reason"
+              type="text"
+              class="text-input"
+              maxlength="60"
+              autocomplete="off"
+              placeholder="예: 아이디어가 신선하고 발표가 설득력 있어요 (비워도 투자 가능)"
+            >
+          </div>
+
+          <div style="margin-top: 18px;">
+            <button type="button" id="invest-btn" class="btn-primary" disabled>💰 1억 원 투자하기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ② 교실 현황판 뷰 -->
+    <section id="view-board" class="view-section hidden" aria-label="실시간 투자 현황판">
+      <div class="board-header">
+        <div class="board-title-group">
+          <h1 id="board-title" class="board-title">2-1반 투자 현황</h1>
+          <span id="board-round" class="round-tag">라운드 준비 중</span>
+          <span id="board-status-badge" class="live-badge" aria-live="polite">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span id="board-status-text">LIVE</span>
+          </span>
+        </div>
+        <div class="board-class-wrap">
+          <div id="board-class-tabs" class="class-tabs" role="group" aria-label="현황판 반 선택">
+            <button type="button" class="class-btn" data-class="2-1" aria-pressed="false">2-1</button>
+            <button type="button" class="class-btn" data-class="2-2" aria-pressed="false">2-2</button>
+            <button type="button" class="class-btn" data-class="2-3" aria-pressed="false">2-3</button>
+            <button type="button" class="class-btn" data-class="2-4" aria-pressed="false">2-4</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">총 펀딩 금액</div>
+          <div id="stat-total" class="stat-value gold">0원</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">참여 인원</div>
+          <div id="stat-votes" class="stat-value">0명</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">우리 반 회사 수</div>
+          <div id="stat-companies" class="stat-value">0팀</div>
+        </div>
+      </div>
+
+      <div class="board-layout">
+        <div class="panel">
+          <p class="section-label">회사별 실시간 모금액 (내림차순)</p>
+          <div id="board-bars" class="bars-list" aria-live="polite"></div>
+        </div>
+        <aside class="panel">
+          <p class="section-label">최근 익명 투자 이유</p>
+          <div id="feed" class="feed-list" aria-live="polite"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ③ 교사 관리 뷰 -->
+    <section id="view-admin" class="view-section hidden" aria-label="교사 관리">
+      <div class="admin-wrap">
+        <div id="admin-login" class="panel pin-card">
+          <p class="section-label">교사 인증</p>
+          <h2 style="margin: 0 0 6px; font-size: 22px;">관리자 PIN 입력</h2>
+          <p style="margin: 0; font-size: 14px; color: var(--text-muted);">숫자 4자리 PIN을 입력하세요.</p>
+          <input
+            id="admin-pin"
+            type="password"
+            inputmode="numeric"
+            maxlength="4"
+            class="text-input pin-input"
+            placeholder="••••"
+            aria-label="교사 PIN 4자리"
+          >
+          <button type="button" id="admin-pin-btn" class="btn-primary">잠금 해제</button>
+          <div id="admin-pin-msg" class="admin-msg" role="alert"></div>
+        </div>
+
+        <div id="admin-panel" class="hidden" style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="panel">
+            <div class="admin-toolbar">
+              <div>
+                <p class="section-label" style="margin-bottom: 4px;">교사 관리 대시보드</p>
+                <strong id="admin-class-label" style="font-size: 20px;">2-1반 관리</strong>
+              </div>
+              <button type="button" id="admin-logout-btn" class="btn-secondary">잠그기</button>
+            </div>
+            <div id="admin-class-tabs" class="class-tabs" style="margin-top: 14px;" role="group" aria-label="관리 반 선택">
+              <button type="button" class="class-btn" data-class="2-1" aria-pressed="false">2-1</button>
+              <button type="button" class="class-btn" data-class="2-2" aria-pressed="false">2-2</button>
+              <button type="button" class="class-btn" data-class="2-3" aria-pressed="false">2-3</button>
+              <button type="button" class="class-btn" data-class="2-4" aria-pressed="false">2-4</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <p class="section-label">현재 반 상태 요약</p>
+            <div class="admin-stats">
+              <div class="admin-stat">
+                <div class="admin-stat-label">회사 수</div>
+                <div id="admin-stat-companies" class="admin-stat-val">0팀</div>
+              </div>
+              <div class="admin-stat">
+                <div class="admin-stat-label">투표 수</div>
+                <div id="admin-stat-votes" class="admin-stat-val">0명</div>
+              </div>
+              <div class="admin-stat">
+                <div class="admin-stat-label">총 펀딩액</div>
+                <div id="admin-stat-total" class="admin-stat-val" style="color: var(--gold-bright);">0원</div>
+              </div>
+              <div class="admin-stat">
+                <div class="admin-stat-label">투표 상태</div>
+                <div id="admin-stat-status" class="admin-stat-val">진행 중</div>
+              </div>
+            </div>
+            <div class="admin-actions" style="margin-top: 14px;">
+              <button type="button" id="admin-toggle-open" class="btn-secondary">투표 마감하기</button>
+              <button type="button" id="admin-refresh-btn" class="btn-secondary">상태 새로고침</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <p class="section-label">반별 회사 일괄 등록 / 편집</p>
+            <p style="margin: 0 0 10px; font-size: 14px; color: var(--text-muted);">
+              한 줄에 <code>회사명 | 아이템명 | 한 줄 소개</code> 형식으로 붙여넣으세요. (빈 줄 무시, 저장 시 해당 반 목록 교체)
+            </p>
+            <textarea
+              id="admin-companies-input"
+              class="text-area"
+              placeholder="예시)&#10;에코백스 | 폐현수막 업사이클링 가방 | 학교 행사 현수막으로 만드는 방수 에코백&#10;스쿨런치 | 급식 잔반 줄이기 앱 | 선호 메뉴 사전 투표로 잔반 30% 절감"
+            ></textarea>
+            <div class="admin-actions" style="margin-top: 12px;">
+              <button type="button" id="admin-save-companies" class="btn-primary" style="width: auto; min-width: 180px;">회사 목록 저장</button>
+              <span id="admin-save-msg" class="admin-msg ok" style="margin: 0;"></span>
+            </div>
+          </div>
+
+          <div class="panel" style="border-color: rgba(239, 68, 68, 0.35);">
+            <p class="section-label" style="color: #fca5a5;">펀딩 초기화 (새 라운드 시작)</p>
+            <p style="margin: 0; font-size: 14px; color: var(--text-muted);">
+              새 라운드 ID를 발급하여 해당 반 학생들이 다시 투자할 수 있게 합니다. 아래에 <strong>초기화</strong>를 입력한 뒤 버튼을 누르세요.
+            </p>
+            <div class="reset-box">
+              <input id="admin-reset-confirm" aria-label="초기화 확인 문구" type="text" class="text-input" placeholder="'초기화' 입력" autocomplete="off">
+              <button type="button" id="admin-reset-btn" class="btn-danger">새 라운드로 초기화</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 1억 원 펀딩 애니메이션 오버레이 -->
+  <div id="funding-overlay" class="funding-overlay hidden" role="dialog" aria-modal="true" aria-label="투자 완료 애니메이션">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="funding-modal">
+      <div class="funding-badge">엔젤 투자 완료!</div>
+      <div id="funding-amount" class="funding-amount">0원</div>
+      <p id="funding-target" class="funding-target"></p>
+    </div>
+  </div>
+
+  <!-- 공통 알림 토스트 -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const CONFIG = {
+    SUPABASE_URL: 'https://tstjreubarmklckjhelv.supabase.co',
+    SUPABASE_ANON_KEY: 'sb_publishable_F3v2CpBvmOtrrHJkWe-fRw_Ia6hc1cN',
+    CLASSES: ['2-1', '2-2', '2-3', '2-4'],
+    INVEST_AMOUNT: 100000000,
+    RPC_TIMEOUT_MS: 8000,
+    POLL_FOREGROUND_MS: 5000,
+    POLL_BACKGROUND_MS: 30000,
+    DEMO_PIN: '2026',
+    STORAGE_KEYS: {
+      DEVICE_ID: 'invest.deviceId',
+      LAST_CLASS: 'invest.lastClass',
+      VOTED_PREFIX: 'invest.voted.',
+      DEMO_STATE: 'invest.demo.state.v1',
+      DEMO_PIN_LOCK: 'invest.demo.pinLock'
+    }
+  };
+
+  const state = {
+    view: 'student',
+    isDemo: false,
+    liveConfirmed: false,
+    studentClass: '',
+    selectedCompanyId: null,
+    studentBoard: null,
+    boardClass: '2-1',
+    boardData: null,
+    boardFeed: [],
+    prevTotals: {},
+    pollTimer: null,
+    adminClass: '2-1',
+    adminPin: '',
+    adminUnlocked: false,
+    adminState: null,
+    toastTimer: null
+  };
+
+  /* ---------- 유틸리티 ---------- */
+  function safeStorageGet(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (_) {
+      // 저장 불가 환경 무시
+    }
+  }
+
+  function generateUuid() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  function getDeviceId() {
+    const key = state.isDemo ? 'invest.demo.deviceId' : CONFIG.STORAGE_KEYS.DEVICE_ID;
+    const uuidV4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved && saved.length === 36 && uuidV4.test(saved)) return saved.toLowerCase();
+      const id = state.isDemo ? generateUuid() : window.crypto.randomUUID();
+      localStorage.setItem(key, id);
+      return localStorage.getItem(key) === id ? id : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function votedKey(classCode) {
+    return (state.isDemo ? 'invest.demo.voted.' : CONFIG.STORAGE_KEYS.VOTED_PREFIX) + classCode;
+  }
+
+  function getLastClass() {
+    const saved = safeStorageGet(CONFIG.STORAGE_KEYS.LAST_CLASS);
+    return CONFIG.CLASSES.includes(saved) ? saved : '2-1';
+  }
+
+  function setLastClass(classCode) {
+    if (CONFIG.CLASSES.includes(classCode)) {
+      safeStorageSet(CONFIG.STORAGE_KEYS.LAST_CLASS, classCode);
+    }
+  }
+
+  function getVotedRecord(classCode, roundId) {
+    if (!classCode || !roundId) return null;
+    const raw = safeStorageGet(votedKey(classCode));
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.round_id === roundId) return parsed;
+    } catch (_) {
+      return null;
+    }
+    return null;
+  }
+
+  function setVotedRecord(classCode, roundId, companyId, companyName) {
+    if (!classCode || !roundId) return;
+    safeStorageSet(
+      votedKey(classCode),
+      JSON.stringify({
+        round_id: roundId,
+        company_id: companyId,
+        company_name: companyName,
+        voted_at: new Date().toISOString()
+      })
+    );
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function sanitizeReason(str) {
+    return String(str == null ? '' : str)
+      .replace(/[\r\n\t]+/g, ' ')
+      .trim()
+      .slice(0, 60);
+  }
+
+  function formatMoney(amount) {
+    const n = Math.max(0, Math.floor(Number(amount) || 0));
+    if (n === 0) return '0원';
+    const eok = Math.floor(n / 100000000);
+    const man = Math.floor((n % 100000000) / 10000);
+    if (eok > 0 && man > 0) {
+      return `${eok.toLocaleString('ko-KR')}억 ${man.toLocaleString('ko-KR')}만 원`;
+    }
+    if (eok > 0) {
+      return `${eok.toLocaleString('ko-KR')}억 원`;
+    }
+    if (man > 0) {
+      return `${man.toLocaleString('ko-KR')}만 원`;
+    }
+    return `${n.toLocaleString('ko-KR')}원`;
+  }
+
+  function formatRelativeTime(isoStr) {
+    const ts = Date.parse(isoStr);
+    if (Number.isNaN(ts)) return '방금 전';
+    const diffSec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+    if (diffSec < 15) return '방금 전';
+    if (diffSec < 60) return `${diffSec}초 전`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}분 전`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}시간 전`;
+    return `${Math.floor(diffHr / 24)}일 전`;
+  }
+
+  function prefersReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function showToast(message, durationMs = 2600) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.remove('hidden');
+    if (state.toastTimer) clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(() => {
+      el.classList.add('hidden');
+    }, durationMs);
+  }
+
+  function animateCountUp(el, fromVal, toVal, durationMs = 700, formatter = formatMoney) {
+    if (!el) return;
+    const startVal = Number(fromVal) || 0;
+    const endVal = Number(toVal) || 0;
+    if (prefersReducedMotion() || startVal === endVal || durationMs <= 0) {
+      el.textContent = formatter(endVal);
+      return;
+    }
+    const startTime = performance.now();
+    function step(now) {
+      const progress = Math.min(1, (now - startTime) / durationMs);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(startVal + (endVal - startVal) * eased);
+      el.textContent = formatter(current);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = formatter(endVal);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function launchConfetti(canvasEl, durationMs = 1400) {
+    if (!canvasEl || prefersReducedMotion()) return;
+    const ctx = canvasEl.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = canvasEl.clientWidth;
+    const height = canvasEl.clientHeight;
+    if (!width || !height) return;
+    canvasEl.width = Math.floor(width * dpr);
+    canvasEl.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const symbols = ['💵', '🪙', '💰', '✨'];
+    const colors = ['#fbbf24', '#f59e0b', '#10b981', '#60a5fa', '#fef08a'];
+    const particles = [];
+    const count = 46;
+
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.random() * Math.PI * 2);
+      const speed = 4 + Math.random() * 9;
+      particles.push({
+        x: width * 0.5 + (Math.random() - 0.5) * 80,
+        y: height * 0.45 + (Math.random() - 0.5) * 40,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 4.5,
+        gravity: 0.24 + Math.random() * 0.1,
+        size: 16 + Math.random() * 14,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.2,
+        isEmoji: i % 2 === 0,
+        symbol: symbols[i % symbols.length],
+        color: colors[i % colors.length]
+      });
+    }
+
+    const start = performance.now();
+    let rafId = 0;
+
+    function frame(now) {
+      const elapsed = now - start;
+      const alpha = Math.max(0, 1 - elapsed / durationMs);
+      ctx.clearRect(0, 0, width, height);
+
+      if (elapsed >= durationMs || canvasEl.clientWidth !== width || canvasEl.clientHeight !== height) {
+        cancelAnimationFrame(rafId);
+        return;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.rot += p.vRot;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        if (p.isEmoji) {
+          ctx.font = `${Math.round(p.size)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(p.symbol, 0, 0);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size * 0.35, -p.size * 0.2, p.size * 0.7, p.size * 0.4);
+        }
+        ctx.restore();
+      }
+      ctx.restore();
+      rafId = requestAnimationFrame(frame);
+    }
+
+    rafId = requestAnimationFrame(frame);
+  }
+
+  /* ---------- 데모 데이터 & 로컬 RPC 시뮬레이터 ---------- */
+  const DEMO_TEMPLATES = [
+    ['에코백스', '폐현수막 방수 에코백', '학교 행사 현수막을 업사이클링한 맞춤형 방수 가방'],
+    ['스쿨런치', '급식 잔반 제로 앱', '선호 메뉴 사전 투표로 잔반을 30% 줄이는 스마트 급식'],
+    ['투어메이트', '서울 골목 오디오 투어', '외국인 관광객을 위한 10분 로컬 스토리텔링 가이드'],
+    ['그린카페', '커피박 친환경 텀블러', '카페 커피 찌꺼기로 만든 경량 다회용 컵'],
+    ['펫트립', '반려동물 동반 여행 지도', '반려견 출입 가능 숙소·식당 실시간 필터링 플랫폼'],
+    ['스터디핏', '15분 벼락치기 퀴즈앱', '특성화고 전공 과목 핵심만 뽑아주는 AI 오답노트'],
+    ['로컬베이커리', '못난이 과일 디저트', '농가 잉여 과일로 만드는 건강한 학교 매점 간식'],
+    ['세이프워크', '야간 귀가 안심 키링', '버튼 한 번으로 위치와 경고음을 전송하는 스마트 키링'],
+    ['제로패키지', '다회용 배달 용기 구독', '동네 식당과 연계한 보증금 없는 순환 용기 서비스'],
+    ['뷰티랩', '비건 립밤 DIY 키트', '천연 재료로 나만의 컬러를 만드는 체험형 코스메틱']
+  ];
+
+  const DEMO_REASONS = [
+    '발표가 정말 설득력 있고 수익 모델이 탄탄해요!',
+    '당장 학교에서 써보고 싶은 아이디어입니다.',
+    '친환경 가치와 실용성을 둘 다 잡았어요.',
+    '타깃 고객 분석이 아주 구체적이라 투자합니다.',
+    '디자인과 스토리텔링이 기억에 오래 남아요.'
+  ];
+
+  function createInitialDemoStore() {
+    const classes = {};
+    const distByClass = {
+      '2-1': [5, 4, 3, 2, 2, 1, 1, 1, 0, 0],
+      '2-2': [4, 4, 3, 2, 1, 1, 1, 0, 0, 0],
+      '2-3': [6, 3, 2, 2, 2, 1, 1, 0, 0, 0],
+      '2-4': [5, 3, 3, 2, 1, 1, 0, 0, 0, 0]
+    };
+
+    CONFIG.CLASSES.forEach((cls, clsIdx) => {
+      const roundId = `demo-round-${cls}-1`;
+      const counts = distByClass[cls];
+      const companies = DEMO_TEMPLATES.map((tpl, idx) => {
+        const shifted = DEMO_TEMPLATES[(idx + clsIdx * 2) % DEMO_TEMPLATES.length];
+        return {
+          id: `demo-co-${cls}-${idx + 1}`,
+          name: shifted[0],
+          item: shifted[1],
+          description: shifted[2],
+          sort: idx + 1
+        };
+      });
+
+      const votes = [];
+      let voteSeq = 1;
+      companies.forEach((co, idx) => {
+        const c = counts[idx] || 0;
+        for (let k = 0; k < c; k++) {
+          votes.push({
+            id: `demo-v-${cls}-${voteSeq++}`,
+            round_id: roundId,
+            company_id: co.id,
+            device_id: `seed-device-${cls}-${voteSeq}`,
+            reason: DEMO_REASONS[(voteSeq + idx) % DEMO_REASONS.length],
+            amount: CONFIG.INVEST_AMOUNT,
+            created_at: new Date(Date.now() - (voteSeq * 45000)).toISOString()
+          });
+        }
+      });
+
+      classes[cls] = {
+        round_id: roundId,
+        round_num: 1,
+        is_open: true,
+        companies,
+        votes
+      };
+    });
+
+    return { classes };
+  }
+
+  function loadDemoStore() {
+    const raw = safeStorageGet(CONFIG.STORAGE_KEYS.DEMO_STATE);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.classes) return parsed;
+      } catch (_) {
+        // 재생성
+      }
+    }
+    const fresh = createInitialDemoStore();
+    safeStorageSet(CONFIG.STORAGE_KEYS.DEMO_STATE, JSON.stringify(fresh));
+    return fresh;
+  }
+
+  function saveDemoStore(store) {
+    safeStorageSet(CONFIG.STORAGE_KEYS.DEMO_STATE, JSON.stringify(store));
+  }
+
+  function buildDemoBoardPayload(clsData, sortByTotal) {
+    const activeVotes = clsData.votes.filter((v) => v.round_id === clsData.round_id);
+    const companyIds = new Set(clsData.companies.map((c) => c.id));
+    const validVotes = activeVotes.filter((v) => companyIds.has(v.company_id));
+
+    const statsMap = {};
+    validVotes.forEach((v) => {
+      if (!statsMap[v.company_id]) statsMap[v.company_id] = { total: 0, count: 0 };
+      statsMap[v.company_id].total += v.amount;
+      statsMap[v.company_id].count += 1;
+    });
+
+    const companies = clsData.companies.map((c) => ({
+      id: c.id,
+      name: c.name,
+      item: c.item,
+      description: c.description,
+      sort: c.sort,
+      total: statsMap[c.id] ? statsMap[c.id].total : 0,
+      count: statsMap[c.id] ? statsMap[c.id].count : 0
+    }));
+
+    if (sortByTotal) {
+      companies.sort((a, b) => b.total - a.total || a.sort - b.sort);
+    } else {
+      companies.sort((a, b) => a.sort - b.sort);
+    }
+
+    const totalAmount = validVotes.reduce((sum, v) => sum + v.amount, 0);
+    return {
+      ok: true,
+      round_id: clsData.round_id,
+      is_open: clsData.is_open,
+      companies,
+      total_amount: totalAmount,
+      vote_count: validVotes.length,
+      company_count: companies.length
+    };
+  }
+
+  function isValidCompanyRow(row) {
+    return ['name', 'item', 'description'].every((field, index) => {
+      const value = row?.[field];
+      return typeof value === 'string' && value.length > 0 &&
+        [...value].length <= [80, 100, 240][index] && !/[\x00-\x1f\x7f-\x9f]/.test(value);
+    });
+  }
+
+  function demoRpc(fnName, params = {}) {
+    const store = loadDemoStore();
+    const cls = params.p_class;
+    if (cls && !CONFIG.CLASSES.includes(cls)) {
+      return { ok: false, code: 'INVALID_CLASS', message: '유효하지 않은 반입니다.' };
+    }
+    const clsData = cls ? store.classes[cls] : null;
+
+    if (fnName === 'invest_board') {
+      return buildDemoBoardPayload(clsData, true);
+    }
+
+    if (fnName === 'invest_feed') {
+      if (params.p_round && params.p_round !== clsData.round_id) {
+        return { ok: false, code: 'ROUND_CHANGED', message: '라운드가 변경되었습니다.' };
+      }
+      const limit = Math.min(8, Math.max(1, params.p_limit ?? 8));
+      const items = clsData.votes
+        .filter((v) => v.round_id === clsData.round_id && clsData.companies.some((c) => c.id === v.company_id))
+        .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+        .slice(0, limit)
+        .map((v) => ({ id: v.id, reason: v.reason, created_at: v.created_at }));
+      return { ok: true, round_id: clsData.round_id, items };
+    }
+
+    if (fnName === 'invest_submit') {
+      if (!params.p_device) return { ok: false, code: 'INVALID_DEVICE' };
+      if (params.p_round !== clsData.round_id) return { ok: false, code: 'ROUND_CHANGED' };
+
+      const existing = clsData.votes.find(
+        (v) => v.round_id === clsData.round_id && v.device_id === params.p_device
+      );
+      if (existing) {
+        const co = clsData.companies.find((c) => c.id === existing.company_id);
+        return {
+          ok: false,
+          code: 'ALREADY_VOTED',
+          round_id: clsData.round_id,
+          company_id: existing.company_id,
+          company_name: co ? co.name : '선택한 회사'
+        };
+      }
+
+      if (!clsData.is_open) return { ok: false, code: 'VOTING_CLOSED' };
+      const target = clsData.companies.find((c) => c.id === params.p_company);
+      if (!target) return { ok: false, code: 'INVALID_COMPANY' };
+
+      const cleanReason = sanitizeReason(params.p_reason) || '이유 없이 투자';
+      clsData.votes.push({
+        id: generateUuid(),
+        round_id: clsData.round_id,
+        company_id: target.id,
+        device_id: params.p_device,
+        reason: cleanReason,
+        amount: CONFIG.INVEST_AMOUNT,
+        created_at: new Date().toISOString()
+      });
+      saveDemoStore(store);
+      return {
+        ok: true,
+        round_id: clsData.round_id,
+        company_id: target.id,
+        company_name: target.name,
+        amount: CONFIG.INVEST_AMOUNT
+      };
+    }
+
+    // 관리자 RPC 공통 PIN 검증
+    if (fnName.startsWith('invest_admin_')) {
+      if (String(params.p_pin || '') !== CONFIG.DEMO_PIN) {
+        return { ok: false, code: 'INVALID_PIN', message: 'PIN이 올바르지 않습니다.' };
+      }
+    }
+
+    if (fnName === 'invest_admin_state') {
+      return buildDemoBoardPayload(clsData, false);
+    }
+
+    if (fnName === 'invest_admin_save_companies') {
+      const rows = Array.isArray(params.p_rows) ? params.p_rows : [];
+      if (rows.length === 0 || rows.length > 30) return { ok: false, code: 'INVALID_ROWS' };
+      const seen = new Set();
+      const nextCompanies = [];
+      for (let i = 0; i < rows.length; i++) {
+        const name = String(rows[i].name || '').trim();
+        const item = String(rows[i].item || '').trim();
+        const description = String(rows[i].description || '').trim();
+        if (!isValidCompanyRow({ name, item, description })) return { ok: false, code: 'INVALID_ROWS' };
+        const key = name;
+        if (seen.has(key)) return { ok: false, code: 'DUPLICATE_COMPANY_NAME' };
+        seen.add(key);
+        const existing = clsData.companies.find((c) => c.name === key);
+        nextCompanies.push({
+          id: existing ? existing.id : generateUuid(),
+          name,
+          item,
+          description,
+          sort: i + 1
+        });
+      }
+      clsData.companies = nextCompanies;
+      saveDemoStore(store);
+      return { ok: true, company_count: nextCompanies.length };
+    }
+
+    if (fnName === 'invest_admin_set_open') {
+      if (params.p_open && clsData.companies.length === 0) {
+        return { ok: false, code: 'NO_COMPANIES' };
+      }
+      clsData.is_open = Boolean(params.p_open);
+      saveDemoStore(store);
+      return { ok: true, round_id: clsData.round_id, is_open: clsData.is_open };
+    }
+
+    if (fnName === 'invest_admin_reset') {
+      if (params.p_round !== clsData.round_id) return { ok: false, code: 'ROUND_CHANGED' };
+      clsData.round_num = (clsData.round_num || 1) + 1;
+      clsData.round_id = `demo-round-${cls}-${clsData.round_num}`;
+      clsData.is_open = false;
+      saveDemoStore(store);
+      return { ok: true, round_id: clsData.round_id, is_open: false };
+    }
+
+    return { ok: false, code: 'UNKNOWN_RPC' };
+  }
+
+  function setDemoMode(enabled) {
+    state.isDemo = enabled;
+    document.getElementById('demo-badge').classList.toggle('hidden', !enabled);
+    document.getElementById('retry-live').classList.toggle('hidden', !enabled);
+  }
+
+  async function callRpc(fnName, params = {}, { liveOnly = false } = {}) {
+    if (state.isDemo && !liveOnly) return demoRpc(fnName, params);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), CONFIG.RPC_TIMEOUT_MS);
+    const canFallback = () => fnName === 'invest_board' && !liveOnly && !state.liveConfirmed;
+    const fallback = () => {
+      setDemoMode(true);
+      return demoRpc(fnName, params);
+    };
+
+    try {
+      const res = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
+        method: 'POST',
+        headers: {
+          apikey: CONFIG.SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(params),
+        signal: controller.signal
+      });
+      if (canFallback() && (res.status === 404 || res.status === 400)) return fallback();
+      const data = await res.json().catch(() => null);
+      if (!res.ok) return {
+        ok: false,
+        code: 'HTTP_ERROR',
+        message: (data && data.message) || '서버 요청을 처리하지 못했습니다.'
+      };
+      if (!data || typeof data.ok !== 'boolean') {
+        return { ok: false, code: 'INVALID_RESPONSE', message: '서버 응답 형식이 올바르지 않습니다.' };
+      }
+      if (state.isDemo && !liveOnly) {
+        return fnName === 'invest_board' ? demoRpc(fnName, params) : { ok: false, code: 'MODE_CHANGED' };
+      }
+      if (data.ok && (fnName === 'invest_board' || fnName === 'invest_admin_state')) {
+        state.liveConfirmed = true;
+      }
+      return data;
+    } catch (_) {
+      if (canFallback()) return fallback();
+      return { ok: false, code: 'NETWORK_ERROR', message: '네트워크 연결을 확인해 주세요.' };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  window.InvestApp = {
+    CONFIG,
+    state,
+    getDeviceId,
+    getLastClass,
+    setLastClass,
+    getVotedRecord,
+    setVotedRecord,
+    escapeHtml,
+    isValidCompanyRow,
+    sanitizeReason,
+    formatMoney,
+    formatRelativeTime,
+    prefersReducedMotion,
+    showToast,
+    animateCountUp,
+    launchConfetti,
+    setDemoMode,
+    callRpc
+  };
+})();
+</script>
+
+<script>
+(() => {
+  'use strict';
+
+  const app = window.InvestApp;
+  const {
+    CONFIG,
+    state,
+    getDeviceId,
+    setLastClass,
+    getVotedRecord,
+    setVotedRecord,
+    escapeHtml,
+    sanitizeReason,
+    formatMoney,
+    showToast,
+    animateCountUp,
+    launchConfetti,
+    callRpc
+  } = app;
+
+  let isSubmitting = false;
+  let studentReqToken = 0;
+  let overlayTimer = null;
+
+  const dom = {
+    tabs: {
+      student: document.getElementById('tab-student'),
+      board: document.getElementById('tab-board'),
+      admin: document.getElementById('tab-admin')
+    },
+    views: {
+      student: document.getElementById('view-student'),
+      board: document.getElementById('view-board'),
+      admin: document.getElementById('view-admin')
+    },
+    classTabs: document.getElementById('class-tabs'),
+    closedNotice: document.getElementById('student-closed-notice'),
+    votedCard: document.getElementById('voted-card'),
+    votedCompanyName: document.getElementById('voted-company-name'),
+    goBoardBtn: document.getElementById('go-board-btn'),
+    formArea: document.getElementById('student-form-area'),
+    companyList: document.getElementById('company-list'),
+    reasonInput: document.getElementById('reason'),
+    reasonCount: document.getElementById('reason-count'),
+    investBtn: document.getElementById('invest-btn'),
+    fundingOverlay: document.getElementById('funding-overlay'),
+    confettiCanvas: document.getElementById('confetti-canvas'),
+    fundingAmount: document.getElementById('funding-amount'),
+    fundingTarget: document.getElementById('funding-target')
+  };
+
+  function switchView(viewName, options = {}) {
+    const validViews = ['student', 'board', 'admin'];
+    const target = validViews.includes(viewName) ? viewName : 'student';
+    if (state.view !== target) {
+      ++studentReqToken;
+      clearTimeout(overlayTimer);
+      if (dom.fundingOverlay) dom.fundingOverlay.classList.add('hidden');
+    }
+    state.view = target;
+
+    validViews.forEach((v) => {
+      const tab = dom.tabs[v];
+      const sec = dom.views[v];
+      const active = v === target;
+      if (tab) tab.setAttribute('aria-pressed', String(active));
+      if (sec) sec.classList.toggle('hidden', !active);
+    });
+
+    if (!options.skipHash && window.location.hash !== `#${target}`) {
+      try {
+        window.history.replaceState(null, '', `#${target}`);
+      } catch (_) {
+        // 무시
+      }
+    }
+
+    if (typeof app.onViewChange === 'function') {
+      app.onViewChange(target, options);
+    }
+  }
+
+  function updateClassButtons(classCode) {
+    if (!dom.classTabs) return;
+    const buttons = dom.classTabs.querySelectorAll('.class-btn');
+    buttons.forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.class === classCode));
+    });
+  }
+
+  function updateInvestButtonState() {
+    if (!dom.investBtn) return;
+    const board = state.studentBoard;
+    const isOpen = !!(board && board.is_open);
+    const hasCompany = Boolean(state.selectedCompanyId);
+    dom.investBtn.disabled = isSubmitting || !isOpen || !hasCompany;
+    dom.investBtn.textContent = isSubmitting ? '투자 중…' : '💰 1억 원 투자하기';
+  }
+
+  function showVotedCard(companyName) {
+    if (dom.formArea) dom.formArea.classList.add('hidden');
+    if (dom.closedNotice) dom.closedNotice.classList.add('hidden');
+    if (dom.votedCompanyName) {
+      dom.votedCompanyName.textContent = `— ${companyName || '선택한 회사'}`;
+    }
+    if (dom.votedCard) dom.votedCard.classList.remove('hidden');
+  }
+
+  function renderCompanyCards(companies) {
+    if (!dom.companyList) return;
+    if (!Array.isArray(companies) || companies.length === 0) {
+      dom.companyList.innerHTML =
+        '<div class="empty-hint">아직 등록된 회사가 없습니다. 선생님이 회사를 등록하면 여기에 표시됩니다.</div>';
+      return;
+    }
+
+    const sorted = [...companies].sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    dom.companyList.innerHTML = sorted
+      .map((co) => {
+        const selected = state.selectedCompanyId === co.id;
+        return `
+          <button
+            type="button"
+            class="company-card"
+            data-company-id="${escapeHtml(co.id)}"
+            aria-pressed="${selected ? 'true' : 'false'}"
+          >
+            <div class="company-card-main">
+              <div class="company-name">${escapeHtml(co.name)}</div>
+              ${co.item ? `<div class="company-item">${escapeHtml(co.item)}</div>` : ''}
+              ${co.description ? `<p class="company-desc">${escapeHtml(co.description)}</p>` : ''}
+            </div>
+            <div class="company-meta">
+              <span class="company-amount">${escapeHtml(formatMoney(co.total || 0))}</span>
+              <span class="check-pill" aria-hidden="true">✓</span>
+            </div>
+          </button>
+        `;
+      })
+      .join('');
+  }
+
+  function renderStudentView() {
+    const board = state.studentBoard;
+    if (!board) {
+      if (dom.formArea) dom.formArea.classList.add('hidden');
+      if (dom.votedCard) dom.votedCard.classList.add('hidden');
+      if (dom.closedNotice) dom.closedNotice.classList.add('hidden');
+      return;
+    }
+
+    const voted = getVotedRecord(state.studentClass, board.round_id);
+    if (voted) {
+      showVotedCard(voted.company_name);
+      return;
+    }
+
+    if (dom.votedCard) dom.votedCard.classList.add('hidden');
+    if (dom.closedNotice) dom.closedNotice.classList.toggle('hidden', Boolean(board.is_open));
+    if (dom.formArea) dom.formArea.classList.remove('hidden');
+
+    renderCompanyCards(board.companies || []);
+    updateInvestButtonState();
+  }
+
+  async function loadStudentClass(classCode) {
+    if (!CONFIG.CLASSES.includes(classCode)) return;
+    const token = ++studentReqToken;
+    state.studentClass = classCode;
+    state.studentBoard = null;
+    state.selectedCompanyId = null;
+    setLastClass(classCode);
+    updateClassButtons(classCode);
+
+    if (dom.formArea) dom.formArea.classList.remove('hidden');
+    if (dom.votedCard) dom.votedCard.classList.add('hidden');
+    if (dom.closedNotice) dom.closedNotice.classList.add('hidden');
+    if (dom.companyList) {
+      dom.companyList.innerHTML = '<div class="empty-hint">회사 목록을 불러오는 중입니다…</div>';
+    }
+    updateInvestButtonState();
+
+    const res = await callRpc('invest_board', { p_class: classCode });
+    if (token !== studentReqToken || state.view !== 'student') return;
+
+    if (!res || !res.ok) {
+      state.studentBoard = null;
+      if (dom.companyList) {
+        dom.companyList.innerHTML = '<div class="empty-hint">목록을 불러오지 못했습니다. 다시 선택해 주세요.</div>';
+      }
+      showToast((res && res.message) || '회사 목록을 불러오지 못했습니다.');
+      return;
+    }
+
+    state.studentBoard = res;
+    renderStudentView();
+  }
+
+  function playFundingAnimation(companyName, targetClass) {
+    if (overlayTimer) clearTimeout(overlayTimer);
+
+    if (dom.fundingTarget) {
+      dom.fundingTarget.textContent = `${companyName}에 투자 완료!`;
+    }
+    if (dom.fundingAmount) {
+      dom.fundingAmount.textContent = '0원';
+    }
+    if (dom.fundingOverlay) {
+      dom.fundingOverlay.classList.remove('hidden');
+    }
+
+    animateCountUp(dom.fundingAmount, 0, CONFIG.INVEST_AMOUNT, 700, formatMoney);
+    launchConfetti(dom.confettiCanvas, 1450);
+
+    overlayTimer = setTimeout(() => {
+      if (dom.fundingOverlay) dom.fundingOverlay.classList.add('hidden');
+      state.boardClass = targetClass;
+      setLastClass(targetClass);
+      switchView('board', { forceRefresh: true });
+    }, 1600);
+  }
+
+  async function handleInvestSubmit() {
+    if (isSubmitting) return;
+    const board = state.studentBoard;
+    if (!board || !state.studentClass || !state.selectedCompanyId) return;
+
+    if (!board.is_open) {
+      if (dom.closedNotice) dom.closedNotice.classList.remove('hidden');
+      updateInvestButtonState();
+      showToast('현재 투자가 마감되었습니다.');
+      return;
+    }
+
+    const targetClass = state.studentClass;
+    const companyId = state.selectedCompanyId;
+    const token = studentReqToken;
+    const demo = state.isDemo;
+    isSubmitting = true;
+    updateInvestButtonState();
+    let deviceId;
+    try {
+      deviceId = navigator.locks
+        ? await navigator.locks.request('invest.deviceId', getDeviceId)
+        : getDeviceId();
+    } catch (_) {
+      deviceId = null;
+    }
+    if (token !== studentReqToken || state.view !== 'student' || state.isDemo !== demo) {
+      isSubmitting = false;
+      updateInvestButtonState();
+      return;
+    }
+    if (!deviceId) {
+      isSubmitting = false;
+      updateInvestButtonState();
+      showToast('기기 식별 정보를 저장할 수 없습니다. 브라우저 저장소 설정을 확인해 주세요.');
+      return;
+    }
+
+    const reasonText = sanitizeReason(dom.reasonInput ? dom.reasonInput.value : '');
+    const res = await callRpc('invest_submit', {
+      p_class: targetClass,
+      p_round: board.round_id,
+      p_company: companyId,
+      p_device: deviceId,
+      p_reason: reasonText
+    });
+
+    isSubmitting = false;
+    updateInvestButtonState();
+
+    const code = (res && res.code) || 'UNKNOWN';
+    const sameContext = () => token === studentReqToken && state.view === 'student' && state.isDemo === demo;
+    if (res && (res.ok || code === 'ALREADY_VOTED')) {
+      const votedName = res.company_name || '선택한 회사';
+      if (state.isDemo === demo && res.round_id === board.round_id) {
+        setVotedRecord(targetClass, res.round_id, res.company_id, votedName);
+      }
+      if (!sameContext()) return;
+      await loadStudentClass(targetClass);
+      if (state.view !== 'student' || state.studentClass !== targetClass ||
+          studentReqToken !== token + 1 || state.isDemo !== demo) return;
+      if (!state.studentBoard) {
+        showToast('투자 기록은 확인됐습니다. 회사 목록을 다시 불러와 주세요.');
+        return;
+      }
+      if (state.studentBoard.round_id !== res.round_id) {
+        showToast('새 라운드가 시작되었습니다.');
+        return;
+      }
+      if (dom.reasonInput) dom.reasonInput.value = '';
+      if (dom.reasonCount) dom.reasonCount.textContent = '0 / 60';
+      showVotedCard(votedName);
+      if (res.ok) playFundingAnimation(votedName, targetClass);
+      else showToast('이미 이번 라운드에 투자했습니다.');
+      return;
+    }
+
+    if (!sameContext()) return;
+    if (code === 'VOTING_CLOSED') {
+      if (state.studentBoard) state.studentBoard.is_open = false;
+      if (dom.closedNotice) dom.closedNotice.classList.remove('hidden');
+      showToast('현재 투표가 마감되었습니다.');
+      updateInvestButtonState();
+      return;
+    }
+
+    if (code === 'ROUND_CHANGED') {
+      state.selectedCompanyId = null;
+      showToast('새 라운드가 시작되어 목록을 다시 불러옵니다.');
+      await loadStudentClass(state.studentClass);
+      return;
+    }
+
+    if (code === 'INVALID_COMPANY') {
+      state.selectedCompanyId = null;
+      showToast('선택한 회사에 지금은 투자할 수 없습니다. 목록을 새로 불러옵니다.');
+      await loadStudentClass(state.studentClass);
+      return;
+    }
+
+    if (code === 'INVALID_DEVICE') {
+      showToast('기기 식별 정보를 확인할 수 없습니다. 새로고침 후 다시 시도해 주세요.');
+      updateInvestButtonState();
+      return;
+    }
+
+    showToast((res && res.message) || '투자 처리 중 문제가 발생했습니다. 다시 시도해 주세요.');
+    updateInvestButtonState();
+  }
+
+  function bindStudentEvents() {
+    Object.entries(dom.tabs).forEach(([viewKey, btn]) => {
+      if (!btn) return;
+      btn.addEventListener('click', () => switchView(viewKey));
+    });
+
+    if (dom.classTabs) {
+      dom.classTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.class-btn');
+        if (!btn || !btn.dataset.class) return;
+        loadStudentClass(btn.dataset.class);
+      });
+    }
+
+    if (dom.companyList) {
+      dom.companyList.addEventListener('click', (e) => {
+        const card = e.target.closest('.company-card');
+        if (!card || !card.dataset.companyId) return;
+        state.selectedCompanyId = card.dataset.companyId;
+        const cards = dom.companyList.querySelectorAll('.company-card');
+        cards.forEach((c) => {
+          c.setAttribute('aria-pressed', String(c.dataset.companyId === state.selectedCompanyId));
+        });
+        updateInvestButtonState();
+      });
+    }
+
+    if (dom.reasonInput) {
+      dom.reasonInput.addEventListener('input', () => {
+        if (dom.reasonInput.value.length > 60) {
+          dom.reasonInput.value = dom.reasonInput.value.slice(0, 60);
+        }
+        if (dom.reasonCount) {
+          dom.reasonCount.textContent = `${dom.reasonInput.value.length} / 60`;
+        }
+      });
+    }
+
+    if (dom.investBtn) {
+      dom.investBtn.addEventListener('click', handleInvestSubmit);
+    }
+
+    if (dom.goBoardBtn) {
+      dom.goBoardBtn.addEventListener('click', () => {
+        if (state.studentClass) {
+          state.boardClass = state.studentClass;
+          setLastClass(state.studentClass);
+        }
+        switchView('board', { forceRefresh: true });
+      });
+    }
+  }
+
+  app.switchView = switchView;
+  app.loadStudentClass = loadStudentClass;
+  app.initStudentView = bindStudentEvents;
+})();
+</script>
+
+<script>
+(() => {
+  'use strict';
+
+  const app = window.InvestApp;
+  const {
+    CONFIG,
+    state,
+    getLastClass,
+    setLastClass,
+    escapeHtml,
+    formatMoney,
+    formatRelativeTime,
+    isValidCompanyRow,
+    showToast,
+    animateCountUp,
+    callRpc,
+    switchView,
+    initStudentView
+  } = app;
+
+  let boardReqToken = 0;
+  let boardRequest = Promise.resolve();
+  let pollGeneration = 0;
+  let adminReqToken = 0;
+  let prevStats = { total: 0, votes: 0, companies: 0 };
+  let seenFeedIds = new Set();
+  let lastFeedClass = '';
+  let lastFeedRound = '';
+  let barsSignature = '';
+  let feedSignature = '';
+  let adminBusy = false;
+  let adminLoading = false;
+  let adminSession = 0;
+  const pinAttempts = new Map();
+
+  const dom = {
+    boardTitle: document.getElementById('board-title'),
+    boardRound: document.getElementById('board-round'),
+    boardStatusBadge: document.getElementById('board-status-badge'),
+    boardStatusText: document.getElementById('board-status-text'),
+    boardClassTabs: document.getElementById('board-class-tabs'),
+    statTotal: document.getElementById('stat-total'),
+    statVotes: document.getElementById('stat-votes'),
+    statCompanies: document.getElementById('stat-companies'),
+    boardBars: document.getElementById('board-bars'),
+    feed: document.getElementById('feed'),
+
+    adminLogin: document.getElementById('admin-login'),
+    adminPanel: document.getElementById('admin-panel'),
+    adminPin: document.getElementById('admin-pin'),
+    adminPinBtn: document.getElementById('admin-pin-btn'),
+    adminPinMsg: document.getElementById('admin-pin-msg'),
+    adminLogoutBtn: document.getElementById('admin-logout-btn'),
+    adminClassLabel: document.getElementById('admin-class-label'),
+    adminClassTabs: document.getElementById('admin-class-tabs'),
+    adminStatCompanies: document.getElementById('admin-stat-companies'),
+    adminStatVotes: document.getElementById('admin-stat-votes'),
+    adminStatTotal: document.getElementById('admin-stat-total'),
+    adminStatStatus: document.getElementById('admin-stat-status'),
+    adminToggleOpen: document.getElementById('admin-toggle-open'),
+    adminRefreshBtn: document.getElementById('admin-refresh-btn'),
+    adminCompaniesInput: document.getElementById('admin-companies-input'),
+    adminSaveCompanies: document.getElementById('admin-save-companies'),
+    adminSaveMsg: document.getElementById('admin-save-msg'),
+    adminResetConfirm: document.getElementById('admin-reset-confirm'),
+    adminResetBtn: document.getElementById('admin-reset-btn')
+  };
+
+  /* ---------- ① 현황판 뷰 ---------- */
+  function updateBoardClassButtons(classCode) {
+    if (!dom.boardClassTabs) return;
+    dom.boardClassTabs.querySelectorAll('.class-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.class === classCode));
+    });
+  }
+
+  function renderBoardHeader(board) {
+    if (dom.boardTitle) {
+      dom.boardTitle.textContent = `${state.boardClass}반 투자 현황`;
+    }
+    if (dom.boardRound) {
+      const shortRound = board && board.round_id ? String(board.round_id).slice(0, 6) : '------';
+      dom.boardRound.textContent = `라운드 ${shortRound}`;
+    }
+    if (dom.boardStatusBadge && dom.boardStatusText) {
+      const isOpen = Boolean(board && board.is_open);
+      dom.boardStatusBadge.classList.toggle('is-closed', !isOpen);
+      dom.boardStatusText.textContent = isOpen ? 'LIVE' : '투표 마감';
+    }
+  }
+
+  function renderBoardStats(board, resetAnim) {
+    const nextTotal = Number(board.total_amount) || 0;
+    const nextVotes = Number(board.vote_count) || 0;
+    const nextCompanies = Number(board.company_count) || 0;
+
+    const fromTotal = resetAnim ? 0 : prevStats.total;
+    const fromVotes = resetAnim ? 0 : prevStats.votes;
+    const fromCompanies = resetAnim ? 0 : prevStats.companies;
+
+    if (dom.statTotal) {
+      if (fromTotal !== nextTotal || resetAnim) {
+        animateCountUp(dom.statTotal, fromTotal, nextTotal, 650, formatMoney);
+      } else {
+        dom.statTotal.textContent = formatMoney(nextTotal);
+      }
+    }
+    if (dom.statVotes) {
+      if (fromVotes !== nextVotes || resetAnim) {
+        animateCountUp(dom.statVotes, fromVotes, nextVotes, 650, (v) => `${v}명`);
+      } else {
+        dom.statVotes.textContent = `${nextVotes}명`;
+      }
+    }
+    if (dom.statCompanies) {
+      if (fromCompanies !== nextCompanies || resetAnim) {
+        animateCountUp(dom.statCompanies, fromCompanies, nextCompanies, 500, (v) => `${v}팀`);
+      } else {
+        dom.statCompanies.textContent = `${nextCompanies}팀`;
+      }
+    }
+
+    prevStats = { total: nextTotal, votes: nextVotes, companies: nextCompanies };
+  }
+
+  function renderBoardBars(board, resetAnim) {
+    if (!dom.boardBars) return;
+    const companies = Array.isArray(board.companies) ? [...board.companies] : [];
+    companies.sort((a, b) => (Number(b.total) || 0) - (Number(a.total) || 0) || (a.sort || 0) - (b.sort || 0));
+    const signature = JSON.stringify([state.isDemo, state.boardClass, board.round_id,
+      companies.map(({ id, name, item, sort, total }) => [id, name, item, sort, total])]);
+    if (signature === barsSignature) return;
+    barsSignature = signature;
+    if (companies.length === 0) {
+      dom.boardBars.innerHTML = '<div class="empty-hint">등록된 회사가 없습니다.</div>';
+      state.prevTotals = {};
+      return;
+    }
+
+    const maxTotal = Math.max(0, ...companies.map((c) => Number(c.total) || 0));
+    const prevMap = resetAnim ? {} : state.prevTotals;
+    const nextMap = {};
+
+    dom.boardBars.innerHTML = companies
+      .map((co, idx) => {
+        const total = Number(co.total) || 0;
+        const prev = prevMap[co.id] != null ? prevMap[co.id] : 0;
+        const pct = maxTotal > 0 && total > 0 ? Math.max(4, Math.round((total / maxTotal) * 100)) : 0;
+        const prevPct = maxTotal > 0 && prev > 0 ? Math.max(4, Math.round((prev / maxTotal) * 100)) : 0;
+        const isLeader = maxTotal > 0 && total === maxTotal;
+        const changed = resetAnim || prev !== total;
+        const initWidth = changed ? prevPct : pct;
+
+        nextMap[co.id] = total;
+
+        return `
+          <div class="bar-row${isLeader ? ' is-leader' : ''}" data-company-id="${escapeHtml(co.id)}">
+            <div class="bar-head">
+              <div class="bar-name-wrap">
+                <span class="rank-num">${isLeader ? '👑' : `${idx + 1}위`}</span>
+                <span class="bar-company">${escapeHtml(co.name)}</span>
+                ${co.item ? `<span class="bar-item">· ${escapeHtml(co.item)}</span>` : ''}
+                ${isLeader ? '<span class="leader-badge">현재 1위</span>' : ''}
+              </div>
+              <div class="bar-amount" data-amount-id="${escapeHtml(co.id)}">${escapeHtml(formatMoney(changed ? prev : total))}</div>
+            </div>
+            <div class="bar-track" aria-hidden="true">
+              <div class="bar-fill" data-fill-id="${escapeHtml(co.id)}" data-target-pct="${pct}" style="width: ${initWidth}%;"></div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    requestAnimationFrame(() => {
+      if (barsSignature !== signature) return;
+      companies.forEach((co) => {
+        const total = Number(co.total) || 0;
+        const prev = prevMap[co.id] != null ? prevMap[co.id] : 0;
+        const changed = resetAnim || prev !== total;
+        if (!changed) return;
+
+        const fillEl = dom.boardBars.querySelector(`[data-fill-id="${CSS.escape(String(co.id))}"]`);
+        const amtEl = dom.boardBars.querySelector(`[data-amount-id="${CSS.escape(String(co.id))}"]`);
+        if (fillEl) {
+          fillEl.style.width = `${fillEl.dataset.targetPct || 0}%`;
+        }
+        if (amtEl) {
+          animateCountUp(amtEl, prev, total, 650, formatMoney);
+        }
+      });
+    });
+
+    state.prevTotals = nextMap;
+  }
+
+  function renderBoardFeed(items, classCode, roundId) {
+    if (!dom.feed) return;
+    const isContextChanged = lastFeedClass !== classCode || lastFeedRound !== roundId;
+    if (isContextChanged) {
+      seenFeedIds = new Set();
+      lastFeedClass = classCode;
+      lastFeedRound = roundId;
+      feedSignature = '';
+    }
+
+    const entries = Array.isArray(items) ? items : [];
+    const signature = JSON.stringify(entries.map(({ id, reason, created_at }) => [id, reason, created_at]));
+    if (signature === feedSignature) {
+      dom.feed.querySelectorAll('.feed-meta').forEach((meta, index) => {
+        const label = `익명 투자자 · ${formatRelativeTime(entries[index].created_at)}`;
+        if (meta.textContent !== label) meta.textContent = label;
+      });
+      return;
+    }
+    feedSignature = signature;
+    if (entries.length === 0) {
+      dom.feed.innerHTML = '<div class="empty-hint">아직 등록된 투자 이유가 없습니다.</div>';
+      return;
+    }
+
+    const firstRender = seenFeedIds.size === 0;
+    dom.feed.innerHTML = items
+      .map((item) => {
+        const id = String(item.id || `${item.created_at}-${item.reason}`);
+        const isNew = !firstRender && !seenFeedIds.has(id);
+        const text = (item.reason && String(item.reason).trim()) || '이유 없이 투자';
+        const relTime = formatRelativeTime(item.created_at);
+        return `
+          <div class="feed-item"${isNew ? '' : ' style="animation: none;"'}>
+            <div class="feed-meta">익명 투자자 · ${escapeHtml(relTime)}</div>
+            <p class="feed-text">${escapeHtml(text)}</p>
+          </div>
+        `;
+      })
+      .join('');
+
+    items.forEach((item) => {
+      const id = String(item.id || `${item.created_at}-${item.reason}`);
+      seenFeedIds.add(id);
+    });
+  }
+
+  function refreshBoard(options = {}) {
+    const cls = state.boardClass;
+    const token = ++boardReqToken;
+    boardRequest = boardRequest.then(() => {
+      if (token === boardReqToken && state.view === 'board') return fetchBoard(cls, token, options);
+    });
+    return boardRequest;
+  }
+
+  async function fetchBoard(cls, myToken, options) {
+    const source = state.isDemo;
+    const resetAnim = Boolean(options.resetAnim);
+
+    updateBoardClassButtons(cls);
+
+    const boardRes = await callRpc('invest_board', { p_class: cls });
+    if (myToken !== boardReqToken || state.boardClass !== cls || state.view !== 'board' || (source && !state.isDemo)) return;
+
+    if (!boardRes || !boardRes.ok) {
+      showToast((boardRes && boardRes.message) || '현황판 데이터를 불러오지 못했습니다.');
+      return;
+    }
+
+    const roundChanged = Boolean(state.boardData && state.boardData.round_id !== boardRes.round_id);
+    if (roundChanged || lastFeedClass !== cls) {
+      state.boardFeed = [];
+      renderBoardFeed([], cls, boardRes.round_id);
+    }
+    state.boardData = boardRes;
+
+    renderBoardHeader(boardRes);
+    renderBoardStats(boardRes, resetAnim || roundChanged);
+    renderBoardBars(boardRes, resetAnim || roundChanged);
+
+    const feedRes = await callRpc('invest_feed', {
+      p_class: cls,
+      p_round: boardRes.round_id,
+      p_limit: 8
+    });
+    if (myToken !== boardReqToken || state.boardClass !== cls || state.view !== 'board' || (source && !state.isDemo)) return;
+
+    if (feedRes && feedRes.ok && feedRes.round_id === boardRes.round_id) {
+      state.boardFeed = feedRes.items || [];
+      renderBoardFeed(state.boardFeed, cls, boardRes.round_id);
+    } else if (feedRes && feedRes.code === 'ROUND_CHANGED') {
+      if (!options.roundRetry) refreshBoard({ resetAnim: true, roundRetry: true });
+    }
+  }
+
+  /* ---------- ② 현황판 폴링 ---------- */
+  function stopBoardPolling() {
+    ++pollGeneration;
+    if (state.pollTimer) {
+      clearTimeout(state.pollTimer);
+      state.pollTimer = null;
+    }
+  }
+
+  function scheduleBoardPolling() {
+    stopBoardPolling();
+    if (state.view !== 'board') return;
+    const delay = document.hidden ? CONFIG.POLL_BACKGROUND_MS : CONFIG.POLL_FOREGROUND_MS;
+    const generation = pollGeneration;
+    state.pollTimer = setTimeout(async () => {
+      if (state.view !== 'board') return;
+      await refreshBoard({ resetAnim: false });
+      if (generation === pollGeneration) scheduleBoardPolling();
+    }, delay);
+  }
+
+  /* ---------- ③ 교사 관리 뷰 ---------- */
+  function setAdminPinMessage(msg, isOk = false) {
+    if (!dom.adminPinMsg) return;
+    dom.adminPinMsg.textContent = msg || '';
+    dom.adminPinMsg.classList.toggle('ok', Boolean(isOk));
+  }
+
+  function setAdminSaveMessage(msg, isOk = true) {
+    if (!dom.adminSaveMsg) return;
+    dom.adminSaveMsg.textContent = msg || '';
+    dom.adminSaveMsg.classList.toggle('ok', Boolean(isOk));
+  }
+
+  function updateAdminClassButtons(classCode) {
+    if (!dom.adminClassTabs) return;
+    dom.adminClassTabs.querySelectorAll('.class-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.class === classCode));
+    });
+  }
+
+  function updateResetButtonState() {
+    if (!dom.adminResetBtn || !dom.adminResetConfirm) return;
+    const ok = dom.adminResetConfirm.value.trim() === '초기화';
+    dom.adminResetBtn.disabled = adminBusy || !ok;
+  }
+
+  function lockAdminView(msg = '') {
+    ++adminReqToken;
+    ++adminSession;
+    state.adminUnlocked = false;
+    state.adminPin = '';
+    state.adminState = null;
+    if (dom.adminPanel) dom.adminPanel.classList.add('hidden');
+    if (dom.adminLogin) dom.adminLogin.classList.remove('hidden');
+    if (dom.adminPin) dom.adminPin.value = '';
+    if (dom.adminResetConfirm) dom.adminResetConfirm.value = '';
+    updateResetButtonState();
+    setAdminPinMessage(msg, false);
+  }
+
+  function renderAdminDashboard(data) {
+    if (!data) return;
+    state.adminState = data;
+    updateAdminClassButtons(state.adminClass);
+
+    if (dom.adminClassLabel) dom.adminClassLabel.textContent = `${state.adminClass}반 관리`;
+    if (dom.adminStatCompanies) dom.adminStatCompanies.textContent = `${data.company_count || 0}팀`;
+    if (dom.adminStatVotes) dom.adminStatVotes.textContent = `${data.vote_count || 0}명`;
+    if (dom.adminStatTotal) dom.adminStatTotal.textContent = formatMoney(data.total_amount || 0);
+    if (dom.adminStatStatus) dom.adminStatStatus.textContent = data.is_open ? '진행 중' : '마감됨';
+
+    if (dom.adminToggleOpen) {
+      dom.adminToggleOpen.textContent = data.is_open ? '투표 마감하기' : '투표 열기';
+    }
+
+    if (dom.adminCompaniesInput) {
+      const companies = Array.isArray(data.companies) ? [...data.companies] : [];
+      companies.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+      dom.adminCompaniesInput.value = companies
+        .map((c) => [c.name || '', c.item || '', c.description || ''].join(' | '))
+        .join('\n');
+    }
+
+    updateResetButtonState();
+  }
+
+  function handleAdminAuthError(res, cls) {
+    const code = (res && res.code) || '';
+    if (code !== 'PIN_LOCKED' && code !== 'INVALID_PIN') return false;
+    const previous = pinAttempts.get(cls);
+    let attempts = previous && (!previous.until || previous.until > Date.now()) ? previous.count : 0;
+    let until = 0;
+    let message;
+    if (code === 'PIN_LOCKED' || (state.isDemo && attempts >= 4)) {
+      const sec = code === 'PIN_LOCKED' ? Number(res.retry_after_seconds) || 60 : 60;
+      until = Date.now() + sec * 1000;
+      attempts = 5;
+      message = `${cls}반 PIN 5회 실패 · 잠금 해제까지 ${sec}초`;
+    } else {
+      attempts += 1;
+      message = `${cls}반 PIN이 올바르지 않습니다. (이 화면에서 ${attempts}회 실패)`;
+    }
+    pinAttempts.set(cls, { count: attempts, until });
+    if (state.adminUnlocked) {
+      state.adminClass = cls;
+      lockAdminView(message);
+    } else {
+      setAdminPinMessage(message);
+    }
+    return true;
+  }
+
+  async function loadAdminState(classCode, pinOverride) {
+    const cls = classCode || state.adminClass;
+    const pin = pinOverride != null ? pinOverride : state.adminPin;
+    const myToken = ++adminReqToken;
+    adminLoading = true;
+    const res = await callRpc('invest_admin_state', { p_class: cls, p_pin: pin });
+    if (myToken === adminReqToken || !state.adminUnlocked) adminLoading = false;
+    if (myToken !== adminReqToken || state.view !== 'admin') return null;
+
+    if (!res || !res.ok) {
+      if (!handleAdminAuthError(res, cls)) {
+        showToast((res && res.message) || '관리 상태를 불러오지 못했습니다.');
+      }
+      return null;
+    }
+
+    pinAttempts.delete(cls);
+    if (state.adminClass !== cls && dom.adminResetConfirm) dom.adminResetConfirm.value = '';
+    state.adminClass = cls;
+    renderAdminDashboard(res);
+    return res;
+  }
+
+  async function handleAdminLogin() {
+    if (adminBusy) return;
+    const now = Date.now();
+    const lockUntil = pinAttempts.get(state.adminClass)?.until || 0;
+    if (lockUntil > now) {
+      const remain = Math.ceil((lockUntil - now) / 1000);
+      setAdminPinMessage(`잠금 상태입니다. ${remain}초 후 다시 시도해 주세요.`);
+      return;
+    }
+
+    const pin = dom.adminPin ? dom.adminPin.value.trim() : '';
+    if (!/^\d{4}$/.test(pin)) {
+      setAdminPinMessage('숫자 4자리 PIN을 입력해 주세요.');
+      return;
+    }
+
+    adminBusy = true;
+    if (dom.adminPinBtn) dom.adminPinBtn.disabled = true;
+    setAdminPinMessage('확인 중…', true);
+
+    const res = await loadAdminState(state.adminClass, pin);
+
+    adminBusy = false;
+    if (dom.adminPinBtn) dom.adminPinBtn.disabled = false;
+
+    if (!res || state.view !== 'admin') return;
+
+    state.adminPin = pin;
+    state.adminUnlocked = true;
+    if (dom.adminPin) dom.adminPin.value = '';
+    setAdminPinMessage('');
+    setAdminSaveMessage('');
+    if (dom.adminLogin) dom.adminLogin.classList.add('hidden');
+    if (dom.adminPanel) dom.adminPanel.classList.remove('hidden');
+
+    if (pin === '2026') {
+      showToast('초기 PIN 사용 중 — 수업 후 변경 권장', 4000);
+    }
+  }
+
+  function parseCompaniesText(rawText) {
+    const lines = String(rawText || '').split(/\r?\n/);
+    const rows = [];
+    const seen = new Set();
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      const parts = line.split('|').map((s) => s.trim());
+      if (parts.length < 3) {
+        return {
+          ok: false,
+          error: `${i + 1}번째 줄 형식 오류: "회사명 | 아이템명 | 한 줄 소개" 형식으로 입력해 주세요.`
+        };
+      }
+      const name = parts[0];
+      const item = parts[1] || '';
+      const description = parts.slice(2).join(' | ').trim();
+      if (!isValidCompanyRow({ name, item, description })) {
+        return {
+          ok: false,
+          error: `${i + 1}번째 줄: 이름·아이템·소개를 모두 입력하고 각각 80·100·240자 이내로 작성해 주세요.`
+        };
+      }
+      const key = name;
+      if (seen.has(key)) {
+        return { ok: false, error: `중복된 회사명이 있습니다: "${name}"` };
+      }
+      seen.add(key);
+      rows.push({ name, item, description });
+      if (rows.length > 30) return { ok: false, error: '회사는 최대 30개까지 등록할 수 있습니다.' };
+    }
+
+    if (rows.length === 0) {
+      return { ok: false, error: '등록할 회사를 1개 이상 입력해 주세요.' };
+    }
+    return { ok: true, rows };
+  }
+
+  async function handleAdminSaveCompanies() {
+    if (adminBusy || adminLoading || !state.adminUnlocked) return;
+    const parsed = parseCompaniesText(dom.adminCompaniesInput ? dom.adminCompaniesInput.value : '');
+    if (!parsed.ok) {
+      setAdminSaveMessage(parsed.error, false);
+      return;
+    }
+
+    adminBusy = true;
+    if (dom.adminSaveCompanies) dom.adminSaveCompanies.disabled = true;
+    setAdminSaveMessage('저장 중…', true);
+
+    const session = adminSession;
+    const res = await callRpc('invest_admin_save_companies', {
+      p_class: state.adminClass,
+      p_pin: state.adminPin,
+      p_rows: parsed.rows
+    });
+
+    adminBusy = false;
+    if (dom.adminSaveCompanies) dom.adminSaveCompanies.disabled = false;
+
+    if (session !== adminSession) return;
+    if (!res || !res.ok) {
+      if (handleAdminAuthError(res, state.adminClass)) return;
+      const code = (res && res.code) || '';
+      if (code === 'DUPLICATE_COMPANY_NAME') {
+        setAdminSaveMessage('중복된 회사명이 포함되어 저장할 수 없습니다.', false);
+      } else if (code === 'INVALID_ROWS') {
+        setAdminSaveMessage('회사 목록 형식이 올바르지 않습니다.', false);
+      } else {
+        setAdminSaveMessage((res && res.message) || '저장에 실패했습니다.', false);
+      }
+      return;
+    }
+
+    setAdminSaveMessage(`${res.company_count || parsed.rows.length}개 회사를 저장했습니다.`, true);
+    showToast(`${state.adminClass}반 회사 목록이 저장되었습니다.`);
+    await loadAdminState(state.adminClass);
+  }
+
+  async function handleAdminToggleOpen() {
+    if (adminBusy || adminLoading || !state.adminUnlocked || !state.adminState) return;
+    const nextOpen = !state.adminState.is_open;
+
+    adminBusy = true;
+    if (dom.adminToggleOpen) dom.adminToggleOpen.disabled = true;
+
+    const session = adminSession;
+    const res = await callRpc('invest_admin_set_open', {
+      p_class: state.adminClass,
+      p_pin: state.adminPin,
+      p_open: nextOpen
+    });
+
+    adminBusy = false;
+    if (dom.adminToggleOpen) dom.adminToggleOpen.disabled = false;
+
+    if (session !== adminSession) return;
+    if (!res || !res.ok) {
+      if (handleAdminAuthError(res, state.adminClass)) return;
+      if (res && res.code === 'NO_COMPANIES') {
+        showToast('등록된 회사가 없어 투표를 열 수 없습니다.');
+      } else {
+        showToast((res && res.message) || '투표 상태 변경에 실패했습니다.');
+      }
+      return;
+    }
+
+    showToast(nextOpen ? `${state.adminClass}반 투표를 열었습니다.` : `${state.adminClass}반 투표를 마감했습니다.`);
+    await loadAdminState(state.adminClass);
+  }
+
+  async function handleAdminReset() {
+    if (adminBusy || adminLoading || !state.adminUnlocked || !state.adminState) return;
+    if (!dom.adminResetConfirm || dom.adminResetConfirm.value.trim() !== '초기화') return;
+
+    adminBusy = true;
+    updateResetButtonState();
+
+    const session = adminSession;
+    const res = await callRpc('invest_admin_reset', {
+      p_class: state.adminClass,
+      p_pin: state.adminPin,
+      p_round: state.adminState.round_id
+    });
+
+    adminBusy = false;
+    if (session !== adminSession) return;
+    if (dom.adminResetConfirm) dom.adminResetConfirm.value = '';
+    updateResetButtonState();
+    if (!res || !res.ok) {
+      if (handleAdminAuthError(res, state.adminClass)) return;
+      if (res && res.code === 'ROUND_CHANGED') {
+        showToast('라운드가 변경되었습니다. 현재 상태를 확인한 후 다시 초기화해 주세요.');
+        await loadAdminState(state.adminClass);
+      } else {
+        showToast((res && res.message) || '초기화에 실패했습니다.');
+      }
+      return;
+    }
+
+    showToast(`${state.adminClass}반 새 라운드로 초기화되었습니다. (투표 마감 상태)`);
+    await loadAdminState(state.adminClass);
+  }
+
+  /* ---------- ④ 이벤트 바인딩 & 초기화/라우팅 ---------- */
+  function bindBoardAndAdminEvents() {
+    document.getElementById('retry-live').addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      const cls = (state.view === 'admin' ? state.adminClass :
+        state.view === 'board' ? state.boardClass : state.studentClass) || getLastClass();
+      const res = await callRpc('invest_board', { p_class: cls }, { liveOnly: true });
+      button.disabled = false;
+      if (!res.ok) {
+        showToast('실서버에 연결하지 못했습니다. 다시 시도해 주세요.');
+        return;
+      }
+      app.setDemoMode(false);
+      pinAttempts.clear();
+      lockAdminView();
+      state.boardData = null;
+      state.boardFeed = [];
+      state.prevTotals = {};
+      if (state.view === 'student' && state.studentClass) app.loadStudentClass(state.studentClass);
+      if (state.view === 'board') {
+        renderBoardFeed([], state.boardClass, '');
+        refreshBoard({ resetAnim: true });
+      }
+      showToast('실서버에 연결되었습니다.');
+    });
+
+    if (dom.boardClassTabs) {
+      dom.boardClassTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.class-btn');
+        if (!btn || !btn.dataset.class) return;
+        state.boardClass = btn.dataset.class;
+        setLastClass(state.boardClass);
+        state.prevTotals = {};
+        refreshBoard({ resetAnim: true });
+        scheduleBoardPolling();
+      });
+    }
+
+    if (dom.adminPinBtn) {
+      dom.adminPinBtn.addEventListener('click', handleAdminLogin);
+    }
+    if (dom.adminPin) {
+      dom.adminPin.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleAdminLogin();
+      });
+    }
+    if (dom.adminLogoutBtn) {
+      dom.adminLogoutBtn.addEventListener('click', () => {
+        lockAdminView('잠금 처리되었습니다.');
+      });
+    }
+    if (dom.adminClassTabs) {
+      dom.adminClassTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.class-btn');
+        if (!btn || !btn.dataset.class || adminBusy || adminLoading || !state.adminUnlocked) return;
+        setAdminSaveMessage('');
+        loadAdminState(btn.dataset.class);
+      });
+    }
+    if (dom.adminToggleOpen) {
+      dom.adminToggleOpen.addEventListener('click', handleAdminToggleOpen);
+    }
+    if (dom.adminRefreshBtn) {
+      dom.adminRefreshBtn.addEventListener('click', () => {
+        if (state.adminUnlocked && !adminBusy && !adminLoading) {
+          setAdminSaveMessage('');
+          loadAdminState(state.adminClass);
+        }
+      });
+    }
+    if (dom.adminSaveCompanies) {
+      dom.adminSaveCompanies.addEventListener('click', handleAdminSaveCompanies);
+    }
+    if (dom.adminResetConfirm) {
+      dom.adminResetConfirm.addEventListener('input', updateResetButtonState);
+    }
+    if (dom.adminResetBtn) {
+      dom.adminResetBtn.addEventListener('click', handleAdminReset);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (state.view === 'board') {
+        if (!document.hidden) {
+          refreshBoard({ resetAnim: false });
+        }
+        scheduleBoardPolling();
+      }
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (['student', 'board', 'admin'].includes(hash) && hash !== state.view) {
+        switchView(hash, { skipHash: true });
+      }
+    });
+  }
+
+  app.onViewChange = (targetView, options = {}) => {
+    if (targetView === 'board') {
+      if (!CONFIG.CLASSES.includes(state.boardClass)) {
+        state.boardClass = getLastClass();
+      }
+      refreshBoard({ resetAnim: Boolean(options.forceRefresh) || !state.boardData });
+      scheduleBoardPolling();
+    } else {
+      ++boardReqToken;
+      stopBoardPolling();
+    }
+
+    if (targetView !== 'admin') lockAdminView();
+    if (targetView === 'student' && state.studentClass) app.loadStudentClass(state.studentClass);
+  };
+
+  function resolveInitialView() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('board') === '1') return 'board';
+    const hash = window.location.hash.replace('#', '');
+    if (['student', 'board', 'admin'].includes(hash)) return hash;
+    return 'student';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const lastClass = getLastClass();
+    state.boardClass = lastClass;
+    state.adminClass = lastClass;
+
+    initStudentView();
+    bindBoardAndAdminEvents();
+    updateResetButtonState();
+
+    const initialView = resolveInitialView();
+    switchView(initialView, { skipHash: true, forceRefresh: initialView === 'board' });
+  });
+})();
+</script>
+</body>
+</html>
