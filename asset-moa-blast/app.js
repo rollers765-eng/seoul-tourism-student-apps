@@ -16,6 +16,86 @@
   const board = window.BlastBoard;
   const DEF = { nickname: '', bestCombo: 0, gems: 30, stars: {}, best: 0, wrong: [], last: { corner: 'inv', stage: 1 }, scores: [], music: true, queue: [], recent: [], lastQid: null };
   let SAVE = load();
+  let scope = 'third';
+  const FINAL_CHALLENGE = new Set('i05 i09 i10 j27 f05 f06 f07 f08 f09 f10 f11 f12 f13 f17 j30'.split(' '));
+  const DIFFICULTY = {
+    easy: { help: .28, pressure: -.18, points: 150 },
+    normal: { help: 0, pressure: 0, points: 300 },
+    challenge: { help: -.12, pressure: .18, points: 450 }
+  };
+  const TERMS = {
+    '자본적 지출': '가치를 높이는 지출',
+    '건설중인자산': '아직 짓는 중인 건물',
+    '투자부동산': '임대해서 돈 버는 건물',
+    '장부금액': '지금 장부에 적힌 값'
+  };
+
+  const voiceFiles = {
+    '분개하기!': 'line.mp3',
+    '분개 완료!': 'clear.mp3',
+    '다시 분개해 보자!': 'retry.mp3'
+  };
+  const voiceCooldown = new Map();
+  let activeVoice = null;
+  let voiceQueue = [];
+  document.addEventListener('pointerdown', () => window.speechSynthesis?.getVoices(), { once: true });
+
+  function speak(text) {
+    if (SAVE.voice === false) return;
+    const now = performance.now();
+    if (now - (voiceCooldown.get(text) ?? -Infinity) < 1200 ||
+        activeVoice?.text === text || voiceQueue.includes(text)) return;
+    voiceCooldown.set(text, now);
+    voiceQueue.push(text);
+    playVoice();
+  }
+
+  function playVoice() {
+    if (activeVoice || !voiceQueue.length || SAVE.voice === false) return;
+    const text = voiceQueue.shift();
+    const playback = { text, audio: null };
+    activeVoice = playback;
+    const finish = () => {
+      if (activeVoice !== playback) return;
+      activeVoice = null;
+      playVoice();
+    };
+    const fallback = () => {
+      if (activeVoice !== playback || playback.fallback) return;
+      playback.fallback = true;
+      try {
+        const engine = window.speechSynthesis;
+        const voices = engine?.getVoices().filter(v => /^ko(?:[-_]|$)/i.test(v.lang)) || [];
+        const voice = voices.find(v => v.localService === false) ||
+          voices.find(v => /yuna|sora/i.test(v.name)) || voices.find(v => v.default) || voices[0];
+        if (!voice || typeof SpeechSynthesisUtterance !== 'function') { finish(); return; }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        utterance.voice = voice;
+        utterance.pitch = 1.35;
+        utterance.rate = 1.05;
+        utterance.onend = utterance.onerror = finish;
+        engine.speak(utterance);
+      } catch { finish(); }
+    };
+    try {
+      const audio = new Audio('audio/' + voiceFiles[text]);
+      playback.audio = audio;
+      audio.volume = .75;
+      audio.onended = finish;
+      audio.onerror = fallback;
+      audio.play().catch(fallback);
+    } catch { fallback(); }
+  }
+
+  function stopVoice() {
+    voiceQueue = [];
+    const previous = activeVoice;
+    activeVoice = null;
+    previous?.audio?.pause();
+    window.speechSynthesis?.cancel();
+  }
+
   function load() {
     try {
       const raw = JSON.parse(localStorage.getItem(KEY) || '{}');
@@ -44,7 +124,10 @@
     if (!validNickname(SAVE.nickname)) return;
     invalidateBoardMetrics();
     $$('.screen').forEach((s) => s.classList.toggle('active', s.id === id));
-    if (id === 'screen-play') fitPlayLabels();
+    if (id === 'screen-play') {
+      scope = P.st.scope;
+      fitPlayLabels();
+    }
     window.scrollTo(0, 0);
     board?.activate(id, renderBoards);
   }
@@ -186,25 +269,34 @@
     return pool.filter((sp) => placements({ cells: sp.c }, P.grid, P.obst, side).length);
   }
 
-  function preferredShape(pool, side, chance = 0.4) {
-    const occupied = P.grid.reduce((count, cell) => count + (cell ? 1 : 0), 0);
-    if (occupied >= 4 && occupied + P.obst.size <= 42 && Math.random() < chance) {
-      const gaps = [];
-      for (let line = 0; line < N; line++) {
-        for (const axis of ['row', 'col']) {
-          const cells = Array.from({ length: N }, (_, i) => axis === 'row' ? idx(line, i) : idx(i, line));
-          if (cells.some((i) => P.obst.has(i))) continue;
-          const missing = cells.filter((i) => !P.grid[i]);
-          if (missing.length > 0 && missing.length <= 9) gaps.push(missing);
-        }
-      }
-      const matching = pool.filter((sp) => placements({ cells: sp.c }, P.grid, P.obst, side).some(([r, c]) => {
-        const filled = new Set(sp.c.map(([dr, dc]) => idx(r + dr, c + dc)));
-        return gaps.some((missing) => missing.every((i) => filled.has(i)));
-      }));
-      if (matching.length) return shapeWeighted(matching);
-    }
-    return shapeWeighted(pool);
+  function difficultyProfile(stageNo, level) {
+    const setting = DIFFICULTY[level] ?? DIFFICULTY.normal;
+    const ramp = Math.min(1, Math.max(0, (stageNo - 4) / 36));
+    if (stageNo <= 3) return { fit: .9, near: 0, points: 0 };
+    return { fit: Math.max(.03, Math.min(.9, .58 - .5 * ramp + setting.help)),
+      near: Math.max(0, Math.min(.85, .22 + .5 * ramp + setting.pressure)),
+      points: setting.points };
+  }
+
+  function preferredShape(pool, side) {
+    const { fit, near } = P.profile;
+    const progress = P.targetScore ? playScore() / P.targetScore :
+      P.st.mode === 'hard' ? (closestAmountLine()?.sum || 0) / P.goal : 0;
+    const tight = progress >= .85 && progress <= .92;
+    const roll = Math.random();
+    const favorFit = roll < (tight ? fit / 2 : fit);
+    if (!favorFit && roll >= Math.min(1, fit + near + (tight ? .14 : 0))) return shapeWeighted(pool);
+    const gaps = amountLines().map(({ cells }) => cells)
+      .filter(cells => !cells.some(i => P.obst.has(i)))
+      .map(cells => cells.filter(i => !P.grid[i]))
+      .filter(cells => cells.length >= 1 && cells.length <= 5);
+    if (!gaps.length) return shapeWeighted(pool);
+    const candidates = pool.filter(sp => placements({ cells: sp.c }, P.grid, P.obst, side).some(([r, c]) => {
+      const filled = new Set(sp.c.map(([dr, dc]) => idx(r + dr, c + dc)));
+      return gaps.some(missing => missing.length >= (favorFit ? 1 : 2) &&
+        missing.filter(i => !filled.has(i)).length === (favorFit ? 0 : 1));
+    }));
+    return shapeWeighted(candidates.length ? candidates : pool);
   }
 
   function amountLines() {
@@ -273,7 +365,7 @@
       if (numeric) return numeric;
     }
     const accounts = new Set(held.filter((pc) => !pc.pure).map((pc) => pc.key));
-    const open = P.mission.filter((m) => !m.filled && !accounts.has(m.account));
+    const open = P.st.mode === 'pick' ? [] : P.mission.filter((m) => !m.filled && !accounts.has(m.account));
     if (open.length && (!accounts.size || Math.random() < ACCOUNT_RATE)) {
       for (const entry of shuffle(open)) {
         const shapes = playableShapes(ACCOUNT_SHAPES, entry.side);
@@ -287,8 +379,8 @@
     const available = playableShapes(SHAPES, 'any');
     const colors = PURE_CATS.filter((cat) => !held.some((pc) => pc.cat === cat));
     const speed = P.st.mode === 'pure';
-    const opening = speed && P.placed === 0 && held.length < 2 && available.find((sp) => sp.n === '2가로');
-    const selected = opening || (available.length ? preferredShape(available, 'any', speed ? 0.65 : 0.4) : SINGLE);
+    const opening = speed && P.stageNo <= 3 && P.placed === 0 && held.length < 2 && available.find((sp) => sp.n === '2가로');
+    const selected = opening || (available.length ? preferredShape(available, 'any') : SINGLE);
     return makePiece(selected, null, null, pickOne(colors.length ? colors : PURE_CATS));
   }
 
@@ -508,6 +600,18 @@
 
   function renderMission() {
     const st = P.st;
+    const conditions = $('#missionConditions');
+    conditions.replaceChildren(...(st.mode === 'pure' ? [] : (st.conditions || []).map(text => {
+      const item = document.createElement('li');
+      item.textContent = text;
+      return item;
+    })));
+    conditions.hidden = !conditions.children.length;
+    const vocabulary = $('#missionTerms');
+    const context = [st.prompt, st.tag, ...(st.conditions || []), ...st.entries.map(e => e.account)].join(' ');
+    vocabulary.textContent = st.mode === 'pure' ? '' : Object.entries(TERMS)
+      .filter(([term]) => context.includes(term)).map(([term, meaning]) => term + ' = ' + meaning).join(' · ');
+    vocabulary.hidden = !vocabulary.textContent;
     if (specialMode(st)) {
       $('#playStageLabel').textContent = cornerName(P.cornerKey) + ' ' + P.stageNo + '단계';
       $('#playScore').textContent = won(playScore());
@@ -527,6 +631,7 @@
       return;
     }
     missionTextEl.textContent = st.prompt;
+    $('#missionGoal').textContent = P.targetScore ? '🎯 ' + won(playScore()) + ' / ' + won(P.targetScore) + '점' : '🎯 한 줄 터뜨리면 +300';
     journalEl.innerHTML = '';
     if (st.mode === 'pick') {
       const col = document.createElement('div');
@@ -539,6 +644,32 @@
         ? '<span>' + P.mission[0].account + '</span>'
         : '<span>?</span><span class="amt">보기 중에서</span>';
       col.appendChild(slot);
+      if (!P.mission[0].filled) {
+        const options = document.createElement('div');
+        options.className = 'stage-choices';
+        P.options.forEach(label => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = label;
+          button.addEventListener('click', () => {
+            if (P.done || P.over || P.settling || P.mission[0].filled) return;
+            if (label !== P.mission[0].account) {
+              button.disabled = true;
+              SOUND.play('wrong');
+              return;
+            }
+            P.mission[0].filled = true;
+            P.earned += 150;
+            // An undo of a later block cannot reopen the already answered question.
+            P.history.length = 0;
+            renderMission();
+            SOUND.play('right');
+            finishTurn();
+          });
+          options.append(button);
+        });
+        col.append(options);
+      }
       journalEl.appendChild(col);
     } else {
       ['d', 'c'].forEach((side) => {
@@ -933,6 +1064,7 @@
     fx.shards(centers, 3);
     navigator.vibrate?.([0, 25, 40, 30]);
     SOUND.play('clear', 2);
+    speak('분개하기!');
     flashText('🎯 ' + won(P.goal * 10000) + '원!');
     scheduleClear();
     return true;
@@ -990,6 +1122,7 @@
   function updateStreak(res) {
     if (res.count) {
       afterClear(res);
+      if (!specialMode(P.st)) renderMission();
     } else if (P.comboMoves > 0 && --P.comboMoves === 0) {
       P.combo = 0;
     }
@@ -1021,6 +1154,7 @@
     }
     showJournalStamp();
     SOUND.play('combo', P.combo);
+    speak('분개하기!');
     flashText('+' + (pts + comboGain));
     $('#playScore').textContent = won(playScore());
     if (res.count >= 2 || P.combo >= 3) fx.confetti(Math.min(180, 65 + res.count * 18 + P.combo * 12));
@@ -1062,17 +1196,19 @@
     const stage = P;
     if (stage.done || stage.settling) return;
     const cleared = stage.st.mode === 'pure' ? (stage.earned >= SPEED_GOAL || !stage.grid.some(Boolean)) :
-      stage.st.mode !== 'hard' && stage.mission.every((m) => m.filled);
+      stage.st.mode !== 'hard' && stage.mission.every((m) => m.filled) && playScore() >= stage.targetScore;
     if (cleared) {
       scheduleClear();
       return;
     }
     if (!anyTrayFits()) {
       setTimeout(() => {
-        if (P !== stage || stage.done || !$('#screen-play').classList.contains('active') || anyTrayFits()) return;
+        if (P !== stage || stage.done || stage.over || !$('#screen-play').classList.contains('active') || anyTrayFits()) return;
         stage.over = true;
         $('#overLine').textContent = '조각 3개를 놓을 자리가 없어요. 이어하기로 보드를 정리할까요?';
+        $('#overRescue').disabled = stage.rescueUsed;
         $('#ovOver').hidden = false;
+        speak('다시 분개해 보자!');
       }, 300);
     }
   }
@@ -1092,15 +1228,22 @@
   function startStage(cornerKey, stageNo) {
     const st = D.STAGES[cornerKey][stageNo - 1];
     if (!st || !validNickname(SAVE.nickname)) return;
+    scope = st.scope;
     $('.journal-stamp')?.remove();
     $('#ovClear').hidden = true;
     $('#ovOver').hidden = true;
+    const profile = difficultyProfile(stageNo, SAVE.difficulty);
+    const mission = specialMode(st) ? [] : buildMission(st);
     P = {
+      profile, rescueUsed: false,
+      options: st.mode === 'pick' ? shuffle([...new Set([...st.picks, ...st.decoys].map(option => option.label))]) : [],
+      targetScore: st.mode === 'pure' ? SPEED_GOAL : st.mode === 'hard' || !profile.points ? 0 : mission.length * 150 + profile.points,
       st: st, cornerKey: cornerKey, stageNo: stageNo,
       grid: emptyGrid(), obst: specialMode(st) ? new Set() : buildObstacles(stageNo),
-      mission: specialMode(st) ? [] : buildMission(st), tray: [], earned: 0, penalty: 0, combo: 0, comboMoves: 0, clears: 0, placed: 0, settling: false,
+      mission, tray: [], earned: 0, penalty: 0, combo: 0, comboMoves: 0, clears: 0, placed: 0, settling: false,
       history: [], over: false, done: false, startedAt: Date.now()
     };
+    $('#itemRescue').disabled = false;
     SAVE.last = { corner: cornerKey, stage: stageNo }; save();
     clearTimeout(tipTimer);
     $('#placementTip').hidden = true;
@@ -1118,7 +1261,7 @@
     renderMission();
     $('#playScore').textContent = '0';
     const g = $('#missionGoal');
-    if (g) { g.classList.remove('on'); g.textContent = '🎯 한 줄 터뜨리면 +300'; }
+    if (g) g.classList.remove('on');
     SOUND.start();
     if (stageNo <= 2) bubble('색 블록은 어디든! 계정 블록은 차변·대변 제자리에');
   }
@@ -1126,6 +1269,7 @@
   function stageClear() {
     if (P.done) return;
     P.done = true;
+    speak('분개 완료!');
     const elapsed = (P.finishedAt - P.startedAt) / 1000;
     const sec = Math.max(1, Math.round(P.st.mode === 'pure' ? elapsed : (Date.now() - P.startedAt) / 1000));
     const isSpeed = P.st.mode === 'pure';
@@ -1185,6 +1329,29 @@
   }
 
   /* ───────── 아이템 ───────── */
+  function rescueLine() {
+    if (!P || P.done || P.settling || P.rescueUsed) return;
+    const candidates = amountLines().map(({ cells }) => cells.filter(i => P.obst.has(i) || (P.grid[i] && !P.grid[i].sealed)));
+    candidates.sort((a, b) => b.length - a.length);
+    const line = candidates[0];
+    if (!line.length) { toast('지울 수 있는 블록이 아직 없어요'); return; }
+    P.rescueUsed = true;
+    $('#itemRescue').disabled = true;
+    P.history.length = 0;
+    for (const i of line) {
+      P.grid[i] = null;
+      P.obst.delete(i);
+    }
+    P.over = false;
+    $('#ovOver').hidden = true;
+    renderBoard();
+    if (!anyTrayFits()) refillTray();
+    renderMission();
+    fx.confetti(30);
+    toast('한 줄 정리 완료 · 이번 판에서 1회 사용했어요');
+    finishTurn();
+  }
+
   function useItem(name) {
     if (!P || P.done || P.settling) return;
     const cost = { undo: 3, clean: 8, hint: 2 }[name];
@@ -1225,6 +1392,7 @@
         SOUND.play('gem');
         return;
       }
+      if (P.st.mode === 'pick') { toast('문제 카드에서 정답 하나를 골라요'); return; }
       const open = P.mission.filter((m) => !m.filled);
       if (!open.length) { toast('이미 다 채웠어요'); return; }
       const target = open[0];
@@ -1544,6 +1712,7 @@
   $('#nicknameCancel').addEventListener('click', closeNickname);
 
   function renderHome() {
+    $('#studyScope').value = scope;
     const host = $('#cornerList');
     host.innerHTML = '';
     D.CORNERS.forEach((c) => {
@@ -1576,18 +1745,20 @@
 
   function openStages(key) {
     const c = D.CORNERS.filter((x) => x.key === key)[0];
-    const sts = D.STAGES[key];
+    const sts = D.STAGES[key].filter(st => st.scope === scope);
+    $('#stageScope').value = scope;
+    $('#stageScope').dataset.corner = key;
     $('#stagesTitle').textContent = c.emoji + ' ' + c.name;
     $('#stagesDesc').textContent = c.desc + ' · ' + c.stages + '단계';
     const grid = $('#stageGrid');
     grid.innerHTML = '';
-    sts.forEach((s) => {
+    sts.forEach((s, i) => {
       const b = document.createElement('button');
       const stars = SAVE.stars[s.id] || 0;
-      const prev = s.stage === 1 ? true : !!SAVE.stars[sts[s.stage - 2].id];
+      const prev = i === 0 || !!SAVE.stars[sts[i - 1].id] || !!stars;
       b.className = 'stage' + (stars ? ' done' : '') + (prev ? '' : ' locked');
       b.innerHTML = '<span class="st">' + (stars ? '★'.repeat(stars) : '') + '</span><span>' + s.stage + '</span>' +
-        (D.EXAM[s.gen] ? '<span class="exam">3차</span>' : '') +
+        (s.scope === 'third' && D.EXAM[s.gen] ? '<span class="exam">3차</span>' : '') +
         (specialMode(s) ? '<span class="stage-mode" title="' + modeLabel[s.mode] + '">' + modeLabel[s.mode].split(' ')[0] + '</span>' : '');
       b.addEventListener('click', () => {
         if (!prev) { toast('이전 단계를 먼저 클리어해 주세요'); SOUND.play('wrong'); return; }
@@ -1609,7 +1780,7 @@
     return fresh.concat(old);
   }
   function makeChallenge() {
-    const pool = window.BlastChallenge || [];
+    const pool = (window.BlastChallenge || []).filter(item => FINAL_CHALLENGE.has(item.id) === (scope === 'final'));
     if (!pool.length) return null;
     const byId = new Map(pool.map(item => [item.id, item]));
     if (SAVE.challengePoolVersion !== 2) {
@@ -1633,6 +1804,7 @@
     SOUND.start();
     CH = makeChallenge();
     if (!CH) return;
+    $('#challengeScope').value = scope;
     const duration = CH.type === 'journal' ? 30 : 15;
     CH.startedAt = Date.now();
     CH.timer = duration;
@@ -1903,12 +2075,13 @@
       $('#ovClear').hidden = true;
       if (k === 'next') {
         const st = P.st;
-        const list = D.STAGES[P.cornerKey];
-        if (st.stage < list.length) startStage(P.cornerKey, st.stage + 1);
+        const next = D.STAGES[P.cornerKey].find(s => s.stage > st.stage && s.scope === st.scope);
+        if (next) startStage(P.cornerKey, next.stage);
         else { openStages(P.cornerKey); toast('코너 완주! 다른 코너에 도전해요'); }
       } else if (k === 'retry') startStage(P.cornerKey, P.stageNo);
       else if (k === 'chal') openChallenge();
     } else if (which === 'ovOver') {
+      if (k === 'rescue') { rescueLine(); return; }
       $('#ovOver').hidden = true;
       if (k === 'retry') startStage(P.cornerKey, P.stageNo);
       else if (k === 'quit') openStages(P.cornerKey);
@@ -1933,10 +2106,31 @@
   });
 
   /* ───────── 바인딩 ───────── */
+  const voiceButton = $('#btnVoice');
+  function paintVoice() {
+    voiceButton.setAttribute('aria-pressed', String(SAVE.voice !== false));
+    voiceButton.textContent = SAVE.voice === false ? '🔇' : '🗣️';
+  }
+  paintVoice();
+  voiceButton.addEventListener('click', () => {
+    SAVE.voice = SAVE.voice === false;
+    if (!SAVE.voice) stopVoice();
+    save();
+    paintVoice();
+  });
+  $('#difficulty').value = Object.hasOwn(DIFFICULTY, SAVE.difficulty) ? SAVE.difficulty : 'normal';
+  $('#difficulty').addEventListener('change', event => { SAVE.difficulty = event.target.value; save(); });
+  $('#studyScope').addEventListener('change', event => { scope = event.target.value; });
+  $('#stageScope').addEventListener('change', event => { scope = event.target.value; openStages(event.target.dataset.corner); });
+  $('#challengeScope').addEventListener('change', event => { scope = event.target.value; openChallenge(); });
+  $('#itemRescue').addEventListener('click', rescueLine);
+
   $('#btnPlay').addEventListener('click', () => {
     const last = SAVE.last || { corner: 'inv', stage: 1 };
-    const next = D.STAGES[last.corner][Math.min(last.stage, D.STAGES[last.corner].length) - 1];
-    startStage(last.corner, next.stage);
+    const resume = D.STAGES[last.corner].find(s => s.stage === last.stage && s.scope === scope);
+    const next = resume || D.STAGES[last.corner].find(s => s.scope === scope) ||
+      Object.values(D.STAGES).flat().find(s => s.scope === scope);
+    startStage(next.corner, next.stage);
   });
   $('#btnChallenge').addEventListener('click', openChallenge);
   $('#itemChallenge').addEventListener('click', () => {
@@ -1978,7 +2172,7 @@
       return { myRank, aboveName, gap, text };
     },
     challengeInfo: () => CH ? JSON.parse(JSON.stringify({
-      type: CH.type, q: CH.q, answer: CH.answer, opts: CH.opts, debit: CH.debit,
+      id: CH.id, type: CH.type, q: CH.q, answer: CH.answer, opts: CH.opts, debit: CH.debit,
       credit: CH.credit, chips: CH.chips, timer: CH.timer
     })) : null,
     state: function () {

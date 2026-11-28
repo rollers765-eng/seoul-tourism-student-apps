@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://rollers765-eng.github.io/seoul-tourism-student-apps/asset-moa-blast/share-card-v1.jpg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="style.css?v=63">
+<link rel="stylesheet" href="style.css?v=64">
 </head>
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -35,6 +35,7 @@
     <header class="home-top">
       <a class="nav-back" href="../accounting-library/" aria-label="회계원리 자료실로 돌아가기"><span aria-hidden="true">←</span> 회계원리 자료실</a>
       <div class="home-top-right">
+        <button class="chip" id="btnVoice" aria-label="분개 음성 켜기/끄기" aria-pressed="true">🗣️</button>
         <button class="chip" id="btnMusic" aria-label="배경음악 켜기/끄기" aria-pressed="true">🎵</button>
         <span class="track-chip" id="musicTrack" title="지금 나오는 배경음악 트랙" aria-live="polite">♪ 1/3</span>
         <div class="gem-chip" id="homeGems"><span>💎</span><b>30</b></div>
@@ -51,6 +52,7 @@
     </div>
     <div class="dday" id="homeDday">3차 서술형 · 기말 대비</div>
     <nav class="home-actions">
+      <div class="study-settings"><select id="studyScope" aria-label="학습 범위"><option value="third">3차 대비</option><option value="final">기말 대비</option></select><select id="difficulty" aria-label="퍼즐 난이도"><option value="easy">쉬움</option><option value="normal" selected>보통</option><option value="challenge">도전</option></select></div>
       <button class="big-btn" id="btnPlay">▶ 바로 플레이</button>
       <button class="big-btn gem-btn" id="btnChallenge">💎 도전! 보석챌린지</button>
       <div class="row3">
@@ -70,6 +72,7 @@
       <h2 id="stagesTitle">재고자산</h2>
       <div class="gem-chip small"><span>💎</span><b id="stagesGems">30</b></div>
     </header>
+    <div class="study-settings"><select id="stageScope" aria-label="학습 범위"><option value="third">3차 대비</option><option value="final">기말 대비</option></select></div>
     <p class="section-desc" id="stagesDesc"></p>
     <div class="stage-grid" id="stageGrid"></div>
   </section>
@@ -87,7 +90,9 @@
       <p class="mode-target" id="modeTarget" hidden></p>
       <progress id="modeMeter" max="1200" value="0" aria-label="스피드 블라스트 목표 점수" hidden></progress>
       <p class="mode-help" id="modeHelp" hidden></p>
+      <ul id="missionConditions" class="mission-notes" hidden></ul>
       <div class="mission-head"><img src="assets/moa.png" alt="모아" class="mission-moa"><p class="mission-text" id="missionText"></p></div>
+      <p id="missionTerms" class="mission-notes" hidden></p>
       <div class="journal" id="journal"></div>
       <div class="mission-foot"><div class="mission-progress" id="missionProgress"></div><span class="mission-goal" id="missionGoal">🎯 한 줄 터뜨리면 +300</span></div>
       <p class="placement-tip" id="placementTip" role="status" hidden></p>
@@ -104,6 +109,7 @@
       <button class="item-btn" id="itemUndo" data-item="undo">↩️<small>3</small></button>
       <button class="item-btn" id="itemClean" data-item="clean">🧹<small>8</small></button>
       <button class="item-btn" id="itemHint" data-item="hint">💡<small>2</small></button>
+      <button class="item-btn" id="itemRescue" aria-label="한 줄 지우기, 판당 1회">🧽<small>한 줄</small></button>
       <button class="item-btn challenge" id="itemChallenge">💎<small>도전</small></button>
     </div>
   </section>
@@ -115,6 +121,7 @@
       <h2>💎 보석 챌린지</h2>
       <div class="gem-chip small"><span>💎</span><b id="chGems">30</b></div>
     </header>
+    <div class="study-settings"><select id="challengeScope" aria-label="학습 범위"><option value="third">3차 대비</option><option value="final">기말 대비</option></select></div>
     <div class="ch-timer"><div id="chBar"></div></div>
     <div class="ch-card" id="chCard"></div>
   </section>
@@ -188,6 +195,7 @@
       <p class="over-line" id="overLine">조각을 놓을 자리가 없어요.</p>
       <div class="row-btns">
         <button class="ghost-btn" data-ov="quit">나가기</button>
+        <button class="ghost-btn" id="overRescue" data-ov="rescue">한 줄 지우기</button>
         <button class="ghost-btn" data-ov="continue">💎 5 이어하기</button>
         <button class="big-btn" data-ov="retry">다시 하기</button>
       </div>
@@ -205,10 +213,10 @@
   <div id="toast" role="status" aria-live="polite"></div>
 </div>
 
-<script src="data.js?v=2"></script>
+<script src="data.js?v=3"></script>
 <script src="challenge.js?v=4"></script>
 <script src="music.js?v=15"></script>
 <script src="leaderboard.js?v=1"></script>
-<script src="app.js?v=63"></script>
+<script src="app.js?v=64"></script>
 </body>
 </html>

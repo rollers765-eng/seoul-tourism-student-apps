@@ -943,3 +943,12 @@ body{
 .rc-me.rank-gap{font-size:8.5px;line-height:1.2;word-break:keep-all}
 .rc-me .gap{white-space:nowrap}
 .rank-gap .gap{color:#aa285f;font-weight:900}
+
+.study-settings{display:flex;gap:6px;flex:none}
+.study-settings select{min-width:0;border:1px solid #bca8e9;border-radius:9px;padding:4px 7px;background:#f5edff;color:#35215d;font:inherit;font-size:12px;font-weight:800}
+.home-actions .study-settings select{flex:1}
+.mission-notes{font-size:11px;line-height:1.27;color:#392359;margin:2px 0 4px}
+ul.mission-notes{padding-left:18px}
+.stage-choices{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.stage-choices button{font:inherit;font-size:12px;font-weight:800;color:#302057;background:#fff;border:1px solid #b6a0de;border-radius:6px;padding:3px 5px}
+.stage-choices button:disabled,#itemRescue:disabled,#overRescue:disabled{opacity:.48}

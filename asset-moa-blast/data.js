@@ -26,6 +26,8 @@
     return min + Math.floor(r() * n) * step;
   };
   const won = (n) => n.toLocaleString('ko-KR') + '원';
+  const particle = (word, final, open) => word +
+    (((word.charCodeAt(word.length - 1) - 0xac00) % 28 + 28) % 28 ? final : open);
   const man = (n) => Math.round(n / 10000) + '만 원';
 
   /* ────────── 등장 회사·물건 이름 ────────── */
@@ -38,6 +40,7 @@
 
   /* ────────── 계정과목 도감 ────────── */
   const ACCOUNTS = {
+    '차량유지비': { kind: '비용', inc: '차변', desc: '배달용 차량의 원래 성능을 유지하는 데 든 비용' },
     '현금': { kind: '자산', inc: '차변', desc: '지폐·동전처럼 바로 쓸 수 있는 돈', ex: '상품을 현금으로 팔면 현금이 늘어 차변에 적어요.' },
     '당좌예금': { kind: '자산', inc: '차변', desc: '은행에 맡긴 돈으로, 수표를 발행해 쓸 수 있어요.', ex: '당좌수표를 발행하면 당좌예금이 줄어 대변에 적어요.' },
     '보통예금': { kind: '자산', inc: '차변', desc: '은행에 맡긴 돈 중 자유롭게 넣고 뺄 수 있는 예금', ex: '은행에서 이체로 받으면 보통예금이 늘어요.' },
@@ -132,7 +135,7 @@
   };
   G['inv-return-out'] = (r) => {
     const a = int(r, 30, 120, 5) * 1000;
-    return { tag: '매출환입', prompt: `외상으로 팔았던 ${pick(r, GOODS)} 중 ${won(a)}어치를 돌려받고, 같은 금액을 거래처 외상대금에서 빼 주었다. (3분법·매출환입은 매출에서 직접 차감)`, entries: [{ side: 'd', account: '매출', amount: a }, { side: 'c', account: '외상매출금', amount: a }], explain: '매출환입은 매출을 직접 줄여요(차변 매출). 받을 돈도 줄어 대변 외상매출금이에요.' };
+    return { tag: '매출환입', prompt: `외상으로 판 ${pick(r, GOODS)} 중 ${won(a)}어치를 돌려받았다. 받을 돈에서 같은 금액을 뺐다. (3분법)`, entries: [{ side: 'd', account: '매출', amount: a }, { side: 'c', account: '외상매출금', amount: a }], explain: '매출환입은 매출을 직접 줄여요(차변 매출). 받을 돈도 줄어 대변 외상매출금이에요.' };
   };
   G['inv-return-out-cash'] = (r) => {
     const a = int(r, 30, 100, 5) * 1000;
@@ -144,15 +147,15 @@
   };
   G['inv-allowance-in'] = (r) => {
     const a = int(r, 20, 90, 5) * 1000;
-    return { tag: '매입에누리', prompt: `외상으로 매입한 ${pick(r, GOODS)}에 흠이 있어 ${won(a)}을(를) 에누리받고 외상대금에서 빼 주기로 했다. (3분법)`, entries: [{ side: 'd', account: '외상매입금', amount: a }, { side: 'c', account: '매입', amount: a }], explain: '매입에누리도 매입을 직접 줄여요. 대변 매입, 차변 외상매입금이에요.' };
+    return { tag: '매입에누리', prompt: `외상으로 매입한 ${pick(r, GOODS)}에 흠이 있어 ${won(a)}을 에누리받고 외상대금에서 빼 주기로 했다. (3분법)`, entries: [{ side: 'd', account: '외상매입금', amount: a }, { side: 'c', account: '매입', amount: a }], explain: '매입에누리도 매입을 직접 줄여요. 대변 매입, 차변 외상매입금이에요.' };
   };
   G['inv-allowance-out'] = (r) => {
     const a = int(r, 20, 90, 5) * 1000;
-    return { tag: '매출에누리', prompt: `외상으로 판매한 ${pick(r, GOODS)} 대금에서 ${won(a)}을(를) 에누리해 주고 외상대금에서 차감했다. (3분법)`, entries: [{ side: 'd', account: '매출', amount: a }, { side: 'c', account: '외상매출금', amount: a }], explain: '매출에누리는 매출을 직접 줄여요(차변 매출). 받을 돈도 줄어 대변이에요.' };
+    return { tag: '매출에누리', prompt: `외상으로 판매한 ${pick(r, GOODS)} 대금에서 ${won(a)}을 에누리해 주고 외상대금에서 차감했다. (3분법)`, entries: [{ side: 'd', account: '매출', amount: a }, { side: 'c', account: '외상매출금', amount: a }], explain: '매출에누리는 매출을 직접 줄여요(차변 매출). 받을 돈도 줄어 대변이에요.' };
   };
   G['inv-discount-in'] = (r) => {
     const a = int(r, 250, 600, 10) * 1000, d = int(r, 5, 20, 1) * 1000;
-    return { tag: '매입할인', prompt: `외상으로 매입한 ${pick(r, GOODS)} ${won(a)}을(를) 오늘 현금으로 갚으며 매입할인 ${won(d)}을(를) 받았다. (3분법)`, entries: [{ side: 'd', account: '외상매입금', amount: a }, { side: 'c', account: '현금', amount: a - d }, { side: 'c', account: '매입', amount: d }], explain: '매입할인은 매입을 줄여요. 실제로 낸 현금은 ' + won(a - d) + '이고, 할인액만큼 매입을 대변에 적어요.', amountPhase: true };
+    return { tag: '매입할인', prompt: `외상으로 매입한 ${pick(r, GOODS)} ${won(a)}을 오늘 현금으로 갚으며 매입할인 ${won(d)}을 받았다. (3분법)`, entries: [{ side: 'd', account: '외상매입금', amount: a }, { side: 'c', account: '현금', amount: a - d }, { side: 'c', account: '매입', amount: d }], explain: '매입할인은 매입을 줄여요. 실제로 낸 현금은 ' + won(a - d) + '이고, 할인액만큼 매입을 대변에 적어요.', amountPhase: true };
   };
   G['inv-combined-settle'] = (r) => {
     const a = int(r, 300, 700, 10) * 1000, b = int(r, 20, 80, 5) * 1000;
@@ -213,35 +216,35 @@
   /* ═══════════ 투자자산 ═══════════ */
   G['fin-long-deposit'] = (r) => {
     const a = int(r, 500, 2000, 100) * 1000;
-    return { tag: '장기금융상품', prompt: `${FIRM(r)}는 3년 만기 정기예금에 현금 ${won(a)}을 예입했다.`, entries: [{ side: 'd', account: '장기금융상품', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '만기가 1년을 넘는 예금은 장기금융상품(투자자산)이에요.' };
+    return { tag: '장기금융상품', prompt: `${particle(FIRM(r), '은', '는')} 3년 만기 정기예금에 현금 ${won(a)}을 예입했다.`, entries: [{ side: 'd', account: '장기금융상품', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '만기가 1년을 넘는 예금은 장기금융상품(투자자산)이에요.' };
   };
   G['fin-hold-bond'] = (r) => {
     const a = int(r, 500, 1500, 100) * 1000;
-    return { tag: '만기보유증권', prompt: `${FIRM(r)}는 만기까지 보유할 목적으로 국채를 ${won(a)}에 현금으로 취득했다.`, entries: [{ side: 'd', account: '만기보유증권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '만기까지 보유할 목적의 채권은 만기보유증권(투자자산)이에요.' };
+    return { tag: '만기보유증권', prompt: `${particle(FIRM(r), '은', '는')} 만기까지 보유할 목적으로 국채를 ${won(a)}에 현금으로 취득했다.`, entries: [{ side: 'd', account: '만기보유증권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '만기까지 보유할 목적의 채권은 만기보유증권(투자자산)이에요.' };
   };
   G['fin-available-stock'] = (r) => {
     const a = int(r, 300, 1200, 100) * 1000;
-    return { tag: '매도가능증권', prompt: `${FIRM(r)}는 장기간 보유할 목적으로 다른 회사 주식을 ${won(a)}에 현금으로 취득했다.`, entries: [{ side: 'd', account: '매도가능증권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '장기 보유 목적의 주식은 매도가능증권(투자자산)으로 분류해요.' };
+    return { tag: '매도가능증권', prompt: `${particle(FIRM(r), '은', '는')} 장기간 보유할 목적으로 다른 회사 주식을 ${won(a)}에 현금으로 취득했다.`, entries: [{ side: 'd', account: '매도가능증권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '장기 보유 목적의 주식은 매도가능증권(투자자산)으로 분류해요.' };
   };
   G['fin-long-loan'] = (r) => {
     const a = int(r, 500, 2000, 100) * 1000;
-    return { tag: '장기대여금', prompt: `${FIRM(r)}는 거래처에 현금 ${won(a)}을 2년간 빌려주었다.`, entries: [{ side: 'd', account: '장기대여금', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '1년이 넘게 빌려준 돈은 장기대여금(투자자산)이에요.' };
+    return { tag: '장기대여금', prompt: `${particle(FIRM(r), '은', '는')} 거래처에 현금 ${won(a)}을 2년간 빌려주었다.`, entries: [{ side: 'd', account: '장기대여금', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '1년이 넘게 빌려준 돈은 장기대여금(투자자산)이에요.' };
   };
   G['fin-lease-deposit'] = (r) => {
     const a = int(r, 1000, 3000, 100) * 1000;
-    return { tag: '임차보증금', prompt: `${SHOP(r)}는 매장으로 쓸 건물을 빌리며 보증금 ${won(a)}을 현금으로 지급했다.`, entries: [{ side: 'd', account: '임차보증금', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '건물을 빌리며 맡긴 보증금은 임차보증금(투자자산)이에요.' };
+    return { tag: '임차보증금', prompt: `${particle(SHOP(r), '은', '는')} 매장으로 쓸 건물을 빌리며 보증금 ${won(a)}을 현금으로 지급했다.`, entries: [{ side: 'd', account: '임차보증금', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '건물을 빌리며 맡긴 보증금은 임차보증금(투자자산)이에요.' };
   };
   G['fin-bond-fee'] = (r) => {
     const a = int(r, 500, 1200, 100) * 1000, f = int(r, 10, 30, 5) * 1000;
-    return { tag: '만기보유증권+수수료', prompt: `${FIRM(r)}는 만기까지 보유할 국채를 ${won(a)}에 사고 취득 수수료 ${won(f)}까지 포함해 현금으로 지급했다.`, entries: [{ side: 'd', account: '만기보유증권', amount: a + f }, { side: 'c', account: '현금', amount: a + f }], explain: '취득에 직접 든 수수료는 증권의 취득원가에 더해요.' };
+    return { tag: '만기보유증권+수수료', prompt: `${particle(FIRM(r), '은', '는')} 만기까지 보유할 국채를 ${won(a)}에 사고 취득 수수료 ${won(f)}까지 포함해 현금으로 지급했다.`, entries: [{ side: 'd', account: '만기보유증권', amount: a + f }, { side: 'c', account: '현금', amount: a + f }], explain: '취득에 직접 든 수수료는 증권의 취득원가에 더해요.' };
   };
   G['fin-stock-fee'] = (r) => {
     const a = int(r, 300, 900, 100) * 1000, f = int(r, 5, 25, 5) * 1000;
-    return { tag: '매도가능증권+수수료', prompt: `${FIRM(r)}는 장기 보유 목적으로 주식을 ${won(a)}에 사고 수수료 ${won(f)}을 더해 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '매도가능증권', amount: a + f }, { side: 'c', account: '당좌예금', amount: a + f }], explain: '수수료를 포함한 금액이 매도가능증권의 취득원가예요.' };
+    return { tag: '매도가능증권+수수료', prompt: `${particle(FIRM(r), '은', '는')} 장기 보유 목적으로 주식을 ${won(a)}에 사고 수수료 ${won(f)}을 더해 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '매도가능증권', amount: a + f }, { side: 'c', account: '당좌예금', amount: a + f }], explain: '수수료를 포함한 금액이 매도가능증권의 취득원가예요.' };
   };
   G['fin-invest-property'] = (r) => {
     const a = int(r, 2000, 5000, 100) * 1000, tax = int(r, 50, 150, 10) * 1000;
-    return { tag: '투자부동산', prompt: `${FIRM(r)}는 임대 목적으로 상가 건물을 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '투자부동산', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '임대·시세차익 목적의 부동산은 투자부동산이고, 취득세는 취득원가에 더해요.' };
+    return { tag: '투자부동산', prompt: `${particle(FIRM(r), '은', '는')} 임대 목적으로 상가 건물을 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '투자부동산', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '임대·시세차익 목적의 부동산은 투자부동산이고, 취득세는 취득원가에 더해요.' };
   };
   G['fin-loan-collect'] = (r) => {
     const a = int(r, 500, 1500, 100) * 1000, i = int(r, 20, 80, 5) * 1000;
@@ -276,27 +279,27 @@
   /* ═══════════ 유형자산 ═══════════ */
   G['fa-buy-fixture'] = (r) => {
     const a = int(r, 300, 1200, 50) * 1000;
-    return { tag: '비품 취득', prompt: `${SHOP(r)}에서 매장용 ${pick(r, EQUIP)}을 ${won(a)}에 사고 현금으로 지급했다. (비품으로 처리)`, entries: [{ side: 'd', account: '비품', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '오래 쓰는 기구는 비품(유형자산)이 늘어 차변, 현금은 줄어 대변이에요.' };
+    return { tag: '비품 취득', prompt: `${SHOP(r)}에서 매장용 ${particle(pick(r, EQUIP), '을', '를')} ${won(a)}에 사고 현금으로 지급했다. (비품으로 처리)`, entries: [{ side: 'd', account: '비품', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '오래 쓰는 기구는 비품(유형자산)이 늘어 차변, 현금은 줄어 대변이에요.' };
   };
   G['fa-buy-fixture-install'] = (r) => {
     const a = int(r, 800, 2500, 100) * 1000, f = int(r, 50, 150, 10) * 1000;
-    return { tag: '비품+설치비', prompt: `${SHOP(r)}에서 ${pick(r, EQUIP)}을 ${won(a)}에 사고 설치비 ${won(f)}을 더해 현금으로 지급했다. (비품으로 처리)`, entries: [{ side: 'd', account: '비품', amount: a + f }, { side: 'c', account: '현금', amount: a + f }], explain: '설치비는 취득부대비용이라 비품의 취득원가에 더해요.' };
+    return { tag: '비품+설치비', prompt: `${SHOP(r)}에서 ${particle(pick(r, EQUIP), '을', '를')} ${won(a)}에 사고 설치비 ${won(f)}을 더해 현금으로 지급했다. (비품으로 처리)`, entries: [{ side: 'd', account: '비품', amount: a + f }, { side: 'c', account: '현금', amount: a + f }], explain: '설치비는 취득부대비용이라 비품의 취득원가에 더해요.' };
   };
   G['fa-buy-machine'] = (r) => {
     const a = int(r, 2000, 4000, 100) * 1000, f = int(r, 50, 200, 10) * 1000;
-    return { tag: '기계장치+운송비', prompt: `${FIRM(r)}는 공장용 기계 ${won(a)}을 사고 운송비 ${won(f)}을 더해 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '기계장치', amount: a + f }, { side: 'c', account: '당좌예금', amount: a + f }], explain: '운송비도 취득부대비용이라 기계장치의 취득원가에 더해요.' };
+    return { tag: '기계장치+운송비', prompt: `${particle(FIRM(r), '은', '는')} 공장용 기계 ${won(a)}을 사고 운송비 ${won(f)}을 더해 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '기계장치', amount: a + f }, { side: 'c', account: '당좌예금', amount: a + f }], explain: '운송비도 취득부대비용이라 기계장치의 취득원가에 더해요.' };
   };
   G['fa-buy-land'] = (r) => {
     const a = int(r, 4000, 9000, 100) * 1000, tax = int(r, 100, 300, 10) * 1000;
-    return { tag: '토지+취득세', prompt: `${FIRM(r)}는 영업용 토지를 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '토지', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '토지의 취득원가는 구입대금 + 취득세 같은 부대비용이에요. 토지는 감가상각하지 않아요.' };
+    return { tag: '토지+취득세', prompt: `${particle(FIRM(r), '은', '는')} 영업용 토지를 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '토지', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '토지의 취득원가는 구입대금 + 취득세 같은 부대비용이에요. 토지는 감가상각하지 않아요.' };
   };
   G['fa-buy-building'] = (r) => {
     const a = int(r, 8000, 20000, 500) * 1000, fee = int(r, 100, 400, 50) * 1000;
-    return { tag: '건물+중개수수료', prompt: `${FIRM(r)}는 영업용 건물을 ${won(a)}에 사고 중개수수료 ${won(fee)}를 더해 현금으로 지급했다.`, entries: [{ side: 'd', account: '건물', amount: a + fee }, { side: 'c', account: '현금', amount: a + fee }], explain: '중개수수료는 취득부대비용이라 건물의 취득원가에 더해요.' };
+    return { tag: '건물+중개수수료', prompt: `${particle(FIRM(r), '은', '는')} 영업용 건물을 ${won(a)}에 사고 중개수수료 ${won(fee)}을 더해 현금으로 지급했다.`, entries: [{ side: 'd', account: '건물', amount: a + fee }, { side: 'c', account: '현금', amount: a + fee }], explain: '중개수수료는 취득부대비용이라 건물의 취득원가에 더해요.' };
   };
   G['fa-buy-vehicle'] = (r) => {
     const a = int(r, 3000, 6000, 100) * 1000;
-    return { tag: '차량 취득', prompt: `${SHOP(r)}는 배달용 차량을 ${won(a)}에 사고 대금은 다음 달에 지급하기로 했다.`, entries: [{ side: 'd', account: '차량운반구', amount: a }, { side: 'c', account: '미지급금', amount: a }], explain: '상품이 아닌 물건을 외상으로 사면 미지급금(부채)으로 기록해요.' };
+    return { tag: '차량 취득', prompt: `${particle(SHOP(r), '은', '는')} 배달용 차량을 ${won(a)}에 사고 대금은 다음 달에 지급하기로 했다.`, entries: [{ side: 'd', account: '차량운반구', amount: a }, { side: 'c', account: '미지급금', amount: a }], explain: '상품이 아닌 물건을 외상으로 사면 미지급금(부채)으로 기록해요.' };
   };
   G['fa-construction'] = (r) => {
     const a = int(r, 1000, 3000, 100) * 1000;
@@ -304,7 +307,7 @@
   };
   G['fa-construction-done'] = (r) => {
     const a = int(r, 4000, 8000, 500) * 1000, b = int(r, 1000, 3000, 100) * 1000;
-    return { tag: '완공·인수', prompt: `신축하던 건물이 완공되어 잔금 ${won(a)}을 현금으로 지급하고 인수했다. (앞서 건설중인자산으로 ${won(b)}을 기록해 두었다.)`, entries: [{ side: 'd', account: '건물', amount: a + b }, { side: 'c', account: '건설중인자산', amount: b }, { side: 'c', account: '현금', amount: a }], explain: '완공되면 건설중인자산과 잔금을 합쳐 건물 계정으로 옮겨요.', amountPhase: true };
+    return { tag: '완공·인수', prompt: `공사 중 ${won(b)}을 건설중인자산으로 기록했다. 건물이 완공돼 잔금 ${won(a)}을 현금으로 냈다.`, entries: [{ side: 'd', account: '건물', amount: a + b }, { side: 'c', account: '건설중인자산', amount: b }, { side: 'c', account: '현금', amount: a }], explain: '완공되면 건설중인자산과 잔금을 합쳐 건물 계정으로 옮겨요.', amountPhase: true };
   };
   G['fa-capital-expense'] = (r) => {
     const a = int(r, 800, 2000, 100) * 1000;
@@ -316,7 +319,7 @@
   };
   G['fa-mixed-expense'] = (r) => {
     const cap = int(r, 400, 900, 100) * 1000, rev = int(r, 100, 400, 50) * 1000;
-    return { tag: '자본적+수익적', prompt: `영업용 건물의 수리비 ${won(cap + rev)}을 현금으로 지급했다. 이 중 ${won(cap)}은 건물의 가치를 높이는 엘리베이터 신설비(자본적 지출)이고, ${won(rev)}은 외벽 도색비(수익적 지출)이다.`, entries: [{ side: 'd', account: '건물', amount: cap }, { side: 'd', account: '수선비', amount: rev }, { side: 'c', account: '현금', amount: cap + rev }], explain: '한 번에 낸 돈이라도 자본적 지출은 건물에, 수익적 지출은 수선비로 나눠 기록해요.', amountPhase: true };
+    return { tag: '자본적+수익적', prompt: `건물 공사비 ${won(cap + rev)}을 현금으로 냈다. 이 중 ${won(cap)}은 가치를 높이는 엘리베이터 설치비이고, ${won(rev)}은 원래 상태를 유지하는 외벽 도색비다.`, entries: [{ side: 'd', account: '건물', amount: cap }, { side: 'd', account: '수선비', amount: rev }, { side: 'c', account: '현금', amount: cap + rev }], explain: '한 번에 낸 돈이라도 자본적 지출은 건물에, 수익적 지출은 수선비로 나눠 기록해요.', amountPhase: true };
   };
   G['fa-dep-indirect'] = (r) => {
     const life = int(r, 4, 6, 1), res = 100000;
@@ -348,7 +351,7 @@
   };
   G['fa-dispose-receivable'] = (r) => {
     const book = int(r, 300, 800, 50) * 1000;
-    return { tag: '처분·대금 미수', prompt: `${SHOP(r)}는 사용하던 냉장고(장부금액 ${won(book)})를 ${won(book)}에 처분하고 대금은 다음 달 말에 받기로 했다.`, entries: [{ side: 'd', account: '미수금', amount: book }, { side: 'c', account: '비품', amount: book }], explain: '상품이 아닌 물건을 팔고 나중에 받을 돈은 미수금이에요.' };
+    return { tag: '처분·대금 미수', prompt: `${particle(SHOP(r), '은', '는')} 사용하던 냉장고(장부금액 ${won(book)})를 ${won(book)}에 처분하고 대금은 다음 달 말에 받기로 했다.`, entries: [{ side: 'd', account: '미수금', amount: book }, { side: 'c', account: '비품', amount: book }], explain: '상품이 아닌 물건을 팔고 나중에 받을 돈은 미수금이에요.' };
   };
   G['fa-concept'] = (r) => {
     const items = [
@@ -371,23 +374,23 @@
   /* ═══════════ 무형자산 ═══════════ */
   G['ia-patent'] = (r) => {
     const a = int(r, 300, 1200, 100) * 1000;
-    return { tag: '특허권 취득', prompt: `${FIRM(r)}는 신제품 제조에 필요한 특허권을 ${won(a)}에 사고 현금으로 지급했다.`, entries: [{ side: 'd', account: '특허권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '특허권은 무형자산이에요. 사면 차변에 적어요.' };
+    return { tag: '특허권 취득', prompt: `${particle(FIRM(r), '은', '는')} 신제품 제조에 필요한 특허권을 ${won(a)}에 사고 현금으로 지급했다.`, entries: [{ side: 'd', account: '특허권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '특허권은 무형자산이에요. 사면 차변에 적어요.' };
   };
   G['ia-software'] = (r) => {
     const a = int(r, 200, 900, 50) * 1000;
-    return { tag: '소프트웨어 취득', prompt: `${SHOP(r)}는 매장 관리용 컴퓨터 소프트웨어를 ${won(a)}에 사고 현금으로 지급했다.`, entries: [{ side: 'd', account: '컴퓨터소프트웨어', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '사서 쓰는 프로그램은 컴퓨터소프트웨어(무형자산)로 처리해요.' };
+    return { tag: '소프트웨어 취득', prompt: `${particle(SHOP(r), '은', '는')} 매장 관리용 컴퓨터 소프트웨어를 ${won(a)}에 사고 현금으로 지급했다.`, entries: [{ side: 'd', account: '컴퓨터소프트웨어', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '사서 쓰는 프로그램은 컴퓨터소프트웨어(무형자산)로 처리해요.' };
   };
   G['ia-trademark'] = (r) => {
     const a = int(r, 200, 800, 50) * 1000;
-    return { tag: '상표권 취득', prompt: `${SHOP(r)}는 가게 이름의 상표권을 ${won(a)}에 사고 당좌수표를 발행했다.`, entries: [{ side: 'd', account: '상표권', amount: a }, { side: 'c', account: '당좌예금', amount: a }], explain: '상표권은 무형자산이에요.' };
+    return { tag: '상표권 취득', prompt: `${particle(SHOP(r), '은', '는')} 가게 이름의 상표권을 ${won(a)}에 사고 당좌수표를 발행했다.`, entries: [{ side: 'd', account: '상표권', amount: a }, { side: 'c', account: '당좌예금', amount: a }], explain: '상표권은 무형자산이에요.' };
   };
   G['ia-development'] = (r) => {
     const a = int(r, 500, 1500, 100) * 1000;
-    return { tag: '개발비 자산 인식', prompt: `${FIRM(r)}는 신기술 개발에 ${won(a)}을 썼고, 자산으로 인식할 요건을 모두 갖추었다. 현금으로 지급했다.`, entries: [{ side: 'd', account: '개발비', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '개발비는 자산 인식 요건을 충족할 때만 무형자산(개발비)으로 처리해요. 요건을 못 갖추면 비용이에요.' };
+    return { tag: '개발비 자산 인식', prompt: `${particle(FIRM(r), '은', '는')} 신기술 개발에 ${won(a)}을 썼고, 자산으로 인식할 요건을 모두 갖추었다. 현금으로 지급했다.`, entries: [{ side: 'd', account: '개발비', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '개발비는 자산 인식 요건을 충족할 때만 무형자산(개발비)으로 처리해요. 요건을 못 갖추면 비용이에요.' };
   };
   G['ia-goodwill'] = (r) => {
     const a = int(r, 1000, 3000, 100) * 1000;
-    return { tag: '영업권', prompt: `${FIRM(r)}는 다른 회사를 인수하며 순자산 장부가치보다 ${won(a)}을 더 지급했다. (현금 지급)`, entries: [{ side: 'd', account: '영업권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '회사를 살 때 장부가치보다 더 낸 금액은 영업권(무형자산)이에요.' };
+    return { tag: '영업권', prompt: `${particle(FIRM(r), '은', '는')} 다른 회사를 인수하며 순자산 장부가치보다 ${won(a)}을 더 지급했다. (현금 지급)`, entries: [{ side: 'd', account: '영업권', amount: a }, { side: 'c', account: '현금', amount: a }], explain: '회사를 살 때 장부가치보다 더 낸 금액은 영업권(무형자산)이에요.' };
   };
   G['ia-classify'] = (r) => {
     const right = ['영업권', '특허권', '상표권', '컴퓨터소프트웨어', '개발비', '산업재산권'];
@@ -428,6 +431,26 @@
     return { mode: 'pick', tag: '무형자산 개념', prompt: it.q + ' 알맞은 계정과목을 골라 부수세요.', picks: [{ label: it.a }], decoys: it.d.map((x) => ({ label: x })), explain: '무형자산은 형체가 없지만 오래 쓰는 자산이에요. 상각은 무형자산상각비로 기록해요.' };
   };
 
+  G['fa-vehicle-maintenance'] = () => ({
+    tag: '차량유지비와 수선비',
+    prompt: '배달용 차량이 원래 성능을 유지하도록 수리했다. 수리비 120,000원을 현금으로 냈다.',
+    entries: [{ side: 'd', account: '차량유지비', amount: 120000 }, { side: 'c', account: '현금', amount: 120000 }],
+    explain: '차량의 수리비는 차량유지비, 건물의 도색비는 수선비로 기록해요. 둘 다 원래 상태를 유지하는 수익적 지출이에요.'
+  });
+  G['fa-no-depreciation'] = () => ({
+    mode: 'pick', tag: '감가상각 제외',
+    prompt: '감가상각을 하지 않는 유형자산끼리 짝지은 보기 하나를 고르세요.',
+    picks: [{ label: '토지·건설중인자산' }],
+    decoys: ['건물·비품', '차량운반구·기계장치', '토지·차량운반구'].map(label => ({ label })),
+    explain: '토지와 아직 사용할 수 없는 건설중인자산은 감가상각하지 않아요.'
+  });
+
+  const EXPOSE = new Set('inv-13 inv-14 inv-18 inv-21 inv-25 inv-29 inv-31 inv-35 fin-5 fa-5 fa-7 fa-11 fa-13 fa-38 inv-19 inv-24 inv-28 inv-33 fa-43'.split(' '));
+  const CHECKLIST = new Set(['fa-43', 'inv-19', 'inv-24', 'inv-28', 'inv-33']);
+  function isFinal(corner, gen) {
+    return corner === 'ia' || /^(fa-dep-|fa-dispose-|inv-bungi-|inv-chonggi-|inv-concept-method)/.test(gen);
+  }
+
   /* ────────── 코너별 단계 배치 ────────── */
   const CORNERS = [
     {
@@ -464,12 +487,12 @@
       plan: [
         'fa-buy-fixture', 'fa-buy-machine', 'fa-buy-land', 'fa-buy-fixture-install', 'fa-construction',
         'fa-buy-building', 'fa-buy-vehicle', 'fa-buy-fixture-install', 'fa-buy-land', 'fa-concept',
-        'fa-revenue-expense', 'fa-capital-expense', 'fa-construction-done', 'fa-mixed-expense', 'fa-buy-machine',
+        'fa-vehicle-maintenance', 'fa-capital-expense', 'fa-construction-done', 'fa-mixed-expense', 'fa-buy-machine',
         'fa-capital-expense', 'fa-revenue-expense', 'fa-mixed-expense', 'fa-buy-building', 'fa-capital-expense',
         'fa-dep-indirect', 'fa-dep-account', 'fa-dep-calc', 'fa-dep-direct', 'fa-dep-indirect',
         'fa-dep-account', 'fa-dep-calc', 'fa-mixed-expense', 'fa-dep-direct', 'fa-dep-indirect',
         'fa-dep-calc', 'fa-dispose-receivable', 'fa-dispose-gain', 'fa-dispose-loss', 'fa-dep-indirect',
-        'fa-dispose-gain', 'fa-dispose-loss', 'fa-concept', 'fa-dispose-receivable', 'fa-dep-calc',
+        'fa-dispose-gain', 'fa-dispose-loss', 'fa-no-depreciation', 'fa-dispose-receivable', 'fa-dep-calc',
         'fa-dispose-gain', 'fa-dispose-loss', 'fa-mixed-expense', 'fa-dispose-gain', 'fa-dep-account',
         'fa-dispose-loss', 'fa-dep-indirect', 'fa-dispose-gain', 'fa-concept', 'fa-dispose-loss'
       ]
@@ -512,6 +535,30 @@
       explain: base.explain || '',
       amountPhase: !!base.amountPhase
     };
+    st.scope = isFinal(st.corner, st.gen) ? 'final' : 'third';
+    if (st.picks.length > 1) {
+      const outside = st.decoys || base.decoys;
+      st.picks = [outside[0]];
+      base.decoys = base.picks;
+      st.prompt = (st.corner === 'fin' ? '투자자산' : '무형자산') + '이 아닌 계정과목 하나를 고르세요.';
+    }
+    if (CHECKLIST.has(st.id) || st.gen === 'ia-total' || /^fa-dep-(direct|indirect)$/.test(st.gen)) {
+      const split = st.prompt.replace(/, (판매자가|매입자가|남은 금액을)/, '\n$1')
+        .replace(/(.+?) 오늘 현금으로 갚으며 (매입할인 .+?) 받았다\./, '$1 갚기로 했다.\n$2 받고 나머지를 현금으로 냈다.')
+        .replace('. 이 중 ', '.\n이 중 ').replace(' 설치비이고, ', ' 설치비다.\n');
+      if (st.gen === 'ia-total') {
+        st.conditions = split.split(/, (?=[가-힣])/).map(text => text.replace(/일 때 재무상태표의 무형자산 합계는\?$/, ''));
+        st.prompt = '재무상태표에 표시할 무형자산의 합계는 얼마인가요?';
+      } else if (/^fa-dep-(direct|indirect)$/.test(st.gen)) {
+        const [task, givens] = split.split(' (');
+        st.conditions = givens.slice(0, -1).split(/, (?=[가-힣])/);
+        st.prompt = task.replace('기록한다.', '기록하세요.');
+      } else {
+        st.conditions = split.replace(/ \(3분법\)$/, '').split('\n').map(text =>
+          text.replace(/팔고$/, '팔았다.').replace(/사고$/, '샀다.').replace(/돌려보내고$/, '돌려보냈다.'));
+        st.prompt = st.corner === 'inv' ? '다음 거래를 3분법으로 분개하세요.' : '다음 지출을 나누어 분개하세요.';
+      }
+    }
     // 복합분개가 아니어도 16단계부터는 금액 라운드를 붙인다
     if (st.mode === 'journal' && !st.amountPhase && stageNo >= 16) st.amountPhase = true;
     if (st.mode === 'journal') {
@@ -555,7 +602,7 @@
     const targets = (st) => [...new Set(st.entries.map((entry) => entry.amount)
       .filter((amount) => amount >= 300000 && amount <= 950000 && amount % 10000 === 0))];
     const candidates = stages.filter((st) => st.stage >= 6 && st.stage < corner.stages &&
-      st.mode === 'journal' && targets(st).length);
+      st.mode === 'journal' && !EXPOSE.has(st.id) && targets(st).length);
     let best = [];
     let bestCost = Infinity;
 
@@ -583,7 +630,7 @@
 
     const taken = [1, corner.stages];
     for (let i = 0; i < pureCount; i++) {
-      const eligible = stages.slice(1, -1).filter((st) => st.mode !== 'hard' && st.mode !== 'pure')
+      const eligible = stages.slice(1, -1).filter((st) => st.mode !== 'hard' && st.mode !== 'pure' && !EXPOSE.has(st.id))
         .filter((st) => {
           // Never let another speed stage create a run of four.
           let start = st.stage - 1;
@@ -612,10 +659,16 @@
     'fin-available-stock': '3차 6번 유형 · 매도가능증권',
     'fa-buy-fixture-install': '3차 7번 유형 · 비품+설치비',
     'fa-mixed-expense': '3차 8번 유형 · 지출 구분',
-    'fa-dep-indirect': '3차 9번 유형 · 정액법 간접법',
-    'ia-software': '3차 10번 유형 · 소프트웨어'
+    'fa-vehicle-maintenance': '3차 9번 유형 · 차량유지비',
+    'fa-construction': '3차 10번 유형 · 공사비 지급',
+    'fa-construction-done': '3차 10번 유형 · 완공 대체',
+    'fa-no-depreciation': '3차 10번 유형 · 감가상각 제외'
   };
-  const api = { CORNERS, STAGES, ACCOUNTS, EXAM, buildStage, makeRng, won };
+  const FINAL_EXAM = {
+    'fa-dep-indirect': '정액법 간접법',
+    'ia-software': '소프트웨어'
+  };
+  const api = { FINAL_EXAM, CORNERS, STAGES, ACCOUNTS, EXAM, buildStage, makeRng, won };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.BlasterData = api;
 })(typeof window !== 'undefined' ? window : globalThis);
