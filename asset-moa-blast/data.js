@@ -164,12 +164,12 @@
   G['inv-periodic-cost'] = (r) => {
     const beg = int(r, 80, 160, 10) * 1000, pur = int(r, 300, 500, 10) * 1000, end = int(r, 100, 200, 10) * 1000;
     const cogs = beg + pur - end;
-    return { mode: 'pick', tag: '매출원가 계산', prompt: `기초 상품 재고액 ${won(beg)}, 당기 순매입액 ${won(pur)}, 기말 상품 재고액 ${won(end)}일 때 매출원가는?`, picks: [{ label: won(cogs), value: cogs }], decoys: [{ label: won(beg + pur), value: beg + pur }, { label: won(pur - end), value: pur - end }, { label: won(cogs + 10000), value: cogs + 10000 }, { label: won(Math.max(10000, cogs - 10000)), value: cogs - 10000 }], explain: '매출원가 = 기초재고 ' + won(beg) + ' + 순매입 ' + won(pur) + ' − 기말재고 ' + won(end) + ' = ' + won(cogs) };
+    return { mode: 'pick', tag: '매출원가 계산', operands: [beg, pur, end], prompt: `기초 상품 재고액 ${won(beg)}, 당기 순매입액 ${won(pur)}, 기말 상품 재고액 ${won(end)}일 때 매출원가는?`, picks: [{ label: won(cogs), value: cogs }], decoys: [{ label: won(beg + pur), value: beg + pur }, { label: won(pur - end), value: pur - end }, { label: won(cogs + 10000), value: cogs + 10000 }, { label: won(Math.max(10000, cogs - 10000)), value: cogs - 10000 }], explain: '매출원가 = 기초재고 ' + won(beg) + ' + 순매입 ' + won(pur) + ' − 기말재고 ' + won(end) + ' = ' + won(cogs) };
   };
   G['inv-net-purchase'] = (r) => {
     const total = int(r, 500, 800, 10) * 1000, f = int(r, 10, 30, 5) * 1000, e = int(r, 20, 60, 5) * 1000, ret = int(r, 20, 80, 5) * 1000;
     const net = total + f - e - ret;
-    return { mode: 'pick', tag: '순매입액 계산', prompt: `당기 총매입액 ${won(total)}, 매입운임 ${won(f)}, 매입에누리 ${won(e)}, 매입환출 ${won(ret)}일 때 당기 순매입액은?`, picks: [{ label: won(net), value: net }], decoys: [{ label: won(total), value: total }, { label: won(total + f), value: total + f }, { label: won(total - e - ret), value: total - e - ret }, { label: won(net + f), value: net + f }], explain: '순매입액 = 총매입 ' + won(total) + ' + 매입운임 ' + won(f) + ' − 매입에누리 ' + won(e) + ' − 매입환출 ' + won(ret) + ' = ' + won(net) };
+    return { mode: 'pick', tag: '순매입액 계산', operands: [total, f, e, ret], prompt: `당기 총매입액 ${won(total)}, 매입운임 ${won(f)}, 매입에누리 ${won(e)}, 매입환출 ${won(ret)}일 때 당기 순매입액은?`, picks: [{ label: won(net), value: net }], decoys: [{ label: won(total), value: total }, { label: won(total + f), value: total + f }, { label: won(total - e - ret), value: total - e - ret }, { label: won(net + f), value: net + f }], explain: '순매입액 = 총매입 ' + won(total) + ' + 매입운임 ' + won(f) + ' − 매입에누리 ' + won(e) + ' − 매입환출 ' + won(ret) + ' = ' + won(net) };
   };
   G['inv-gross-profit'] = (r) => {
     const rev = int(r, 500, 900, 10) * 1000, cogs = int(r, 3, 6, 1) * 100000;
@@ -244,7 +244,7 @@
   };
   G['fin-invest-property'] = (r) => {
     const a = int(r, 2000, 5000, 100) * 1000, tax = int(r, 50, 150, 10) * 1000;
-    return { tag: '투자부동산', prompt: `${particle(FIRM(r), '은', '는')} 임대 목적으로 상가 건물을 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '투자부동산', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '임대·시세차익 목적의 부동산은 투자부동산이고, 취득세는 취득원가에 더해요.' };
+    return { tag: '투자부동산', operands: [a, tax], prompt: `${particle(FIRM(r), '은', '는')} 임대 목적으로 상가 건물을 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '투자부동산', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '임대·시세차익 목적의 부동산은 투자부동산이고, 취득세는 취득원가에 더해요.' };
   };
   G['fin-loan-collect'] = (r) => {
     const a = int(r, 500, 1500, 100) * 1000, i = int(r, 20, 80, 5) * 1000;
@@ -287,11 +287,11 @@
   };
   G['fa-buy-machine'] = (r) => {
     const a = int(r, 2000, 4000, 100) * 1000, f = int(r, 50, 200, 10) * 1000;
-    return { tag: '기계장치+운송비', prompt: `${particle(FIRM(r), '은', '는')} 공장용 기계 ${won(a)}을 사고 운송비 ${won(f)}을 더해 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '기계장치', amount: a + f }, { side: 'c', account: '당좌예금', amount: a + f }], explain: '운송비도 취득부대비용이라 기계장치의 취득원가에 더해요.' };
+    return { tag: '기계장치+운송비', operands: [a, f], prompt: `${particle(FIRM(r), '은', '는')} 공장용 기계 ${won(a)}을 사고 운송비 ${won(f)}을 더해 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '기계장치', amount: a + f }, { side: 'c', account: '당좌예금', amount: a + f }], explain: '운송비도 취득부대비용이라 기계장치의 취득원가에 더해요.' };
   };
   G['fa-buy-land'] = (r) => {
     const a = int(r, 4000, 9000, 100) * 1000, tax = int(r, 100, 300, 10) * 1000;
-    return { tag: '토지+취득세', prompt: `${particle(FIRM(r), '은', '는')} 영업용 토지를 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '토지', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '토지의 취득원가는 구입대금 + 취득세 같은 부대비용이에요. 토지는 감가상각하지 않아요.' };
+    return { tag: '토지+취득세', operands: [a, tax], prompt: `${particle(FIRM(r), '은', '는')} 영업용 토지를 ${won(a)}에 사고 취득세 ${won(tax)}을 포함해 전액 당좌수표로 지급했다.`, entries: [{ side: 'd', account: '토지', amount: a + tax }, { side: 'c', account: '당좌예금', amount: a + tax }], explain: '토지의 취득원가는 구입대금 + 취득세 같은 부대비용이에요. 토지는 감가상각하지 않아요.' };
   };
   G['fa-buy-building'] = (r) => {
     const a = int(r, 8000, 20000, 500) * 1000, fee = int(r, 100, 400, 50) * 1000;
@@ -518,6 +518,69 @@
     ia: ['현금', '당좌예금', '무형자산상각비', '경상개발비', '임차보증금', '영업권', '특허권', '비품', '선급비용', '감가상각비']
   };
 
+  // Wording reviewed against the 15 audit examples. Entries, picks and modes
+  // stay with the original generators.
+  const REVIEWED_WORDING = {
+    'fa-43': ([building, paint, cash]) => [
+      '다음 지출을 나누어 분개하세요.',
+      [`건물에 쓴 돈 ${cash}을 현금으로 냈어요.`,
+        `엘리베이터 새로 설치: ${building} (건물 가치를 높임 → 건물)`,
+        `외벽 도색: ${paint} (원래 상태 유지 → 수선비)`]
+    ],
+    'fa-13': ([, prior, cash]) => [
+      '건물 계정에 모두 얼마를 적을까요? 완공 분개를 하세요.',
+      [`지난번에 건설중인자산 ${prior}을 적어 두었어요.`,
+        `오늘 완공되어 잔금 ${cash}을 현금으로 냈어요.`, '건설중인자산은 건물로 옮겨요.']
+    ],
+    'inv-19': ([sale, freight]) => [
+      '외상매출과 배송비를 각각 3분법으로 분개하세요.',
+      [`시럽 ${sale}어치를 외상으로 팔았어요.`,
+        `배송비 ${freight}은 우리가 현금으로 냈어요. (파는 쪽이 낸 배송비는 운반비)`]
+    ],
+    'inv-24': ([, purchase, freight]) => [
+      '매입 계정에 얼마를 적을까요? 3분법으로 분개하세요.',
+      [`케이크 ${purchase}어치를 외상으로 샀어요.`,
+        `배송비 ${freight}은 우리가 현금으로 냈어요. (살 때 낸 배송비는 매입에 더해요.)`]
+    ],
+    'inv-33': ([price, cash, discount]) => [
+      '다음 거래를 3분법으로 분개하세요.',
+      [`외상으로 산 케이크 값 ${price}을 오늘 갚았어요.`,
+        `${discount}을 깎아 주셔서 현금 ${cash}만 냈어요.`, `깎아 준 ${discount}은 매입에서 빼요.`]
+    ],
+    'inv-28': ([price, returned, cash]) => [
+      '다음 거래를 3분법으로 분개하세요.',
+      [`상품 ${price}어치를 외상으로 샀는데 그중 ${returned}어치를 돌려보냈어요.`,
+        `남은 ${cash}을 오늘 현금으로 냈어요.`]
+    ],
+    'inv-35': (_, [total, freight, allowance, returned]) => [
+      `${total} + ${freight} − ${allowance} − ${returned} = ? (원)`,
+      ['순매입액 = 총매입 + 매입운임 − 매입에누리 − 매입환출']
+    ],
+    'inv-31': (_, [opening, purchases, closing]) => [
+      `${opening} + ${purchases} − ${closing} = ? (원)`,
+      ['매출원가 = 기초재고 + 순매입 − 기말재고']
+    ],
+    'fin-19': () => ['다음 중 투자자산이 아닌 것은? 하나만 고르세요.'],
+    'fin-24': (_, [price, tax]) => [
+      `임대해서 돈 버는 상가 건물 ${price}원을 샀어요. 취득세 ${tax}원도 함께 냈어요. 전액 당좌수표로 지급했어요. (임대용 건물은 투자부동산)`
+    ],
+    'fin-22': ([deposit, principal, interest]) => [
+      `보유하던 국채 ${principal}의 만기가 됐어요. 이자 ${interest}까지 보통예금으로 모두 ${deposit}을 받았어요.`
+    ],
+    'fin-29': ([deposit, book, gain]) => [
+      `장부금액이 ${book}인 주식(매도가능증권)을 오늘 ${deposit}에 팔아 보통예금으로 받았어요. 차액 ${gain}은 매도가능증권처분이익이에요.`
+    ],
+    'fa-9': (_, [price, tax]) => [
+      `영업용 땅 ${price}원을 샀어요. 취득세 ${tax}원도 냈어요. 전액 당좌수표로 지급했어요. (취득세도 땅값에 더해요.) 토지 계정에 얼마를 적을까요?`
+    ],
+    'fa-2': (_, [price, freight]) => [
+      `공장 기계 ${price}원을 샀어요. 운송비 ${freight}원도 냈어요. 전액 당좌수표로 지급했어요. 기계장치 계정에 얼마를 적을까요?`
+    ],
+    'fin-21': ([, principal, interest]) => [
+      `오랫동안 빌려준 돈 ${principal}을 돌려받았어요. 이자 ${interest}도 함께 현금으로 받았어요.`
+    ]
+  };
+
   function buildStage(corner, stageNo) {
     const gen = G[corner.plan[stageNo - 1]];
     const rng = makeRng(corner.key.charCodeAt(0) * 7919 + stageNo * 104729 + 17);
@@ -558,6 +621,13 @@
           text.replace(/팔고$/, '팔았다.').replace(/사고$/, '샀다.').replace(/돌려보내고$/, '돌려보냈다.'));
         st.prompt = st.corner === 'inv' ? '다음 거래를 3분법으로 분개하세요.' : '다음 지출을 나누어 분개하세요.';
       }
+    }
+    if (Object.hasOwn(REVIEWED_WORDING, st.id)) {
+      const amounts = st.entries.map(entry => won(entry.amount));
+      const operands = base.operands?.map(amount => amount.toLocaleString('ko-KR'));
+      const [prompt, conditions] = REVIEWED_WORDING[st.id](amounts, operands);
+      st.prompt = prompt;
+      if (conditions) st.conditions = conditions;
     }
     // 복합분개가 아니어도 16단계부터는 금액 라운드를 붙인다
     if (st.mode === 'journal' && !st.amountPhase && stageNo >= 16) st.amountPhase = true;
