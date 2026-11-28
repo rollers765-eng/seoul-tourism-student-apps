@@ -1711,25 +1711,29 @@
   });
   $('#nicknameCancel').addEventListener('click', closeNickname);
 
-  function renderHome() {
-    $('#studyScope').value = scope;
+  function renderCorners() {
     const host = $('#cornerList');
     host.innerHTML = '';
     D.CORNERS.forEach((c) => {
-      const st = D.STAGES[c.key];
+      const st = D.STAGES[c.key].filter(stage => stage.scope === scope);
       const done = st.filter((s) => SAVE.stars[s.id]).length;
       const stars = st.reduce((a, s) => a + (SAVE.stars[s.id] || 0), 0);
       const el = document.createElement('button');
       el.className = 'corner';
       el.innerHTML =
         '<span class="emoji">' + c.emoji + '</span>' +
-        '<span class="meta"><span class="name">' + c.name + ' <small style="font-size:10px;color:#8b93b5">★' + stars + '/' + (c.stages * 3) + '</small></span>' +
+        '<span class="meta"><span class="name">' + c.name + ' <small style="font-size:10px;color:#8b93b5">★' + stars + '/' + (st.length * 3) + '</small></span>' +
         '<span class="desc">' + c.desc + '</span>' +
-        '<span class="pbar"><i style="width:' + Math.round((done / c.stages) * 100) + '%"></i></span></span>' +
-        '<span class="prog">' + done + '/' + c.stages + '</span>';
+        '<span class="pbar"><i style="width:' + (st.length ? Math.round(done / st.length * 100) : 0) + '%"></i></span></span>' +
+        '<span class="prog">' + done + '/' + st.length + '</span>';
       el.addEventListener('click', () => openStages(c.key));
       host.appendChild(el);
     });
+  }
+
+  function renderHome() {
+    $('#studyScope').value = scope;
+    renderCorners();
     paintGems();
     const dday = $('#homeDday');
     const exam = new Date('2026-11-30T09:00:00+09:00');
@@ -1746,12 +1750,31 @@
   function openStages(key) {
     const c = D.CORNERS.filter((x) => x.key === key)[0];
     const sts = D.STAGES[key].filter(st => st.scope === scope);
-    $('#stageScope').value = scope;
-    $('#stageScope').dataset.corner = key;
+    const selector = $('#stageScope');
+    selector.value = scope;
+    selector.dataset.corner = key;
+    selector.parentElement.hidden = !sts.length;
     $('#stagesTitle').textContent = c.emoji + ' ' + c.name;
-    $('#stagesDesc').textContent = c.desc + ' · ' + c.stages + '단계';
+    const desc = $('#stagesDesc');
+    desc.hidden = !sts.length;
+    desc.textContent = c.desc + ' · ' + sts.length + '단계';
     const grid = $('#stageGrid');
-    grid.innerHTML = '';
+    grid.replaceChildren();
+    if (!sts.length) {
+      const target = D.STAGES[key][0].scope;
+      const label = Array.from(selector.options).find(option => option.value === target).textContent;
+      const empty = document.createElement('div');
+      empty.className = 'stage-empty';
+      const message = document.createElement('p');
+      message.textContent = c.name + '은 ' + label + ' 구간이에요.';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'big-btn';
+      button.textContent = label + ' 보기';
+      button.addEventListener('click', () => { scope = target; openStages(key); });
+      empty.append(message, button);
+      grid.append(empty);
+    }
     sts.forEach((s, i) => {
       const b = document.createElement('button');
       const stars = SAVE.stars[s.id] || 0;
@@ -2120,7 +2143,7 @@
   });
   $('#difficulty').value = Object.hasOwn(DIFFICULTY, SAVE.difficulty) ? SAVE.difficulty : 'normal';
   $('#difficulty').addEventListener('change', event => { SAVE.difficulty = event.target.value; save(); });
-  $('#studyScope').addEventListener('change', event => { scope = event.target.value; });
+  $('#studyScope').addEventListener('change', event => { scope = event.target.value; renderCorners(); });
   $('#stageScope').addEventListener('change', event => { scope = event.target.value; openStages(event.target.dataset.corner); });
   $('#challengeScope').addEventListener('change', event => { scope = event.target.value; openChallenge(); });
   $('#itemRescue').addEventListener('click', rescueLine);

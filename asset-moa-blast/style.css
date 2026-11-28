@@ -952,3 +952,8 @@ ul.mission-notes{padding-left:18px}
 .stage-choices{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .stage-choices button{font:inherit;font-size:12px;font-weight:800;color:#302057;background:#fff;border:1px solid #b6a0de;border-radius:6px;padding:3px 5px}
 .stage-choices button:disabled,#itemRescue:disabled,#overRescue:disabled{opacity:.48}
+
+#screen-stages .study-settings[hidden]{display:none}
+.stage-empty{grid-column:1/-1;display:grid;justify-items:center;gap:12px;text-align:center;padding:24px 12px}
+.stage-empty p{margin:0;font-weight:800}
+.stage-empty button{width:auto;padding-inline:20px}
