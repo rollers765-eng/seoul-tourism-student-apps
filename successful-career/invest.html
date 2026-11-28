@@ -523,6 +523,37 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+/* 회사 카드 하단 공개 보고서 링크 (v1.4) */
+.company-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.company-report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--mint-text);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.company-report-link:hover {
+  background: var(--mint-soft);
+  border-color: var(--mint);
+}
+
 /* 회사 프로젝트 카드 (와디즈·텀블벅 스타일) */
 .company-card {
   position: relative;
@@ -2703,37 +2734,45 @@ function renderCompanyCards(companies) {
       : Math.round(total / CONFIG.INVEST_AMOUNT);
     const share = sumTotal > 0 ? (total / sumTotal) * 100 : 0;
     const shareLabel = share.toLocaleString('ko-KR', { maximumFractionDigits: 1 });
+    const rawReportUrl = typeof company.report_url === 'string' ? company.report_url.trim() : '';
+    const hasReportUrl = /^https:\/\//i.test(rawReportUrl);
+    const reportLinkHtml = hasReportUrl
+      ? `<a class="company-report-link" href="${escapeHtml(rawReportUrl)}" target="_blank" rel="noopener" aria-label="${escapeHtml(name)} 보고서 새 창에서 보기">📄 보고서 보기</a>`
+      : '';
 
     return `
-      <button
-        type="button"
-        class="company-card"
-        data-company-id="${escapeHtml(companyId)}"
-        aria-pressed="${selected}"
-      >
-        <span class="card-thumb thumb-theme-${themeIndex}" aria-hidden="true">
-          <span class="thumb-initial">${escapeHtml(initial)}</span>
-          <span class="check-pill">✓</span>
-        </span>
-        <span class="company-card-main">
-          <span class="company-name">${escapeHtml(name)}</span>
-          ${company.item ? `<span class="company-item">${escapeHtml(company.item)}</span>` : ''}
-          ${company.description ? `<span class="company-desc">${escapeHtml(company.description)}</span>` : ''}
-          <span class="card-amount-row">
-            <span class="company-amount">${escapeHtml(formatMoney(total))}</span>
-            <span class="card-pills">
-              <span class="card-pill pill-count">${count}명 찈여</span>
-              <span class="card-pill pill-status${isOpen ? '' : ' is-closed'}">${isOpen ? '진행 중' : '마감'}</span>
+      <div class="company-shell">
+        <button
+          type="button"
+          class="company-card"
+          data-company-id="${escapeHtml(companyId)}"
+          aria-pressed="${selected}"
+        >
+          <span class="card-thumb thumb-theme-${themeIndex}" aria-hidden="true">
+            <span class="thumb-initial">${escapeHtml(initial)}</span>
+            <span class="check-pill">✓</span>
+          </span>
+          <span class="company-card-main">
+            <span class="company-name">${escapeHtml(name)}</span>
+            ${company.item ? `<span class="company-item">${escapeHtml(company.item)}</span>` : ''}
+            ${company.description ? `<span class="company-desc">${escapeHtml(company.description)}</span>` : ''}
+            <span class="card-amount-row">
+              <span class="company-amount">${escapeHtml(formatMoney(total))}</span>
+              <span class="card-pills">
+                <span class="card-pill pill-count">${count}명 참여</span>
+                <span class="card-pill pill-status${isOpen ? '' : ' is-closed'}">${isOpen ? '진행 중' : '마감'}</span>
+              </span>
+            </span>
+            <span class="card-progress">
+              <span class="card-progress-track" aria-hidden="true">
+                <span class="card-progress-fill" style="display: block; width: ${share}%;"></span>
+              </span>
+              <span class="card-progress-meta">전체 투자금의 ${shareLabel}%</span>
             </span>
           </span>
-          <span class="card-progress">
-            <span class="card-progress-track" aria-hidden="true">
-              <span class="card-progress-fill" style="display: block; width: ${share}%;"></span>
-            </span>
-            <span class="card-progress-meta">전체 투자금의 ${shareLabel}%</span>
-          </span>
-        </span>
-      </button>
+        </button>
+        ${reportLinkHtml}
+      </div>
     `;
   }).join('');
 }
